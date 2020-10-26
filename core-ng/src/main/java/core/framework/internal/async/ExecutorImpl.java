@@ -7,15 +7,18 @@ import core.framework.internal.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static core.framework.log.Markers.errorCode;
 
@@ -39,8 +42,14 @@ public final class ExecutorImpl implements Executor {
         logger.info("shutting down executor, name={}", name);
         synchronized (this) {
             if (scheduler != null) {
-                List<Runnable> delayedTasks = scheduler.shutdownNow(); // drop all delayed tasks
-                logger.info("cancelled delayed tasks, name={}, cancelled={}", name, delayedTasks.size());
+                List<Runnable> canceledTasks = scheduler.shutdownNow(); // drop all delayed tasks
+                if (!canceledTasks.isEmpty()) {
+                    String tasks = canceledTasks.stream().map(canceledTask -> {
+                        DelayedTask task = callableFromFutureTask((FutureTask<?>) canceledTask);
+                        return task == null ? null : task.execution.action() + ":" + task.execution.actionId;
+                    }).collect(Collectors.joining(", "));
+                    logger.warn(errorCode("TASK_REJECTED"), "delayed tasks are canceled due to server is shutting down, name={}, tasks={}", name, tasks);
+                }
             }
             executor.shutdown();
         }
@@ -48,8 +57,16 @@ public final class ExecutorImpl implements Executor {
 
     public void awaitTermination(long timeoutInMs) throws InterruptedException {
         boolean success = executor.awaitTermination(timeoutInMs, TimeUnit.MILLISECONDS);
-        if (!success) logger.warn("failed to terminate executor, name={}", name);
-        else logger.info("executor stopped, name={}", name);
+        if (!success) {
+            List<Runnable> canceledTasks = executor.shutdownNow();    // only return tasks not started yet
+            String tasks = canceledTasks.stream().map(canceledTask -> {
+                ExecutorTask<?> task = callableFromFutureTask((FutureTask<?>) canceledTask);
+                return task == null ? null : task.action() + ":" + task.actionId;
+            }).collect(Collectors.joining(", "));
+            logger.warn(errorCode("FAILED_TO_STOP"), "failed to terminate executor, name={}, canceledTasks={}", name, tasks);
+        } else {
+            logger.info("executor stopped, name={}", name);
+        }
     }
 
     @Override
@@ -57,8 +74,8 @@ public final class ExecutorImpl implements Executor {
         Instant now = Instant.now();
         String actionId = LogManager.ID_GENERATOR.next(now);
         logger.debug("submit task, action={}, id={}", action, actionId);
-        Callable<T> execution = execution(actionId, action, now, task);
-        return submitTask(action, execution);
+        ExecutorTask<T> execution = execution(actionId, action, now, task);
+        return submitTask(execution);
     }
 
     @Override
@@ -81,19 +98,12 @@ public final class ExecutorImpl implements Executor {
         logger.debug("submit delayed task, action={}, id={}, delay={}", action, actionId, delay);
 
         // construct execution outside scheduler thread, to obtain parent action log
-        Callable<Void> execution = execution(actionId, action, now.plus(delay), () -> {
+        ExecutorTask<Void> execution = execution(actionId, action, now.plus(delay), () -> {
             task.execute();
             return null;
         });
-        Runnable delayedTask = () -> {
-            try {
-                submitTask(action, execution);
-            } catch (Throwable e) {
-                logger.error(e.getMessage(), e);    // in scheduler.schedule exception will be swallowed, here is to log if any
-            }
-        };
         try {
-            scheduler.schedule(delayedTask, delay.toMillis(), TimeUnit.MILLISECONDS);
+            scheduler.schedule(new DelayedTask(execution), delay.toMillis(), TimeUnit.MILLISECONDS);
             return true;
         } catch (RejectedExecutionException e) {    // with current executor impl, rejection only happens when shutdown
             logger.warn(errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action, e);
@@ -101,17 +111,47 @@ public final class ExecutorImpl implements Executor {
         return false;
     }
 
-    private <T> Future<T> submitTask(String action, Callable<T> execution) {
+    private <T> Future<T> submitTask(ExecutorTask<T> execution) {
         try {
             return executor.submit(execution);
         } catch (RejectedExecutionException e) {    // with current executor impl, rejection only happens when shutdown
-            logger.warn(errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action, e);
+            logger.warn(errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", execution.action(), e);
             return new CancelledFuture<>();
         }
     }
 
-    private <T> Callable<T> execution(String actionId, String action, Instant startTime, Callable<T> task) {
+    private <T> ExecutorTask<T> execution(String actionId, String action, Instant startTime, Callable<T> task) {
         ActionLog parentActionLog = LogManager.CURRENT_ACTION_LOG.get();
         return new ExecutorTask<>(actionId, action, startTime, parentActionLog, logManager, task);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T callableFromFutureTask(FutureTask<?> runnable) {
+        try {
+            Field field = FutureTask.class.getDeclaredField("callable");
+            if (!field.trySetAccessible()) return null;
+            return (T) field.get(runnable);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            logger.warn(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    class DelayedTask implements Callable<Void> {
+        final ExecutorTask<Void> execution;
+
+        DelayedTask(ExecutorTask<Void> execution) {
+            this.execution = execution;
+        }
+
+        @Override
+        public Void call() {
+            try {
+                submitTask(execution);
+            } catch (Throwable e) {
+                logger.error(e.getMessage(), e);    // in scheduler.schedule exception will be swallowed, here is to log if any
+            }
+            return null;
+        }
     }
 }

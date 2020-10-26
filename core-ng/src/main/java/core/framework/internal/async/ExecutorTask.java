@@ -16,11 +16,11 @@ import java.util.concurrent.Callable;
  */
 public class ExecutorTask<T> implements Callable<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorTask.class);
+    final String actionId;
     private final String action;
     private final LogManager logManager;
     private final Callable<T> task;
     private final Instant startTime;
-    private final String actionId;
     private String rootAction;
     private String refId;
     private String correlationId;

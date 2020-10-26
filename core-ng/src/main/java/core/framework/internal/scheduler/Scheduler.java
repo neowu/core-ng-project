@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static core.framework.log.Markers.errorCode;
 import static core.framework.util.Strings.format;
 
 /**
@@ -78,7 +79,7 @@ public final class Scheduler {
 
     public void awaitTermination(long timeoutInMs) throws InterruptedException {
         boolean success = jobExecutor.awaitTermination(timeoutInMs, TimeUnit.MILLISECONDS);
-        if (!success) logger.warn("failed to terminate scheduler job executor");
+        if (!success) logger.warn(errorCode("FAILED_TO_STOP"), "failed to terminate scheduler job executor");
         else logger.info("scheduler stopped");
     }
 

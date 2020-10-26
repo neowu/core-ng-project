@@ -101,7 +101,7 @@ class MessageListenerThread extends Thread {
             while (processing) {
                 long left = end - System.currentTimeMillis();
                 if (left <= 0) {
-                    logger.warn("failed to terminate kafka message listener thread, name={}", getName());
+                    logger.warn(errorCode("FAILED_TO_STOP"), "failed to terminate kafka message listener thread, name={}", getName());
                     break;
                 }
                 lock.wait(left);

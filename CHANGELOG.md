@@ -1,6 +1,7 @@
 ## Change log
 ### 7.6.1 (10/15/2020 - )
 * http: httpClient does not read response body if status code is 204 
+* executor: improve warning for task rejection/cancellation during shutdown
 
 ### 7.6.0 (09/30/2020 - 10/13/2020) !!! only support java 15
 * java: update to java 15, please make sure to upgrade build/jenkins and all docker runtime to 14 before upgrading framework
