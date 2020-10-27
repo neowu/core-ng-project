@@ -2,6 +2,7 @@ package core.framework.internal.async;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.util.Threads;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -107,5 +108,13 @@ class ExecutorImplTest {
         boolean scheduled = executor.scheduleDelayedTask("task", () -> {
         }, Duration.ofHours(1));
         assertThat(scheduled).isFalse();
+    }
+
+    @Test
+    void awaitTermination() throws InterruptedException {
+        executor.submit("task-1", () -> Threads.sleepRoughly(Duration.ofHours(1)));
+        executor.submit("task-2", () -> Threads.sleepRoughly(Duration.ofHours(1)));
+        executor.shutdown();
+        executor.awaitTermination(0);
     }
 }
