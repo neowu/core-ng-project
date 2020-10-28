@@ -65,6 +65,18 @@ class RepositoryImplAssignedIdEntityTest {
     }
 
     @Test
+    void insertIgnore() {
+        String id = UUID.randomUUID().toString();
+        AssignedIdEntity entity = entity(id, "string", 12);
+
+        boolean inserted = repository.insertIgnore(entity);
+        assertThat(inserted).isTrue();
+
+        inserted = repository.insertIgnore(entity);
+        assertThat(inserted).isFalse();
+    }
+
+    @Test
     void validateId() {
         AssignedIdEntity entity = entity(null, "string", 1);
 

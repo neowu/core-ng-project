@@ -19,4 +19,11 @@ final class InsertQuery<T> {
     Object[] params(T entity) {
         return paramBuilder.apply(entity);
     }
+
+    String insertIgnoreSQL() {
+        // due to insert ignore will be used less frequently, so not to build sql in advance to reduce memory footprint
+        // replace first INSERT with INSERT IGNORE
+        // new StringBuilder(str) will reserve str.length+16 as capacity, so insert will not trigger expansion
+        return new StringBuilder(sql).insert(6, " IGNORE").toString();
+    }
 }

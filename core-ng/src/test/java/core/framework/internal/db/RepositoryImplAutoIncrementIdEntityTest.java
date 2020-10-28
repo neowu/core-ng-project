@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.OptionalLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -61,6 +62,14 @@ class RepositoryImplAutoIncrementIdEntityTest {
                 .ignoringFields("id")
                 .isEqualTo(entity);
         assertThat(result.id).isEqualTo(id.orElseThrow());
+    }
+
+    @Test
+    void insertIgnore() {
+        var entity = new AutoIncrementIdEntity();
+        assertThatThrownBy(() -> repository.insertIgnore(entity))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("entity with auto increment primary key must not use insert ignore");
     }
 
     @Test

@@ -70,6 +70,25 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
+    public boolean insertIgnore(T entity) {
+        var watch = new StopWatch();
+        validator.validate(entity, false);
+        if (insertQuery.generatedColumn != null) throw new Error("entity must not have auto increment primary key, entityClass=" + entityClass.getCanonicalName());
+        int updatedRows = 0;
+        String sql = insertQuery.insertIgnoreSQL();
+        Object[] params = insertQuery.params(entity);
+        try {
+            updatedRows = database.operation.update(sql, params);
+            return updatedRows == 1;
+        } finally {
+            long elapsed = watch.elapsed();
+            int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
+            logger.debug("insertIgnore, sql={}, params={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), elapsed);
+            database.checkOperation(elapsed, operations);
+        }
+    }
+
+    @Override
     public void update(T entity) {
         update(entity, false);
     }
