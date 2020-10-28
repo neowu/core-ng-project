@@ -47,10 +47,9 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public Optional<T> get(Object... primaryKeys) {
-        String sql = selectQuery.getSQL;
         if (primaryKeys.length != selectQuery.primaryKeyColumns)
             throw new Error(Strings.format("the length of primary keys does not match columns, primaryKeys={}, columns={}", selectQuery.primaryKeyColumns, primaryKeys.length));
-        return database.selectOne(sql, entityClass, primaryKeys);
+        return database.selectOne(selectQuery.getSQL, entityClass, primaryKeys);
     }
 
     @Override
@@ -72,8 +71,8 @@ public final class RepositoryImpl<T> implements Repository<T> {
     @Override
     public boolean insertIgnore(T entity) {
         var watch = new StopWatch();
-        validator.validate(entity, false);
         if (insertQuery.generatedColumn != null) throw new Error("entity must not have auto increment primary key, entityClass=" + entityClass.getCanonicalName());
+        validator.validate(entity, false);
         int updatedRows = 0;
         String sql = insertQuery.insertIgnoreSQL();
         Object[] params = insertQuery.params(entity);
@@ -117,9 +116,10 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public void delete(Object... primaryKeys) {
-        if (primaryKeys.length != selectQuery.primaryKeyColumns)
-            throw new Error(Strings.format("the length of primary keys does not match columns, primaryKeys={}, columns={}", selectQuery.primaryKeyColumns, primaryKeys.length));
         var watch = new StopWatch();
+        if (primaryKeys.length != selectQuery.primaryKeyColumns) {
+            throw new Error(Strings.format("the length of primary keys does not match columns, primaryKeys={}, columns={}", selectQuery.primaryKeyColumns, primaryKeys.length));
+        }
         int deletedRows = 0;
         try {
             deletedRows = database.operation.update(deleteSQL, primaryKeys);
