@@ -69,7 +69,7 @@ class RepositoryImplAutoIncrementIdEntityTest {
         var entity = new AutoIncrementIdEntity();
         assertThatThrownBy(() -> repository.insertIgnore(entity))
                 .isInstanceOf(Error.class)
-                .hasMessageContaining("entity with auto increment primary key must not use insert ignore");
+                .hasMessageContaining("entity must not have auto increment primary key");
     }
 
     @Test
