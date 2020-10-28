@@ -5,6 +5,7 @@ import core.framework.redis.RedisAdmin;
 import core.framework.redis.RedisHash;
 import core.framework.redis.RedisList;
 import core.framework.redis.RedisSet;
+import core.framework.redis.RedisSortedSet;
 import core.framework.util.Maps;
 
 import java.time.Duration;
@@ -21,6 +22,7 @@ public final class MockRedis implements Redis {
     private final MockRedisHash hash = new MockRedisHash(store);
     private final MockRedisSet set = new MockRedisSet(store);
     private final MockRedisList list = new MockRedisList(store);
+    private final MockRedisSortedSet sortedSet = new MockRedisSortedSet(store);
     private final MockRedisAdmin admin = new MockRedisAdmin();
 
     @Override
@@ -115,5 +117,10 @@ public final class MockRedis implements Redis {
     @Override
     public RedisList list() {
         return list;
+    }
+
+    @Override
+    public RedisSortedSet sortedSet() {
+        return sortedSet;
     }
 }
