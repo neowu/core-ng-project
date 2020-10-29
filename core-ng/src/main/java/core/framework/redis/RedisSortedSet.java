@@ -1,10 +1,14 @@
 package core.framework.redis;
 
+import java.util.Map;
+
 /**
  * @author tempo
  */
 public interface RedisSortedSet {
-    boolean push(String key, long score, String value, boolean onlyIfAbsent);
+    boolean zadd(String key, String value, long score, boolean onlyIfAbsent);
 
-    String popByScoreCap(String key, long maxScore);
+    Map<String, Long> zrange(String key, long start, long end);
+
+    Map<String, Long> zpopByScore(String key, long minScore, long maxScore, long limit);
 }
