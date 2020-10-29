@@ -35,14 +35,14 @@ public final class MockRedisList implements RedisList {
     }
 
     @Override
-    public List<String> range(String key, long start, long end) {
+    public List<String> range(String key, long start, long stop) {
         var value = store.get(key);
         if (value == null) return List.of();
         List<String> list = value.list();
         int size = list.size();
         int startIndex = start < 0 ? 0 : (int) start;
         if (startIndex > size) startIndex = size;
-        int endIndex = end < 0 ? (int) end + size : (int) end;
+        int endIndex = stop < 0 ? (int) stop + size : (int) stop;
         if (endIndex >= size) endIndex = size - 1;
         return List.copyOf(list.subList(startIndex, endIndex + 1));
     }

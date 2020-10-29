@@ -2,11 +2,10 @@ package core.framework.test.redis;
 
 import core.framework.util.Maps;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,9 +61,9 @@ class MockRedisStore {
         }
 
         @SuppressWarnings("unchecked")
-        SortedMap<String, Long> sortedSet() {
-            assertThat(value).isInstanceOf(SortedMap.class);
-            return (TreeMap<String, Long>) value;
+        Map<String, Long> sortedSet() {
+            assertThat(value).isInstanceOf(Map.class);
+            return (HashMap<String, Long>) value;
         }
 
         boolean expired(long now) {

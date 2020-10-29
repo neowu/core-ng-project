@@ -74,7 +74,7 @@ public final class RedisListImpl implements RedisList {
     }
 
     @Override
-    public List<String> range(String key, long start, long end) {
+    public List<String> range(String key, long start, long stop) {
         var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         List<String> values = null;
@@ -84,7 +84,7 @@ public final class RedisListImpl implements RedisList {
             connection.writeBlobString(LRANGE);
             connection.writeBlobString(encode(key));
             connection.writeBlobString(encode(start));
-            connection.writeBlobString(encode(end));
+            connection.writeBlobString(encode(stop));
             connection.flush();
             Object[] response = connection.readArray();
             values = new ArrayList<>(response.length);
@@ -99,7 +99,7 @@ public final class RedisListImpl implements RedisList {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
-            logger.debug("lrange, key={}, start={}, end={}, returnedValues={}, elapsed={}", key, start, end, values, elapsed);
+            logger.debug("lrange, key={}, start={}, stop={}, returnedValues={}, elapsed={}", key, start, stop, values, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
