@@ -54,7 +54,7 @@ public class MockRedisSortedSet implements RedisSortedSet {
         return map.entrySet().stream()
                 .filter(entry -> entry.getValue() >= minScore && entry.getValue() <= maxScore)
                 .sorted(Entry.comparingByValue())
-                .limit(limit)
+                .limit(limit == -1 ? Long.MAX_VALUE : limit)
                 .peek(entry -> map.remove(entry.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
     }

@@ -39,7 +39,7 @@ public class MockRedisSortedSetTest {
         sortedSet.add("key", "3", 3, false);
         sortedSet.add("key", "4", 4, false);
 
-        assertThat(sortedSet.popByScore("key", 0, 999, 1)).isEmpty();
+        assertThat(sortedSet.popByScore("key", -10, 0)).isEmpty();
         assertThat(sortedSet.popByScore("key", 0, 1, 1)).containsExactly(entry("1", 1L));
         assertThat(sortedSet.popByScore("key", 0, 4, 2)).containsExactly(entry("2", 2L), entry("3", 3L));
     }
