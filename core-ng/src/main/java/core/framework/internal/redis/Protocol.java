@@ -96,6 +96,11 @@ final class Protocol {
 
         static final byte[] INFO = Strings.bytes("INFO");
         static final byte[] QUIT = Strings.bytes("QUIT");
+
+        static final byte[] ZADD = Strings.bytes("ZADD");
+        static final byte[] ZRANGE = Strings.bytes("ZRANGE");
+        static final byte[] ZRANGEBYSCORE = Strings.bytes("ZRANGEBYSCORE");
+        static final byte[] ZREM = Strings.bytes("ZREM");
     }
 
     static class Keyword {
@@ -103,5 +108,8 @@ final class Protocol {
         static final byte[] COUNT = Strings.bytes("COUNT");
         static final byte[] NX = Strings.bytes("NX");
         static final byte[] PX = Strings.bytes("PX");
+        static final byte[] LIMIT = Strings.bytes("LIMIT");
+        static final byte[] INF_MIN = Strings.bytes("-inf");
+        static final byte[] WITHSCORES = Strings.bytes("WITHSCORES");
     }
 }

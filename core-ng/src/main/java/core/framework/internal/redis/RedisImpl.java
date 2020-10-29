@@ -13,6 +13,7 @@ import core.framework.redis.RedisAdmin;
 import core.framework.redis.RedisHash;
 import core.framework.redis.RedisList;
 import core.framework.redis.RedisSet;
+import core.framework.redis.RedisSortedSet;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
@@ -49,6 +50,7 @@ public class RedisImpl implements Redis {
     private final RedisSet redisSet = new RedisSetImpl(this);
     private final RedisHash redisHash = new RedisHashImpl(this);
     private final RedisList redisList = new RedisListImpl(this);
+    private final RedisSortedSet redisSortedSet = new RedisSortedSetImpl(this);
     private final RedisAdmin redisAdmin = new RedisAdminImpl(this);
     private final String name;
     public Pool<RedisConnection> pool;
@@ -325,6 +327,11 @@ public class RedisImpl implements Redis {
     @Override
     public RedisList list() {
         return redisList;
+    }
+
+    @Override
+    public RedisSortedSet sortedSet() {
+        return redisSortedSet;
     }
 
     @Override

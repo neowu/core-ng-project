@@ -38,6 +38,8 @@ public interface Redis {
 
     RedisList list();
 
+    RedisSortedSet sortedSet();
+
     void forEach(String pattern, Consumer<String> consumer);
 
     RedisAdmin admin();
