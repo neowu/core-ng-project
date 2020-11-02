@@ -1,4 +1,6 @@
 ## Change log
+### 7.6.2 (10/30/2020 - )
+
 ### 7.6.1 (10/15/2020 - 10/29/2020)
 * http: httpClient does not read response body if status code is 204 
 * executor: improve warning for task rejection/cancellation during shutdown

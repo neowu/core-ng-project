@@ -1,8 +1,7 @@
-# replace with gradle image once gradle:jdk15 is available
-FROM        adoptopenjdk/openjdk15:alpine as build
+FROM        gradle:jdk15 as build
 WORKDIR     /depot
 ADD         ./ /depot
-RUN         ./gradlew -Penv=prod :ext:log-processor:docker
+RUN         gradle -Penv=prod :ext:log-processor:docker
 
 FROM        adoptopenjdk/openjdk15:alpine-jre
 LABEL       app=log-processor
