@@ -34,22 +34,27 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     }
 
     @Override
-    public boolean add(String key, String value, long score, boolean onlyIfAbsent) {
+    public long multiAdd(String key, Map<String, Long> values, boolean onlyIfAbsent) {
         var watch = new StopWatch();
-        int added = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        int added = 0;
         try {
             RedisConnection connection = item.resource;
-            int length = onlyIfAbsent ? 5 : 4;
+            int length = 2 + values.size() * 2;
+            if (onlyIfAbsent) {
+                length++;
+            }
             connection.writeArray(length);
             connection.writeBlobString(ZADD);
             connection.writeBlobString(encode(key));
             if (onlyIfAbsent) connection.writeBlobString(NX);
-            connection.writeBlobString(encode(score));
-            connection.writeBlobString(encode(value));
+            for (Map.Entry<String, Long> valueEntry : values.entrySet()) {
+                connection.writeBlobString(encode(valueEntry.getValue()));
+                connection.writeBlobString(encode(valueEntry.getKey()));
+            }
             connection.flush();
             added = (int) connection.readLong();
-            return added > 0;
+            return added;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
@@ -57,7 +62,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, added);
-            logger.debug("zadd, key={}, value={}, score={}, onlyIfAbsent={}, added={}, elapsed={}", key, value, score, onlyIfAbsent, added, elapsed);
+            logger.debug("zadd, key={}, values={}, onlyIfAbsent={}, added={}, elapsed={}", key, values, onlyIfAbsent, added, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
@@ -95,6 +100,48 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     }
 
     @Override
+    public Map<String, Long> rangeByScore(String key, long minScore, long maxScore, long limit) {
+        var watch = new StopWatch();
+        if (limit == 0) throw new Error("limit must not be 0");
+        if (maxScore < minScore) throw new Error("stop must be larger than start");
+
+        Map<String, Long> values = null;
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            Object[] response = rangeByScore(connection, key, minScore, maxScore, limit);
+            if (response.length % 2 != 0) throw new IOException("unexpected length of array, length=" + response.length);
+            values = Maps.newLinkedHashMapWithExpectedSize(response.length / 2);
+            for (int i = 0; i < response.length; i += 2) {
+                values.put(decode((byte[]) response[i]), (long) Double.parseDouble(decode((byte[]) response[i + 1])));
+            }
+            return values;
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
+            logger.debug("zrangeByScore, key={}, minScore={}, maxScore={}, returnedValues={}, elapsed={}", key, minScore, maxScore, values, elapsed);
+        }
+    }
+
+    private Object[] rangeByScore(RedisConnection connection, String key, long minScore, long maxScore, long limit) throws IOException {
+        connection.writeArray(8);
+        connection.writeBlobString(ZRANGEBYSCORE);
+        connection.writeBlobString(encode(key));
+        connection.writeBlobString(encode(minScore));
+        connection.writeBlobString(encode(maxScore));
+        connection.writeBlobString(WITHSCORES);
+        connection.writeBlobString(LIMIT);
+        connection.writeBlobString(encode(0));
+        connection.writeBlobString(encode(limit));
+        connection.flush();
+        return connection.readArray();
+    }
+
+    @Override
     public Map<String, Long> popByScore(String key, long minScore, long maxScore, long limit) {
         var watch = new StopWatch();
         if (limit == 0) throw new Error("limit must not be 0");
@@ -105,17 +152,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.writeArray(8);
-            connection.writeBlobString(ZRANGEBYSCORE);
-            connection.writeBlobString(encode(key));
-            connection.writeBlobString(encode(minScore));
-            connection.writeBlobString(encode(maxScore));
-            connection.writeBlobString(WITHSCORES);
-            connection.writeBlobString(LIMIT);
-            connection.writeBlobString(encode(0));
-            connection.writeBlobString(encode(limit));
-            connection.flush();
-            Object[] response = connection.readArray();
+            Object[] response = rangeByScore(connection, key, minScore, maxScore, limit);
             if (response.length % 2 != 0) throw new IOException("unexpected length of array, length=" + response.length);
             values = Maps.newLinkedHashMapWithExpectedSize(response.length / 2);
             fetchedEntries = response.length / 2;
