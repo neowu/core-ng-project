@@ -1,5 +1,6 @@
 ## Change log
 ### 7.6.2 (10/30/2020 - )
+* redis: support zadd with multiple keys and rangeByScore
 
 ### 7.6.1 (10/15/2020 - 10/29/2020)
 * http: httpClient does not read response body if status code is 204 

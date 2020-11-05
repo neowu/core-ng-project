@@ -34,23 +34,21 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     }
 
     @Override
-    public long multiAdd(String key, Map<String, Long> values, boolean onlyIfAbsent) {
+    public int add(String key, Map<String, Long> values, boolean onlyIfAbsent) {
         var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         int added = 0;
         try {
             RedisConnection connection = item.resource;
             int length = 2 + values.size() * 2;
-            if (onlyIfAbsent) {
-                length++;
-            }
+            if (onlyIfAbsent) length++;
             connection.writeArray(length);
             connection.writeBlobString(ZADD);
             connection.writeBlobString(encode(key));
             if (onlyIfAbsent) connection.writeBlobString(NX);
-            for (Map.Entry<String, Long> valueEntry : values.entrySet()) {
-                connection.writeBlobString(encode(valueEntry.getValue()));
-                connection.writeBlobString(encode(valueEntry.getKey()));
+            for (Map.Entry<String, Long> entry : values.entrySet()) {
+                connection.writeBlobString(encode(entry.getValue()));
+                connection.writeBlobString(encode(entry.getKey()));
             }
             connection.flush();
             added = (int) connection.readLong();
@@ -82,11 +80,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
             connection.writeBlobString(WITHSCORES);
             connection.flush();
             Object[] response = connection.readArray();
-            if (response.length % 2 != 0) throw new IOException("unexpected length of array, length=" + response.length);
-            values = Maps.newLinkedHashMapWithExpectedSize(response.length / 2);
-            for (int i = 0; i < response.length; i += 2) {
-                values.put(decode((byte[]) response[i]), (long) Double.parseDouble(decode((byte[]) response[i + 1])));
-            }
+            values = valuesWithScores(response);
             return values;
         } catch (IOException e) {
             item.broken = true;
@@ -103,18 +97,14 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     public Map<String, Long> rangeByScore(String key, long minScore, long maxScore, long limit) {
         var watch = new StopWatch();
         if (limit == 0) throw new Error("limit must not be 0");
-        if (maxScore < minScore) throw new Error("stop must be larger than start");
+        if (maxScore < minScore) throw new Error("maxScore must be larger than minScore");
 
         Map<String, Long> values = null;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             Object[] response = rangeByScore(connection, key, minScore, maxScore, limit);
-            if (response.length % 2 != 0) throw new IOException("unexpected length of array, length=" + response.length);
-            values = Maps.newLinkedHashMapWithExpectedSize(response.length / 2);
-            for (int i = 0; i < response.length; i += 2) {
-                values.put(decode((byte[]) response[i]), (long) Double.parseDouble(decode((byte[]) response[i + 1])));
-            }
+            values = valuesWithScores(response);
             return values;
         } catch (IOException e) {
             item.broken = true;
@@ -141,6 +131,15 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         return connection.readArray();
     }
 
+    private Map<String, Long> valuesWithScores(Object[] response) throws IOException {
+        if (response.length % 2 != 0) throw new IOException("unexpected length of array, length=" + response.length);
+        Map<String, Long> values = Maps.newLinkedHashMapWithExpectedSize(response.length / 2);
+        for (int i = 0; i < response.length; i += 2) {
+            values.put(decode((byte[]) response[i]), (long) Double.parseDouble(decode((byte[]) response[i + 1])));
+        }
+        return values;
+    }
+
     @Override
     public Map<String, Long> popByScore(String key, long minScore, long maxScore, long limit) {
         var watch = new StopWatch();
@@ -157,10 +156,11 @@ public class RedisSortedSetImpl implements RedisSortedSet {
             values = Maps.newLinkedHashMapWithExpectedSize(response.length / 2);
             fetchedEntries = response.length / 2;
             for (int i = 0; i < response.length; i += 2) {
-                connection.writeKeyArgumentCommand(ZREM, key, (byte[]) response[i]);
+                byte[] value = (byte[]) response[i];
+                connection.writeKeyArgumentCommand(ZREM, key, value);
                 long removed = connection.readLong();
                 if (removed == 1L) {
-                    values.put(decode((byte[]) response[i]), (long) Double.parseDouble(decode((byte[]) response[i + 1])));
+                    values.put(decode(value), (long) Double.parseDouble(decode((byte[]) response[i + 1])));
                 }
             }
             return values;

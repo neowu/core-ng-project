@@ -7,11 +7,11 @@ import java.util.Map;
  */
 public interface RedisSortedSet {
     // use long as score to keep precision, redis uses float type for score
-    default boolean add(String key, String value, long score, boolean onlyIfAbsent) {
-        return multiAdd(key, Map.ofEntries(Map.entry(value, score)), onlyIfAbsent) == 1;
+    default boolean add(String key, String value, long score) {
+        return add(key, Map.of(value, score), false) == 1;
     }
 
-    long multiAdd(String key, Map<String, Long> values, boolean onlyIfAbsent);
+    int add(String key, Map<String, Long> values, boolean onlyIfAbsent);
 
     default Map<String, Long> range(String key) {
         return range(key, 0, -1);

@@ -19,12 +19,12 @@ public class MockRedisSortedSet implements RedisSortedSet {
     }
 
     @Override
-    public long multiAdd(String key, Map<String, Long> values, boolean onlyIfAbsent) {
+    public int add(String key, Map<String, Long> values, boolean onlyIfAbsent) {
         var map = store.putIfAbsent(key, new HashMap<>()).sortedSet();
         if (onlyIfAbsent) {
             int added = 0;
-            for (Entry<String, Long> valueEntry : values.entrySet()) {
-                if (map.putIfAbsent(valueEntry.getKey(), valueEntry.getValue()) == null) {
+            for (Entry<String, Long> entry : values.entrySet()) {
+                if (map.putIfAbsent(entry.getKey(), entry.getValue()) == null) {
                     added++;
                 }
             }
@@ -46,10 +46,10 @@ public class MockRedisSortedSet implements RedisSortedSet {
         int endIndex = stop < 0 ? (int) stop + size : (int) stop;
         if (endIndex >= size) endIndex = size - 1;
         return map.entrySet().stream()
-                  .sorted(Entry.comparingByValue())
-                  .skip(startIndex)
-                  .limit(endIndex - startIndex + 1)
-                  .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
+                .sorted(Entry.comparingByValue())
+                .skip(startIndex)
+                .limit(endIndex - startIndex + 1)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
     }
 
     @Override
@@ -58,10 +58,10 @@ public class MockRedisSortedSet implements RedisSortedSet {
         if (value == null) return Map.of();
         var map = value.sortedSet();
         return map.entrySet().stream()
-                  .filter(entry -> entry.getValue() >= minScore && entry.getValue() <= maxScore)
-                  .sorted(Entry.comparingByValue())
-                  .limit(limit == -1 ? Long.MAX_VALUE : limit)
-                  .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
+                .filter(entry -> entry.getValue() >= minScore && entry.getValue() <= maxScore)
+                .sorted(Entry.comparingByValue())
+                .limit(limit == -1 ? Long.MAX_VALUE : limit)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
     }
 
     @Override
@@ -70,10 +70,10 @@ public class MockRedisSortedSet implements RedisSortedSet {
         if (value == null) return Map.of();
         var map = value.sortedSet();
         return map.entrySet().stream()
-                  .filter(entry -> entry.getValue() >= minScore && entry.getValue() <= maxScore)
-                  .sorted(Entry.comparingByValue())
-                  .limit(limit == -1 ? Long.MAX_VALUE : limit)
-                  .peek(entry -> map.remove(entry.getKey()))
-                  .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
+                .filter(entry -> entry.getValue() >= minScore && entry.getValue() <= maxScore)
+                .sorted(Entry.comparingByValue())
+                .limit(limit == -1 ? Long.MAX_VALUE : limit)
+                .peek(entry -> map.remove(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
     }
 }
