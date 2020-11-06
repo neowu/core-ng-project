@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class MockRedisSortedSet implements RedisSortedSet {
     private final MockRedisStore store;
 
-    public MockRedisSortedSet(MockRedisStore store) {
+    MockRedisSortedSet(MockRedisStore store) {
         this.store = store;
     }
 
