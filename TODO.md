@@ -11,7 +11,6 @@
 * revisit trace log truncation, better/more elegant handling?
 * monitor to collect api/db definition overtime and compare to check backaward compability?
 * way to expose service structure/dependency diagram? 
-* redis: support zset / resp3 ? 
 
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled
 * class in interface module generates Validator make interface depends on core-ng module (java module)

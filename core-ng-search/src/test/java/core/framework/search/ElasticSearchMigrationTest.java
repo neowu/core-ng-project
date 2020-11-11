@@ -18,9 +18,12 @@ class ElasticSearchMigrationTest {
 
     @Test
     void migrate() {
+        migration.migrate(search -> {
+        });
+
         assertThatThrownBy(() -> migration.migrate(search -> {
             throw new RuntimeException("migration error");
         })).isInstanceOf(RuntimeException.class)
-           .hasMessageContaining("migration");
+                .hasMessageContaining("migration");
     }
 }
