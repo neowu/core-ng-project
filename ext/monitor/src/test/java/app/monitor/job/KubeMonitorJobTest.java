@@ -57,19 +57,6 @@ class KubeMonitorJobTest {
     }
 
     @Test
-    void checkWithOOMKilled() {
-        var pod = pod("Running");
-        KubePodList.ContainerStatus status = pod.status.containerStatuses.get(0);
-        KubePodList.ContainerState lastState = new KubePodList.ContainerState();
-        lastState.terminated = new KubePodList.ContainerStateTerminated();
-        lastState.terminated.reason = "OOMKilled";
-        status.lastState = lastState;
-
-        assertThat(job.check(pod, ZonedDateTime.now()))
-                .contains(status.lastState.terminated.reason);
-    }
-
-    @Test
     void checkWithNotReady() {
         var startTime = ZonedDateTime.now();
 
