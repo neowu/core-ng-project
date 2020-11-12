@@ -1,6 +1,7 @@
 ## Change log
-### 7.6.2 (10/30/2020 - )
+### 7.6.2 (10/30/2020 - 11/12/2020)
 * redis: support zadd with multiple keys and rangeByScore
+* monitor: improve kube pod monitor error message, to provide better error message if pod was killed in the middle
 
 ### 7.6.1 (10/15/2020 - 10/29/2020)
 * http: httpClient does not read response body if status code is 204 

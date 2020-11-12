@@ -52,8 +52,21 @@ class KubeMonitorJobTest {
         status.state.waiting.message = "Back-off 5m0s restarting failed container";
 
         assertThat(job.check(pod, ZonedDateTime.now()))
-                .contains(status.state.waiting.reason)
-                .contains(status.state.waiting.message);
+                .isEqualTo("CrashLoopBackOff: Back-off 5m0s restarting failed container");
+    }
+
+    @Test
+    void checkWithTerminated() {
+        var pod = pod("Running");
+        KubePodList.ContainerStatus status = pod.status.containerStatuses.get(0);
+        KubePodList.ContainerState lastState = new KubePodList.ContainerState();
+        lastState.terminated = new KubePodList.ContainerStateTerminated();
+        lastState.terminated.reason = "OOMKilled";
+        lastState.terminated.exitCode = 137;
+        status.lastState = lastState;
+
+        assertThat(job.check(pod, ZonedDateTime.now()))
+                .isEqualTo("pod was terminated, reason=OOMKilled, exitCode=137");
     }
 
     @Test
