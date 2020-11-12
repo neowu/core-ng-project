@@ -21,6 +21,10 @@ public class TestSearchConfig extends SearchConfig {
         // refer to org.elasticsearch.transport.netty4.Netty4Utils.setAvailableProcessors
         // netty only allows set available processors once
         System.setProperty("es.set.netty.runtime.available.processors", "false");
+
+        // disable warning from org.elasticsearch.node.Node
+        // refer to org.elasticsearch.node.Node deprecationLogger/no-jdk
+        System.setProperty("es.bundled_jdk", "true");
     }
 
     @Override
