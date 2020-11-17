@@ -70,10 +70,12 @@ public class MongoConfig extends Config {
         mongo.timeout(timeout);
     }
 
-    public <T> void collection(Class<T> entityClass) {
+    public <T> MongoCollection<T> collection(Class<T> entityClass) {
         if (uri == null) throw new Error("mongo uri must be configured first, name=" + name);
-        context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), name, mongo.collection(entityClass));
+        MongoCollection<T> collection = mongo.collection(entityClass);
+        context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), name, collection);
         entityAdded = true;
+        return collection;
     }
 
     public <T> void view(Class<T> viewClass) {

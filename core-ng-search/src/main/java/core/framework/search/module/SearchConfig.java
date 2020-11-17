@@ -66,9 +66,10 @@ public class SearchConfig extends Config {
         search.timeout = timeout;
     }
 
-    public <T> void type(Class<T> documentClass) {
+    public <T> ElasticSearchType<T> type(Class<T> documentClass) {
         ElasticSearchType<T> searchType = search.type(documentClass);
         context.beanFactory.bind(Types.generic(ElasticSearchType.class, documentClass), name, searchType);
         typeAdded = true;
+        return searchType;
     }
 }

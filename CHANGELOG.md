@@ -1,4 +1,7 @@
 ## Change log
+### 7.6.3 (11/16/2020 - )
+* module: DBConfig.repository() returns repository object, to make it easier to extend, same applied to es search type and mongo collection
+
 ### 7.6.2 (10/30/2020 - 11/12/2020)
 * redis: support zadd with multiple keys and rangeByScore
 * monitor: improve kube pod monitor error message, to provide better error message if pod was killed in the middle
