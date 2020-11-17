@@ -56,10 +56,10 @@ class KubeMonitorJobTest {
     }
 
     @Test
-    void checkWithTerminated() {
+    void checkWithOOMKill() {
         var pod = pod("Running");
         KubePodList.ContainerStatus status = pod.status.containerStatuses.get(0);
-        KubePodList.ContainerState lastState = new KubePodList.ContainerState();
+        var lastState = new KubePodList.ContainerState();
         lastState.terminated = new KubePodList.ContainerStateTerminated();
         lastState.terminated.reason = "OOMKilled";
         lastState.terminated.exitCode = 137;
@@ -67,6 +67,23 @@ class KubeMonitorJobTest {
 
         assertThat(job.check(pod, ZonedDateTime.now()))
                 .isEqualTo("pod was terminated, reason=OOMKilled, exitCode=137");
+    }
+
+    @Test
+    void checkWithFailedToStart() {
+        var pod = pod("Running");
+        KubePodList.ContainerStatus status = pod.status.containerStatuses.get(0);
+        var lastState = new KubePodList.ContainerState();
+        lastState.terminated = new KubePodList.ContainerStateTerminated();
+        lastState.terminated.reason = "Error";
+        lastState.terminated.exitCode = 1;      // failed to start, App.java return exitCode=1 if any exception
+        status.lastState = lastState;
+
+        assertThat(job.check(pod, ZonedDateTime.now()))
+                .isEqualTo("pod was terminated, reason=Error, exitCode=1");
+
+        status.ready = Boolean.TRUE;
+        assertThat(job.check(pod, ZonedDateTime.now())).isNull();
     }
 
     @Test
@@ -85,19 +102,6 @@ class KubeMonitorJobTest {
 
         assertThat(job.check(pod, startTime.plusMinutes(1))).isNull();
         assertThat(job.check(pod, startTime.plusMinutes(5))).isEqualTo("pod is not in ready state, uptime=PT5M");
-    }
-
-    @Test
-    void checkWithTooManyRestarts() {
-        var pod = pod("Running");
-        KubePodList.ContainerStatus status = pod.status.containerStatuses.get(0);
-        status.ready = Boolean.FALSE;
-        status.restartCount = 5;
-
-        assertThat(job.check(pod, ZonedDateTime.now())).isEqualTo("pod restarted too many times, restart=5");
-
-        status.ready = Boolean.TRUE;
-        assertThat(job.check(pod, ZonedDateTime.now())).isNull();
     }
 
     @Test
