@@ -17,6 +17,8 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /**
  * @author neo
  */
@@ -42,7 +44,8 @@ public class ResponseHandler {
 
         response.body.send(exchange.getResponseSender(), context);
 
-        actionLog.context("response_code", status.code);  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
+        actionLog.context.put("response_code", List.of(String.valueOf(status.code)));  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
+        logger.debug("[response] statusCode={}", status.code);
     }
 
     private void putHeaders(ResponseImpl response, HttpServerExchange exchange) {

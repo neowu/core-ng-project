@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,19 +53,21 @@ public final class RequestParser {
         request.port = port(requestPort, headers.getFirst(Headers.X_FORWARDED_PORT));
 
         String method = exchange.getRequestMethod().toString();
-        actionLog.context("method", method);
+        actionLog.context.put("method", List.of(method));
 
         request.requestURL = requestURL(request, exchange);
-        actionLog.context("request_url", request.requestURL);
+        putContext(actionLog, "request_url", request.requestURL);   // record request url even if attacker passes long string
+        logger.debug("[request] method={}, requestURL={}", method, request.requestURL);
 
         logHeaders(headers);
         parseClientIP(request, exchange, actionLog, headers.getFirst(Headers.X_FORWARDED_FOR)); // parse client ip after logging header, as ip in x-forwarded-for may be invalid
         parseCookies(request, exchange);
 
-        request.method = httpMethod(method);    // parse method after logging header/etc, to gather more info in case we see unsupported method passed from internet
+        // parse method, validate url length after logging header/etc, to gather more info in case we see arbitrary attacking request from internet
+        request.method = httpMethod(method);
+        if (request.requestURL.length() > MAX_URL_LENGTH) throw new BadRequestException(format("requestURL is too long, requestURL={}...(truncated)", request.requestURL.substring(0, 50)), "INVALID_HTTP_REQUEST");
 
         logSiteHeaders(headers, actionLog);
-
         parseQueryParams(request, exchange.getQueryParameters());
 
         if (withBodyMethods.contains(request.method)) {
@@ -99,13 +102,12 @@ public final class RequestParser {
 
     private void parseClientIP(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog, String xForwardedFor) {
         String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
-        logger.debug("[request] remoteAddress={}", remoteAddress);
         request.clientIP = clientIPParser.parse(remoteAddress, xForwardedFor);
-        actionLog.context("client_ip", request.clientIP);
+        actionLog.context.put("client_ip", List.of(request.clientIP));
+        logger.debug("[request] remoteAddress={}, clientIP={}", remoteAddress, request.clientIP);
     }
 
     String scheme(String requestScheme, String xForwardedProto) {       // xForwardedProto is single value, refer to https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto
-        logger.debug("[request] requestScheme={}", requestScheme);
         return xForwardedProto != null ? xForwardedProto : requestScheme;
     }
 
@@ -121,9 +123,9 @@ public final class RequestParser {
     void logSiteHeaders(HeaderMap headers, ActionLog actionLog) {
         if (logSiteHeaders) {
             String userAgent = headers.getFirst(Headers.USER_AGENT);
-            if (userAgent != null) actionLog.context("user_agent", userAgent);
+            if (userAgent != null) putContext(actionLog, "user_agent", userAgent);
             String referer = headers.getFirst(Headers.REFERER);
-            if (referer != null) actionLog.context("referer", Strings.truncate(referer, 1000));     // referer passed from browser can be long
+            if (referer != null) putContext(actionLog, "referer", referer);
         }
     }
 
@@ -231,9 +233,8 @@ public final class RequestParser {
     String requestURL(RequestImpl request, HttpServerExchange exchange) {
         var builder = new StringBuilder(128);
 
-        if (exchange.isHostIncludedInRequestURI()) {    // GET can use absolute url as request uri, http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html, when client sends request via forward proxy
-            builder.append(exchange.getRequestURI());
-        } else {
+        // GET can use absolute url as request uri, http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html, when client sends request via forward proxy
+        if (!exchange.isHostIncludedInRequestURI()) {
             String scheme = request.scheme;
             int port = request.port;
 
@@ -244,15 +245,20 @@ public final class RequestParser {
             if (!(port == 80 && "http".equals(scheme)) && !(port == 443 && "https".equals(scheme))) {
                 builder.append(':').append(port);
             }
-
-            builder.append(exchange.getRequestURI());
         }
+
+        builder.append(exchange.getRequestURI());
 
         String queryString = exchange.getQueryString();
         if (!queryString.isEmpty()) builder.append('?').append(queryString);
 
-        String requestURL = builder.toString();
-        if (requestURL.length() > MAX_URL_LENGTH) throw new BadRequestException(format("requestURL is too long, requestURL={}...(truncated)", requestURL.substring(0, 50)), "INVALID_HTTP_REQUEST");
-        return requestURL;
+        return builder.toString();
+    }
+
+    // directly put to actionLog context with truncation, to handle attacking request gracefully
+    // to unify request logging, and to be slightly efficient
+    void putContext(ActionLog actionLog, String key, String value) {
+        String contextValue = value.length() <= ActionLog.MAX_CONTEXT_VALUE_LENGTH ? value : value.substring(0, ActionLog.MAX_CONTEXT_VALUE_LENGTH);
+        actionLog.context.put(key, List.of(contextValue));
     }
 }

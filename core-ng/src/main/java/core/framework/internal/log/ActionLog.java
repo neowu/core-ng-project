@@ -20,7 +20,7 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 public final class ActionLog {
-    static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
+    public static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
 
     private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
     private static final ThreadMXBean THREAD = ManagementFactory.getThreadMXBean();

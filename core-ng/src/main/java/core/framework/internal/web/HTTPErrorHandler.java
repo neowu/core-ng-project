@@ -22,6 +22,8 @@ import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /**
  * @author neo
  */
@@ -114,7 +116,8 @@ public class HTTPErrorHandler {
     private void renderDefaultErrorPage(Throwable e, HttpServerExchange exchange, ActionLog actionLog) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, ContentType.TEXT_HTML.toString());
         exchange.setStatusCode(HTTPStatus.INTERNAL_SERVER_ERROR.code);
-        actionLog.context("response_code", exchange.getStatusCode());
+        actionLog.context.put("response_code", List.of(String.valueOf(HTTPStatus.INTERNAL_SERVER_ERROR.code)));
+        logger.debug("[response] statusCode={}", HTTPStatus.INTERNAL_SERVER_ERROR.code);
         exchange.getResponseSender().send(errorHTML(e, actionLog.id));
     }
 }

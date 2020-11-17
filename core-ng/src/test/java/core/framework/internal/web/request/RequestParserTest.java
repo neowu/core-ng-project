@@ -13,6 +13,7 @@ import io.undertow.server.handlers.form.FormData;
 import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
+import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -154,21 +155,6 @@ class RequestParserTest {
     }
 
     @Test
-    void requestURLIsTooLong() {
-        var exchange = new HttpServerExchange(null);
-        exchange.getRequestHeaders().put(Headers.HOST, "localhost");
-        exchange.setRequestURI("/path");
-
-        exchange.setQueryString("1234567890".repeat(100));
-        var request = new RequestImpl(exchange, null);
-        request.scheme = "http";
-        request.port = 80;
-        assertThatThrownBy(() -> parser.requestURL(request, exchange))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("requestURL is too long");
-    }
-
-    @Test
     void parseCookies() {
         Map<String, String> cookies = parser.decodeCookies(Set.of(new CookieImpl("name", "value")));
         assertThat(cookies).containsEntry("name", "value");
@@ -220,15 +206,11 @@ class RequestParserTest {
     @Test
     void parse() throws Throwable {
         byte[] body = Strings.bytes("{}");
-
         var actionLog = new ActionLog(null, null);
-        var exchange = new HttpServerExchange(null);
-        exchange.setRequestMethod(Methods.POST);
-        exchange.getRequestHeaders().put(Headers.HOST, "localhost");
-        exchange.setDestinationAddress(new InetSocketAddress(80));
-        exchange.setSourceAddress(new InetSocketAddress(10000));
+        HttpServerExchange exchange = exchange(Methods.POST);
         exchange.getRequestHeaders().put(Headers.CONTENT_LENGTH, body.length);
         exchange.putAttachment(RequestBodyReader.REQUEST_BODY, new RequestBodyReader.RequestBody(body, null));
+
         var request = new RequestImpl(exchange, null);
         request.contentType = ContentType.TEXT_XML;
         parser.parse(request, exchange, actionLog);
@@ -236,5 +218,29 @@ class RequestParserTest {
         assertThat(request.method).isEqualTo(HTTPMethod.POST);
         assertThat(request.body()).hasValue(body);
         assertThat(actionLog.stats).containsKeys("http_content_length");
+    }
+
+    @Test
+    void parseWithLongRequestURL() {
+        var actionLog = new ActionLog(null, null);
+        HttpServerExchange exchange = exchange(Methods.GET);
+        exchange.setRequestURI("/path");
+        exchange.setQueryString("1234567890".repeat(100));
+
+        var request = new RequestImpl(exchange, null);
+        request.scheme = "http";
+        request.port = 80;
+        assertThatThrownBy(() -> parser.parse(request, exchange, actionLog))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("requestURL is too long");
+    }
+
+    private HttpServerExchange exchange(HttpString method) {
+        var exchange = new HttpServerExchange(null);
+        exchange.setRequestMethod(method);
+        exchange.getRequestHeaders().put(Headers.HOST, "localhost");
+        exchange.setDestinationAddress(new InetSocketAddress(80));
+        exchange.setSourceAddress(new InetSocketAddress(10000));
+        return exchange;
     }
 }
