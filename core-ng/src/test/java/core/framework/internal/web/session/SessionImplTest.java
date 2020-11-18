@@ -36,4 +36,10 @@ class SessionImplTest {
         session.set("key", "value");
         assertThat(session.changedFields).isEmpty();
     }
+
+    @Test
+    void id() {
+        session.id("sessionId");
+        assertThat(session.hash).isNotNull();
+    }
 }

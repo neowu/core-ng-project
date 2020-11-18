@@ -1,6 +1,5 @@
 package core.framework.internal.web.session;
 
-import core.framework.crypto.Hash;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.web.request.RequestImpl;
 import core.framework.web.CookieSpec;
@@ -12,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,16 +30,16 @@ public class SessionManager implements SessionContext {
         if (store == null) return null;  // session store is not initialized
         if (!"https".equals(request.scheme())) return null;  // only load session under https
 
-        var session = new SessionImpl(domain(request));
+        String domain = domain(request);
+        var session = new SessionImpl(domain);
         sessionId(request).ifPresent(sessionId -> {
-            logger.debug("load session");
             Map<String, String> values = store.getAndRefresh(sessionId, session.domain, timeout);
             if (values != null) {
-                // the redis session store use sha256 to hash, here use md5 to make sure not logging actual redis key, and keep reference shorter
-                actionLog.context("session_hash", Hash.md5Hex(sessionId));
-                session.id = sessionId;
+                session.id(sessionId);
+                actionLog.context.put("session_hash", List.of(session.hash));
                 session.values.putAll(values);
             }
+            logger.debug("load session, domain={}, sessionHash={}", domain, session.hash);  // session.hash can be null if session is not found
         });
         return session;
     }
@@ -55,17 +55,17 @@ public class SessionManager implements SessionContext {
         session.saved = true;   // it will try to save session on both normal and exception flows, here is to only attempt once in case of store throws exception
         if (session.invalidated) {
             if (session.id != null) {
-                logger.debug("invalidate session");
+                logger.debug("invalidate session, domain={}, sessionHash={}", session.domain, session.hash);
                 store.invalidate(session.id, session.domain);
                 putSessionId(response, null);
             }
         } else if (session.changed()) {
-            logger.debug("save session");
             if (session.id == null) {
-                session.id = UUID.randomUUID().toString();
-                actionLog.context("session_hash", Hash.md5Hex(session.id));
+                session.id(UUID.randomUUID().toString());
+                actionLog.context.put("session_hash", List.of(session.hash));
                 putSessionId(response, session.id);
             }
+            logger.debug("save session, domain={}, sessionHash={}", session.domain, session.hash);
             store.save(session.id, session.domain, session.values, session.changedFields, timeout);
         }
     }
