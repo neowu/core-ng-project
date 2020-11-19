@@ -4,6 +4,8 @@
 * http: tweak http request/response logging to gracefully handle vulnerability scan request from internet
 * json: update jackson to 2.11.3 
     es lib still depends on jackson-dataformat 2.10.4, it can be safely ignored if not use smile/yml/cbor
+* mysql: update driver to 8.0.22, disabled mysql connection cleanup thread, 
+    !!! must update mysql driver to 8.0.22 as framework uses type referring to set system property.  
 
 ### 7.6.2 (10/30/2020 - 11/12/2020)
 * redis: support zadd with multiple keys and rangeByScore

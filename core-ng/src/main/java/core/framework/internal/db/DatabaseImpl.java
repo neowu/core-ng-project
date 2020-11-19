@@ -1,5 +1,6 @@
 package core.framework.internal.db;
 
+import com.mysql.cj.conf.PropertyDefinitions;
 import com.mysql.cj.conf.PropertyKey;
 import core.framework.db.Database;
 import core.framework.db.IsolationLevel;
@@ -33,6 +34,11 @@ import static core.framework.log.Markers.errorCode;
  * @author neo
  */
 public final class DatabaseImpl implements Database {
+    static {
+        // disable unnecessary mysql connection cleanup thread to reduce overhead
+        System.setProperty(PropertyDefinitions.SYSP_disableAbandonedConnectionCleanup, "true");
+    }
+
     public final Pool<Connection> pool;
     public final DatabaseOperation operation;
 
