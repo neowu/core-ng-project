@@ -2,6 +2,8 @@
 ### 7.6.3 (11/16/2020 - )
 * module: DBConfig.repository() returns repository object, to make it easier to extend, same applied to es search type and mongo collection
 * http: tweak http request/response logging to gracefully handle vulnerability scan request from internet
+* json: update jackson to 2.11.3 
+    es lib still depends on jackson-dataformat 2.10.4, it can be safely ignored if not use smile/yml/cbor
 
 ### 7.6.2 (10/30/2020 - 11/12/2020)
 * redis: support zadd with multiple keys and rangeByScore

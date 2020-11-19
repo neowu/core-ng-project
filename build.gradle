@@ -7,10 +7,10 @@ subprojects {
 
 def elasticVersion = '7.10.0'
 def kafkaVersion = '2.4.1'
-def jacksonVersion = '2.10.4'
+def jacksonVersion = '2.11.3'
 def junitVersion = '5.7.0'
-def mockitoVersion = '3.5.13'
-def assertjVersion = '3.17.2'
+def mockitoVersion = '3.6.0'
+def assertjVersion = '3.18.1'
 def mysqlVersion = '8.0.21'
 
 project('core-ng-api') {
@@ -73,6 +73,7 @@ project('core-ng-search') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
+        // elasticsearch-x-content depends on jackson-dataformat 2.10.4 which is not aligned with the version core-ng using, this can be ignored if not using smile/yaml/cbor
         api "org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticVersion}"
         testImplementation project(":core-ng-test")
     }
