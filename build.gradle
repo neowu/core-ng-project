@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '7.6.3'
+    version = '7.6.4'
 }
 
 def elasticVersion = '7.10.0'
@@ -65,7 +65,7 @@ project('core-ng-mongo-test') {
     dependencies {
         api project(":core-ng-test")
         api project(":core-ng-mongo")
-        implementation 'de.bwaldvogel:mongo-java-server:1.34.0'
+        implementation 'de.bwaldvogel:mongo-java-server:1.36.0'
     }
 }
 
