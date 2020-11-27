@@ -28,7 +28,7 @@ project('core-ng') {
         implementation 'com.squareup.okhttp3:okhttp:4.9.0'
         implementation 'io.undertow:undertow-core:2.2.2.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
-        implementation 'org.xerial.snappy:snappy-java:1.1.7.6'      // used by kafka message compression
+        implementation 'org.xerial.snappy:snappy-java:1.1.8.1'      // used by kafka message compression
         compileOnly "mysql:mysql-connector-java:${mysqlVersion}"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
