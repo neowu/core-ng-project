@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.apache.kafka.clients.consumer.ConsumerConfig.DEFAULT_FETCH_MAX_BYTES;
-
 /**
  * @author neo
  */
@@ -41,7 +39,7 @@ public class MessageListener {
     public Duration maxProcessTime = Duration.ofMinutes(30);
     public Duration longConsumerDelayThreshold = Duration.ofSeconds(60);
     public int maxPollRecords = 500;            // default kafka setting, refer to org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
-    public int maxPollBytes = DEFAULT_FETCH_MAX_BYTES;  // get 50M bytes message at max, default kafka config
+    public int maxPollBytes = 3 * 1024 * 1024;  // get 3M bytes if possible for batching, this is not absolute limit of max bytes to poll, refer to org.apache.kafka.clients.consumer.ConsumerConfig.FETCH_MAX_BYTES_DOC
     public int minPollBytes = 1;                // default kafka setting
     public Duration maxWaitTime = Duration.ofMillis(500);
     public String groupId = LogManager.APP_NAME;
@@ -128,7 +126,7 @@ public class MessageListener {
             config.put(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L);                       // longer backoff to reduce cpu usage when kafka is not available
             config.put(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5L * 1000);
             config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
-            config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes);
+            config.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxPollBytes);
             config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);
             config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) maxWaitTime.toMillis());
             var deserializer = new ByteArrayDeserializer();

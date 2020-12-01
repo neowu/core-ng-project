@@ -32,6 +32,7 @@ public class KafkaConfig extends Config {
     private KafkaURI uri;
     private MessageListener listener;
     private boolean handlerAdded;
+    private int maxRequestSize = 1024 * 1024;   // default 1M, refer to org.apache.kafka.clients.producer.ProducerConfig.MAX_REQUEST_SIZE_CONFIG
 
     @Override
     protected void initialize(ModuleContext context, String name) {
@@ -68,7 +69,7 @@ public class KafkaConfig extends Config {
 
     <T> MessagePublisher<T> createMessagePublisher(String topic, Class<T> messageClass) {
         if (producer == null) {
-            var producer = new MessageProducer(uri, name);
+            var producer = new MessageProducer(uri, name, maxRequestSize);
             producer.tryCreateProducer();  // try to init kafka during startup
             context.collector.metrics.add(producer.producerMetrics);
             context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
@@ -129,6 +130,15 @@ public class KafkaConfig extends Config {
 
     public void maxProcessTime(Duration maxProcessTime) {
         listener().maxProcessTime = maxProcessTime;
+    }
+
+    // to increase max message size, it must change on both producer and broker sides
+    // on broker size use "--override message.max.bytes=size"
+    // refer to https://kafka.apache.org/documentation/#message.max.bytes
+    public void maxRequestSize(int size) {
+        if (size <= 0) throw new Error("max request size must be greater than 0, value=" + size);
+        if (producer != null) throw new Error("kafka().maxRequestSize() must be configured before adding publisher");
+        maxRequestSize = size;
     }
 
     public void longConsumerDelayThreshold(Duration threshold) {

@@ -100,6 +100,7 @@ public class TestModule extends AbstractTestModule {
     private void configureKafka() {
         kafka().uri("kafka://localhost:9092");
         kafka().maxProcessTime(Duration.ofMinutes(30));
+        kafka().maxRequestSize(2 * 1024 * 1024);
         kafka().longConsumerDelayThreshold(Duration.ofSeconds(60));
         kafka().poolSize(1);
         kafka().groupId("test");
