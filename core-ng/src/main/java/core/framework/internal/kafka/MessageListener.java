@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.apache.kafka.clients.consumer.ConsumerConfig.DEFAULT_FETCH_MAX_BYTES;
+
 /**
  * @author neo
  */
@@ -39,7 +41,7 @@ public class MessageListener {
     public Duration maxProcessTime = Duration.ofMinutes(30);
     public Duration longConsumerDelayThreshold = Duration.ofSeconds(60);
     public int maxPollRecords = 500;            // default kafka setting, refer to org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
-    public int maxPollBytes = 3 * 1024 * 1024;  // get 3M bytes message at max
+    public int maxPollBytes = DEFAULT_FETCH_MAX_BYTES;  // get 50M bytes message at max, default kafka config
     public int minPollBytes = 1;                // default kafka setting
     public Duration maxWaitTime = Duration.ofMillis(500);
     public String groupId = LogManager.APP_NAME;

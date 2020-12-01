@@ -61,7 +61,8 @@ public class MessageProducer {
                     ProducerConfig.LINGER_MS_CONFIG, 5L,                                         // use small linger time within acceptable range to improve batching
                     ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                            // longer backoff to reduce cpu usage when kafka is not available
                     ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5L * 1000,                   // 5s
-                    ProducerConfig.MAX_BLOCK_MS_CONFIG, 30L * 1000);                             // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+                    ProducerConfig.MAX_BLOCK_MS_CONFIG, 30L * 1000,                              // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+                    ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10 * 1024 * 1024);                   // 10MB for maximum message size
 
             var serializer = new ByteArraySerializer();
             var producer = new KafkaProducer<>(config, serializer, serializer);
@@ -93,9 +94,9 @@ public class MessageProducer {
             if (exception != null) {    // if failed to send message (kafka is down), fallback to error output
                 byte[] key = record.key();
                 LOGGER.error("failed to send kafka message, key={}, value={}",
-                        key == null ? null : new String(key, UTF_8),
-                        new String(record.value(), UTF_8),
-                        exception);
+                    key == null ? null : new String(key, UTF_8),
+                    new String(record.value(), UTF_8),
+                    exception);
             }
         }
     }
