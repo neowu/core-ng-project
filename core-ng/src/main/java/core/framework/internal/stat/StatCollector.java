@@ -1,7 +1,9 @@
 package core.framework.internal.stat;
 
 import com.sun.management.OperatingSystemMXBean;
+import core.framework.util.Files;
 import core.framework.util.Lists;
+import kotlin.text.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +12,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.ThreadMXBean;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +28,12 @@ public class StatCollector {
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
     private final List<GCStat> gcStats = new ArrayList<>(2);
     private final CPUStat cpuStat = new CPUStat(os);
+    private final boolean supportMemoryTracking;
+    private final Path procPath = Path.of("/proc/self/statm");
 
     public double highCPUUsageThreshold = 0.8;
     public double highHeapUsageThreshold = 0.8;
+    public double highMemUsageThreshold = 0.8;  // the java process RSS usage
 
     public StatCollector() {
         List<GarbageCollectorMXBean> beans = ManagementFactory.getGarbageCollectorMXBeans();
@@ -35,14 +41,13 @@ public class StatCollector {
             GCStat stat = GCStat.of(bean);
             if (stat != null) gcStats.add(stat);
         }
+        supportMemoryTracking = java.nio.file.Files.exists(procPath);
     }
 
-    public Stats collect() {
-        var stats = new Stats();
-
+    public void collectJVMUsage(Stats stats) {
         collectCPUUsage(stats);
         stats.put("thread_count", thread.getThreadCount());
-        collectMemoryUsage(stats);
+        collectHeapUsage(stats);
 
         for (GCStat gcStat : gcStats) {
             long count = gcStat.count();
@@ -50,12 +55,44 @@ public class StatCollector {
             stats.put("jvm_gc_" + gcStat.name + "_count", (double) count);
             stats.put("jvm_gc_" + gcStat.name + "_elapsed", (double) elapsed);
         }
-
-        collectMetrics(stats);
-        return stats;
     }
 
-    private void collectMemoryUsage(Stats stats) {
+    // collect VmRSS / cgroup ram limit
+    // refer to https://man7.org/linux/man-pages/man5/proc.5.html, /proc/[pid]/statm section
+    // e.g. 913415 52225 7215 1 0 66363 0
+    // the second number is VmRSS in pages (4k)
+    public void collectMemoryUsage(Stats stats) {
+        if (!supportMemoryTracking) return;
+
+        var content = new String(Files.bytes(procPath), Charsets.US_ASCII);
+        double vmRSS = parseVmRSS(content);
+        stats.put("vm_rss", vmRSS);
+        double maxMemory = os.getTotalMemorySize();
+        stats.put("max_memory", maxMemory);
+        boolean highUsage = stats.checkHighUsage(vmRSS / maxMemory, highMemUsageThreshold, "mem");
+        if (highUsage) {
+            stats.info("proc_status", new String(Files.bytes(Path.of("/proc/self/status")), Charsets.US_ASCII));
+            stats.info("native_memory", Diagnostic.nativeMemory());
+        }
+    }
+
+    int parseVmRSS(String content) {
+        int index1 = content.indexOf(' ');
+        int index2 = content.indexOf(' ', index1 + 1);
+        return Integer.parseInt(content.substring(index1 + 1, index2)) * 4096;
+    }
+
+    public void collectMetrics(Stats stats) {
+        for (Metrics metrics : metrics) {
+            try {
+                metrics.collect(stats);
+            } catch (Throwable e) {
+                logger.warn("failed to collect metrics, metrics={}, error={}", metrics.getClass().getCanonicalName(), e.getMessage(), e);
+            }
+        }
+    }
+
+    private void collectHeapUsage(Stats stats) {
         MemoryUsage heapUsage = memory.getHeapMemoryUsage();
         double usedHeap = heapUsage.getUsed();
         double maxHeap = heapUsage.getMax();
@@ -75,16 +112,6 @@ public class StatCollector {
         boolean highUsage = stats.checkHighUsage(usage, highCPUUsageThreshold, "cpu");
         if (highUsage) {
             stats.info("thread_dump", Diagnostic.thread());
-        }
-    }
-
-    private void collectMetrics(Stats stats) {
-        for (Metrics metrics : metrics) {
-            try {
-                metrics.collect(stats);
-            } catch (Throwable e) {
-                logger.warn("failed to collect metrics, metrics={}, error={}", metrics.getClass().getCanonicalName(), e.getMessage(), e);
-            }
         }
     }
 }

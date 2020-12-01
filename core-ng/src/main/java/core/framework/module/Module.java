@@ -145,5 +145,10 @@ public abstract class Module {
         context.collector.highHeapUsageThreshold = threshold;
     }
 
+    // monitor java process VmRSS / cgroup ram limit
+    public void highMemUsageThreshold(double threshold) {
+        context.collector.highMemUsageThreshold = threshold;
+    }
+
     protected abstract void initialize();
 }

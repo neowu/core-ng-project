@@ -14,6 +14,7 @@ import java.time.Instant;
 public final class CollectStatTask implements Runnable {
     private final LogAppender appender;
     private final StatCollector collector;
+    private int count;
 
     public CollectStatTask(LogAppender appender, StatCollector collector) {
         this.appender = appender;
@@ -22,7 +23,13 @@ public final class CollectStatTask implements Runnable {
 
     @Override
     public void run() {
-        Stats stats = collector.collect();
+        var stats = new Stats();
+        collector.collectJVMUsage(stats);
+        collector.collectMetrics(stats);
+        if (count % 6 == 0) {   // every 60s
+            collector.collectMemoryUsage(stats);
+        }
+        count++;
         StatMessage message = message(stats);
         appender.append(message);
     }

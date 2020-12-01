@@ -24,6 +24,11 @@ public class Diagnostic {
         return invoke("gcClassHistogram");
     }
 
+    // enable by -XX:NativeMemoryTracking=summary
+    public static String nativeMemory() {
+        return invoke("vmNativeMemory", "summary");
+    }
+
     // use "jcmd pid help" to list all operations,
     // refer to com.sun.management.internal.DiagnosticCommandImpl.getMBeanInfo, all command names are transformed
     private static String invoke(String operation, String... params) {
