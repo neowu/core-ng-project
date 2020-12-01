@@ -68,7 +68,7 @@ public class StatCollector {
     }
 
     private void collectCPUUsage(Stats stats) {
-        stats.put("sys_load_avg", os.getSystemLoadAverage());   // until java 14, OperatingSystemMXBean returns host level load and cpu usage, not container level
+        stats.put("sys_load_avg", os.getSystemLoadAverage());   // until java 15, OperatingSystemMXBean returns host level load and cpu usage, not container level
 
         double usage = cpuStat.usage();
         stats.put("cpu_usage", usage);

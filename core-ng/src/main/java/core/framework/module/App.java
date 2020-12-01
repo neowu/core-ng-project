@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import com.sun.management.OperatingSystemMXBean;
 import core.framework.async.Task;
 import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.json.JSONMapper;
@@ -10,6 +11,8 @@ import core.framework.internal.validate.Validator;
 import core.framework.log.Markers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.management.ManagementFactory;
 
 /**
  * @author neo
@@ -53,9 +56,9 @@ public abstract class App extends Module {
 
     void logContext(ActionLog actionLog) {
         actionLog.action("app:start");
-        Runtime runtime = Runtime.getRuntime();
-        actionLog.stats.put("cpu", (double) runtime.availableProcessors());
-        actionLog.stats.put("max_memory", (double) runtime.maxMemory());
+        actionLog.stats.put("cpu", (double) Runtime.getRuntime().availableProcessors());
+        // Runtime.getRuntime().maxMemory() returns max heap only
+        actionLog.stats.put("max_memory", (double) ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalMemorySize());
     }
 
     private void cleanup() {
