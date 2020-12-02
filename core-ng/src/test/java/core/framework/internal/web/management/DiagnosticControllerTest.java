@@ -44,4 +44,10 @@ class DiagnosticControllerTest {
         Response response = controller.thread(request);
         assertThat(response.contentType()).get().isEqualTo(ContentType.TEXT_PLAIN);
     }
+
+    @Test
+    void proc() {
+        Response response = controller.proc(request);
+        assertThat(response.contentType()).get().isEqualTo(ContentType.TEXT_PLAIN);
+    }
 }

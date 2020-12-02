@@ -1,9 +1,13 @@
 package core.framework.internal.web.management;
 
+import core.framework.http.ContentType;
 import core.framework.internal.stat.Diagnostic;
 import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.util.Files;
 import core.framework.web.Request;
 import core.framework.web.Response;
+
+import java.nio.file.Path;
 
 /**
  * @author neo
@@ -26,5 +30,17 @@ public class DiagnosticController {
     public Response heap(Request request) {
         accessControl.validate(request.clientIP());
         return Response.text(Diagnostic.heap());
+    }
+
+    public Response proc(Request request) {
+        accessControl.validate(request.clientIP());
+
+        Path procPath = Path.of("/proc/self/status");
+        if (java.nio.file.Files.exists(procPath)) {
+            return Response.bytes(Files.bytes(procPath))
+                    .contentType(ContentType.TEXT_PLAIN);
+        } else {
+            return Response.text("/proc/self/status not found");
+        }
     }
 }
