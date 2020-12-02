@@ -68,7 +68,7 @@ public class StatCollector {
         double vmRSS = parseVmRSS(content);
         stats.put("vm_rss", vmRSS);
         double maxMemory = os.getTotalMemorySize();
-        stats.put("max_memory", maxMemory);
+        stats.put("mem_max", maxMemory);
         boolean highUsage = stats.checkHighUsage(vmRSS / maxMemory, highMemUsageThreshold, "mem");
         if (highUsage) {
             stats.info("proc_status", new String(Files.bytes(Path.of("/proc/self/status")), Charsets.US_ASCII));

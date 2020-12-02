@@ -44,21 +44,22 @@ public abstract class App extends Module {
         }
     }
 
+    void logContext(ActionLog actionLog) {
+        actionLog.action("app:start");
+    }
+
     public final void configure() {
         logger.info("initialize framework");
+        Runtime runtime = Runtime.getRuntime();
+        logger.info("availableProcessors={}, maxMemory={}", runtime.availableProcessors(), ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalMemorySize());
+        logger.info("jvmArgs={}", String.join(" ", ManagementFactory.getRuntimeMXBean().getInputArguments()));
+
         context = new ModuleContext(logManager);
-        Runtime.getRuntime().addShutdownHook(new Thread(context.shutdownHook, "shutdown"));
+        runtime.addShutdownHook(new Thread(context.shutdownHook, "shutdown"));
 
         logger.info("initialize application");
         initialize();
         context.validate();
-    }
-
-    void logContext(ActionLog actionLog) {
-        actionLog.action("app:start");
-        actionLog.stats.put("cpu", (double) Runtime.getRuntime().availableProcessors());
-        // Runtime.getRuntime().maxMemory() returns max heap only
-        actionLog.stats.put("max_memory", (double) ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalMemorySize());
     }
 
     private void cleanup() {
