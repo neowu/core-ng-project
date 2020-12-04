@@ -17,6 +17,10 @@ import java.util.Optional;
  * @author neo
  */
 public class ResponseBeanReader {   // used by webservice client
+    static Class<?> responseBeanClass(Type responseType) {
+        return GenericTypes.isOptional(responseType) ? GenericTypes.optionalValueClass(responseType) : GenericTypes.rawClass(responseType);
+    }
+
     final Map<Class<?>, Context<?>> context = Maps.newHashMap();
 
     public ResponseBeanReader() {
@@ -24,7 +28,7 @@ public class ResponseBeanReader {   // used by webservice client
     }
 
     public void register(Type responseType, BeanClassValidator validator) {
-        Class<?> beanClass = ContextHelper.responseBeanClass(responseType);
+        Class<?> beanClass = responseBeanClass(responseType);
 
         if (!context.containsKey(beanClass)) {
             validator.validate(beanClass);
@@ -35,8 +39,9 @@ public class ResponseBeanReader {   // used by webservice client
     public Object fromJSON(Type responseType, byte[] body) throws IOException {
         if (void.class == responseType) return null;
 
-        Class<?> beanClass = ContextHelper.responseBeanClass(responseType);
-        Context<Object> context = ContextHelper.context(this.context, beanClass);
+        Class<?> beanClass = responseBeanClass(responseType);
+        @SuppressWarnings("unchecked")
+        Context<Object> context = (Context<Object>) this.context.get(beanClass);    // response type is registered thru APIConfig
         Object bean = context.reader.fromJSON(body);
         if (GenericTypes.isOptional(responseType)) {
             if (bean == null) return Optional.empty();

@@ -31,13 +31,15 @@ public class RequestBeanWriter {    // used by webservice client
     }
 
     public <T> Map<String, String> toParams(Class<T> beanClass, T bean) {
-        QueryParamContext<T> context = ContextHelper.context(queryParamContext, beanClass);
+        @SuppressWarnings("unchecked")
+        QueryParamContext<T> context = (QueryParamContext<T>) queryParamContext.get(beanClass);     // query param is registered thru APIConfig
         context.validator.validate(bean, false);
         return context.writer.toParams(bean);
     }
 
     public <T> byte[] toJSON(Class<T> beanClass, T bean) {
-        BeanContext<T> context = ContextHelper.context(beanContext, beanClass);
+        @SuppressWarnings("unchecked")
+        BeanContext<T> context = (BeanContext<T>) beanContext.get(beanClass);       // bean is registered thru APIConfig
         context.validator.validate(bean, false);
         return context.writer.toJSON(bean);
     }

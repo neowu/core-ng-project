@@ -25,7 +25,7 @@ public class ResponseBeanWriter {   // used by controller and web service
     }
 
     public void register(Type responseType, BeanClassValidator validator) {
-        Class<?> beanClass = ContextHelper.responseBeanClass(responseType);
+        Class<?> beanClass = ResponseBeanReader.responseBeanClass(responseType);
 
         if (!context.containsKey(beanClass)) {
             validator.validate(beanClass);
@@ -42,14 +42,26 @@ public class ResponseBeanWriter {   // used by controller and web service
             Optional<?> optional = (Optional<?>) bean;
             if (optional.isEmpty()) return Strings.bytes("null");
             Object value = optional.get();
-            Context<Object> context = ContextHelper.context(this.context, value.getClass());
+            Context<Object> context = context(this.context, value.getClass());
             context.validator.validate(value, false);
             return context.writer.toJSON(value);
         } else {
-            Context<Object> context = ContextHelper.context(this.context, bean.getClass());
+            Context<Object> context = context(this.context, bean.getClass());
             context.validator.validate(bean, false);
             return context.writer.toJSON(bean);
         }
+    }
+
+    private <T> T context(Map<Class<?>, ?> context, Class<?> beanClass) {
+        @SuppressWarnings("unchecked")
+        T result = (T) context.get(beanClass);
+        if (result == null) {
+            if (beanClass.getPackageName().startsWith("java")) {   // provide better error message for developer, rather than return class is not registered message
+                throw new Error("bean class must not be java built-in class, class=" + beanClass.getCanonicalName());
+            }
+            throw new Error("bean class is not registered, please use http().bean() to register, class=" + beanClass.getCanonicalName());
+        }
+        return result;
     }
 
     private static class Context<T> {

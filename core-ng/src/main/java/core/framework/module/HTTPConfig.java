@@ -1,6 +1,5 @@
 package core.framework.module;
 
-import core.framework.api.web.service.QueryParam;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.inject.InjectValidator;
 import core.framework.internal.json.JSONClassValidator;
@@ -14,8 +13,6 @@ import core.framework.web.ErrorHandler;
 import core.framework.web.Interceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Field;
 
 /**
  * @author neo
@@ -53,7 +50,7 @@ public final class HTTPConfig extends Config {
     // register http body bean and query param bean
     private void registerBean(Class<?> beanClass) {
         RequestBeanReader reader = context.httpServer.handler.requestBeanReader;
-        if (isQueryParamBean(beanClass)) {
+        if (RequestBeanReader.isQueryParamBean(beanClass)) {
             if (reader.containsQueryParam(beanClass)) {
                 throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
             }
@@ -66,12 +63,6 @@ public final class HTTPConfig extends Config {
             reader.registerBean(beanClass, context.beanClassValidator);
             writer.register(beanClass, context.beanClassValidator);
         }
-    }
-
-    private boolean isQueryParamBean(Class<?> beanClass) {
-        Field[] fields = beanClass.getDeclaredFields();
-        if (fields.length == 0) return false;
-        return fields[0].isAnnotationPresent(QueryParam.class);
     }
 
     public void intercept(Interceptor interceptor) {

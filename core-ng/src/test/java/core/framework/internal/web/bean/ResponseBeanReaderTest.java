@@ -80,14 +80,4 @@ class ResponseBeanReaderTest {
         TestBean parsedBean = (TestBean) reader.fromJSON(TestBean.class, Strings.bytes(JSON.toJSON(bean)));
         assertThat(parsedBean).usingRecursiveComparison().isEqualTo(bean);
     }
-
-    @Test
-    void withUnregisteredBean() {
-        assertThatThrownBy(() -> reader.fromJSON(TestUnregisteredBean.class, new byte[0]))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("bean class is not registered");
-    }
-
-    public static class TestUnregisteredBean {
-    }
 }
