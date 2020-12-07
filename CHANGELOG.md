@@ -1,5 +1,5 @@
 ## Change log
-### 7.6.4 (11/19/2020 - )
+### 7.6.4 (11/19/2020 - 12/07/2020)
 * kafka: update snappy-java to 1.1.8.1, (according to release note, there is small performance improvement)
 * kafka: added kafka().maxRequestSize() to configure max request size, this setting must be consistent with broker
 * stat: track and warn on java process high vmRSS usage, for docker OOMKill cases better enable -XX:NativeMemoryTracking=summary with detailed usage report
