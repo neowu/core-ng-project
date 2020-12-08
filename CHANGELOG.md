@@ -1,5 +1,12 @@
 ## Change log
+
+### 7.6.5 (12/08/2020 - )
+
+* http: update undertow to 2.2.3
+* httpClient: support fallback dns cache, to reduce intermitent dns resolving failures for external domains
+
 ### 7.6.4 (11/19/2020 - 12/07/2020)
+
 * kafka: update snappy-java to 1.1.8.1, (according to release note, there is small performance improvement)
 * kafka: added kafka().maxRequestSize() to configure max request size, this setting must be consistent with broker
 * stat: track and warn on java process high vmRSS usage, for docker OOMKill cases better enable -XX:NativeMemoryTracking=summary with detailed usage report
@@ -7,6 +14,7 @@
 * http: improve error message on query/form/json bean parsing, return generic message with 400 for vulnerability scanning
 
 ### 7.6.3 (11/16/2020 - 11/19/2020)
+
 * module: DBConfig.repository() returns repository object, to make it easier to extend, same applied to es search type and mongo collection
 * http: tweak http request/response logging to gracefully handle vulnerability scan request from internet
 * json: update jackson to 2.11.3 

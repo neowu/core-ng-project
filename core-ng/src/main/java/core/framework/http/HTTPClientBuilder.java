@@ -2,6 +2,7 @@ package core.framework.http;
 
 import core.framework.internal.http.CookieManager;
 import core.framework.internal.http.DefaultTrustManager;
+import core.framework.internal.http.FallbackDNSCache;
 import core.framework.internal.http.HTTPClientImpl;
 import core.framework.internal.http.HTTPEventListenerFactory;
 import core.framework.internal.http.PEM;
@@ -64,6 +65,10 @@ public final class HTTPClientBuilder {
     private Duration keepAlive = Duration.ofSeconds(30);    // conservative setting, as http connection to internet/external can be cut off by NAT/firewall if idle too long
     private Duration slowOperationThreshold = Duration.ofSeconds(30);   // slow threshold should be longer than connect timeout
     private boolean enableCookie = false;
+    // there is already networkaddress.cache.ttl=300s, this is to mitigate dns failure further,
+    // like external domain can be under DDos attack constantly (DNS hijacking) or unstable DNS query between countries
+    // this is trying to use previous success resolution to reduce intermittent dns resolve failures
+    private boolean enableFallbackDNSCache = false;
     private String userAgent = "HTTPClient";
     private boolean trustAll = false;
     private KeyStore trustStore;
@@ -93,6 +98,7 @@ public final class HTTPClientBuilder {
                 builder.addInterceptor(new RetryInterceptor(maxRetries, retryWaitTime, Threads::sleepRoughly));
             }
             if (enableCookie) builder.cookieJar(new CookieManager());
+            if (enableFallbackDNSCache) builder.dns(new FallbackDNSCache());
 
             return new HTTPClientImpl(builder.build(), userAgent, slowOperationThreshold);
         } finally {
@@ -159,6 +165,11 @@ public final class HTTPClientBuilder {
 
     public HTTPClientBuilder enableCookie() {
         enableCookie = true;
+        return this;
+    }
+
+    public HTTPClientBuilder enableFallbackDNSCache() {
+        enableFallbackDNSCache = true;
         return this;
     }
 
