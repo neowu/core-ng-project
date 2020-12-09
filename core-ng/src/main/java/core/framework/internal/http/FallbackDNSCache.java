@@ -1,6 +1,5 @@
 package core.framework.internal.http;
 
-import core.framework.log.Markers;
 import core.framework.util.Maps;
 import okhttp3.Dns;
 import org.slf4j.Logger;
@@ -11,6 +10,8 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import static core.framework.log.Markers.errorCode;
 
 /**
  * @author neo
@@ -30,7 +31,7 @@ public class FallbackDNSCache implements Dns {
         } catch (UnknownHostException e) {
             List<InetAddress> addresses = cache.get(domain);
             if (addresses != null) {
-                logger.warn(Markers.errorCode("DNS_FAILURE"), "failed to resolve domain, fallback to previous cached addresses, domain={}", domain, e);
+                logger.warn(errorCode("DNS_FAILURE"), "failed to resolve domain, fallback to previous cached addresses, domain={}", domain, e);
                 return addresses;
             }
             throw e;

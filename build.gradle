@@ -28,7 +28,7 @@ project('core-ng') {
         implementation 'com.squareup.okhttp3:okhttp:4.9.0'
         implementation 'io.undertow:undertow-core:2.2.3.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
-        implementation 'org.xerial.snappy:snappy-java:1.1.8.1'      // used by kafka message compression
+        implementation 'org.xerial.snappy:snappy-java:1.1.8.2'      // used by kafka message compression
         compileOnly "mysql:mysql-connector-java:${mysqlVersion}"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
@@ -73,8 +73,12 @@ project('core-ng-search') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        // elasticsearch-x-content depends on jackson-dataformat 2.10.4 which is not aligned with the version core-ng using, this can be ignored if not using smile/yaml/cbor
-        api "org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticVersion}"
+        api("org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticVersion}") {
+            exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
+            exclude group: 'com.fasterxml.jackson.dataformat', module: 'jackson-dataformat-smile'
+            exclude group: 'com.fasterxml.jackson.dataformat', module: 'jackson-dataformat-yaml'
+            exclude group: 'com.fasterxml.jackson.dataformat', module: 'jackson-dataformat-cbor'
+        }
         testImplementation project(":core-ng-test")
     }
 }
@@ -84,6 +88,7 @@ project('core-ng-search-test') {
     dependencies {
         api project(":core-ng-test")
         api project(":core-ng-search")
+        implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
         implementation "org.elasticsearch.plugin:transport-netty4-client:${elasticVersion}"
         implementation "org.elasticsearch.plugin:reindex-client:${elasticVersion}"
         implementation "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
