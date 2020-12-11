@@ -55,7 +55,6 @@ public class LogProcessorApp extends App {
         configureKafka();
 
         configureJob();
-        schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
     }
 
     private void configureKibanaService() {
@@ -107,9 +106,13 @@ public class LogProcessorApp extends App {
     }
 
     private void configureJob() {
-        var jobConfig = new JobConfig();
-        jobConfig.indexAliveDays = Integer.parseInt(property("job.index.aliveDays").orElse("30"));  // delete index older than indexAliveDays
-        jobConfig.indexOpenDays = Integer.parseInt(property("job.index.openDays").orElse("7"));  // close index older than indexOpenDays
-        bind(jobConfig);
+        var config = new JobConfig();
+        // delete index older than retention days, override by env JOB_INDEX_RETENTION_DAYS if needed
+        config.indexRetentionDays = Integer.parseInt(property("job.index.retention.days").orElse("30"));
+        // close index older than open days, override by env JOB_INDEX_OPEN_DAYS if needed
+        config.indexOpenDays = Integer.parseInt(property("job.index.open.days").orElse("7"));
+        bind(config);
+
+        schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
     }
 }

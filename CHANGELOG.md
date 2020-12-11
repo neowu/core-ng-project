@@ -4,6 +4,7 @@
 
 * http: update undertow to 2.2.3
 * httpClient: support fallback dns cache, to reduce intermitent dns resolving failures for external domains
+* log-processor: support JOB_INDEX_OPEN_DAYS, JOB_INDEX_RETENTION_DAYS env to configure how long to keep log index open and when to delete
 
 ### 7.6.4 (11/19/2020 - 12/07/2020)
 

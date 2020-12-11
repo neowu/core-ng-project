@@ -4,6 +4,6 @@ package core.log.service;
  * @author miller
  */
 public class JobConfig {
-    public int indexAliveDays;
+    public int indexRetentionDays;
     public int indexOpenDays;
 }

@@ -36,7 +36,7 @@ public class CleanupOldIndexJob implements Job {
             String index = entry.getKey();
             indexService.createdDate(index).ifPresent(date -> {
                 long days = ChronoUnit.DAYS.between(date, now);
-                if (days >= jobConfig.indexAliveDays) {        // delete index older than indexAliveDays, default is 30
+                if (days >= jobConfig.indexRetentionDays) {        // delete index older than indexAliveDays, default is 30
                     deleteIndex(index);
                 } else if (days >= jobConfig.indexOpenDays && entry.getValue().state == ClusterStateResponse.IndexState.OPEN) {  // close index older than indexOpenDays, default is 7
                     closeIndex(index);
