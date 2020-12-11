@@ -3,6 +3,7 @@ package core.log.job;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.log.service.IndexService;
+import core.log.service.JobConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,7 @@ class CleanupOldIndexJobTest {
         job = new CleanupOldIndexJob();
         job.elasticSearch = elasticSearch;
         job.indexService = new IndexService();
+        job.jobConfig = defaultJobConfig();
     }
 
     @Test
@@ -46,9 +48,36 @@ class CleanupOldIndexJobTest {
         verify(elasticSearch).closeIndex("action-2017.11.01");
     }
 
+    @Test
+    void customJobConfig() {
+        var jobConfig = new JobConfig();
+        jobConfig.indexAliveDays = 7;
+        jobConfig.indexOpenDays = 3;
+        job.jobConfig = jobConfig;
+        var state = new ClusterStateResponse();
+        state.metadata = new ClusterStateResponse.Metadata();
+        state.metadata.indices = Map.of("action-2017.10.29", index(ClusterStateResponse.IndexState.OPEN),
+                "action-2017.10.30", index(ClusterStateResponse.IndexState.CLOSE),
+                "action-2017.11.05", index(ClusterStateResponse.IndexState.OPEN));
+        when(elasticSearch.state()).thenReturn(state);
+
+        job.cleanup(LocalDate.of(2017, 11, 8));
+
+        verify(elasticSearch).deleteIndex("action-2017.10.29");
+        verify(elasticSearch).deleteIndex("action-2017.10.30");
+        verify(elasticSearch).closeIndex("action-2017.11.05");
+    }
+
     private ClusterStateResponse.Index index(ClusterStateResponse.IndexState state) {
         ClusterStateResponse.Index index = new ClusterStateResponse.Index();
         index.state = state;
         return index;
+    }
+
+    private JobConfig defaultJobConfig() {
+        var jobConfig = new JobConfig();
+        jobConfig.indexAliveDays = 30;
+        jobConfig.indexOpenDays = 7;
+        return jobConfig;
     }
 }
