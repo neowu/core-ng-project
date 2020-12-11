@@ -6,6 +6,7 @@ import core.framework.scheduler.JobContext;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.log.service.IndexService;
+import core.log.service.JobConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,8 @@ public class CleanupOldIndexJob implements Job {
     ElasticSearch elasticSearch;
     @Inject
     IndexService indexService;
+    @Inject
+    JobConfig jobConfig;
 
     @Override
     public void execute(JobContext context) {
@@ -33,9 +36,9 @@ public class CleanupOldIndexJob implements Job {
             String index = entry.getKey();
             indexService.createdDate(index).ifPresent(date -> {
                 long days = ChronoUnit.DAYS.between(date, now);
-                if (days >= 30) {        // delete log older than 30 days, close index older than 7 days
+                if (days >= jobConfig.indexAliveDays) {        // delete index older than indexAliveDays, default is 30
                     deleteIndex(index);
-                } else if (days >= 7 && entry.getValue().state == ClusterStateResponse.IndexState.OPEN) {
+                } else if (days >= jobConfig.indexOpenDays && entry.getValue().state == ClusterStateResponse.IndexState.OPEN) {  // close index older than indexOpenDays, default is 7
                     closeIndex(index);
                 }
             });

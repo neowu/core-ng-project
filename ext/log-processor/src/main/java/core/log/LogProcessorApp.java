@@ -20,6 +20,7 @@ import core.log.service.ElasticSearchAppender;
 import core.log.service.EventService;
 import core.log.service.IndexOption;
 import core.log.service.IndexService;
+import core.log.service.JobConfig;
 import core.log.service.KibanaService;
 import core.log.service.StatService;
 
@@ -36,6 +37,7 @@ public class LogProcessorApp extends App {
         loadProperties("sys.properties");
         loadProperties("kibana.properties");
         loadProperties("index.properties");
+        loadProperties("job.properties");
 
         configureSearch();
 
@@ -52,6 +54,7 @@ public class LogProcessorApp extends App {
 
         configureKafka();
 
+        configureJob();
         schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
     }
 
@@ -101,5 +104,12 @@ public class LogProcessorApp extends App {
         search.type(TraceDocument.class);
         search.type(StatDocument.class);
         search.type(EventDocument.class);
+    }
+
+    private void configureJob() {
+        var jobConfig = new JobConfig();
+        jobConfig.indexAliveDays = Integer.parseInt(property("job.index.aliveDays").orElse("30"));  // delete index older than indexAliveDays
+        jobConfig.indexOpenDays = Integer.parseInt(property("job.index.openDays").orElse("7"));  // close index older than indexOpenDays
+        bind(jobConfig);
     }
 }
