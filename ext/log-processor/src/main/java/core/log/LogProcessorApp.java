@@ -37,6 +37,7 @@ public class LogProcessorApp extends App {
         loadProperties("sys.properties");
         loadProperties("kibana.properties");
         loadProperties("index.properties");
+        loadProperties("job.properties");
 
         configureSearch();
 
