@@ -1,5 +1,5 @@
 [
-  {"attributes": {"buildNum": 27521, "defaultIndex": "action-pattern", "notifications:banner": "${NOTIFICATION_BANNER}"}, "id": "7.10.0", "type": "config"},
+  {"attributes": {"buildNum": 27521, "defaultIndex": "action-pattern", "notifications:banner": "${NOTIFICATION_BANNER}"}, "id": "7.10.1", "type": "config"},
   {
     "id": "action-pattern", "type": "index-pattern",
     "attributes": {

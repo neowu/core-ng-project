@@ -87,11 +87,7 @@ final class QueryParamHelper {   // used by generated QueryParamMapper
 
     public static Boolean toBoolean(String value) {
         if (value.isEmpty()) return null;
-        try {
-            return Boolean.valueOf(value);
-        } catch (NumberFormatException e) {
-            throw new BadRequestException("failed to parse boolean, value=" + value, "INVALID_HTTP_REQUEST", e);
-        }
+        return Boolean.valueOf(value);  // Boolean.parseBoolean does not throw exception
     }
 
     public static <T extends Enum<?>> T toEnum(String value, Class<T> valueClass) {
