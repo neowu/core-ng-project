@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.6.5 (12/08/2020 - )
+### 7.6.5 (12/08/2020 - 12/16/2020)
 
 * http: update undertow to 2.2.3
 * httpClient: support fallback dns cache, to reduce intermittent dns resolving failures for external domains
