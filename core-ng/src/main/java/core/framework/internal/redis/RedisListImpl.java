@@ -80,8 +80,8 @@ public final class RedisListImpl implements RedisList {
     public List<String> range(String key, long start, long stop) {
         var watch = new StopWatch();
         validate("key", key);
-        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         List<String> values = null;
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.writeArray(4);

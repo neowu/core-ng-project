@@ -38,12 +38,9 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     public int add(String key, Map<String, Long> values, boolean onlyIfAbsent) {
         var watch = new StopWatch();
         validate("key", key);
-        if (values.isEmpty()) throw new Error("values must not be empty");
-        for (String valueKey : values.keySet()) {
-            if (valueKey == null) throw new Error("values must not contain null key");
-        }
-        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        validate("values", values);
         int added = 0;
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             int length = 2 + values.size() * 2;
@@ -75,8 +72,8 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     public Map<String, Long> range(String key, long start, long stop) {
         var watch = new StopWatch();
         validate("key", key);
-        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         Map<String, Long> values = null;
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.writeArray(5);

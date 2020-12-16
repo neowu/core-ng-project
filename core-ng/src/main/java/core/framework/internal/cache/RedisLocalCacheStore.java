@@ -106,6 +106,6 @@ public class RedisLocalCacheStore implements CacheStore {
         var message = new InvalidateLocalCacheMessage();
         message.keys = keys;
         message.clientIP = Network.LOCAL_HOST_ADDRESS;
-        redis.publish(CHANNEL_INVALIDATE_CACHE, writer.toJSON(message));
+        redis.pubSub().publish(CHANNEL_INVALIDATE_CACHE, writer.toJSON(message));
     }
 }

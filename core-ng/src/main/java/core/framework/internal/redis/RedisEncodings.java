@@ -29,9 +29,9 @@ class RedisEncodings {
         }
     }
 
-    static void validate(String name, Map<String, String> values) {
+    static void validate(String name, Map<?, ?> values) {
         if (values.isEmpty()) throw new Error(name + " must not be empty");
-        for (Map.Entry<String, String> entry : values.entrySet()) {
+        for (Map.Entry<?, ?> entry : values.entrySet()) {
             if (entry.getKey() == null || entry.getValue() == null) throw new Error(name + " must not contain null");
         }
     }

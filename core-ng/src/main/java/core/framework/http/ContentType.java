@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -83,6 +84,19 @@ public final class ContentType {
 
     public Optional<Charset> charset() {
         return Optional.ofNullable(charset);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        ContentType that = (ContentType) object;
+        return contentType.equals(that.contentType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(contentType);
     }
 
     @Override

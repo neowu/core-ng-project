@@ -51,4 +51,10 @@ class ContentTypeTest {
         assertThat(type.mediaType).isEqualTo("text/xml");
         assertThat(type.charset()).isNotPresent();
     }
+
+    @Test
+    void compare() {
+        assertThat(ContentType.APPLICATION_JSON).isEqualTo(ContentType.parse("application/json; charset=utf-8"));
+        assertThat(ContentType.APPLICATION_JSON.hashCode()).isNotEqualTo(ContentType.TEXT_HTML.hashCode());
+    }
 }

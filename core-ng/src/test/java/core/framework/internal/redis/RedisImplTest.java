@@ -44,6 +44,6 @@ class RedisImplTest {
     void set() {
         assertThatThrownBy(() -> redis.set("key", "value", Duration.ZERO, true))
                 .isInstanceOf(Error.class)
-                .hasMessageContaining("expiration time must be longer than 1ms");
+                .hasMessageContaining("expiration time must be longer than 0ms");
     }
 }

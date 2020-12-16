@@ -141,7 +141,7 @@ public final class HTTPClientImpl implements HTTPClient {
     @Nullable
     MediaType mediaType(ContentType contentType) {
         if (contentType == null) return null;   // generally body is always set with valid content type, but in theory contentType=null is considered legitimate, so here to support such case
-        if (contentType == ContentType.APPLICATION_JSON) return MEDIA_TYPE_APPLICATION_JSON; // avoid parsing as application/json is most used type
+        if (ContentType.APPLICATION_JSON.equals(contentType)) return MEDIA_TYPE_APPLICATION_JSON; // avoid parsing as application/json is most used type
         return MediaType.get(contentType.toString());   // use get() not parse() to fail if passed invalid contentType
     }
 }

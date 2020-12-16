@@ -62,8 +62,8 @@ public final class RedisSetImpl implements RedisSet {
     public Set<String> members(String key) {
         var watch = new StopWatch();
         validate("key", key);
-        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         Set<String> values = null;
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyCommand(SMEMBERS, key);
@@ -90,8 +90,8 @@ public final class RedisSetImpl implements RedisSet {
         var watch = new StopWatch();
         validate("key", key);
         validate("value", value);
-        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         boolean isMember = false;
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyArgumentCommand(SISMEMBER, key, encode(value));

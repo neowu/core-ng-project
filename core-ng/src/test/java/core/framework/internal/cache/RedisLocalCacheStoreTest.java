@@ -1,6 +1,7 @@
 package core.framework.internal.cache;
 
 import core.framework.internal.redis.RedisImpl;
+import core.framework.internal.redis.RedisPubSub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +31,8 @@ class RedisLocalCacheStoreTest {
     CacheStore redisCacheStore;
     @Mock
     RedisImpl redis;
+    @Mock
+    RedisPubSub redisPubSub;
     private RedisLocalCacheStore cacheStore;
 
     @BeforeEach
@@ -116,23 +119,27 @@ class RedisLocalCacheStoreTest {
 
     @Test
     void put() {
+        when(redis.pubSub()).thenReturn(redisPubSub);
+
         var value = new TestCache();
         cacheStore.put("key", value, Duration.ofHours(1), null);
 
         verify(localCacheStore).put("key", value, Duration.ofHours(1), null);
         verify(redisCacheStore).put("key", value, Duration.ofHours(1), null);
-        verify(redis).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
+        verify(redisPubSub).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
     }
 
     @Test
     void putAll() {
+        when(redis.pubSub()).thenReturn(redisPubSub);
+
         List<CacheStore.Entry<TestCache>> values = List.of(new CacheStore.Entry<>("key", new TestCache()));
         Duration expiration = Duration.ofHours(1);
         cacheStore.putAll(values, expiration, null);
 
         verify(localCacheStore).putAll(values, expiration, null);
         verify(redisCacheStore).putAll(values, expiration, null);
-        verify(redis).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
+        verify(redisPubSub).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
     }
 
     @Test
@@ -142,16 +149,17 @@ class RedisLocalCacheStoreTest {
         cacheStore.delete("key1");
 
         verify(localCacheStore).delete("key1");
-        verify(redis, never()).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
+        verify(redisPubSub, never()).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
     }
 
     @Test
     void delete() {
+        when(redis.pubSub()).thenReturn(redisPubSub);
         when(redisCacheStore.delete("key1")).thenReturn(Boolean.TRUE);
 
         cacheStore.delete("key1");
 
         verify(localCacheStore).delete("key1");
-        verify(redis).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
+        verify(redisPubSub).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
     }
 }

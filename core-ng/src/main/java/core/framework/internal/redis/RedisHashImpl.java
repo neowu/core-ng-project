@@ -120,7 +120,6 @@ public final class RedisHashImpl implements RedisHash {
         var watch = new StopWatch();
         validate("key", key);
         validate("values", values);
-        if (values.isEmpty()) throw new Error("values must not be empty");
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;

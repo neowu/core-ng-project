@@ -32,7 +32,6 @@ import static core.framework.internal.redis.Protocol.Command.MGET;
 import static core.framework.internal.redis.Protocol.Command.MSET;
 import static core.framework.internal.redis.Protocol.Command.PEXPIRE;
 import static core.framework.internal.redis.Protocol.Command.PTTL;
-import static core.framework.internal.redis.Protocol.Command.PUBLISH;
 import static core.framework.internal.redis.Protocol.Command.SCAN;
 import static core.framework.internal.redis.Protocol.Command.SET;
 import static core.framework.internal.redis.Protocol.Keyword.COUNT;
@@ -52,6 +51,7 @@ public class RedisImpl implements Redis {
     private final RedisHash redisHash = new RedisHashImpl(this);
     private final RedisList redisList = new RedisListImpl(this);
     private final RedisSortedSet redisSortedSet = new RedisSortedSetImpl(this);
+    private final RedisPubSub pubSub = new RedisPubSub(this);
     private final RedisAdmin redisAdmin = new RedisAdminImpl(this);
     private final String name;
     public Pool<RedisConnection> pool;
@@ -127,7 +127,7 @@ public class RedisImpl implements Redis {
     @Override
     public boolean set(String key, String value, Duration expiration, boolean onlyIfAbsent) {
         validate("key", key);
-        if (value == null) throw new Error("value must not be null");
+        validate("value", value);
         return set(key, encode(value), expiration, onlyIfAbsent);
     }
 
@@ -297,7 +297,7 @@ public class RedisImpl implements Redis {
 
     public void multiSet(Map<String, byte[]> values, Duration expiration) {
         var watch = new StopWatch();
-        if (values.isEmpty()) throw new Error("values must not be empty");
+        validate("values", values);
         byte[] expirationValue = expirationValue(expiration);
         int size = values.size();
         PoolItem<RedisConnection> item = pool.borrowItem();
@@ -419,34 +419,18 @@ public class RedisImpl implements Redis {
         }
     }
 
-    public void publish(String channel, byte[] message) {
-        var watch = new StopWatch();
-        PoolItem<RedisConnection> item = pool.borrowItem();
-        try {
-            RedisConnection connection = item.resource;
-            connection.writeKeyArgumentCommand(PUBLISH, channel, message);
-            connection.readLong();
-        } catch (IOException e) {
-            item.broken = true;
-            throw new UncheckedIOException(e);
-        } finally {
-            pool.returnItem(item);
-            long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, 0, 1);
-            logger.debug("publish, channel={}, message={}, elapsed={}", channel, new BytesLogParam(message), elapsed);
-            checkSlowOperation(elapsed);
-        }
+    public RedisPubSub pubSub() {
+        return pubSub;
     }
 
     void checkSlowOperation(long elapsed) {
-        if (elapsed > slowOperationThresholdInNanos) {
+        if (elapsed > slowOperationThresholdInNanos)
             logger.warn(Markers.errorCode("SLOW_REDIS"), "slow redis operation, elapsed={}", Duration.ofNanos(elapsed));
-        }
     }
 
     private byte[] expirationValue(Duration expiration) {
         long expirationTime = expiration.toMillis();
-        if (expirationTime <= 0) throw new Error("expiration time must be longer than 1ms");
+        if (expirationTime <= 0) throw new Error("expiration time must be longer than 0ms");
         return encode(expirationTime);
     }
 }
