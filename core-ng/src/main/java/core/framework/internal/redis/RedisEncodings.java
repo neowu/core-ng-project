@@ -3,6 +3,7 @@ package core.framework.internal.redis;
 import core.framework.util.Strings;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * @author neo
@@ -17,8 +18,25 @@ class RedisEncodings {
         }
     }
 
+    static void validate(String name, String value) {
+        if (value == null) throw new Error(name + " must not be null");
+    }
+
+    static void validate(String name, String... values) {
+        if (values.length == 0) throw new Error(name + " must not be empty");
+        for (String value : values) {
+            if (value == null) throw new Error(name + " must not contain null");
+        }
+    }
+
+    static void validate(String name, Map<String, String> values) {
+        if (values.isEmpty()) throw new Error(name + " must not be empty");
+        for (Map.Entry<String, String> entry : values.entrySet()) {
+            if (entry.getKey() == null || entry.getValue() == null) throw new Error(name + " must not contain null");
+        }
+    }
+
     static byte[] encode(String value) {
-        if (value == null) throw new Error("value must not be null");
         return Strings.bytes(value);
     }
 

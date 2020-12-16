@@ -21,6 +21,7 @@ import static core.framework.internal.redis.Protocol.Command.SPOP;
 import static core.framework.internal.redis.Protocol.Command.SREM;
 import static core.framework.internal.redis.RedisEncodings.decode;
 import static core.framework.internal.redis.RedisEncodings.encode;
+import static core.framework.internal.redis.RedisEncodings.validate;
 
 /**
  * @author neo
@@ -36,7 +37,8 @@ public final class RedisSetImpl implements RedisSet {
     @Override
     public long add(String key, String... values) {
         var watch = new StopWatch();
-        if (values.length == 0) throw new Error("values must not be empty");
+        validate("key", key);
+        validate("values", values);
         long addedValues = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
@@ -59,6 +61,7 @@ public final class RedisSetImpl implements RedisSet {
     @Override
     public Set<String> members(String key) {
         var watch = new StopWatch();
+        validate("key", key);
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         Set<String> values = null;
         try {
@@ -85,6 +88,8 @@ public final class RedisSetImpl implements RedisSet {
     @Override
     public boolean isMember(String key, String value) {
         var watch = new StopWatch();
+        validate("key", key);
+        validate("value", value);
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         boolean isMember = false;
         try {
@@ -108,7 +113,8 @@ public final class RedisSetImpl implements RedisSet {
     @Override
     public long remove(String key, String... values) {
         var watch = new StopWatch();
-        if (values.length == 0) throw new Error("values must not be empty");
+        validate("key", key);
+        validate("values", values);
         long removedValues = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
@@ -132,6 +138,7 @@ public final class RedisSetImpl implements RedisSet {
     @Override
     public Set<String> pop(String key, long count) {
         var watch = new StopWatch();
+        validate("key", key);
         if (count <= 0) throw new Error("count must be greater than 0");
         Set<String> values = null;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
@@ -159,6 +166,7 @@ public final class RedisSetImpl implements RedisSet {
     @Override
     public long size(String key) {
         var watch = new StopWatch();
+        validate("key", key);
         long size = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {

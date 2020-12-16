@@ -41,6 +41,7 @@ import static core.framework.internal.redis.Protocol.Keyword.NX;
 import static core.framework.internal.redis.Protocol.Keyword.PX;
 import static core.framework.internal.redis.RedisEncodings.decode;
 import static core.framework.internal.redis.RedisEncodings.encode;
+import static core.framework.internal.redis.RedisEncodings.validate;
 
 /**
  * @author neo
@@ -93,6 +94,7 @@ public class RedisImpl implements Redis {
 
     @Override
     public String get(String key) {
+        validate("key", key);   // only validate on interface methods, internal usage will be checked by caller
         return decode(getBytes(key));
     }
 
@@ -124,6 +126,8 @@ public class RedisImpl implements Redis {
 
     @Override
     public boolean set(String key, String value, Duration expiration, boolean onlyIfAbsent) {
+        validate("key", key);
+        if (value == null) throw new Error("value must not be null");
         return set(key, encode(value), expiration, onlyIfAbsent);
     }
 
@@ -163,6 +167,7 @@ public class RedisImpl implements Redis {
     @Override
     public void expire(String key, Duration expiration) {
         var watch = new StopWatch();
+        validate("key", key);
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -183,7 +188,7 @@ public class RedisImpl implements Redis {
     @Override
     public long del(String... keys) {
         var watch = new StopWatch();
-        if (keys.length == 0) throw new Error("keys must not be empty");
+        validate("keys", keys);
         long deletedKeys = 0;
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
@@ -206,6 +211,7 @@ public class RedisImpl implements Redis {
     @Override
     public long increaseBy(String key, long increment) {
         var watch = new StopWatch();
+        validate("key", key);
         long value = 0;
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
@@ -227,6 +233,7 @@ public class RedisImpl implements Redis {
 
     @Override
     public Map<String, String> multiGet(String... keys) {
+        validate("keys", keys);
         Map<String, byte[]> values = multiGetBytes(keys);
         Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(values.size());
         for (Map.Entry<String, byte[]> entry : values.entrySet()) {
@@ -237,7 +244,6 @@ public class RedisImpl implements Redis {
 
     public Map<String, byte[]> multiGetBytes(String... keys) {
         var watch = new StopWatch();
-        if (keys.length == 0) throw new Error("keys must not be empty");
         Map<String, byte[]> values = Maps.newLinkedHashMapWithExpectedSize(keys.length);
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
@@ -264,7 +270,7 @@ public class RedisImpl implements Redis {
     @Override
     public void multiSet(Map<String, String> values) {
         var watch = new StopWatch();
-        if (values.isEmpty()) throw new Error("values must not be empty");
+        validate("values", values);
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -337,6 +343,7 @@ public class RedisImpl implements Redis {
     @Override
     public void forEach(String pattern, Consumer<String> consumer) {
         var watch = new StopWatch();
+        if (pattern == null) throw new Error("pattern must not be null");
         long start = System.nanoTime();
         long redisTook = 0;
         PoolItem<RedisConnection> item = pool.borrowItem();
@@ -382,7 +389,6 @@ public class RedisImpl implements Redis {
 
     public long[] expirationTime(String... keys) {
         var watch = new StopWatch();
-        if (keys.length == 0) throw new Error("keys must not be empty");
         int size = keys.length;
         long[] expirationTimes = null;
         PoolItem<RedisConnection> item = pool.borrowItem();

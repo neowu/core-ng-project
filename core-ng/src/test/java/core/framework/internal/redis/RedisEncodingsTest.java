@@ -3,7 +3,11 @@ package core.framework.internal.redis;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -33,5 +37,28 @@ class RedisEncodingsTest {
     @Test
     void decode() {
         assertThat(RedisEncodings.decode(Strings.bytes("value"))).isEqualTo("value");
+    }
+
+    @Test
+    void validate() {
+        assertThatThrownBy(() -> RedisEncodings.validate("key", (String) null))
+                .isInstanceOf(Error.class).hasMessage("key must not be null");
+
+        assertThatThrownBy(() -> {
+            var keys = new String[0];
+            RedisEncodings.validate("keys", keys);
+        }).isInstanceOf(Error.class).hasMessage("keys must not be empty");
+
+        assertThatThrownBy(() -> RedisEncodings.validate("keys", "1", "2", null))
+                .isInstanceOf(Error.class).hasMessage("keys must not contain null");
+
+        assertThatThrownBy(() -> RedisEncodings.validate("values", Map.of()))
+                .isInstanceOf(Error.class).hasMessage("values must not be empty");
+
+        assertThatThrownBy(() -> {
+            Map<String, String> values = new HashMap<>();
+            values.put(null, null);
+            RedisEncodings.validate("values", values);
+        }).isInstanceOf(Error.class).hasMessage("values must not contain null");
     }
 }

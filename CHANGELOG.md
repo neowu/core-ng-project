@@ -5,6 +5,7 @@
 * http: update undertow to 2.2.3
 * httpClient: support fallback dns cache, to reduce intermittent dns resolving failures for external domains
 * log-processor: support JOB_INDEX_OPEN_DAYS, JOB_INDEX_RETENTION_DAYS env to configure how long to keep log index open and when to delete
+* redis: improve error handling by validating all input before sending data
 
 ### 7.6.4 (11/19/2020 - 12/07/2020)
 

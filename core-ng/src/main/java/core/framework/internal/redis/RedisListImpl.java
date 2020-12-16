@@ -18,6 +18,7 @@ import static core.framework.internal.redis.Protocol.Command.LRANGE;
 import static core.framework.internal.redis.Protocol.Command.RPUSH;
 import static core.framework.internal.redis.RedisEncodings.decode;
 import static core.framework.internal.redis.RedisEncodings.encode;
+import static core.framework.internal.redis.RedisEncodings.validate;
 
 /**
  * @author rexthk
@@ -33,6 +34,7 @@ public final class RedisListImpl implements RedisList {
     @Override
     public String pop(String key) {
         var watch = new StopWatch();
+        validate("key", key);
         String value = null;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
@@ -55,7 +57,8 @@ public final class RedisListImpl implements RedisList {
     @Override
     public long push(String key, String... values) {
         var watch = new StopWatch();
-        if (values.length == 0) throw new Error("values must not be empty");
+        validate("key", key);
+        validate("values", values);
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -76,6 +79,7 @@ public final class RedisListImpl implements RedisList {
     @Override
     public List<String> range(String key, long start, long stop) {
         var watch = new StopWatch();
+        validate("key", key);
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         List<String> values = null;
         try {

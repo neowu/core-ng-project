@@ -22,6 +22,7 @@ import static core.framework.internal.redis.Protocol.Command.HMSET;
 import static core.framework.internal.redis.Protocol.Command.HSET;
 import static core.framework.internal.redis.RedisEncodings.decode;
 import static core.framework.internal.redis.RedisEncodings.encode;
+import static core.framework.internal.redis.RedisEncodings.validate;
 
 /**
  * @author neo
@@ -37,6 +38,8 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public String get(String key, String field) {
         var watch = new StopWatch();
+        validate("key", key);
+        validate("field", field);
         String value = null;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
@@ -59,6 +62,7 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public Map<String, String> getAll(String key) {
         var watch = new StopWatch();
+        validate("key", key);
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         Map<String, String> values = null;
         try {
@@ -86,6 +90,9 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public void set(String key, String field, String value) {
         var watch = new StopWatch();
+        validate("key", key);
+        validate("field", field);
+        validate("value", value);
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -111,6 +118,8 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public void multiSet(String key, Map<String, String> values) {
         var watch = new StopWatch();
+        validate("key", key);
+        validate("values", values);
         if (values.isEmpty()) throw new Error("values must not be empty");
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
@@ -140,6 +149,8 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public long increaseBy(String key, String field, long increment) {
         var watch = new StopWatch();
+        validate("key", key);
+        validate("field", field);
         long value = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
@@ -162,7 +173,8 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public long del(String key, String... fields) {
         var watch = new StopWatch();
-        if (fields.length == 0) throw new Error("fields must not be empty");
+        validate("key", key);
+        validate("fields", fields);
         long deletedFields = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {

@@ -21,6 +21,7 @@ import static core.framework.internal.redis.Protocol.Keyword.NX;
 import static core.framework.internal.redis.Protocol.Keyword.WITHSCORES;
 import static core.framework.internal.redis.RedisEncodings.decode;
 import static core.framework.internal.redis.RedisEncodings.encode;
+import static core.framework.internal.redis.RedisEncodings.validate;
 
 /**
  * @author tempo
@@ -36,6 +37,11 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     @Override
     public int add(String key, Map<String, Long> values, boolean onlyIfAbsent) {
         var watch = new StopWatch();
+        validate("key", key);
+        if (values.isEmpty()) throw new Error("values must not be empty");
+        for (String valueKey : values.keySet()) {
+            if (valueKey == null) throw new Error("values must not contain null key");
+        }
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         int added = 0;
         try {
@@ -68,6 +74,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     @Override
     public Map<String, Long> range(String key, long start, long stop) {
         var watch = new StopWatch();
+        validate("key", key);
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         Map<String, Long> values = null;
         try {
@@ -96,6 +103,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     @Override
     public Map<String, Long> rangeByScore(String key, long minScore, long maxScore, long limit) {
         var watch = new StopWatch();
+        validate("key", key);
         if (limit == 0) throw new Error("limit must not be 0");
         if (maxScore < minScore) throw new Error("maxScore must be larger than minScore");
 
@@ -143,6 +151,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     @Override
     public Map<String, Long> popByScore(String key, long minScore, long maxScore, long limit) {
         var watch = new StopWatch();
+        validate("key", key);
         if (limit == 0) throw new Error("limit must not be 0");
         if (maxScore < minScore) throw new Error("stop must be larger than start");
 
