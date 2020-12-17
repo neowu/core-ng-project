@@ -19,7 +19,7 @@ class KafkaAppenderTest {
 
     @BeforeEach
     void createKafkaAppender() {
-        appender = new KafkaAppender(null);
+        appender = new KafkaAppender(new KafkaURI("localhost"));
     }
 
     @Test
@@ -31,12 +31,12 @@ class KafkaAppenderTest {
 
     @Test
     void stop() {
-        appender.stop(-1);
+        appender.stop(0);
     }
 
     @Test
     void onCompletion() {
-        KafkaAppender.KafkaCallback callback = appender.new KafkaCallback();
+        var callback = appender.new KafkaCallback();
         appender.records.add(new ProducerRecord<>("topic", new byte[0]));
         callback.onCompletion(null, new KafkaException("unexpected"));
         assertThat(appender.records).isEmpty();

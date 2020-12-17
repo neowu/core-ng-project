@@ -36,26 +36,30 @@ public final class KafkaAppender implements LogAppender {
     private final JSONWriter<ActionLogMessage> actionLogWriter = new JSONWriter<>(ActionLogMessage.class);
     private final JSONWriter<StatMessage> statWriter = new JSONWriter<>(StatMessage.class);
     private final Callback callback = new KafkaCallback();
+    private final KafkaURI uri;
 
     private Producer<byte[], byte[]> producer;
     private volatile boolean stop;
 
     public KafkaAppender(KafkaURI uri) {
+        this.uri = uri;
         logForwarderThread = new Thread(() -> {
-            logger.info("log forwarder thread started, uri={}", uri);
+            logger.info("log forwarder thread started, uri={}", this.uri);
+            initialize();
+            process();
+        }, "log-forwarder");
+    }
 
-            while (!stop) {
-                if (uri.resolveURI()) {
-                    producer = createProducer(uri);
-                    break;
-                }
-                logger.warn("failed to resolve log kafka uri, retry in 10 seconds, uri={}", uri);
+    private void initialize() {
+        while (!stop) {
+            if (uri.resolveURI()) {
+                producer = createProducer(uri);
+            } else {
+                logger.warn("failed to resolve log kafka uri, retry in 10 seconds, uri={}", this.uri);
                 records.clear();    // throw away records, to prevent from high heap usage
                 Threads.sleepRoughly(Duration.ofSeconds(10));
             }
-
-            process();
-        }, "log-forwarder");
+        }
     }
 
     private void process() {
@@ -82,9 +86,9 @@ public final class KafkaAppender implements LogAppender {
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
                     ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60 * 1000,                   // 60s, type is INT
                     ProducerConfig.LINGER_MS_CONFIG, 50L,
-                    ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                        // longer backoff to reduce cpu usage when kafka is not available
-                    ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5L * 1000,               // 5s
-                    ProducerConfig.MAX_BLOCK_MS_CONFIG, 30L * 1000);                         // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+                    ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                       // longer backoff to reduce cpu usage when kafka is not available
+                    ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5L * 1000,              // 5s
+                    ProducerConfig.MAX_BLOCK_MS_CONFIG, 30L * 1000);                        // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
             var serializer = new ByteArraySerializer();
             var producer = new KafkaProducer<>(config, serializer, serializer);
             producerMetrics.set(producer.metrics());
@@ -114,7 +118,9 @@ public final class KafkaAppender implements LogAppender {
         logger.info("stop log forwarder");
         stop = true;
         logForwarderThread.interrupt();
-        if (producer != null) {     // producer can be null if uri is not resolved
+
+        if (producer == null && uri.resolveURI()) producer = createProducer(uri);           // producer can be null if app failed to start (exception thrown by configure(), startup hook will not run)
+        if (producer != null) {                                         // producer can be null if uri is not resolved
             for (ProducerRecord<byte[], byte[]> record : records) {     // if log-kafka is not available, here will block MAX_BLOCK_MS, to simplify it's ok not handling timeout since kafka appender is at end of shutdown, no more critical resources left to handle
                 producer.send(record);
             }

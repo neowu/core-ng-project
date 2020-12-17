@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '7.6.5'
+    version = '7.6.6'
 }
 
 def elasticVersion = '7.10.1'
@@ -74,6 +74,7 @@ project('core-ng-search') {
     dependencies {
         api project(":core-ng")
         api "org.elasticsearch:elasticsearch:${elasticVersion}@jar"
+        api "org.elasticsearch:elasticsearch-x-content:${elasticVersion}@jar"
         implementation "org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticVersion}"
         testImplementation project(":core-ng-test")
         implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"              // override transitive jackson dependencies of elasticsearch
