@@ -146,6 +146,13 @@ class DatabaseImplTest {
     }
 
     @Test
+    void batchExecuteWithEmptyParams() {
+        assertThatThrownBy(() -> database.batchExecute("UPDATE database_test SET string_field = ? WHERE id = ?", List.of()))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("params must not be empty");
+    }
+
+    @Test
     void duplicateKey() {
         String sql = "INSERT INTO database_test (id) VALUES (?)";
 

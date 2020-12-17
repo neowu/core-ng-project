@@ -142,6 +142,13 @@ class RepositoryImplAssignedIdEntityTest {
     }
 
     @Test
+    void batchInsertWithEmptyEntities() {
+        assertThatThrownBy(() -> repository.batchInsert(List.of()))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("entities must not be empty");
+    }
+
+    @Test
     void batchDelete() {
         List<AssignedIdEntity> entities = Lists.newArrayList();
         for (int i = 100; i < 200; i++) {
@@ -154,6 +161,14 @@ class RepositoryImplAssignedIdEntityTest {
 
         assertThat(repository.get(entities.get(0).id)).isNotPresent();
         assertThat(repository.get(entities.get(1).id)).isNotPresent();
+    }
+
+
+    @Test
+    void batchDeleteWithEmptyPrimaryKeys() {
+        assertThatThrownBy(() -> repository.batchDelete(List.of()))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("primaryKeys must not be empty");
     }
 
     @Test

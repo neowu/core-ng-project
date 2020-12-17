@@ -1,5 +1,9 @@
 ## Change log
 
+### 7.6.7 (12/17/2020 - )
+
+* db: validate params of batch operations must not be empty
+
 ### 7.6.6 (12/08/2020 - 12/17/2020)
 
 * http: update undertow to 2.2.3

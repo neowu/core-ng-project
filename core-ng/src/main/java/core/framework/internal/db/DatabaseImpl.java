@@ -183,9 +183,9 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
+        var watch = new StopWatch();
         validateAsterisk(sql);
         validateStringValue(sql);
-        var watch = new StopWatch();
         int returnedRows = 0;
         try {
             List<T> results = operation.select(sql, rowMapper(viewClass), params);
@@ -202,9 +202,9 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
+        var watch = new StopWatch();
         validateAsterisk(sql);
         validateStringValue(sql);
-        var watch = new StopWatch();
         int returnedRows = 0;
         try {
             Optional<T> result = operation.selectOne(sql, rowMapper(viewClass), params);
@@ -220,8 +220,8 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public int execute(String sql, Object... params) {
-        validateStringValue(sql);
         var watch = new StopWatch();
+        validateStringValue(sql);
         int updatedRows = 0;
         try {
             updatedRows = operation.update(sql, params);
@@ -236,8 +236,9 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public int[] batchExecute(String sql, List<Object[]> params) {
+        var watch = new StopWatch();
         validateStringValue(sql);
-        StopWatch watch = new StopWatch();
+        if (params.isEmpty()) throw new Error("params must not be empty");
         int updatedRows = 0;
         try {
             int[] results = operation.batchUpdate(sql, params);

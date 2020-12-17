@@ -136,6 +136,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     @Override
     public void batchInsert(List<T> entities) {
         var watch = new StopWatch();
+        if (entities.isEmpty()) throw new Error("entities must not be empty");
         String sql = insertQuery.sql;
         List<Object[]> params = new ArrayList<>(entities.size());
         for (T entity : entities) {
@@ -156,6 +157,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     @Override
     public void batchDelete(List<?> primaryKeys) {
         var watch = new StopWatch();
+        if (primaryKeys.isEmpty()) throw new Error("primaryKeys must not be empty");
         List<Object[]> params = new ArrayList<>(primaryKeys.size());
         for (Object primaryKey : primaryKeys) {
             if (primaryKey instanceof Object[]) {
