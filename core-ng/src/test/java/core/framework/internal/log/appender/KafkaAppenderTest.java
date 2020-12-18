@@ -41,4 +41,9 @@ class KafkaAppenderTest {
         callback.onCompletion(null, new KafkaException("unexpected"));
         assertThat(appender.records).isEmpty();
     }
+
+    @Test
+    void initialize() {
+        appender.initialize();
+    }
 }

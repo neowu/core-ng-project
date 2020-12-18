@@ -1,16 +1,13 @@
 ## Change log
 
-### 7.6.7 (12/17/2020 - )
-
-* db: validate params of batch operations must not be empty
-
-### 7.6.6 (12/08/2020 - 12/17/2020)
+### 7.6.7 (12/08/2020 - 12/17/2020)
 
 * http: update undertow to 2.2.3
 * httpClient: support fallback dns cache, to reduce intermittent dns resolving failures for external domains
 * log-processor: support JOB_INDEX_OPEN_DAYS, JOB_INDEX_RETENTION_DAYS env to configure how long to keep log index open and when to delete
 * redis: improve error handling by validating all input before sending data
 * log: fixed kafka log appender not sending failed_to_start error, if exception was thrown by configure()
+* db: validate params of batch operations must not be empty
 
 ### 7.6.4 (11/19/2020 - 12/07/2020)
 

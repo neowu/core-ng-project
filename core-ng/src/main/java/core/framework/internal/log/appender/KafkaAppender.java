@@ -50,15 +50,15 @@ public final class KafkaAppender implements LogAppender {
         }, "log-forwarder");
     }
 
-    private void initialize() {
+    void initialize() {
         while (!stop) {
             if (uri.resolveURI()) {
                 producer = createProducer(uri);
-            } else {
-                logger.warn("failed to resolve log kafka uri, retry in 10 seconds, uri={}", this.uri);
-                records.clear();    // throw away records, to prevent from high heap usage
-                Threads.sleepRoughly(Duration.ofSeconds(10));
+                break;
             }
+            logger.warn("failed to resolve log kafka uri, retry in 10 seconds, uri={}", this.uri);
+            records.clear();    // throw away records, to prevent from high heap usage
+            Threads.sleepRoughly(Duration.ofSeconds(10));
         }
     }
 
