@@ -1,10 +1,11 @@
 package core.framework.internal.validate;
 
 import core.framework.api.validate.Digits;
-import java.math.BigDecimal;
+import core.framework.util.ClasspathResources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,10 +14,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class BeanValidatorDigitsTest {
     private BeanValidator validator;
+    private BeanValidatorBuilder builder;
 
     @BeforeEach
-    void createObjectValidator() {
-        validator = new BeanValidatorBuilder(Bean.class).build();
+    void createBeanValidator() {
+        builder = new BeanValidatorBuilder(Bean.class);
+        validator = builder.build();
+    }
+
+    @Test
+    void sourceCode() {
+        String sourceCode = builder.builder.sourceCode();
+        assertThat(sourceCode).isEqualToIgnoringWhitespace(ClasspathResources.text("validator-test/validator-digits.java"));
     }
 
     @Test
@@ -31,11 +40,11 @@ class BeanValidatorDigitsTest {
         validator.validate(bean, errors, false);
 
         assertThat(errors.hasError()).isTrue();
-        assertThat(errors.errors).hasSize(4);
-        assertThat(errors.errors.get("num1")).isEqualTo("field out of bounds (<1 digits>.<inf digits> expected), value=10");
-        assertThat(errors.errors.get("num2")).isEqualTo("num2 out of bounds. expected(<1 digits>.<2 digits>), actual value=11");
-        assertThat(errors.errors.get("num3")).isEqualTo("field out of bounds (<1 digits>.<2 digits> expected), value=0.3333333333333333");
-        assertThat(errors.errors.get("num4")).isEqualTo("field out of bounds (<2 digits>.<0 digits> expected), value=3.14");
+        assertThat(errors.errors).hasSize(4)
+                .containsEntry("num1", "field out of bounds (<1 digits>.<inf digits> expected), value=10")
+                .containsEntry("num2", "num2 out of bounds. expected(<1 digits>.<2 digits>), actual value=11")
+                .containsEntry("num3", "field out of bounds (<1 digits>.<2 digits> expected), value=0.3333333333333333")
+                .containsEntry("num4", "field out of bounds (<2 digits>.<0 digits> expected), value=3.14");
     }
 
     @Test

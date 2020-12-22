@@ -18,7 +18,7 @@ class BeanValidatorNotNullTest {
     private BeanValidator validator;
 
     @BeforeEach
-    void createObjectValidator() {
+    void createBeanValidator() {
         builder = new BeanValidatorBuilder(Bean.class);
         validator = builder.build();
     }

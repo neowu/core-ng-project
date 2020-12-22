@@ -18,7 +18,7 @@ class BeanValidatorStringLengthTest {
     private BeanValidator validator;
 
     @BeforeAll
-    void createObjectValidator() {
+    void createBeanValidator() {
         builder = new BeanValidatorBuilder(Bean.class);
         validator = builder.build();
     }

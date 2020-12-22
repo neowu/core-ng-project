@@ -16,7 +16,7 @@ class BeanValidatorNotBlankTest {
     private BeanValidatorBuilder builder;
 
     @BeforeEach
-    void createObjectValidator() {
+    void createBeanValidator() {
         builder = new BeanValidatorBuilder(Bean.class);
         validator = builder.build();
     }
