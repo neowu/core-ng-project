@@ -1,5 +1,6 @@
 package core.framework.internal.validate;
 
+import core.framework.api.validate.Digits;
 import core.framework.api.validate.Max;
 import core.framework.api.validate.Min;
 import core.framework.api.validate.NotBlank;
@@ -99,6 +100,24 @@ public class BeanValidatorBuilder {
             builder.indent(2).append("if (bean.{}.doubleValue() > {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}), \"max\", \"{}\"));\n",
                     field.getName(), max.value(), pathLiteral, variable(max.message()),
                     field.getName(), max.value());
+        Digits digits = field.getDeclaredAnnotation(Digits.class);
+        if (digits != null) {
+            int integer = digits.integer();
+            int fraction = digits.fraction();
+            builder.indent(2).append("java.math.BigDecimal bigNum;\n")
+                    .indent(2).append("if ( (java.lang.Number) bean.{} instanceof java.math.BigDecimal ) bigNum = (java.math.BigDecimal) ((java.lang.Number) bean.{});\n", field.getName(), field.getName())
+                    .indent(2).append("else bigNum = new java.math.BigDecimal(bean.{}.toString()).stripTrailingZeros();\n", field.getName());
+            if (digits.integer() > -1)
+                builder.indent(2).append("int integerPartLength = bigNum.precision() - bigNum.scale();\n")
+                        .indent(2).append("if ({} < integerPartLength) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}), \"integer\", \"{}\", \"fraction\", \"{}\"));\n",
+                         integer, pathLiteral, variable(digits.message()),
+                         field.getName(), integer, fraction == -1 ? "inf" : fraction);
+            if (digits.fraction() > -1)
+                builder.indent(2).append("int fractionPartLength = bigNum.scale() < 0 ? 0 : bigNum.scale();\n")
+                        .indent(2).append("if ({} < fractionPartLength) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}), \"integer\", \"{}\", \"fraction\", \"{}\"));\n",
+                         fraction, pathLiteral, variable(digits.message()),
+                         field.getName(), integer == -1 ? "inf" : integer, fraction);
+        }
     }
 
     private void buildMapValidation(CodeBuilder builder, Field field, String pathLiteral, String parentPath) {
@@ -185,7 +204,8 @@ public class BeanValidatorBuilder {
     }
 
     private boolean hasValidationAnnotation(Field field) {
-        boolean hasAnnotation = field.isAnnotationPresent(NotNull.class)
+        boolean hasAnnotation = field.isAnnotationPresent(Digits.class)
+                || field.isAnnotationPresent(NotNull.class)
                 || field.isAnnotationPresent(NotBlank.class)
                 || field.isAnnotationPresent(Max.class)
                 || field.isAnnotationPresent(Min.class)
@@ -249,6 +269,10 @@ public class BeanValidatorBuilder {
         Min min = field.getDeclaredAnnotation(Min.class);
         if (min != null && !Number.class.isAssignableFrom(fieldClass))
             throw new Error(format("@Min must on Number, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName()));
+
+        Digits digits = field.getDeclaredAnnotation(Digits.class);
+        if (digits != null && !Number.class.isAssignableFrom(fieldClass))
+            throw new Error(format("@Digits must on Number, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName()));
     }
 
     private boolean isValueClass(Class<?> fieldClass) {
