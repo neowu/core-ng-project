@@ -1,5 +1,6 @@
 package core.framework.internal.validate;
 
+import core.framework.api.validate.Digits;
 import core.framework.api.validate.Min;
 import core.framework.api.validate.Size;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,13 @@ class BeanValidatorBuilderTest {
     }
 
     @Test
+    void validateDigitsAnnotation() {
+        assertThatThrownBy(() -> new BeanValidatorBuilder(BeanWithInvalidDigitsAnnotation.class).build())
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("@Digits must on Number");
+    }
+
+    @Test
     void validateNotNull() {
         assertThatThrownBy(() -> new BeanValidatorBuilder(BeanWithDefaultValue.class).build())
                 .isInstanceOf(Error.class)
@@ -49,6 +57,11 @@ class BeanValidatorBuilderTest {
     public static class BeanWithInvalidSizeAnnotation {
         @Size(min = 1)
         public Integer intField;
+    }
+
+    public static class BeanWithInvalidDigitsAnnotation {
+        @Digits(integer = 1)
+        public String stringField;
     }
 
     public static class BeanWithDefaultValue {
