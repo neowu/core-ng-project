@@ -2,41 +2,19 @@ public class BeanValidatorDigitsTest$Bean$Validator implements core.framework.in
     private void validateBean0(core.framework.internal.validate.BeanValidatorDigitsTest.Bean bean, core.framework.internal.validate.ValidationErrors errors, boolean partial) {
         if (bean.num1 == null) {
         } else {
-            java.math.BigDecimal number;
-            if ((java.lang.Number) bean.num1 instanceof java.math.BigDecimal) number = (java.math.BigDecimal) ((java.lang.Number) bean.num1);
-            else number = new java.math.BigDecimal(bean.num1.toString()).stripTrailingZeros();
-            int integerDigits = number.precision() - number.scale();
-            if (integerDigits > 1) errors.add("num1", "field out of bounds (<{integer} digits>.<{fraction} digits> expected), value={value}", java.util.Map.of("value", String.valueOf(bean.num1), "integer", "1", "fraction", "inf"));
+            core.framework.internal.validate.ValidatorHelper.validateDigits(bean.num1, 1, -1, "field out of bounds (<{integer} digits>.<{fraction} digits> expected), value={value}", "num1", errors);
         }
         if (bean.num2 == null) {
         } else {
-            java.math.BigDecimal number;
-            if ((java.lang.Number) bean.num2 instanceof java.math.BigDecimal) number = (java.math.BigDecimal) ((java.lang.Number) bean.num2);
-            else number = new java.math.BigDecimal(bean.num2.toString()).stripTrailingZeros();
-            int integerDigits = number.precision() - number.scale();
-            if (integerDigits > 1) errors.add("num2", "num2 out of bounds. expected(<{integer} digits>.<{fraction} digits>), actual value={value}", java.util.Map.of("value", String.valueOf(bean.num2), "integer", "1", "fraction", "2"));
-            int fractionDigits = number.scale() < 0 ? 0 : number.scale();
-            if (fractionDigits > 2) errors.add("num2", "num2 out of bounds. expected(<{integer} digits>.<{fraction} digits>), actual value={value}", java.util.Map.of("value", String.valueOf(bean.num2), "integer", "1", "fraction", "2"));
+            core.framework.internal.validate.ValidatorHelper.validateDigits(bean.num2, 1, 2, "num2 out of bounds. expected(<{integer} digits>.<{fraction} digits>), actual value={value}", "num2", errors);
         }
         if (bean.num3 == null) {
         } else {
-            java.math.BigDecimal number;
-            if ((java.lang.Number) bean.num3 instanceof java.math.BigDecimal) number = (java.math.BigDecimal) ((java.lang.Number) bean.num3);
-            else number = new java.math.BigDecimal(bean.num3.toString()).stripTrailingZeros();
-            int integerDigits = number.precision() - number.scale();
-            if (integerDigits > 1) errors.add("num3", "field out of bounds (<{integer} digits>.<{fraction} digits> expected), value={value}", java.util.Map.of("value", String.valueOf(bean.num3), "integer", "1", "fraction", "2"));
-            int fractionDigits = number.scale() < 0 ? 0 : number.scale();
-            if (fractionDigits > 2) errors.add("num3", "field out of bounds (<{integer} digits>.<{fraction} digits> expected), value={value}", java.util.Map.of("value", String.valueOf(bean.num3), "integer", "1", "fraction", "2"));
+            core.framework.internal.validate.ValidatorHelper.validateDigits(bean.num3, 1, 2, "field out of bounds (<{integer} digits>.<{fraction} digits> expected), value={value}", "num3", errors);
         }
         if (bean.num4 == null) {
         } else {
-            java.math.BigDecimal number;
-            if ((java.lang.Number) bean.num4 instanceof java.math.BigDecimal) number = (java.math.BigDecimal) ((java.lang.Number) bean.num4);
-            else number = new java.math.BigDecimal(bean.num4.toString()).stripTrailingZeros();
-            int integerDigits = number.precision() - number.scale();
-            if (integerDigits > 2) errors.add("num4", "field out of bounds (<{integer} digits>.<{fraction} digits> expected), value={value}", java.util.Map.of("value", String.valueOf(bean.num4), "integer", "2", "fraction", "0"));
-            int fractionDigits = number.scale() < 0 ? 0 : number.scale();
-            if (fractionDigits > 0) errors.add("num4", "field out of bounds (<{integer} digits>.<{fraction} digits> expected), value={value}", java.util.Map.of("value", String.valueOf(bean.num4), "integer", "2", "fraction", "0"));
+            core.framework.internal.validate.ValidatorHelper.validateDigits(bean.num4, 2, 0, "field out of bounds (<{integer} digits>.<{fraction} digits> expected), value={value}", "num4", errors);
         }
     }
 

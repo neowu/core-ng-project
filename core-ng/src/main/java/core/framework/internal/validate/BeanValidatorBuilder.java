@@ -104,19 +104,8 @@ public class BeanValidatorBuilder {
         if (digits != null) {
             int integer = digits.integer();
             int fraction = digits.fraction();
-            builder.indent(2).append("java.math.BigDecimal number;\n")
-                    .indent(2).append("if ((java.lang.Number) bean.{} instanceof java.math.BigDecimal) number = (java.math.BigDecimal) ((java.lang.Number) bean.{});\n", field.getName(), field.getName())
-                    .indent(2).append("else number = new java.math.BigDecimal(bean.{}.toString()).stripTrailingZeros();\n", field.getName());
-            if (digits.integer() > -1)
-                builder.indent(2).append("int integerDigits = number.precision() - number.scale();\n")
-                        .indent(2).append("if (integerDigits > {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}), \"integer\", \"{}\", \"fraction\", \"{}\"));\n",
-                        integer, pathLiteral, variable(digits.message()),
-                        field.getName(), integer, fraction == -1 ? "inf" : fraction);
-            if (digits.fraction() > -1)
-                builder.indent(2).append("int fractionDigits = number.scale() < 0 ? 0 : number.scale();\n")
-                        .indent(2).append("if (fractionDigits > {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}), \"integer\", \"{}\", \"fraction\", \"{}\"));\n",
-                        fraction, pathLiteral, variable(digits.message()),
-                        field.getName(), integer == -1 ? "inf" : integer, fraction);
+            builder.indent(2).append("{}.validateDigits(bean.{}, {}, {}, {}, {}, errors);\n",
+                    type(ValidatorHelper.class), field.getName(), integer, fraction, variable(digits.message()), pathLiteral);
         }
     }
 
