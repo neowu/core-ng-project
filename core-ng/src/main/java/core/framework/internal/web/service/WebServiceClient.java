@@ -129,16 +129,14 @@ public class WebServiceClient {
 
         // handle empty body gracefully, e.g. 503 during deployment
         // handle html error message gracefully, e.g. public cloud LB failed to connect to backend
-        if (response.body.length == 0 || !ContentType.APPLICATION_JSON.equals(response.contentType))
-            throw new RemoteServiceException("failed to call remote service, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode));
-        ErrorResponse error = errorResponse(response);
-        if (error.id != null && error.errorCode != null) {  // use manual validation rather than annotation to keep the flow straightforward and less try/catch
-            LOGGER.debug("failed to call remote service, statusCode={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", statusCode, error.id, error.severity, error.errorCode, error.stackTrace);
-            throw new RemoteServiceException(error.message, parseSeverity(error.severity), error.errorCode, parseHTTPStatus(statusCode));
-        } else {
-            // handle api return non-2xx status code explicitly with valid json response, e.g. 410 GONE
-            throw new RemoteServiceException("failed to call remote service, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode));
+        if (response.body.length > 0 && ContentType.APPLICATION_JSON.equals(response.contentType)) {
+            ErrorResponse error = errorResponse(response);
+            if (error.id != null && error.errorCode != null) {  // use manual validation rather than annotation to keep the flow straightforward and less try/catch, check if valid error response json
+                LOGGER.debug("failed to call remote service, statusCode={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", statusCode, error.id, error.severity, error.errorCode, error.stackTrace);
+                throw new RemoteServiceException(error.message, parseSeverity(error.severity), error.errorCode, parseHTTPStatus(statusCode));
+            }
         }
+        throw new RemoteServiceException("failed to call remote service, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode));
     }
 
     private ErrorResponse errorResponse(HTTPResponse response) {

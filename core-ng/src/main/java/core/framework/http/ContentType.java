@@ -32,8 +32,8 @@ public final class ContentType {
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentType.class);
     // cache most common ones to save paring time
     private static final Map<String, ContentType> CACHE = Map.of(
-        APPLICATION_JSON.contentType, APPLICATION_JSON,
-        TEXT_HTML.contentType, TEXT_HTML
+            APPLICATION_JSON.contentType, APPLICATION_JSON,
+            TEXT_HTML.contentType, TEXT_HTML
     );
 
     // only cover common case, assume pattern is "media-type; charset=" or "multipart/form-data; boundary="
@@ -89,7 +89,7 @@ public final class ContentType {
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
+        if (object == null || ContentType.class != object.getClass()) return false;
         ContentType that = (ContentType) object;
         return contentType.equals(that.contentType);
     }
