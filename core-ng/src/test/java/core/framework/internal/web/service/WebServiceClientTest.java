@@ -3,6 +3,7 @@ package core.framework.internal.web.service;
 import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;
 import core.framework.http.HTTPClient;
+import core.framework.http.HTTPHeaders;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
@@ -87,7 +88,7 @@ class WebServiceClientTest {
         response.errorCode = "NOT_FOUND";
         response.message = "not found";
 
-        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(404, Map.of(), Strings.bytes(JSON.toJSON(response)))))
+        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(404, Map.of(HTTPHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()), Strings.bytes(JSON.toJSON(response)))))
                 .isInstanceOf(RemoteServiceException.class)
                 .satisfies(throwable -> {
                     RemoteServiceException exception = (RemoteServiceException) throwable;
@@ -125,8 +126,21 @@ class WebServiceClientTest {
     }
 
     @Test
+    void validateResponseWith502() {
+        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.BAD_GATEWAY.code, Map.of(HTTPHeaders.CONTENT_TYPE, ContentType.TEXT_HTML.toString()), Strings.bytes("<html/>"))))
+                .isInstanceOf(RemoteServiceException.class)
+                .satisfies(throwable -> {
+                    RemoteServiceException exception = (RemoteServiceException) throwable;
+                    assertThat(exception.severity()).isEqualTo(Severity.ERROR);
+                    assertThat(exception.errorCode()).isEqualTo("REMOTE_SERVICE_ERROR");
+                    assertThat(exception.getMessage()).isEqualTo("failed to call remote service, statusCode=502");
+                    assertThat(exception.status).isEqualTo(HTTPStatus.BAD_GATEWAY);
+                });
+    }
+
+    @Test
     void validateResponseWithUnexpectedBody() {
-        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.SERVICE_UNAVAILABLE.code, Map.of(), Strings.bytes("<html/>"))))
+        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.SERVICE_UNAVAILABLE.code, Map.of(HTTPHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()), Strings.bytes("<html/>"))))
                 .isInstanceOf(RemoteServiceException.class)
                 .satisfies(throwable -> {
                     RemoteServiceException exception = (RemoteServiceException) throwable;

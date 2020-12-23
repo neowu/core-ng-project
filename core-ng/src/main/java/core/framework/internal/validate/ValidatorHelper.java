@@ -7,26 +7,26 @@ import java.util.Map;
  * @author neo
  */
 public class ValidatorHelper {  // used by generated BeanValidator
-    public static void validateDigits(Number value, int integer, int fraction, String message, String pathLiteral, ValidationErrors errors) {
+    public static void validateDigits(Number value, int maxIntegerDigits, int maxFractionDigits, String message, String pathLiteral, ValidationErrors errors) {
         BigDecimal number;
         if (value instanceof BigDecimal) {
             number = (BigDecimal) value;
         } else {
             number = new BigDecimal(value.toString()).stripTrailingZeros();
         }
-        if (integer > -1) {
+        if (maxIntegerDigits > -1) {
             int integerDigits = number.precision() - number.scale();
-            if (integerDigits > integer) errors.add(pathLiteral, message,
+            if (integerDigits > maxIntegerDigits) errors.add(pathLiteral, message,
                     Map.of("value", String.valueOf(value),
-                            "integer", String.valueOf(integer),
-                            "fraction", fraction == -1 ? "inf" : String.valueOf(fraction)));
+                            "integer", String.valueOf(maxIntegerDigits),
+                            "fraction", maxFractionDigits == -1 ? "inf" : String.valueOf(maxFractionDigits)));
         }
-        if (fraction > -1) {
+        if (maxFractionDigits > -1) {
             int fractionDigits = Math.max(number.scale(), 0);
-            if (fractionDigits > fraction) errors.add(pathLiteral, message,
+            if (fractionDigits > maxFractionDigits) errors.add(pathLiteral, message,
                     Map.of("value", String.valueOf(value),
-                            "integer", integer == -1 ? "inf" : String.valueOf(integer),
-                            "fraction", String.valueOf(fraction)));
+                            "integer", maxIntegerDigits == -1 ? "inf" : String.valueOf(maxIntegerDigits),
+                            "fraction", String.valueOf(maxFractionDigits)));
         }
     }
 }

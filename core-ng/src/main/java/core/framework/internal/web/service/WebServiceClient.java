@@ -23,7 +23,7 @@ import java.io.UncheckedIOException;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-import static core.framework.util.Strings.format;
+import static core.framework.http.ContentType.APPLICATION_JSON;
 
 /**
  * @author neo
@@ -130,7 +130,9 @@ public class WebServiceClient {
         if (statusCode >= 200 && statusCode < 300) return;
 
         // handle empty body gracefully, e.g. 503 during deployment
-        if (response.body.length == 0) throw new RemoteServiceException("failed to call remote service, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode));
+        // handle html error message gracefully, e.g. public cloud LB failed to connect to backend
+        if (response.body.length == 0 || !APPLICATION_JSON.mediaType.equals(response.contentType.mediaType))
+            throw new RemoteServiceException("failed to call remote service, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode));
         ErrorResponse error = errorResponse(response);
         if (error.id != null && error.errorCode != null) {  // use manual validation rather than annotation to keep the flow straightforward and less try/catch
             LOGGER.debug("failed to call remote service, statusCode={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", statusCode, error.id, error.severity, error.errorCode, error.stackTrace);
@@ -146,7 +148,7 @@ public class WebServiceClient {
             return (ErrorResponse) reader.fromJSON(ErrorResponse.class, response.body);
         } catch (Throwable e) {
             int statusCode = response.statusCode;
-            throw new RemoteServiceException(format("failed to deserialize remote service error response, statusCode={}", statusCode), Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode), e);
+            throw new RemoteServiceException("failed to deserialize remote service error response, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode), e);
         }
     }
 
