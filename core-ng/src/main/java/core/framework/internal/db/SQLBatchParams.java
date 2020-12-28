@@ -29,11 +29,11 @@ class SQLBatchParams implements LogParam {
             int length = batch.length;
             for (int i = 0; i < length; i++) {
                 if (i > 0) builder.append(", ");
-                builder.append(SQLParams.value(batch[i], mapper, maxParamLength / 10));
+                builder.append(SQLParams.value(batch[i], mapper));
             }
             builder.append(']');
 
-            if (builder.length() >= maxLength) {
+            if (builder.length() > maxLength) {
                 builder.setLength(maxLength);
                 builder.append("...(truncated)");
                 return;

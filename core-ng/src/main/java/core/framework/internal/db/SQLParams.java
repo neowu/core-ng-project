@@ -1,6 +1,7 @@
 package core.framework.internal.db;
 
 import core.framework.internal.log.filter.LogParam;
+import core.framework.internal.log.filter.LogParamHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +13,7 @@ import java.util.Set;
 class SQLParams implements LogParam {
     private static final Logger LOGGER = LoggerFactory.getLogger(SQLParams.class);
 
-    static String value(Object param, EnumDBMapper mapper, int maxLength) {
+    static String value(Object param, EnumDBMapper mapper) {
         if (param instanceof Enum) {
             try {
                 return mapper.getDBValue((Enum<?>) param);
@@ -21,11 +22,7 @@ class SQLParams implements LogParam {
                 return String.valueOf(param);
             }
         }
-        String value = String.valueOf(param);
-        if (value.length() > maxLength) {
-            return value.substring(0, maxLength) + "...(truncated)";
-        }
-        return value;
+        return String.valueOf(param);
     }
 
     private final EnumDBMapper mapper;
@@ -41,13 +38,14 @@ class SQLParams implements LogParam {
         if (params == null) {
             builder.append("null");
         } else {
+            // roughly limit each string value to 1000 chars
+            int maxSQLParamLength = maxParamLength / 10;
             builder.append('[');
             int length = params.length;
             for (int i = 0; i < length; i++) {
                 if (i > 0) builder.append(", ");
-                // roughly limit each string values to 1000 chars,
-                // can only break limit when there are 10 more long string params, which is very rare
-                builder.append(value(params[i], mapper, maxParamLength / 10));
+                String value = value(params[i], mapper);
+                LogParamHelper.append(builder, value, maxSQLParamLength);
             }
             builder.append(']');
         }

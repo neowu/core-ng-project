@@ -1,10 +1,10 @@
 package core.framework.internal.web.request;
 
 import core.framework.internal.log.filter.LogParam;
+import core.framework.internal.log.filter.LogParamHelper;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.HttpString;
 
-import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -24,9 +24,10 @@ class HeaderLogParam implements LogParam {
         if (maskedFields.contains(header.toString())) {
             builder.append("******");
         } else if (values.size() == 1) {
-            builder.append(values.getFirst());
+            String value = values.getFirst();
+            LogParamHelper.append(builder, value, maxParamLength);
         } else {
-            builder.append(Arrays.toString(values.toArray()));
+            LogParamHelper.append(builder, values.toArray(), maxParamLength);
         }
     }
 }

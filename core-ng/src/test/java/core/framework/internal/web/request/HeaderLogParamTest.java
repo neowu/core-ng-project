@@ -27,7 +27,7 @@ class HeaderLogParamTest {
     @Test
     void append() {
         var headers = new HeaderMap();
-        HttpString name = new HttpString("client-id");
+        var name = new HttpString("client-id");
 
         headers.put(name, "client1");
         var builder = new StringBuilder();
@@ -40,5 +40,23 @@ class HeaderLogParamTest {
         param = new HeaderLogParam(name, headers.get(name));
         param.append(builder, Set.of(), 1000);
         assertThat(builder.toString()).isEqualTo("[client1, client2]");
+    }
+
+    @Test
+    void appendWithTruncation() {
+        var headers = new HeaderMap();
+        var name = new HttpString("client-id");
+        headers.put(name, "client1");
+
+        var builder = new StringBuilder();
+        var param = new HeaderLogParam(name, headers.get(name));
+        param.append(builder, Set.of(), 5);
+        assertThat(builder.toString()).isEqualTo("clien...(truncated)");
+
+        headers.add(name, "client2");
+        builder = new StringBuilder();
+        param = new HeaderLogParam(name, headers.get(name));
+        param.append(builder, Set.of(), 5);
+        assertThat(builder.toString()).isEqualTo("[clie...(truncated)");
     }
 }

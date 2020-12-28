@@ -54,12 +54,7 @@ public class LogFilter {
         } else {
             value = String.valueOf(argument);
         }
-        if (value.length() > maxLength) {
-            builder.append(value, 0, maxLength);
-            builder.append("...(truncated)");
-        } else {
-            builder.append(value);
-        }
+        LogParamHelper.append(builder, value, maxLength);
     }
 
     private String arrayArgument(Object argument) {

@@ -19,7 +19,7 @@ public class FieldLogParam implements LogParam {
         if (maskedFields.contains(field)) {
             builder.append("******");
         } else {
-            builder.append(value);
+            LogParamHelper.append(builder, value, maxParamLength);
         }
     }
 }

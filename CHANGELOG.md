@@ -5,7 +5,7 @@
 * kafka: update to 2.7.0
   !!! kafka client causes high cpu issue with 2.5/2.6, refer to https://issues.apache.org/jira/browse/KAFKA-10134
 * validation: added @Digits, constricts maximum number of integral/fractional digits
-* log: SQLParams truncate long string param
+* log: SQLParams/HTTPHeader truncate long string param
 
 ### 7.6.7 (12/08/2020 - 12/17/2020)
 
