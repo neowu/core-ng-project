@@ -12,7 +12,7 @@ import java.util.Set;
 class SQLParams implements LogParam {
     private static final Logger LOGGER = LoggerFactory.getLogger(SQLParams.class);
 
-    static String value(Object param, EnumDBMapper mapper) {
+    static String value(Object param, EnumDBMapper mapper, int maxLength) {
         if (param instanceof Enum) {
             try {
                 return mapper.getDBValue((Enum<?>) param);
@@ -21,7 +21,11 @@ class SQLParams implements LogParam {
                 return String.valueOf(param);
             }
         }
-        return String.valueOf(param);
+        String value = String.valueOf(param);
+        if (value.length() > maxLength) {
+            return value.substring(0, maxLength) + "...(truncated)";
+        }
+        return value;
     }
 
     private final EnumDBMapper mapper;
@@ -41,7 +45,9 @@ class SQLParams implements LogParam {
             int length = params.length;
             for (int i = 0; i < length; i++) {
                 if (i > 0) builder.append(", ");
-                builder.append(value(params[i], mapper));
+                // roughly limit each string values to 1000 chars,
+                // can only break limit when there are 10 more long string params, which is very rare
+                builder.append(value(params[i], mapper, maxParamLength / 10));
             }
             builder.append(']');
         }

@@ -48,4 +48,13 @@ class SQLParamsTest {
         assertThat(builder.toString())
                 .isEqualTo("null");
     }
+
+    @Test
+    void appendWithTruncation() {
+        var params = new SQLParams(null, "v1-long-text", "v2-long-text");
+        var builder = new StringBuilder();
+        params.append(builder, Set.of(), 20);
+        assertThat(builder.toString())
+                .isEqualTo("[v1...(truncated), v2...(truncated)]");
+    }
 }

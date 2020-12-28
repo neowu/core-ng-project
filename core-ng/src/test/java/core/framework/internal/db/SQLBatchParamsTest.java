@@ -28,13 +28,14 @@ class SQLBatchParamsTest {
 
     @Test
     void appendWithTruncation() {
-        var params = new SQLBatchParams(new EnumDBMapper(), List.of(new Object[]{"param1", 1},
-                new Object[]{"param2", 2},
-                new Object[]{"param3", 3}));
+        var params = new SQLBatchParams(new EnumDBMapper(), List.of(new Object[]{"v01-long-text", 1},
+                new Object[]{"v02-long-text", 2},
+                new Object[]{"v03-long-text", 3},
+                new Object[]{"v04-long-text", 4}));
         var builder = new StringBuilder();
-        params.append(builder, Set.of(), 10);
+        params.append(builder, Set.of(), 40);
         assertThat(builder.toString())
-                .hasSize(10 + "...(truncated)".length())
-                .isEqualTo("[[param1, ...(truncated)");
+                .hasSize(40 + "...(truncated)".length())
+                .isEqualTo("[[v01-...(truncated), 1], [v02-...(trunc...(truncated)");
     }
 }

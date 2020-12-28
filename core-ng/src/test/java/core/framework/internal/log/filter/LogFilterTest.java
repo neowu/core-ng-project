@@ -79,9 +79,9 @@ class LogFilterTest {
     }
 
     @Test
-    void truncate() {
+    void appendRawArgument() {
         var builder = new StringBuilder();
-        filter.truncate(builder, "1234567890", 5);
+        filter.appendRawArgument(builder, "1234567890", 5);
         assertThat(builder.toString()).isEqualTo("12345...(truncated)");
     }
 }

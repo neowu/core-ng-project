@@ -27,7 +27,7 @@ public class FieldMapLogParam implements LogParam {
             if (maskedFields.contains(key)) builder.append("******");
             else builder.append(entry.getValue());
 
-            if (builder.length() >= maxLength) {
+            if (builder.length() > maxLength) {
                 builder.setLength(maxLength);
                 builder.append("...(truncated)");
                 return;

@@ -39,17 +39,27 @@ public class LogFilter {
             builder.append("null");
             return;
         }
+        // for performance reason, truncation will be handled by each type of LogParam, to best fit each specific cases
         if (argument instanceof LogParam) {
             ((LogParam) argument).append(builder, maskedFields, MAX_PARAM_LENGTH);
             return;
         }
+        appendRawArgument(builder, argument, MAX_PARAM_LENGTH);
+    }
+
+    void appendRawArgument(StringBuilder builder, Object argument, int maxLength) {
         String value;
         if (argument.getClass().isArray()) {
             value = arrayArgument(argument);
         } else {
             value = String.valueOf(argument);
         }
-        truncate(builder, value, MAX_PARAM_LENGTH);
+        if (value.length() > maxLength) {
+            builder.append(value, 0, maxLength);
+            builder.append("...(truncated)");
+        } else {
+            builder.append(value);
+        }
     }
 
     private String arrayArgument(Object argument) {
@@ -71,15 +81,6 @@ public class LogFilter {
             return Arrays.toString((float[]) argument);
         } else {    // in java there are only those possible array type, the last one is short[]
             return Arrays.toString((short[]) argument);
-        }
-    }
-
-    void truncate(StringBuilder builder, String value, int maxLength) {
-        if (value.length() > maxLength) {
-            builder.append(value, 0, maxLength);
-            builder.append("...(truncated)");
-        } else {
-            builder.append(value);
         }
     }
 }

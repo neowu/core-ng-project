@@ -28,7 +28,7 @@ public class BytesMapLogParam implements LogParam {
                     .append('=')
                     .append(new String(entry.getValue(), UTF_8));
 
-            if (builder.length() >= maxLength) {
+            if (builder.length() > maxLength) {
                 builder.setLength(maxLength);
                 builder.append("...(truncated)");
                 return;

@@ -21,7 +21,7 @@ public class ArrayLogParam implements LogParam {
             if (i > 0) builder.append(", ");
             builder.append(value);
 
-            if (builder.length() >= maxLength) {
+            if (builder.length() > maxLength) {
                 builder.setLength(maxLength);
                 builder.append("...(truncated)");
                 return;
