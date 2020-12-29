@@ -44,5 +44,8 @@ public interface Repository<T> {
 
     void batchInsert(List<T> entities);
 
+    // return how many rows inserted
+    int batchInsertIgnore(List<T> entities);
+
     void batchDelete(List<?> primaryKeys);
 }

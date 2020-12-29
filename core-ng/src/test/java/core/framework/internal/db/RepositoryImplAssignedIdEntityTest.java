@@ -149,6 +149,21 @@ class RepositoryImplAssignedIdEntityTest {
     }
 
     @Test
+    void batchInsertIgnore() {
+        List<AssignedIdEntity> entities = Lists.newArrayList();
+        for (int i = 0; i < 10; i++) {
+            AssignedIdEntity entity = entity(String.valueOf(i), "value" + i, 10 + i);
+            entities.add(entity);
+            entities.add(entity);
+        }
+        int inserted = repository.batchInsertIgnore(entities);
+
+        assertThat(inserted).isEqualTo(10);
+        assertThat(repository.get("0")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
+        assertThat(repository.get("1")).get().usingRecursiveComparison().isEqualTo(entities.get(2));
+    }
+
+    @Test
     void batchDelete() {
         List<AssignedIdEntity> entities = Lists.newArrayList();
         for (int i = 100; i < 200; i++) {

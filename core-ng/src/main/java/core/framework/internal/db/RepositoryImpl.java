@@ -155,6 +155,29 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
+    public int batchInsertIgnore(List<T> entities) {
+        var watch = new StopWatch();
+        if (entities.isEmpty()) throw new Error("entities must not be empty");
+        String sql = insertQuery.insertIgnoreSQL();
+        List<Object[]> params = new ArrayList<>(entities.size());
+        for (T entity : entities) {
+            validator.validate(entity, false);
+            params.add(insertQuery.params(entity));
+        }
+        int insertedRows = 0;
+        try {
+            int[] results = database.operation.batchUpdate(sql, params);
+            insertedRows = Arrays.stream(results).sum();
+            return insertedRows;
+        } finally {
+            long elapsed = watch.elapsed();
+            int operations = ActionLogContext.track("db", elapsed, 0, insertedRows);
+            logger.debug("batchInsertIgnore, sql={}, params={}, size={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), entities.size(), elapsed);
+            database.checkOperation(elapsed, operations);
+        }
+    }
+
+    @Override
     public void batchDelete(List<?> primaryKeys) {
         var watch = new StopWatch();
         if (primaryKeys.isEmpty()) throw new Error("primaryKeys must not be empty");
