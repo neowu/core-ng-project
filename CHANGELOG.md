@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.6.8 (12/21/2020 - )
+### 7.6.8 (12/21/2020 - 12/30/2020)
 
 * kafka: update to 2.7.0
   !!! kafka client causes high cpu issue with 2.5/2.6, refer to https://issues.apache.org/jira/browse/KAFKA-10134
