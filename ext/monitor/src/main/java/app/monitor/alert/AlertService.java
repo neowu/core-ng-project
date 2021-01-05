@@ -1,18 +1,14 @@
 package app.monitor.alert;
 
 import app.monitor.AlertConfig;
-import app.monitor.slack.SlackClient;
+import app.monitor.channel.SlackClient;
 import core.framework.inject.Inject;
 import core.framework.internal.util.LRUMap;
-import core.framework.log.Severity;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.IsoFields;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static core.framework.util.Strings.format;
 
 /**
  * @author ericchung, neo
@@ -23,10 +19,6 @@ public class AlertService {
     private final AlertMatcher ignoredErrors;
     private final AlertMatcher criticalErrors;
     private final int timespanInMinutes;
-    private final String[][] colors = {
-            {"#ff5c33", "#ff9933"}, // 2 colors for warn, change color for weekly review of every week
-            {"#a30101", "#e62a00"}  // 2 colors for error
-    };
     private final String site;
     private final List<NotificationChannel> channels;
     @Inject
@@ -47,7 +39,17 @@ public class AlertService {
         LocalDateTime now = LocalDateTime.now();
         Result result = check(alert, now);
         if (result.notify) {
-            notify(alert, result.alertCountSinceLastSent, now);
+            alert.kibanaURL = kibanaURL;
+            alert.site = site;
+            notify(alert, now, result);
+        }
+    }
+
+    private void notify(Alert alert, LocalDateTime now, Result result) {
+        for (NotificationChannel channel : channels) {
+            if (channel.matcher.matches(alert)) {
+                slackClient.notify(channel.channel, alert, result.alertCountSinceLastSent, now);
+            }
         }
     }
 
@@ -71,45 +73,6 @@ public class AlertService {
                 return new Result(false, -1);
             }
         }
-    }
-
-    private void notify(Alert alert, int alertCountSinceLastSent, LocalDateTime now) {
-        String message = message(alert, alertCountSinceLastSent);
-        String color = color(alert.severity, now);
-        for (NotificationChannel channel : channels) {
-            if (channel.matcher.matches(alert)) {
-                slackClient.send(channel.channel, message, color);
-            }
-        }
-    }
-
-    String docURL(String kibanaIndex, String id) {
-        return format("{}/app/kibana#/doc/{}-pattern/{}-*?id={}&_g=()", kibanaURL, kibanaIndex, kibanaIndex, id);
-    }
-
-    String message(Alert alert, int alertCountSinceLastSent) {
-        String docURL = docURL(alert.kibanaIndex, alert.id);
-
-        var builder = new StringBuilder(256);
-        if (alertCountSinceLastSent > 0) builder.append("*[").append(alertCountSinceLastSent).append("]* ");
-
-        builder.append(alert.severity).append(": *");
-        if (site != null) builder.append(site).append(" / ");
-        builder.append(alert.app).append("*\n");
-
-        if (alert.host != null) builder.append("host: ").append(alert.host).append('\n');
-        builder.append("_id: <").append(docURL).append('|').append(alert.id).append(">\n");
-        if (alert.action != null) builder.append("action: ").append(alert.action).append('\n');
-
-        builder.append("error_code: *").append(alert.errorCode).append("*\nmessage: ").append(alert.errorMessage).append('\n');
-
-        return builder.toString();
-    }
-
-    String color(Severity severity, LocalDateTime now) {
-        int week = now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
-        int colorIndex = severity == Severity.WARN ? 0 : 1;
-        return colors[colorIndex][(week - 1) % 2];
     }
 
     String alertKey(Alert alert) {

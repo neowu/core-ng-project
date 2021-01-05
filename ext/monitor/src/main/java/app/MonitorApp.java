@@ -2,12 +2,12 @@ package app;
 
 import app.monitor.AlertConfig;
 import app.monitor.alert.AlertService;
+import app.monitor.channel.SlackClient;
+import app.monitor.channel.SlackMessageAPIRequest;
+import app.monitor.channel.SlackMessageAPIResponse;
 import app.monitor.kafka.ActionLogMessageHandler;
 import app.monitor.kafka.EventMessageHandler;
 import app.monitor.kafka.StatMessageHandler;
-import app.monitor.slack.SlackClient;
-import app.monitor.slack.SlackMessageAPIRequest;
-import app.monitor.slack.SlackMessageAPIResponse;
 import core.framework.http.HTTPClient;
 import core.framework.json.Bean;
 import core.framework.log.message.ActionLogMessage;
@@ -49,9 +49,9 @@ public class MonitorApp extends App {
 
     private void configureSlackClient(String slackToken) {
         HTTPClient httpClient = HTTPClient.builder()
-                                          .maxRetries(3)
-                                          .retryWaitTime(Duration.ofSeconds(2))   // slack has rate limit with 1 message per second, here to slow down further when hit limit, refer to https://api.slack.com/docs/rate-limits
-                                          .build();
+                .maxRetries(3)
+                .retryWaitTime(Duration.ofSeconds(2))   // slack has rate limit with 1 message per second, here to slow down further when hit limit, refer to https://api.slack.com/docs/rate-limits
+                .build();
 
         Bean.register(SlackMessageAPIRequest.class);
         Bean.register(SlackMessageAPIResponse.class);

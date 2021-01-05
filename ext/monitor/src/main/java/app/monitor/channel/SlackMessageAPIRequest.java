@@ -1,7 +1,6 @@
-package app.monitor.slack;
+package app.monitor.channel;
 
 import core.framework.api.json.Property;
-import core.framework.api.validate.NotNull;
 
 import java.util.List;
 
@@ -9,7 +8,6 @@ import java.util.List;
  * @author ericchung
  */
 public class SlackMessageAPIRequest {
-    @NotNull
     @Property(name = "channel")
     public String channel;
 
@@ -17,11 +15,9 @@ public class SlackMessageAPIRequest {
     public List<Attachment> attachments;
 
     public static class Attachment {
-        @NotNull
         @Property(name = "color")
         public String color;
 
-        @NotNull
         @Property(name = "text")
         public String text;
     }

@@ -1,7 +1,7 @@
 package app.monitor.alert;
 
 import app.monitor.AlertConfig;
-import app.monitor.slack.SlackClient;
+import app.monitor.channel.SlackClient;
 import core.framework.log.Severity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -57,11 +57,6 @@ class AlertServiceTest {
     }
 
     @Test
-    void docURL() {
-        assertThat(service.docURL("test", "test-id")).isEqualTo("http://kibana:5601/app/kibana#/doc/test-pattern/test-*?id=test-id&_g=()");
-    }
-
-    @Test
     void alertKey() {
         Alert alert = alert(Severity.WARN, "NOT_FOUND", "trace");
         alert.action = "action";
@@ -76,21 +71,24 @@ class AlertServiceTest {
 
     @Test
     void processWithError() {
-        service.process(alert(Severity.ERROR, "java.lang.NullPointerException", "trace"));
-        verify(slackClient).send(eq("actionErrorChannel"), anyString(), anyString());
+        Alert alert = alert(Severity.ERROR, "java.lang.NullPointerException", "trace");
+        service.process(alert);
+        verify(slackClient).notify(eq("actionErrorChannel"), eq(alert), eq(-1), any());
     }
 
     @Test
     void processWithProductError() {
-        service.process(alert(Severity.ERROR, "PRODUCT_ERROR", "trace"));
-        verify(slackClient).send(eq("actionErrorChannel"), anyString(), anyString());
-        verify(slackClient).send(eq("productChannel"), anyString(), anyString());
+        Alert alert = alert(Severity.ERROR, "PRODUCT_ERROR", "trace");
+        service.process(alert);
+        verify(slackClient).notify(eq("actionErrorChannel"), eq(alert), eq(-1), any());
+        verify(slackClient).notify(eq("productChannel"), eq(alert), eq(-1), any());
     }
 
     @Test
     void processWithEventError() {
-        service.process(alert(Severity.ERROR, "EVENT_ERROR", "event"));
-        verify(slackClient).send(eq("eventErrorChannel"), anyString(), anyString());
+        Alert alert = alert(Severity.ERROR, "EVENT_ERROR", "event");
+        service.process(alert);
+        verify(slackClient).notify(eq("eventErrorChannel"), eq(alert), eq(-1), any());
     }
 
     @Test
@@ -110,51 +108,6 @@ class AlertServiceTest {
         assertThat(result).matches(r -> r.notify && r.alertCountSinceLastSent == 1);
     }
 
-    @Test
-    void color() {
-        LocalDateTime date = LocalDateTime.of(2020, 1, 1, 0, 0, 0);
-
-        assertThat(service.color(Severity.WARN, date)).isEqualTo("#ff5c33");
-        assertThat(service.color(Severity.WARN, date.plusWeeks(1))).isEqualTo("#ff9933");
-
-        assertThat(service.color(Severity.ERROR, date)).isEqualTo("#a30101");
-        assertThat(service.color(Severity.ERROR, date.plusWeeks(1))).isEqualTo("#e62a00");
-    }
-
-    @Test
-    void message() {
-        Alert alert = alert(Severity.WARN, "ERROR_CODE", "trace");
-        alert.id = "id";
-        alert.errorMessage = "message";
-        alert.kibanaIndex = "action";
-
-        assertThat(service.message(alert, 10)).isEqualTo("""
-                *[10]* WARN: *site / website*
-                _id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>
-                error_code: *ERROR_CODE*
-                message: message
-                """);
-
-        alert.host = "host";
-        assertThat(service.message(alert, 0)).isEqualTo("""
-                WARN: *site / website*
-                host: host
-                _id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>
-                error_code: *ERROR_CODE*
-                message: message
-                """);
-
-        alert.action = "action";
-        alert.host = null;
-
-        assertThat(service.message(alert, 0)).isEqualTo("""
-                WARN: *site / website*
-                _id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>
-                action: action
-                error_code: *ERROR_CODE*
-                message: message
-                """);
-    }
 
     private Alert alert(Severity severity, String errorCode, String index) {
         var alert = new Alert();

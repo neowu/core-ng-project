@@ -2,6 +2,8 @@ package app.monitor.alert;
 
 import core.framework.log.Severity;
 
+import static core.framework.util.Strings.format;
+
 /**
  * @author neo
  */
@@ -15,7 +17,15 @@ public class Alert {
     public String kibanaIndex;
     public String host;
 
+    // provided by alert service from global config
+    public String kibanaURL;
+    public String site;
+
     public void severity(String result) {
         severity = "WARN".equals(result) ? Severity.WARN : Severity.ERROR;
+    }
+
+    public String docURL() {
+        return format("{}/app/kibana#/doc/{}-pattern/{}-*?id={}&_g=()", kibanaURL, kibanaIndex, kibanaIndex, id);
     }
 }

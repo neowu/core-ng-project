@@ -43,6 +43,7 @@ public class AlertConfig {
 
         @Property(name = "severity")
         public Severity severity;
+
         @NotNull
         @Property(name = "indices")
         public List<String> indices = List.of();
