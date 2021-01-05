@@ -129,7 +129,7 @@ public class WebServiceClient {
 
         // handle empty body gracefully, e.g. 503 during deployment
         // handle html error message gracefully, e.g. public cloud LB failed to connect to backend
-        if (response.body.length > 0 && ContentType.APPLICATION_JSON.mediaType.equals(response.contentType.mediaType)) {
+        if (response.body.length > 0 && response.contentType != null && ContentType.APPLICATION_JSON.mediaType.equals(response.contentType.mediaType)) {
             ErrorResponse error = errorResponse(response);
             if (error.id != null && error.errorCode != null) {  // use manual validation rather than annotation to keep the flow straightforward and less try/catch, check if valid error response json
                 LOGGER.debug("failed to call remote service, statusCode={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", statusCode, error.id, error.severity, error.errorCode, error.stackTrace);

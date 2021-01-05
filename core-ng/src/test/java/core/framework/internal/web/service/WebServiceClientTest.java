@@ -114,7 +114,8 @@ class WebServiceClientTest {
 
     @Test
     void validateResponseWith410() {
-        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.GONE.code, Map.of(HTTPHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()), Strings.bytes("{}"))))
+        // cloud lb may not have content type in response
+        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.GONE.code, Map.of(), Strings.bytes("{}"))))
                 .isInstanceOf(RemoteServiceException.class)
                 .satisfies(throwable -> {
                     RemoteServiceException exception = (RemoteServiceException) throwable;

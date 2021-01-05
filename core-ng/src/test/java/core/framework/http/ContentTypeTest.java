@@ -14,7 +14,7 @@ class ContentTypeTest {
     void parse() {
         ContentType type = ContentType.parse("application/json");    // within cache
         assertThat(type.mediaType).isEqualTo("application/json");
-        assertThat(type.charset()).isEmpty();
+        assertThat(type.charset()).isNotPresent();
 
         type = ContentType.parse("application/javascript; charset=utf-8");    // not in cache
         assertThat(type.mediaType).isEqualTo("application/javascript");
@@ -34,7 +34,7 @@ class ContentTypeTest {
     }
 
     @Test
-    void value() {
+    void convertToString() {
         assertThat(ContentType.APPLICATION_JSON.toString()).isEqualTo("application/json");
         assertThat(ContentType.APPLICATION_OCTET_STREAM.toString()).isEqualTo("application/octet-stream");
     }
@@ -54,7 +54,17 @@ class ContentTypeTest {
 
     @Test
     void compare() {
-        assertThat(ContentType.APPLICATION_JSON).isEqualTo(ContentType.parse("application/json"));
+        ContentType json = ContentType.create("application/json", null);
+        assertThat(ContentType.APPLICATION_JSON)
+                .isNotSameAs(json)
+                .isEqualTo(json)
+                .hasSameHashCodeAs(json);
         assertThat(ContentType.APPLICATION_JSON.hashCode()).isNotEqualTo(ContentType.TEXT_HTML.hashCode());
+
+        ContentType html = ContentType.create("text/html", StandardCharsets.UTF_8);
+        assertThat(ContentType.TEXT_HTML)
+                .isNotSameAs(json)
+                .isEqualTo(html)
+                .hasSameHashCodeAs(html);
     }
 }

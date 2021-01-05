@@ -22,7 +22,9 @@ public final class ContentType {
     public static final ContentType TEXT_CSS = create("text/css", UTF_8);
     public static final ContentType TEXT_PLAIN = create("text/plain", UTF_8);
     public static final ContentType TEXT_XML = create("text/xml", UTF_8);
-    // UTF-8 as default encoding for JSON (RFC-7159#sectio-8.1), refer to https://chromium-review.googlesource.com/c/chromium/src/+/587829
+    // refer to https://www.iana.org/assignments/media-types/application/json, No "charset" parameter is defined for application/json
+    // https://tools.ietf.org/html/rfc7159#section-8.1, UTF-8 as default encoding for JSON
+    // https://chromium-review.googlesource.com/c/chromium/src/+/587829
     public static final ContentType APPLICATION_JSON = create("application/json", null);
     public static final ContentType APPLICATION_JAVASCRIPT = create("application/javascript", UTF_8);
     // form body content type doesn't use charset normally, refer to https://www.w3.org/TR/html5/sec-forms.html#urlencoded-form-data

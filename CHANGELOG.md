@@ -1,5 +1,9 @@
 ## Change log
 
+### 7.6.9 (01/04/2021 - )
+
+* contentType: according to RFC and iana, application/json should not have charset, and use utf8 as default charset refer to https://tools.ietf.org/html/rfc7159#section-8.1, https://www.iana.org/assignments/media-types/application/json
+
 ### 7.6.8 (12/21/2020 - 12/30/2020)
 
 * kafka: update to 2.7.0
