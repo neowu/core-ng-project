@@ -3,8 +3,6 @@ package app;
 import app.monitor.AlertConfig;
 import app.monitor.alert.AlertService;
 import app.monitor.channel.SlackClient;
-import app.monitor.channel.SlackMessageAPIRequest;
-import app.monitor.channel.SlackMessageAPIResponse;
 import app.monitor.kafka.ActionLogMessageHandler;
 import app.monitor.kafka.EventMessageHandler;
 import app.monitor.kafka.StatMessageHandler;
@@ -53,8 +51,6 @@ public class MonitorApp extends App {
                 .retryWaitTime(Duration.ofSeconds(2))   // slack has rate limit with 1 message per second, here to slow down further when hit limit, refer to https://api.slack.com/docs/rate-limits
                 .build();
 
-        Bean.register(SlackMessageAPIRequest.class);
-        Bean.register(SlackMessageAPIResponse.class);
         bind(new SlackClient(httpClient, slackToken));
     }
 }
