@@ -6,6 +6,9 @@ import core.framework.inject.Inject;
 import core.framework.kafka.MessageHandler;
 import core.framework.log.message.EventMessage;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 /**
  * @author ericchung
  */
@@ -23,6 +26,7 @@ public class EventMessageHandler implements MessageHandler<EventMessage> {
     private Alert alert(EventMessage message) {
         var alert = new Alert();
         alert.id = message.id;
+        alert.date = LocalDateTime.ofInstant(message.date, ZoneId.systemDefault());
         alert.app = message.app;
         alert.action = message.action;
         alert.severity(message.result);

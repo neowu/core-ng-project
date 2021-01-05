@@ -36,24 +36,23 @@ public class AlertService {
     }
 
     public void process(Alert alert) {
-        LocalDateTime now = LocalDateTime.now();
-        Result result = check(alert, now);
+        Result result = check(alert);
         if (result.notify) {
             alert.kibanaURL = kibanaURL;
             alert.site = site;
-            notify(alert, now, result);
+            notify(alert, result);
         }
     }
 
-    private void notify(Alert alert, LocalDateTime now, Result result) {
+    private void notify(Alert alert, Result result) {
         for (NotificationChannel channel : channels) {
             if (channel.matcher.matches(alert)) {
-                slackClient.notify(channel.channel, alert, result.alertCountSinceLastSent, now);
+                slackClient.notify(channel.channel, alert, result.alertCountSinceLastSent);
             }
         }
     }
 
-    Result check(Alert alert, LocalDateTime now) {
+    Result check(Alert alert) {
         if (ignoredErrors.matches(alert))
             return new Result(false, -1);
         if (criticalErrors.matches(alert))
@@ -63,10 +62,10 @@ public class AlertService {
         synchronized (stats) {
             AlertStat stat = stats.get(key);
             if (stat == null) {
-                stats.put(key, new AlertStat(now));
+                stats.put(key, new AlertStat(alert.date));
                 return new Result(true, -1);
-            } else if (Duration.between(stat.lastSentDate, now).toMinutes() >= timespanInMinutes) {
-                stats.put(key, new AlertStat(now));
+            } else if (Duration.between(stat.lastSentDate, alert.date).toMinutes() >= timespanInMinutes) {
+                stats.put(key, new AlertStat(alert.date));
                 return new Result(true, stat.alertCountSinceLastSent);
             } else {
                 stat.alertCountSinceLastSent++;

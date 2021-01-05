@@ -9,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
+
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -31,6 +33,7 @@ class EventMessageHandlerTest {
     @Test
     void handleOKAction() {
         var message = new EventMessage();
+        message.date = Instant.now();
         message.result = "OK";
         message.errorCode = null;
         handler.handle(null, message);
@@ -40,6 +43,7 @@ class EventMessageHandlerTest {
     @Test
     void handle() {
         var message = new EventMessage();
+        message.date = Instant.now();
         message.result = "ERROR";
         message.errorCode = "RUNTIME_ERROR";
         handler.handle(null, message);

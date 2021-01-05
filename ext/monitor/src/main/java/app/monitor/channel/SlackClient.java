@@ -33,9 +33,9 @@ public class SlackClient implements Channel {
     }
 
     @Override
-    public void notify(String channel, Alert alert, int alertCountSinceLastSent, LocalDateTime now) {
+    public void notify(String channel, Alert alert, int alertCountSinceLastSent) {
         String message = message(alert, alertCountSinceLastSent);
-        String color = color(alert.severity, now);
+        String color = color(alert.severity, alert.date);
         send(channel, message, color);
     }
 
@@ -85,8 +85,8 @@ public class SlackClient implements Channel {
         return builder.toString();
     }
 
-    String color(Severity severity, LocalDateTime now) {
-        int week = now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+    String color(Severity severity, LocalDateTime date) {
+        int week = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
         int colorIndex = severity == Severity.WARN ? 0 : 1;
         return colors[colorIndex][(week - 1) % 2];
     }

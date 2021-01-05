@@ -2,6 +2,8 @@ package app.monitor.alert;
 
 import core.framework.log.Severity;
 
+import java.time.LocalDateTime;
+
 import static core.framework.util.Strings.format;
 
 /**
@@ -9,6 +11,7 @@ import static core.framework.util.Strings.format;
  */
 public class Alert {
     public String id;
+    public LocalDateTime date;
     public String app;
     public String action;
     public Severity severity;

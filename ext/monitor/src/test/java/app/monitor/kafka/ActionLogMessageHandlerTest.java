@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
+
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -32,6 +34,7 @@ class ActionLogMessageHandlerTest {
     @Test
     void handleSelfAction() {
         var message = new ActionLogMessage();
+        message.date = Instant.now();
         message.app = MonitorApp.MONITOR_APP;
         handler.handle(null, message);
         verifyNoInteractions(alertService);
@@ -40,6 +43,7 @@ class ActionLogMessageHandlerTest {
     @Test
     void handleOKAction() {
         var message = new ActionLogMessage();
+        message.date = Instant.now();
         message.result = "OK";
         message.errorCode = null;
         handler.handle(null, message);
@@ -49,6 +53,7 @@ class ActionLogMessageHandlerTest {
     @Test
     void handle() {
         var message = new ActionLogMessage();
+        message.date = Instant.now();
         message.result = "WARN";
         message.errorCode = "NOT_FOUND";
         handler.handle(null, message);

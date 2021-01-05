@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -73,44 +72,46 @@ class AlertServiceTest {
     void processWithError() {
         Alert alert = alert(Severity.ERROR, "java.lang.NullPointerException", "trace");
         service.process(alert);
-        verify(slackClient).notify(eq("actionErrorChannel"), eq(alert), eq(-1), any());
+        verify(slackClient).notify(eq("actionErrorChannel"), eq(alert), eq(-1));
     }
 
     @Test
     void processWithProductError() {
         Alert alert = alert(Severity.ERROR, "PRODUCT_ERROR", "trace");
         service.process(alert);
-        verify(slackClient).notify(eq("actionErrorChannel"), eq(alert), eq(-1), any());
-        verify(slackClient).notify(eq("productChannel"), eq(alert), eq(-1), any());
+        verify(slackClient).notify(eq("actionErrorChannel"), eq(alert), eq(-1));
+        verify(slackClient).notify(eq("productChannel"), eq(alert), eq(-1));
     }
 
     @Test
     void processWithEventError() {
         Alert alert = alert(Severity.ERROR, "EVENT_ERROR", "event");
         service.process(alert);
-        verify(slackClient).notify(eq("eventErrorChannel"), eq(alert), eq(-1), any());
+        verify(slackClient).notify(eq("eventErrorChannel"), eq(alert), eq(-1));
     }
 
     @Test
     void check() {
-        assertThat(service.check(alert(Severity.ERROR, "CRITICAL_ERROR", "trace"), LocalDateTime.now()).notify).isTrue();
-        assertThat(service.check(alert(Severity.WARN, "SLOW_SQL", "trace"), LocalDateTime.now()).notify).isTrue();
+        assertThat(service.check(alert(Severity.ERROR, "CRITICAL_ERROR", "trace")).notify).isTrue();
+        assertThat(service.check(alert(Severity.WARN, "SLOW_SQL", "trace")).notify).isTrue();
 
         Alert alert = alert(Severity.ERROR, "ERROR", "trace");
-        LocalDateTime date = LocalDateTime.now();
-        AlertService.Result result = service.check(alert, date);
+        AlertService.Result result = service.check(alert);
         assertThat(result).matches(r -> r.notify && r.alertCountSinceLastSent == -1);
 
-        result = service.check(alert, date.plusMinutes(30));
+        alert.date = alert.date.plusMinutes(30);
+        result = service.check(alert);
         assertThat(result).matches(r -> !r.notify);
 
-        result = service.check(alert, date.plusHours(4));
+        alert.date = alert.date.plusMinutes(210);
+        result = service.check(alert);
         assertThat(result).matches(r -> r.notify && r.alertCountSinceLastSent == 1);
     }
 
 
     private Alert alert(Severity severity, String errorCode, String index) {
         var alert = new Alert();
+        alert.date = LocalDateTime.now();
         alert.app = "website";
         alert.severity = severity;
         alert.errorCode = errorCode;
