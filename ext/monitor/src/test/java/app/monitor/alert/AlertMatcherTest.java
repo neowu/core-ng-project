@@ -15,10 +15,10 @@ class AlertMatcherTest {
     @Test
     void matchAppAndErrorCode() {
         var matcher = new AlertMatcher(List.of(
-                matcher(List.of("website", "backoffice"), List.of("PATH_NOT_FOUND"), null, List.of()),
-                matcher(List.of("frontend-website"), List.of("API_ERROR_401", "FORBIDDEN"), null, List.of()),
-                matcher(List.of(), List.of("VALIDATION_ERROR"), null, List.of()), // match all apps if apps is empty
-                matcher(List.of(), List.of("UNAUTHORIZED"), null, List.of())
+                matcher(List.of("website", "backoffice"), List.of(), null, List.of("PATH_NOT_FOUND"), List.of()),
+                matcher(List.of("frontend-website"), List.of(), null, List.of("API_ERROR_401", "FORBIDDEN"), List.of()),
+                matcher(List.of(), List.of(), null, List.of("VALIDATION_ERROR"), List.of()), // match all apps if apps is empty
+                matcher(List.of(), List.of(), null, List.of("UNAUTHORIZED"), List.of())
         ));
 
         assertThat(matcher.matches(alert("website", "PATH_NOT_FOUND", Severity.WARN, "trace"))).isTrue();
@@ -32,9 +32,9 @@ class AlertMatcherTest {
     @Test
     void matchesSeverityAndIndex() {
         var matcher = new AlertMatcher(List.of(
-                matcher(List.of(), List.of(), Severity.ERROR, List.of("event")),
-                matcher(List.of(), List.of(), Severity.WARN, List.of("trace", "stat")),
-                matcher(List.of("website"), List.of("PATH_NOT_FOUND"), Severity.ERROR, List.of("trace"))
+                matcher(List.of(), List.of("event"), Severity.ERROR, List.of(), List.of()),
+                matcher(List.of(), List.of("trace", "stat"), Severity.WARN, List.of(), List.of()),
+                matcher(List.of("website"), List.of("trace"), Severity.ERROR, List.of("PATH_NOT_FOUND"), List.of())
         ));
 
         assertThat(matcher.matches(alert("website", "UNAUTHORIZED", Severity.ERROR, "event"))).isTrue();
@@ -54,20 +54,21 @@ class AlertMatcherTest {
 
     @Test
     void matchesExcludeErrorCodes() {
-        var rule = new AlertConfig.Matcher();
-        rule.excludeErrorCodes = List.of("ERROR_CODE_FOR_OTHER_TEAM");
-        var matcher = new AlertMatcher(List.of(rule));
+        var matcher = new AlertMatcher(List.of(
+                matcher(List.of(), List.of(), null, List.of(), List.of("ERROR_CODE_FOR_OTHER_TEAM"))
+        ));
 
         assertThat(matcher.matches(alert("website", "ERROR_CODE_FOR_OTHER_TEAM", Severity.ERROR, "trace"))).isFalse();
         assertThat(matcher.matches(alert("website", "UNAUTHORIZED", Severity.ERROR, "trace"))).isTrue();
     }
 
-    private AlertConfig.Matcher matcher(List<String> apps, List<String> errorCodes, Severity severity, List<String> indices) {
+    private AlertConfig.Matcher matcher(List<String> apps, List<String> indices, Severity severity, List<String> errorCodes, List<String> excludeErrorCodes) {
         var matcher = new AlertConfig.Matcher();
         matcher.apps = apps;
-        matcher.errorCodes = errorCodes;
         matcher.severity = severity;
         matcher.indices = indices;
+        matcher.errorCodes = errorCodes;
+        matcher.excludeErrorCodes = excludeErrorCodes;
         return matcher;
     }
 
