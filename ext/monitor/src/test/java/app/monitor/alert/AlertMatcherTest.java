@@ -52,6 +52,16 @@ class AlertMatcherTest {
         assertThat(matcher.matches(alert("website", "UNAUTHORIZED", Severity.ERROR, "trace"))).isFalse();
     }
 
+    @Test
+    void matchesExcludeErrorCodes() {
+        var rule = new AlertConfig.Matcher();
+        rule.excludeErrorCodes = List.of("ERROR_CODE_FOR_OTHER_TEAM");
+        var matcher = new AlertMatcher(List.of(rule));
+
+        assertThat(matcher.matches(alert("website", "ERROR_CODE_FOR_OTHER_TEAM", Severity.ERROR, "trace"))).isFalse();
+        assertThat(matcher.matches(alert("website", "UNAUTHORIZED", Severity.ERROR, "trace"))).isTrue();
+    }
+
     private AlertConfig.Matcher matcher(List<String> apps, List<String> errorCodes, Severity severity, List<String> indices) {
         var matcher = new AlertConfig.Matcher();
         matcher.apps = apps;
