@@ -15,7 +15,7 @@ public class AlertMatcher {
 
     public AlertMatcher(List<AlertConfig.Matcher> matchers) {
         this.rules = matchers.stream()
-                .map(matcher -> new Rule(Set.copyOf(matcher.indices), Set.copyOf(matcher.apps), matcher.severity, Set.copyOf(matcher.errorCodes), Set.copyOf(matcher.excludeErrorCodes)))
+                .map(matcher -> new Rule(Set.copyOf(matcher.indices), Set.copyOf(matcher.apps), matcher.severity, Set.copyOf(matcher.errorCodes)))
                 .collect(Collectors.toList());
     }
 
@@ -33,22 +33,19 @@ public class AlertMatcher {
         final Set<String> apps;
         final Severity severity;
         final Set<String> errorCodes;
-        final Set<String> excludeErrorCodes;
 
-        Rule(Set<String> indices, Set<String> apps, Severity severity, Set<String> errorCodes, Set<String> excludeErrorCodes) {
+        Rule(Set<String> indices, Set<String> apps, Severity severity, Set<String> errorCodes) {
             this.indices = indices;
             this.apps = apps;
             this.severity = severity;
             this.errorCodes = errorCodes;
-            this.excludeErrorCodes = excludeErrorCodes;
         }
 
         boolean matches(Alert alert) {
             return (severity == null || severity == alert.severity)
                     && (indices.isEmpty() || indices.contains(alert.kibanaIndex))
                     && (apps.isEmpty() || apps.contains(alert.app))
-                    && (errorCodes.isEmpty() || errorCodes.contains(alert.errorCode))
-                    && (excludeErrorCodes.isEmpty() || !excludeErrorCodes.contains(alert.errorCode));
+                    && (errorCodes.isEmpty() || errorCodes.contains(alert.errorCode));
         }
     }
 }

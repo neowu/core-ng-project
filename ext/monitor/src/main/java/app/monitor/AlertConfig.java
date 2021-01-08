@@ -51,10 +51,6 @@ public class AlertConfig {
         @NotNull
         @Property(name = "errorCodes")
         public List<String> errorCodes = List.of();
-
-        @NotNull
-        @Property(name = "excludeErrorCodes")
-        public List<String> excludeErrorCodes = List.of();
     }
 }
 
