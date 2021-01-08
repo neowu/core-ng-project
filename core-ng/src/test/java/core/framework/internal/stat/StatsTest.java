@@ -33,4 +33,13 @@ class StatsTest {
         assertThat(stats.errorCode).isEqualTo("HIGH_DISK_USAGE");
         assertThat(stats.errorMessage).isEqualTo("disk usage is too high, usage=80%");
     }
+
+    @Test
+    void checkHighUsageWithMultipleWarnings() {
+        stats.checkHighUsage(1.0, 0.8, "cpu");
+        assertThat(stats.errorCode).isEqualTo("HIGH_CPU_USAGE");
+
+        stats.checkHighUsage(0.8, 0.8, "heap");
+        assertThat(stats.errorCode).isEqualTo("HIGH_CPU_USAGE");
+    }
 }

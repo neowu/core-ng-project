@@ -26,13 +26,15 @@ public class Stats {
     }
 
     public boolean checkHighUsage(double usage, double threshold, String name) {
-        if (usage >= threshold) {
+        if (usage < threshold) return false;
+
+        if (errorCode == null) {    // do not overwrite existing warning, framework will check resource in order of importance
             NumberFormat format = NumberFormat.getPercentInstance();
             errorCode = "HIGH_" + ASCII.toUpperCase(name) + "_USAGE";
             errorMessage = name + " usage is too high, usage=" + format.format(usage);
-            return true;
         }
-        return false;
+
+        return true;
     }
 
     public void info(String key, String value) {
