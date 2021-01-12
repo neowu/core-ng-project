@@ -162,6 +162,14 @@
     "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
+    "id": "business-unique_visitor", "type": "visualization",
+    "attributes": {
+      "title": "business-unique_visitor",
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
+      "visState": "{\n  \"title\": \"business-unique_visitor\",\n  \"type\": \"metrics\",\n  \"aggs\": [],\n  \"params\": {\n    \"id\": \"business-unique_visitor\",\n    \"type\": \"timeseries\",\n    \"time_field\": \"@timestamp\",\n    \"index_pattern\": \"action-*\",\n    \"axis_formatter\": \"number\",\n    \"show_grid\": 1,\n    \"show_legend\": 0,\n    \"series\": [\n      {\n        \"id\": \"session_hash\",\n        \"chart_type\": \"line\",\n        \"color\": \"rgba(96,146,192,1)\",\n        \"split_mode\": \"everything\",\n        \"metrics\": [{\"id\": \"session_hash\", \"type\": \"cardinality\", \"field\": \"context.session_hash\"}],\n        \"formatter\": \"number\",\n        \"line_width\": 1,\n        \"point_size\": 1,\n        \"fill\": 0.5,\n        \"stacked\": \"none\",\n        \"label\": \"unique sessions\",\n        \"type\": \"timeseries\"\n      },\n      {\n        \"id\": \"client_ip\",\n        \"chart_type\": \"line\",\n        \"color\": \"rgba(84,179,153,1)\",\n        \"split_mode\": \"everything\",\n        \"metrics\": [{\"id\": \"client_ip\", \"type\": \"cardinality\", \"field\": \"context.client_ip\"}],\n        \"separate_axis\": 0,\n        \"formatter\": \"number\",\n        \"line_width\": 1,\n        \"point_size\": 1,\n        \"fill\": 0.5,\n        \"label\": \"unique client ips\",\n        \"type\": \"timeseries\"\n      }\n    ]\n  }\n}"
+    }
+  },
+  {
     "id": "perf-db", "type": "visualization",
     "attributes": {
       "title": "perf-db",
@@ -497,12 +505,13 @@
       "title": "business",
       "description": "Business metrics",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "panelsJSON": "[\n  {\"panelIndex\": \"1\", \"gridData\": {\"x\": 0, \"y\": 0, \"w\": 24, \"h\": 15, \"i\": \"1\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_1\"},\n  {\"panelIndex\": \"2\", \"gridData\": {\"x\": 24, \"y\": 0, \"w\": 24, \"h\": 15, \"i\": \"2\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_2\"},\n  {\"panelIndex\": \"3\", \"gridData\": {\"x\": 0, \"y\": 15, \"w\": 24, \"h\": 15, \"i\": \"3\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_3\"}\n]"
+      "panelsJSON": "[\n  {\"panelIndex\": \"1\", \"gridData\": {\"x\": 0, \"y\": 0, \"w\": 24, \"h\": 15, \"i\": \"1\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_1\"},\n  {\"panelIndex\": \"2\", \"gridData\": {\"x\": 24, \"y\": 0, \"w\": 24, \"h\": 15, \"i\": \"2\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_2\"},\n  {\"panelIndex\": \"3\", \"gridData\": {\"x\": 0, \"y\": 15, \"w\": 24, \"h\": 15, \"i\": \"3\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_3\"},\n  {\"panelIndex\": \"4\", \"gridData\": {\"x\": 0, \"y\": 30, \"w\": 48, \"h\": 15, \"i\": \"4\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_4\"}\n]"
     },
     "references": [
       {"id": "business-customer_registered", "name": "panel_1", "type": "visualization"},
       {"id": "business-order_amount", "name": "panel_2", "type": "visualization"},
-      {"id": "business-order_placed", "name": "panel_3", "type": "visualization"}
+      {"id": "business-order_placed", "name": "panel_3", "type": "visualization"},
+      {"id": "business-unique_visitor", "name": "panel_4", "type": "visualization"}
     ]
   },
   {
