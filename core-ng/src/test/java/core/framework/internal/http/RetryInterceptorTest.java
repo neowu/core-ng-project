@@ -1,6 +1,8 @@
 package core.framework.internal.http;
 
 import core.framework.api.http.HTTPStatus;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Protocol;
@@ -243,5 +245,17 @@ class RetryInterceptorTest {
     void uri() {
         Request request = new Request.Builder().url("http://localhost/path?query=value").build();
         assertThat(interceptor.uri(request)).isEqualTo("http://localhost/path");
+    }
+
+    @Test
+    void withinMaxProcessTime() {
+        var logManager = new LogManager();
+        ActionLog actionLog = logManager.begin("start", null);
+        actionLog.maxProcessTimeInNano = Duration.ofSeconds(1).toNanos();
+
+        assertThat(interceptor.withinMaxProcessTime(1)).isTrue();
+        assertThat(interceptor.withinMaxProcessTime(2)).isFalse();
+
+        logManager.end("end");
     }
 }

@@ -45,9 +45,10 @@ class MessageListenerThreadTest {
     }
 
     @Test
-    void longProcessThreshold() {
-        assertThat(thread.longProcessThreshold(Duration.ofNanos(500).toNanos(), 1, 100)).isEqualTo(5);
-        assertThat(thread.longProcessThreshold(Duration.ofNanos(500).toNanos(), 1, 1)).isEqualTo(500);
+    void maxProcessTime() {
+        assertThat(thread.maxProcessTime(Duration.ofNanos(500).toNanos(), 1, 100)).isEqualTo(5);
+        assertThat(thread.maxProcessTime(Duration.ofNanos(500).toNanos(), 1, 1)).isEqualTo(500);
+        assertThat(thread.maxProcessTime(Duration.ofSeconds(1).toNanos(), 10, 100)).isEqualTo(Duration.ofMillis(100).toNanos());
     }
 
     @Test
@@ -86,11 +87,6 @@ class MessageListenerThreadTest {
         thread.checkConsumerDelay(actionLog, actionLog.date.minusSeconds(1).toEpochMilli(), Duration.ofSeconds(6).toNanos());
         assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofSeconds(1).toNanos());
         assertThat(actionLog.errorCode()).isNull();
-    }
-
-    @Test
-    void checkSlowProcess() {
-        thread.checkSlowProcess(Duration.ofSeconds(30).toNanos(), Duration.ofSeconds(25).toNanos());
     }
 
     @Test

@@ -93,6 +93,7 @@ public class TestModule extends AbstractTestModule {
         http().httpsPort(8443);
         http().gzip();
         http().maxForwardedIPs(2);
+        http().maxProcessTime(Duration.ofSeconds(30));
         http().access().allow(List.of("0.0.0.0/0"));
         http().access().deny(List.of("10.0.0.0/24"));
     }

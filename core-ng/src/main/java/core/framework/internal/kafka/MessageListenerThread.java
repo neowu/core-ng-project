@@ -35,7 +35,7 @@ class MessageListenerThread extends Thread {
     private final Logger logger = LoggerFactory.getLogger(MessageListenerThread.class);
     private final MessageListener listener;
     private final LogManager logManager;
-    private final double batchLongProcessThresholdInNano;
+    private final long maxProcessTimeInNano;
     private final long longConsumerDelayThresholdInNano;
 
     private final Object lock = new Object();
@@ -47,7 +47,7 @@ class MessageListenerThread extends Thread {
         super(name);
         this.listener = listener;
         logManager = listener.logManager;
-        batchLongProcessThresholdInNano = listener.maxProcessTime.toNanos() * 0.7; // 70% time of max
+        maxProcessTimeInNano = listener.maxProcessTime.toNanos();
         longConsumerDelayThresholdInNano = listener.longConsumerDelayThreshold.toNanos();
     }
 
@@ -125,9 +125,9 @@ class MessageListenerThread extends Thread {
                 List<ConsumerRecord<byte[], byte[]>> records = entry.getValue();
                 MessageProcess<?> process = listener.processes.get(topic);
                 if (process.bulkHandler != null) {
-                    handleBulk(topic, process, records, longProcessThreshold(batchLongProcessThresholdInNano, records.size(), count));
+                    handleBulk(topic, process, records, maxProcessTime(maxProcessTimeInNano, records.size(), count));
                 } else {
-                    handle(topic, process, records, longProcessThreshold(batchLongProcessThresholdInNano, 1, count));
+                    handle(topic, process, records, maxProcessTime(maxProcessTimeInNano, 1, count));
                 }
             }
         } finally {
@@ -136,7 +136,7 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    <T> void handle(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, double longProcessThresholdInNano) {
+    <T> void handle(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, long maxProcessTimeInNano) {
         for (ConsumerRecord<byte[], byte[]> record : records) {
             ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
             try {
@@ -144,6 +144,7 @@ class MessageListenerThread extends Thread {
                 actionLog.context("topic", topic);
                 actionLog.context("handler", process.handler.getClass().getCanonicalName());
                 actionLog.track("kafka", 0, 1, 0);
+                actionLog.maxProcessTimeInNano = maxProcessTimeInNano;
 
                 Headers headers = record.headers();
                 if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) actionLog.trace = true;
@@ -170,19 +171,18 @@ class MessageListenerThread extends Thread {
             } catch (Throwable e) {
                 logManager.logError(e);
             } finally {
-                long elapsed = actionLog.elapsed();
-                checkSlowProcess(elapsed, longProcessThresholdInNano);
                 logManager.end("=== message handling end ===");
             }
         }
     }
 
-    <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, double longProcessThresholdInNano) {
+    <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, long maxProcessTimeInNano) {
         ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
         try {
             actionLog.action("topic:" + topic);
             actionLog.context("topic", topic);
             actionLog.context("handler", process.bulkHandler.getClass().getCanonicalName());
+            actionLog.maxProcessTimeInNano = maxProcessTimeInNano;
 
             List<Message<T>> messages = messages(records, actionLog, process.reader);
             for (Message<T> message : messages) {   // validate after fromJSON, so it can track refId/correlationId
@@ -193,8 +193,6 @@ class MessageListenerThread extends Thread {
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {
-            long elapsed = actionLog.elapsed();
-            checkSlowProcess(elapsed, longProcessThresholdInNano);
             logManager.end("=== message handling end ===");
         }
     }
@@ -252,12 +250,6 @@ class MessageListenerThread extends Thread {
         return new String(header.value(), UTF_8);
     }
 
-    void checkSlowProcess(long elapsed, double longProcessThreshold) {
-        if (elapsed > longProcessThreshold) {
-            logger.warn(errorCode("LONG_PROCESS"), "took too long to process message, elapsed={}", Duration.ofNanos(elapsed));
-        }
-    }
-
     void checkConsumerDelay(ActionLog actionLog, long timestamp, long longConsumerDelayThresholdInNano) {
         long delay = (actionLog.date.toEpochMilli() - timestamp) * 1_000_000;     // convert to nanoseconds
         actionLog.stats.put("consumer_delay", (double) delay);
@@ -266,7 +258,7 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    double longProcessThreshold(double batchLongProcessThreshold, int recordCount, int totalCount) {
-        return batchLongProcessThreshold * recordCount / totalCount;
+    long maxProcessTime(long maxProcessTimeInNano, int recordCount, int totalCount) {
+        return maxProcessTimeInNano * recordCount / totalCount;
     }
 }

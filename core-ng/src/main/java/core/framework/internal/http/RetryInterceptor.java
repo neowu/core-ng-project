@@ -1,6 +1,8 @@
 package core.framework.internal.http;
 
 import core.framework.api.http.HTTPStatus;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import core.framework.log.ActionLogContext;
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -22,13 +24,13 @@ import static okhttp3.internal.Util.closeQuietly;
 public class RetryInterceptor implements Interceptor {
     private final Logger logger = LoggerFactory.getLogger(RetryInterceptor.class);
     private final int maxRetries;
-    private final int waitTimeInMs;
+    private final long waitTimeInMs;
     private final ThreadSleep sleep;
 
     public RetryInterceptor(int maxRetries, Duration retryWaitTime, ThreadSleep sleep) {
         this.maxRetries = maxRetries;
         this.sleep = sleep;
-        waitTimeInMs = (int) retryWaitTime.toMillis();
+        waitTimeInMs = retryWaitTime.toMillis();
     }
 
     @Override
@@ -39,14 +41,14 @@ public class RetryInterceptor implements Interceptor {
             try {
                 Response response = chain.proceed(request);
                 int statusCode = response.code();
-                if (shouldRetry(attempts, statusCode)) {
+                if (shouldRetry(attempts, statusCode) && withinMaxProcessTime(attempts)) {
                     logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, responseStatus={}, uri={}", statusCode, uri(request));
                     closeResponseBody(response);
                 } else {
                     return response;
                 }
             } catch (IOException e) {
-                if (shouldRetry(attempts, request.method(), e)) {
+                if (shouldRetry(attempts, request.method(), e) && withinMaxProcessTime(attempts)) {
                     logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, uri={}, error={}", uri(request), e.getMessage(), e);
                 } else {
                     throw e;
@@ -56,6 +58,17 @@ public class RetryInterceptor implements Interceptor {
             attempts++;
             ActionLogContext.stat("http_retries", 1);
         }
+    }
+
+    boolean withinMaxProcessTime(int attempts) {
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        if (actionLog == null || actionLog.maxProcessTimeInNano <= 0) return true;
+        long processTimeLeftInNano = actionLog.processTimeLeftInNano();
+        if (processTimeLeftInNano < waitTime(attempts).toNanos()) {
+            logger.debug("not retry due to max process time limit, maxProcessTime={}, timeLeft={}", Duration.ofNanos(actionLog.maxProcessTimeInNano), Duration.ofNanos(processTimeLeftInNano));
+            return false;
+        }
+        return true;
     }
 
     // remove query params, to keep it simple by skipping masking

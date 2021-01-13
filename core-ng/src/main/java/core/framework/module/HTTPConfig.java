@@ -14,6 +14,8 @@ import core.framework.web.Interceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+
 /**
  * @author neo
  */
@@ -105,5 +107,10 @@ public final class HTTPConfig extends Config {
 
     public void gzip() {
         context.httpServer.gzip = true;
+    }
+
+    // use backend timeout of cloud lb
+    public void maxProcessTime(Duration maxProcessTime) {
+        context.httpServer.handler.maxProcessTimeInNano = maxProcessTime.toNanos();
     }
 }

@@ -25,6 +25,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -35,6 +36,7 @@ public class HTTPHandler implements HttpHandler {
     public static final HttpString HEADER_CLIENT = new HttpString("client");
     public static final HttpString HEADER_REF_ID = new HttpString("ref-id");
     public static final HttpString HEADER_TRACE = new HttpString("trace");
+    public static final HttpString HEADER_TIMEOUT = new HttpString("timeout");      // there is ietf draft to define Request-Timeout header, but didn't move on, so here to use shorter name
 
     public final RequestParser requestParser = new RequestParser();
     public final Route route = new Route();
@@ -53,6 +55,8 @@ public class HTTPHandler implements HttpHandler {
 
     public WebSocketHandler webSocketHandler;
     public IPv4AccessControl accessControl;
+
+    public long maxProcessTimeInNano = Duration.ofSeconds(30).toNanos();    // the default backend timeout of popular cloud lb (gcloud/azure) is 30s
 
     HTTPHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager) {
         this.logManager = logManager;
@@ -117,7 +121,20 @@ public class HTTPHandler implements HttpHandler {
         String correlationId = headers.getFirst(HTTPHandler.HEADER_CORRELATION_ID);
         if (correlationId != null) actionLog.correlationIds = List.of(correlationId);
 
-        if ("true".equals(headers.getFirst(HEADER_TRACE)))
-            actionLog.trace = true;
+        if ("true".equals(headers.getFirst(HEADER_TRACE))) actionLog.trace = true;
+
+        actionLog.maxProcessTimeInNano = maxProcessTime(headers.getFirst(HTTPHandler.HEADER_TIMEOUT));
+    }
+
+    long maxProcessTime(String timeout) {
+        if (timeout != null) {
+            try {
+                return Long.parseLong(timeout);
+            } catch (NumberFormatException e) {
+                // ignore if got invalid timeout header from internet
+                return maxProcessTimeInNano;
+            }
+        }
+        return maxProcessTimeInNano;
     }
 }

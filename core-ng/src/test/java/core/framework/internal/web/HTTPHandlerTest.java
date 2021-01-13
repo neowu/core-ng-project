@@ -29,4 +29,10 @@ class HTTPHandlerTest {
         assertThat(actionLog.trace).isTrue();
         assertThat(actionLog.clients).containsExactly("client");
     }
+
+    @Test
+    void maxProcessTime() {
+        assertThat(handler.maxProcessTime("invalid")).isEqualTo(handler.maxProcessTimeInNano);
+        assertThat(handler.maxProcessTime("100")).isEqualTo(100);
+    }
 }

@@ -29,9 +29,9 @@ class StatsTest {
         stats.checkHighUsage(0.7, 0.8, "disk");
         assertThat(stats.errorCode).isNull();
 
-        stats.checkHighUsage(0.8, 0.8, "disk");
+        stats.checkHighUsage(0.81, 0.8, "disk");
         assertThat(stats.errorCode).isEqualTo("HIGH_DISK_USAGE");
-        assertThat(stats.errorMessage).isEqualTo("disk usage is too high, usage=80%");
+        assertThat(stats.errorMessage).isEqualTo("disk usage is too high, usage=81%");
     }
 
     @Test

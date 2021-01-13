@@ -27,9 +27,9 @@ public final class ActionLog {
     private static final int SOFT_EVENTS_LIMIT = 3000;    // normally 3000 lines trace is about 350k
 
     public final String id;
+    public final Instant date;
     public final Map<String, List<String>> context;
     public final Map<String, Double> stats;
-    public final Instant date;
     final Map<String, PerformanceStat> performanceStats;
     final List<LogEvent> events;
     final long startTime;
@@ -42,6 +42,7 @@ public final class ActionLog {
     public List<String> refIds;
 
     public boolean suppressSlowSQLWarning;
+    public long maxProcessTimeInNano;
 
     String errorMessage;
     long elapsed;
@@ -155,5 +156,9 @@ public final class ActionLog {
     public void action(String action) {
         add(event("action={}", action));
         this.action = action;
+    }
+
+    public long processTimeLeftInNano() {
+        return maxProcessTimeInNano - elapsed();
     }
 }

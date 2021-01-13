@@ -121,6 +121,10 @@ public class WebServiceClient {
         headers.put(HTTPHandler.HEADER_CORRELATION_ID.toString(), actionLog.correlationId());
         if (actionLog.trace) headers.put(HTTPHandler.HEADER_TRACE.toString(), "true");
         headers.put(HTTPHandler.HEADER_REF_ID.toString(), actionLog.id);
+
+        if (actionLog.maxProcessTimeInNano > 0) {   // only action initiated by http/message has max process time
+            headers.put(HTTPHandler.HEADER_TIMEOUT.toString(), String.valueOf(actionLog.processTimeLeftInNano()));
+        }
     }
 
     void validateResponse(HTTPResponse response) {

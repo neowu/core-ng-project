@@ -26,7 +26,7 @@ public class Stats {
     }
 
     public boolean checkHighUsage(double usage, double threshold, String name) {
-        if (usage < threshold) return false;
+        if (usage <= threshold) return false;
 
         if (errorCode == null) {    // do not overwrite existing warning, framework will check resource in order of importance
             NumberFormat format = NumberFormat.getPercentInstance();

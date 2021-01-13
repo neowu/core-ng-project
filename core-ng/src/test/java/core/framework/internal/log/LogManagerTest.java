@@ -49,6 +49,13 @@ class LogManagerTest {
     }
 
     @Test
+    void checkSlowProcess() {
+        var actionLog = new ActionLog(null, null);
+        actionLog.maxProcessTimeInNano = 1;
+        logManager.checkSlowProcess(actionLog);
+    }
+
+    @Test
     void logError() {
         logManager.logError(new TestException());
     }
