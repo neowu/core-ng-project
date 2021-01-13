@@ -2,9 +2,13 @@
 
 ### 7.6.9 (01/04/2021 - )
 
-* contentType: according to RFC and iana, application/json should not have charset, and use utf8 as default charset refer to https://tools.ietf.org/html/rfc7159#section-8.1, https://www.iana.org/assignments/media-types/application/json
-* http: introduce HTTPConfig.maxProcessTime(), to specify client timeout or cloud lb backend timeout, for default value, http uses 30s for initial request, kafka listener uses 30mins for whole polled batch. maxProcessTime will be passed to subsequent sync action thru "timeout" http header, via
-  WebServiceClient http client retry interceptor will consider time left from max process time action will check for slow process if took more than 80% max process time
+* contentType: according to RFC and iana, application/json should not have charset, and use utf8 as default charset.
+  > refer to https://tools.ietf.org/html/rfc7159#section-8.1, https://www.iana.org/assignments/media-types/application/json
+* http: introduced HTTPConfig.maxProcessTime(), to specify client timeout or cloud lb backend timeout,
+  > for default value, http uses 30s for initial request, kafka listener uses 30mins for whole polled batch.
+  > maxProcessTime will be passed to subsequent sync action thru "timeout" http header, via WebServiceClient
+  > http client retry will consider time left from max process time
+  > action will check for slow process if took more than 80% max process time
 
 ### 7.6.8 (12/21/2020 - 12/30/2020)
 

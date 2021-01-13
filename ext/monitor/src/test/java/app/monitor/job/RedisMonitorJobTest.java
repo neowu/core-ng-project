@@ -38,14 +38,14 @@ class RedisMonitorJobTest {
     void stats() {
         Stats stats = job.stats(Map.of("maxmemory", "0",
                 "total_system_memory", "1000000",
-                "used_memory", "800000",
+                "used_memory", "800001",
                 "db0", "keys=5,expires=0,avg_ttl=0"));
 
         assertThat(stats.result()).isEqualTo("WARN");
         assertThat(stats.errorCode).isEqualTo("HIGH_MEM_USAGE");
         assertThat(stats.stats)
                 .containsEntry("redis_keys", 5d)
-                .containsEntry("redis_mem_used", 800000d);
+                .containsEntry("redis_mem_used", 800001d);
     }
 
     @Test
