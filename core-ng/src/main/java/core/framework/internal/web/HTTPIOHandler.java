@@ -7,6 +7,8 @@ import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.server.handlers.form.FormParserFactory;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnio.channels.StreamSourceChannel;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -16,13 +18,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class HTTPIOHandler implements HttpHandler {
     public static final String HEALTH_CHECK_PATH = "/health-check";
+    private final Logger logger = LoggerFactory.getLogger(HTTPIOHandler.class);
     private final FormParserFactory formParserFactory;
     private final HTTPHandler handler;
     private final ShutdownHandler shutdownHandler;
+    private final long maxEntitySize;
 
-    HTTPIOHandler(HTTPHandler handler, ShutdownHandler shutdownHandler) {
+    HTTPIOHandler(HTTPHandler handler, ShutdownHandler shutdownHandler, long maxEntitySize) {
         this.handler = handler;
         this.shutdownHandler = shutdownHandler;
+        this.maxEntitySize = maxEntitySize;
         var builder = FormParserFactory.builder();
         builder.setDefaultCharset(UTF_8.name());
         formParserFactory = builder.build();
@@ -35,10 +40,13 @@ public class HTTPIOHandler implements HttpHandler {
             return;
         }
 
+        long contentLength = exchange.getRequestContentLength();
+        if (!checkContentLength(contentLength, exchange)) return;
+
         boolean shutdown = shutdownHandler.handle(exchange);
         if (shutdown) return;
 
-        if (hasBody(exchange)) {    // parse body early, not process until body is read (e.g. for chunked), to save one blocking thread during read
+        if (hasBody(contentLength, exchange.getRequestMethod())) {    // parse body early, not process until body is read (e.g. for chunked), to save one blocking thread during read
             FormDataParser parser = formParserFactory.createParser(exchange);
             if (parser != null) {
                 parser.parse(handler);
@@ -58,11 +66,28 @@ public class HTTPIOHandler implements HttpHandler {
         exchange.dispatch(handler);
     }
 
-    private boolean hasBody(HttpServerExchange exchange) {
-        int length = (int) exchange.getRequestContentLength();
-        if (length == 0) return false;  // if body is empty, skip reading
+    // undertow is not handling max entity size checking correctly, it terminates request directly and bypass exchange.endExchange() in certain cases, and log errors in debug level
+    // thus ExchangeCompleteListener will not be triggered, and cause problem on graceful shutdown
+    // for http/1.1, refer to io.undertow.conduits.FixedLengthStreamSourceConduit.checkMaxSize,
+    //      io.undertow.server.handlers.form.MultiPartParserDefinition.MultiPartUploadHandler.NonBlockingParseTask
+    // for http/2.0, refer to io.undertow.server.protocol.framed.AbstractFramedStreamSourceChannel.handleStreamTooLarge
+    //
+    // here to mitigate the issue by checking content length before shutdown handler
+    //
+    // for H2 and "Transfer-Encoding: chunked", there is no easy way to handle graceful shutdown correctly, this is flaw of current undertow h2 implementation
+    boolean checkContentLength(long contentLength, HttpServerExchange exchange) {
+        if (contentLength > maxEntitySize) {
+            // terminate request without reading content will not trigger exchangeCompleteListener, so check content length before shutdown handler
+            logger.warn("content length is too large, requestURL={}, contentLength={}, maxEntitySize={}", exchange.getRequestURL(), contentLength, maxEntitySize);
+            exchange.setStatusCode(413);    // 413 Payload Too Large (RFC 7231), it doesn't matter as undertow will terminate connection, and browser will not see http response status but protocol error
+            exchange.endExchange();
+            return false;
+        }
+        return true;
+    }
 
-        HttpString method = exchange.getRequestMethod();
+    boolean hasBody(long contentLength, HttpString method) {
+        if (contentLength == 0) return false;  // if body is empty, skip reading
         return Methods.POST.equals(method) || Methods.PUT.equals(method) || Methods.PATCH.equals(method);
     }
 }

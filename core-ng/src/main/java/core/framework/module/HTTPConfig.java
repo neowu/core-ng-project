@@ -113,4 +113,9 @@ public final class HTTPConfig extends Config {
     public void maxProcessTime(Duration maxProcessTime) {
         context.httpServer.handler.maxProcessTimeInNano = maxProcessTime.toNanos();
     }
+
+    // to configure max body size for both regular post and multipart upload
+    public void maxEntitySize(long maxEntitySize) {
+        context.httpServer.maxEntitySize = maxEntitySize;
+    }
 }

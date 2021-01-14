@@ -9,6 +9,7 @@
   > maxProcessTime will be passed to subsequent sync action thru "timeout" http header, via WebServiceClient
   > http client retry will consider time left from max process time
   > action will check for slow process if took more than 80% max process time
+* http: added HTTPConfig.maxEntitySize(), to specify max body size and multipart file upload size
 
 ### 7.6.8 (12/21/2020 - 12/30/2020)
 

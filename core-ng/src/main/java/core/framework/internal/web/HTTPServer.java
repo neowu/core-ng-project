@@ -31,6 +31,7 @@ public class HTTPServer {
     public Integer httpPort;
     public Integer httpsPort;
     public boolean gzip;
+    public long maxEntitySize = 1000000;    // limit max post body to 10M
     private Undertow server;
 
     public HTTPServer(LogManager logManager) {
@@ -47,21 +48,21 @@ public class HTTPServer {
             if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
 
             builder.setHandler(handler())
-                   // set tcp back log larger, also requires to update kernel, e.g. sysctl -w net.core.somaxconn=1024 && sysctl -w net.ipv4.tcp_max_syn_backlog=4096
-                   .setSocketOption(Options.BACKLOG, 4096)
-                   .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
-                   .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)
-                   .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, Boolean.TRUE)
-                   // since we don't use Expires or Last- Modified header, so it's not necessary to set Date header, for cache, prefer cache-control/max-age
-                   // refer to https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.18.1
-                   .setServerOption(UndertowOptions.ALWAYS_SET_DATE, Boolean.FALSE)
-                   .setServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE, Boolean.FALSE)
-                   // set tcp idle timeout to 620s, by default AWS ALB uses 60s, GCloud LB uses 600s, since it is always deployed with LB, longer timeout doesn't hurt
-                   // refer to https://cloud.google.com/load-balancing/docs/https/#timeouts_and_retries
-                   // refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout
-                   .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620 * 1000)         // 620s
-                   .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10 * 1000)            // 10s
-                   .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, 10L * 1024 * 1024);    // max post body is 10M
+                    // set tcp back log larger, also requires to update kernel, e.g. sysctl -w net.core.somaxconn=1024 && sysctl -w net.ipv4.tcp_max_syn_backlog=4096
+                    .setSocketOption(Options.BACKLOG, 4096)
+                    .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
+                    .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)
+                    .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, Boolean.TRUE)
+                    // since we don't use Expires or Last- Modified header, so it's not necessary to set Date header, for cache, prefer cache-control/max-age
+                    // refer to https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.18.1
+                    .setServerOption(UndertowOptions.ALWAYS_SET_DATE, Boolean.FALSE)
+                    .setServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE, Boolean.FALSE)
+                    // set tcp idle timeout to 620s, by default AWS ALB uses 60s, GCloud LB uses 600s, since it is always deployed with LB, longer timeout doesn't hurt
+                    // refer to https://cloud.google.com/load-balancing/docs/https/#timeouts_and_retries
+                    // refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout
+                    .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620 * 1000)         // 620s
+                    .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10 * 1000)            // 10s
+                    .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, maxEntitySize);
 
             server = builder.build();
             server.start();
@@ -71,7 +72,7 @@ public class HTTPServer {
     }
 
     private HttpHandler handler() {
-        HttpHandler handler = new HTTPIOHandler(this.handler, shutdownHandler);
+        HttpHandler handler = new HTTPIOHandler(this.handler, shutdownHandler, maxEntitySize);
         if (gzip) {
             // only support gzip, deflate is less popular
             handler = new EncodingHandler(handler, new ContentEncodingRepository()
