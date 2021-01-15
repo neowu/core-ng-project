@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.6.9 (01/04/2021 - )
+### 7.6.9 (01/04/2021 - 01/15/2021)
 
 * contentType: according to RFC and iana, application/json should not have charset, and use utf8 as default charset.
   > refer to https://tools.ietf.org/html/rfc7159#section-8.1, https://www.iana.org/assignments/media-types/application/json

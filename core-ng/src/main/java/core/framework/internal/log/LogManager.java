@@ -57,8 +57,8 @@ public class LogManager {
         ActionLog actionLog = CURRENT_ACTION_LOG.get();
         long elapsed = actionLog.complete();
         checkSlowProcess(elapsed, actionLog.maxProcessTimeInNano);
-        CURRENT_ACTION_LOG.remove();
         actionLog.end(message);
+        CURRENT_ACTION_LOG.remove();
 
         if (appender != null) {
             try {

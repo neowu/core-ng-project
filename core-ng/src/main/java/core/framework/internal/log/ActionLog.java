@@ -40,11 +40,12 @@ public final class ActionLog {
     public List<String> correlationIds;    // with bulk message handler, there will be multiple correlationIds handled by one batch
     public List<String> clients;
     public List<String> refIds;
-
     public boolean suppressSlowSQLWarning;
+    public long maxProcessTimeInNano = -1;
+
     String errorMessage;
     long elapsed;
-    public long maxProcessTimeInNano = -1;
+
     private LogLevel result = LogLevel.INFO;
     private String errorCode;
 
@@ -166,8 +167,8 @@ public final class ActionLog {
     }
 
     public long remainingProcessTimeInNano() {
-        long left = maxProcessTimeInNano - elapsed();
-        if (left < 0) return 0;
-        return left;
+        long remainingTime = maxProcessTimeInNano - elapsed();
+        if (remainingTime < 0) return 0;
+        return remainingTime;
     }
 }
