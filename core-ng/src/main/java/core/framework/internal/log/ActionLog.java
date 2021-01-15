@@ -79,12 +79,15 @@ public final class ActionLog {
         }
     }
 
-    // TODO: stop timer, then end
-    void end(String message) {
+    long complete() {
         double cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
         stats.put("cpu_time", cpuTime);
         elapsed = elapsed();
         add(event("elapsed={}", elapsed));
+        return elapsed;
+    }
+
+    void end(String message) {
         add(event(message));
     }
 
@@ -162,7 +165,7 @@ public final class ActionLog {
         this.action = action;
     }
 
-    public long processTimeLeftInNano() {
+    public long remainingProcessTimeInNano() {
         long left = maxProcessTimeInNano - elapsed();
         if (left < 0) return 0;
         return left;

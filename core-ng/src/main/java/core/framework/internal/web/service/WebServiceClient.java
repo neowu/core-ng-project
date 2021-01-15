@@ -123,7 +123,7 @@ public class WebServiceClient {
         headers.put(HTTPHandler.HEADER_REF_ID.toString(), actionLog.id);
 
         if (actionLog.maxProcessTimeInNano != -1) {   // only action initiated by http/message has max process time
-            headers.put(HTTPHandler.HEADER_TIMEOUT.toString(), String.valueOf(actionLog.processTimeLeftInNano()));
+            headers.put(HTTPHandler.HEADER_TIMEOUT.toString(), String.valueOf(actionLog.remainingProcessTimeInNano()));
         }
     }
 

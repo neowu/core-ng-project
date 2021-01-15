@@ -63,9 +63,9 @@ public class RetryInterceptor implements Interceptor {
     boolean withinMaxProcessTime(int attempts) {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog == null || actionLog.maxProcessTimeInNano == -1) return true;
-        long processTimeLeftInNano = actionLog.processTimeLeftInNano();
-        if (processTimeLeftInNano < waitTime(attempts).toNanos()) {
-            logger.debug("not retry due to max process time limit, maxProcessTime={}, timeLeft={}", Duration.ofNanos(actionLog.maxProcessTimeInNano), Duration.ofNanos(processTimeLeftInNano));
+        long remainingTime = actionLog.remainingProcessTimeInNano();
+        if (remainingTime < waitTime(attempts).toNanos()) {
+            logger.debug("not retry due to max process time limit, maxProcessTime={}, timeLeft={}", Duration.ofNanos(actionLog.maxProcessTimeInNano), Duration.ofNanos(remainingTime));
             return false;
         }
         return true;
