@@ -31,8 +31,8 @@ class HTTPHandlerTest {
     }
 
     @Test
-    void maxProcessTime() {
-        assertThat(handler.maxProcessTime("invalid")).isEqualTo(handler.maxProcessTimeInNano);
-        assertThat(handler.maxProcessTime("100")).isEqualTo(100);
+    void parseMaxProcessTime() {
+        assertThat(handler.parseMaxProcessTime("invalid")).isEqualTo(handler.maxProcessTimeInNano);
+        assertThat(handler.parseMaxProcessTime("100")).isEqualTo(100);
     }
 }
