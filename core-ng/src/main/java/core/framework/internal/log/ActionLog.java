@@ -42,11 +42,9 @@ public final class ActionLog {
     public List<String> refIds;
 
     public boolean suppressSlowSQLWarning;
-    public long maxProcessTimeInNano;
-
     String errorMessage;
     long elapsed;
-
+    public long maxProcessTimeInNano = -1;
     private LogLevel result = LogLevel.INFO;
     private String errorCode;
 
@@ -81,12 +79,18 @@ public final class ActionLog {
         }
     }
 
+    // TODO: stop timer, then end
     void end(String message) {
         double cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
         stats.put("cpu_time", cpuTime);
         elapsed = elapsed();
         add(event("elapsed={}", elapsed));
         add(event(message));
+    }
+
+    public void maxProcessTime(long maxProcessTimeInNano) {
+        this.maxProcessTimeInNano = maxProcessTimeInNano;
+        add(event("maxProcessTime={}", maxProcessTimeInNano));
     }
 
     public long elapsed() {
@@ -159,6 +163,8 @@ public final class ActionLog {
     }
 
     public long processTimeLeftInNano() {
-        return maxProcessTimeInNano - elapsed();
+        long left = maxProcessTimeInNano - elapsed();
+        if (left < 0) return 0;
+        return left;
     }
 }

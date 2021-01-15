@@ -70,7 +70,7 @@ public class LogManager {
 
     void checkSlowProcess(ActionLog actionLog) {
         long maxProcessTimeInNano = actionLog.maxProcessTimeInNano;
-        if (maxProcessTimeInNano > 0) {
+        if (maxProcessTimeInNano != -1) {
             long elapsed = actionLog.elapsed();
             if (elapsed > maxProcessTimeInNano * 0.8) {
                 LOGGER.warn(Markers.errorCode("LONG_PROCESS"), "action took more than 80% of max process time, maxProcessTime={}, elapsed={}", Duration.ofNanos(maxProcessTimeInNano), Duration.ofNanos(elapsed));

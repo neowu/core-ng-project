@@ -144,7 +144,7 @@ class MessageListenerThread extends Thread {
                 actionLog.context("topic", topic);
                 actionLog.context("handler", process.handler.getClass().getCanonicalName());
                 actionLog.track("kafka", 0, 1, 0);
-                actionLog.maxProcessTimeInNano = maxProcessTimeInNano;
+                actionLog.maxProcessTime(maxProcessTimeInNano);
 
                 Headers headers = record.headers();
                 if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) actionLog.trace = true;
@@ -182,7 +182,7 @@ class MessageListenerThread extends Thread {
             actionLog.action("topic:" + topic);
             actionLog.context("topic", topic);
             actionLog.context("handler", process.bulkHandler.getClass().getCanonicalName());
-            actionLog.maxProcessTimeInNano = maxProcessTimeInNano;
+            actionLog.maxProcessTime(maxProcessTimeInNano);
 
             List<Message<T>> messages = messages(records, actionLog, process.reader);
             for (Message<T> message : messages) {   // validate after fromJSON, so it can track refId/correlationId

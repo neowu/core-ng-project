@@ -123,7 +123,7 @@ public class HTTPHandler implements HttpHandler {
 
         if ("true".equals(headers.getFirst(HEADER_TRACE))) actionLog.trace = true;
 
-        actionLog.maxProcessTimeInNano = maxProcessTime(headers.getFirst(HTTPHandler.HEADER_TIMEOUT));
+        actionLog.maxProcessTime(maxProcessTime(headers.getFirst(HTTPHandler.HEADER_TIMEOUT)));
     }
 
     long maxProcessTime(String timeout) {

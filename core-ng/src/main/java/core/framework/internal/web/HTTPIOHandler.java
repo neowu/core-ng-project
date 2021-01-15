@@ -77,9 +77,8 @@ public class HTTPIOHandler implements HttpHandler {
     // for H2 and "Transfer-Encoding: chunked", there is no easy way to handle graceful shutdown correctly, this is flaw of current undertow h2 implementation
     boolean checkContentLength(long contentLength, HttpServerExchange exchange) {
         if (contentLength > maxEntitySize) {
-            // terminate request without reading content will not trigger exchangeCompleteListener, so check content length before shutdown handler
             logger.warn("content length is too large, requestURL={}, contentLength={}, maxEntitySize={}", exchange.getRequestURL(), contentLength, maxEntitySize);
-            exchange.setStatusCode(413);    // 413 Payload Too Large (RFC 7231), it doesn't matter as undertow will terminate connection, and browser will not see http response status but protocol error
+            exchange.setStatusCode(413);    // 413 Payload Too Large (RFC 7231), it doesn't matter as undertow terminates connection, and browser will see protocol error
             exchange.endExchange();
             return false;
         }
