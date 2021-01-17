@@ -1,5 +1,5 @@
 ## Overview
-core-ng is a webapp framework, it's designed to support our own projects.
+core-ng is a webapp framework forked from [Neo's open source project](https://github.com/neowu/core-ng-project).
 
 [![Build Status](https://github.com/neowu/core-ng-project/workflows/build/badge.svg)](https://github.com/neowu/core-ng-project/actions)
 [![Code Coverage](https://codecov.io/gh/neowu/core-ng-project/branch/master/graph/badge.svg)](https://codecov.io/gh/neowu/core-ng-project)
@@ -24,3 +24,15 @@ repositories {
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)
 
+## Keep it up-to-date with the upstream repo
+```
+git remote add upstream https://github.com/neowu/core-ng-project.git
+git fetch upstream
+git checkout master
+git merge upstream/main
+```
+## Publish to RF Azure packages
+Configure the package version in publish.json accordingly and then run command: 
+```
+./gradlew -PmavenAccessToken=[token] clean publish
+```

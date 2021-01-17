@@ -1,0 +1,33 @@
+import groovy.json.JsonSlurper
+
+def publishConf = new JsonSlurper().parseText(rootProject.file("publish.json").text)
+
+// usage: "gradlew -PmavenURL=/path [-PmavenUser={user}] -PmavenAccessToken={token} :{module}:clean :{module}:publish"
+// gradlew -PmavenAccessToken=7ydjlxuuxhp3cf5z3cjzm56sneohsyzeufxhoddmw2vtadjpanxq clean publish
+def mavenURL = hasProperty('mavenURL') ? getProperty('mavenURL') : "https://pkgs.dev.azure.com/foodtruckinc/Wonder/_packaging/maven-local/maven/v1"
+def mavenPass = hasProperty('mavenAccessToken') ? getProperty('mavenAccessToken') : System.getenv('MAVEN_ACCESS_TOKEN')
+
+publishConf.modules.each { module ->
+    project(module.name) {
+        apply plugin: 'maven-publish'
+        publishing {
+            publications {
+                apiInterface(MavenPublication) {
+                    groupId 'com.wonder'
+                    artifactId module.artifactId
+                    version module.version
+                    from components.java
+                }
+            }
+            repositories {
+                maven {
+                    url mavenURL
+                    credentials {
+                        username = 'foodtruckinc'
+                        password = mavenPass
+                    }
+                }
+            }
+        }
+    }
+}

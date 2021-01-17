@@ -4,7 +4,9 @@ include 'core-ng-api',
         'core-ng-search',
         'core-ng-search-test',
         'core-ng-mongo',
-        'core-ng-mongo-test'
+        'core-ng-mongo-test',
+        'core-ng-json',
+        'core-ng-common'
 
 include 'ext:log-processor',
         'ext:log-collector',
