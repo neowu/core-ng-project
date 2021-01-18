@@ -6,6 +6,7 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
+import core.framework.internal.http.HTTPClientImpl;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.web.HTTPHandler;
@@ -111,7 +112,7 @@ public class WebServiceClient {
         }
     }
 
-    private void linkContext(HTTPRequest request) {
+    void linkContext(HTTPRequest request) {
         Map<String, String> headers = request.headers;
         headers.put(HTTPHandler.HEADER_CLIENT.toString(), LogManager.APP_NAME);
 
@@ -122,9 +123,12 @@ public class WebServiceClient {
         if (actionLog.trace) headers.put(HTTPHandler.HEADER_TRACE.toString(), "true");
         headers.put(HTTPHandler.HEADER_REF_ID.toString(), actionLog.id);
 
-        if (actionLog.maxProcessTimeInNano != -1) {   // only action initiated by http/message has max process time
-            headers.put(HTTPHandler.HEADER_TIMEOUT.toString(), String.valueOf(actionLog.remainingProcessTimeInNano()));
+        long timeout = ((HTTPClientImpl) httpClient).timeoutInNano; // not count connect timeout, as action starts after connecting
+        if (actionLog.maxProcessTimeInNano != -1) {                 // only action initiated by http/message has max process time
+            long remaining = actionLog.remainingProcessTimeInNano();
+            if (remaining < timeout) timeout = remaining;
         }
+        headers.put(HTTPHandler.HEADER_TIMEOUT.toString(), String.valueOf(timeout));
     }
 
     void validateResponse(HTTPResponse response) {

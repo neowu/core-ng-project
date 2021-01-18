@@ -100,7 +100,7 @@ public final class HTTPClientBuilder {
             if (enableCookie) builder.cookieJar(new CookieManager());
             if (enableFallbackDNSCache) builder.dns(new FallbackDNSCache());
 
-            return new HTTPClientImpl(builder.build(), userAgent, slowOperationThreshold);
+            return new HTTPClientImpl(builder.build(), userAgent, slowOperationThreshold, timeout);
         } finally {
             logger.info("create http client, elapsed={}", watch.elapsed());
         }

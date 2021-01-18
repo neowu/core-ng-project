@@ -40,7 +40,7 @@ class HTTPClientImplTest {
 
     @BeforeEach
     void createHTTPClient() {
-        httpClient = new HTTPClientImpl(okHttpClient, "TestUserAgent", Duration.ofSeconds(10));
+        httpClient = new HTTPClientImpl(okHttpClient, "TestUserAgent", Duration.ofSeconds(10), Duration.ofSeconds(30));
     }
 
     @Test
