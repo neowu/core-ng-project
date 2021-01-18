@@ -64,7 +64,6 @@ class WebServiceClientLinkContextTest {
         actionLog.maxProcessTimeInNano = Duration.ofSeconds(1).toNanos();
 
         var request = new HTTPRequest(HTTPMethod.GET, "http://localhost");
-        request = new HTTPRequest(HTTPMethod.GET, "http://localhost");
         webServiceClient.linkContext(request);
         assertThat(Long.parseLong(request.headers.get(HTTPHandler.HEADER_TIMEOUT.toString())))
                 .isGreaterThan(0)
