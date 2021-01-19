@@ -4,6 +4,7 @@
 
 * api: for max process time, webservice will consider both http client timeout and remaining process time of current action
 * monitor: support multiple alert channels
+* es: update to 7.10.2
 
 ### 7.6.9 (01/04/2021 - 01/15/2021)
 
