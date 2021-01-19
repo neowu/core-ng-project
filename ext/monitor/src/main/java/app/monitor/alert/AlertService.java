@@ -1,7 +1,7 @@
 package app.monitor.alert;
 
 import app.monitor.AlertConfig;
-import app.monitor.channel.SlackClient;
+import app.monitor.channel.ChannelManager;
 import core.framework.inject.Inject;
 import core.framework.internal.util.LRUMap;
 
@@ -22,7 +22,7 @@ public class AlertService {
     private final String site;
     private final List<NotificationChannel> channels;
     @Inject
-    SlackClient slackClient;
+    ChannelManager channelManager;
 
     public AlertService(AlertConfig config) {
         site = config.site;
@@ -47,7 +47,7 @@ public class AlertService {
     private void notify(Alert alert, Result result) {
         for (NotificationChannel channel : channels) {
             if (channel.matcher.matches(alert)) {
-                slackClient.notify(channel.channel, alert, result.alertCountSinceLastSent);
+                channelManager.notify(channel.channel, alert, result.alertCountSinceLastSent);
             }
         }
     }
