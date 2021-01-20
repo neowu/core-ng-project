@@ -1,6 +1,5 @@
 package app.monitor.kafka;
 
-import app.MonitorApp;
 import app.monitor.alert.Alert;
 import app.monitor.alert.AlertService;
 import core.framework.inject.Inject;
@@ -14,12 +13,14 @@ import java.time.ZoneId;
  * @author ericchung
  */
 public class ActionLogMessageHandler implements MessageHandler<ActionLogMessage> {
+    static final String MONITOR_APP = "monitor";
+
     @Inject
     AlertService alertService;
 
     @Override
     public void handle(String key, ActionLogMessage message) {
-        if (MonitorApp.MONITOR_APP.equals(message.app)) return; // ignore self action to avoid infinite loop on error
+        if (MONITOR_APP.equals(message.app)) return; // ignore self action to avoid infinite loop on error
         if (message.errorCode == null) return;
 
         alertService.process(alert(message));
