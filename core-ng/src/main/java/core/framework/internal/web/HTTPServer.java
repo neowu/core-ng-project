@@ -53,7 +53,7 @@ public class HTTPServer {
                     .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
                     .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)
                     .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, Boolean.TRUE)
-                    // since we don't use Expires or Last- Modified header, so it's not necessary to set Date header, for cache, prefer cache-control/max-age
+                    // since we don't use Expires or Last-Modified header, so it's not necessary to set Date header, for cache, prefer cache-control/max-age
                     // refer to https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.18.1
                     .setServerOption(UndertowOptions.ALWAYS_SET_DATE, Boolean.FALSE)
                     .setServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE, Boolean.FALSE)
