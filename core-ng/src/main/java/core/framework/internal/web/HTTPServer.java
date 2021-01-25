@@ -55,8 +55,6 @@ public class HTTPServer {
                     // and not necessary under cloud env, here to set to match linux default value
                     // to use larger value, it requires to update kernel accordingly, e.g. sysctl -w net.core.somaxconn=1024 && sysctl -w net.ipv4.tcp_max_syn_backlog=4096
                     .setSocketOption(Options.BACKLOG, 1024)
-                    .setIoThreads(1)
-                    .setWorkerThreads(8)
                     .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
                     .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)
                     .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, Boolean.TRUE)
@@ -73,20 +71,6 @@ public class HTTPServer {
 
             server = builder.build();
             server.start();
-//            XnioWorkerMXBean mxBean = server.getWorker().getMXBean();
-//            new Thread(() -> {
-//                while (true) {
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    final long req = shutdownHandler.activeRequests.get();
-//                    if (req > 0)
-//                        System.err.println("req: " + req + ", queue: " + mxBean.getWorkerQueueSize());
-//                }
-//            }).start();
-
         } finally {
             logger.info("http server started, httpPort={}, httpsPort={}, gzip={}, elapsed={}", httpPort, httpsPort, gzip, watch.elapsed());
         }
