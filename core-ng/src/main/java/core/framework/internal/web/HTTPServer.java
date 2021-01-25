@@ -29,8 +29,9 @@ public class HTTPServer {
 
     public final SiteManager siteManager = new SiteManager();
     public final HTTPHandler handler;
+    final ShutdownHandler shutdownHandler = new ShutdownHandler();
+
     private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
-    private final ShutdownHandler shutdownHandler = new ShutdownHandler();
     public Integer httpPort;
     public Integer httpsPort;
     public boolean gzip;

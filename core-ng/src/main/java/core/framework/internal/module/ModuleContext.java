@@ -7,6 +7,7 @@ import core.framework.internal.inject.BeanFactory;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.stat.StatCollector;
 import core.framework.internal.web.HTTPServer;
+import core.framework.internal.web.HTTPServerMetrics;
 import core.framework.internal.web.controller.ControllerClassValidator;
 import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.internal.web.controller.ControllerInspector;
@@ -70,6 +71,8 @@ public class ModuleContext {
         shutdownHook.add(ShutdownHook.STAGE_0, timeout -> httpServer.shutdown());
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitRequestCompletion);
         shutdownHook.add(ShutdownHook.STAGE_9, timeout -> httpServer.awaitTermination());
+
+        collector.metrics.add(new HTTPServerMetrics(httpServer));
         return httpServer;
     }
 

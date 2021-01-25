@@ -5,6 +5,7 @@
 * api: for max process time, webservice will consider both http client timeout and remaining process time of current action
 * monitor: support multiple alert channels
 * es: update to 7.10.2
+* http: collect http server active requests to reflect how many active requests are in process (to analyze performance with cpu usage, worker thread pool size and etc)
 
 ### 7.6.9 (01/04/2021 - 01/15/2021)
 
