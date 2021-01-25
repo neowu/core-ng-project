@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.6.10 (01/18/2021 - )
+### 7.6.10 (01/18/2021 - 01/25/2021)
 
 * api: for max process time, webservice will consider both http client timeout and remaining process time of current action
 * monitor: support multiple alert channels
