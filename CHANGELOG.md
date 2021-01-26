@@ -1,5 +1,11 @@
 ## Change log
 
+### 7.6.11 (01/26/2021 - )
+
+* http: change max allowed url length from 1000 to 2000
+  > Microsoft Azure AD oauth call back url may have long query param,
+  > by considering browser limitation/search engine/CDN/etc, to use 2000 as default setting
+
 ### 7.6.10 (01/18/2021 - 01/25/2021)
 
 * api: for max process time, webservice will consider both http client timeout and remaining process time of current action
