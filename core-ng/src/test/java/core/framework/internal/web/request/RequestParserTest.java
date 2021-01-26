@@ -225,7 +225,7 @@ class RequestParserTest {
         var actionLog = new ActionLog(null, null);
         HttpServerExchange exchange = exchange(Methods.GET);
         exchange.setRequestURI("/path");
-        exchange.setQueryString("1234567890".repeat(100));
+        exchange.setQueryString("0".repeat(RequestParser.MAX_URL_LENGTH));
 
         var request = new RequestImpl(exchange, null);
         request.scheme = "http";
