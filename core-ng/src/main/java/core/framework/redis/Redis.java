@@ -43,4 +43,6 @@ public interface Redis {
     void forEach(String pattern, Consumer<String> consumer);
 
     RedisAdmin admin();
+
+    RedisHyperLogLog hyperLogLog();
 }

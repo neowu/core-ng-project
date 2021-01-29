@@ -11,6 +11,7 @@ import core.framework.log.Markers;
 import core.framework.redis.Redis;
 import core.framework.redis.RedisAdmin;
 import core.framework.redis.RedisHash;
+import core.framework.redis.RedisHyperLogLog;
 import core.framework.redis.RedisList;
 import core.framework.redis.RedisSet;
 import core.framework.redis.RedisSortedSet;
@@ -51,6 +52,7 @@ public class RedisImpl implements Redis {
     private final RedisHash redisHash = new RedisHashImpl(this);
     private final RedisList redisList = new RedisListImpl(this);
     private final RedisSortedSet redisSortedSet = new RedisSortedSetImpl(this);
+    private final RedisHyperLogLog redisHyperLogLog = new RedisHyperLogLogImpl(this);
     private final RedisPubSub pubSub = new RedisPubSub(this);
     private final RedisAdmin redisAdmin = new RedisAdminImpl(this);
     private final String name;
@@ -385,6 +387,11 @@ public class RedisImpl implements Redis {
     @Override
     public RedisAdmin admin() {
         return redisAdmin;
+    }
+
+    @Override
+    public RedisHyperLogLog hyperLogLog() {
+        return redisHyperLogLog;
     }
 
     public long[] expirationTime(String... keys) {
