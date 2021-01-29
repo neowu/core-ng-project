@@ -80,6 +80,10 @@ final class Protocol {
         static final byte[] HDEL = Strings.bytes("HDEL");
         static final byte[] HINCRBY = Strings.bytes("HINCRBY");
 
+        static final byte[] PFADD = Strings.bytes("PFADD");
+        static final byte[] PFCOUNT = Strings.bytes("PFCOUNT");
+        static final byte[] PFMERGE = Strings.bytes("PFMERGE");
+
         static final byte[] SADD = Strings.bytes("SADD");
         static final byte[] SMEMBERS = Strings.bytes("SMEMBERS");
         static final byte[] SISMEMBER = Strings.bytes("SISMEMBER");
@@ -109,7 +113,6 @@ final class Protocol {
         static final byte[] NX = Strings.bytes("NX");
         static final byte[] PX = Strings.bytes("PX");
         static final byte[] LIMIT = Strings.bytes("LIMIT");
-        static final byte[] INF_MIN = Strings.bytes("-inf");
         static final byte[] WITHSCORES = Strings.bytes("WITHSCORES");
     }
 }
