@@ -45,7 +45,7 @@ public class MockRedisHyperLogLog implements RedisHyperLogLog {
         Set<String> destinationSet = value.set();
         for (String sourceKey : sourceKeys) {
             Value sourceValue = store.get(sourceKey);
-            if (sourceKey != null) {
+            if (sourceValue != null) {
                 destinationSet.addAll(sourceValue.set());
             }
         }
