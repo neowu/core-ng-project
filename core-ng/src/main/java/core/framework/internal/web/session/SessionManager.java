@@ -45,13 +45,14 @@ public class SessionManager implements SessionContext {
     }
 
     public void save(RequestImpl request, Response response, ActionLog actionLog) {
-        SessionImpl session = (SessionImpl) request.session;
-        if (session == null || session.saved) return;
-
-        save(session, response, actionLog);
+        // request.session can be null or ReadOnlySession for websocket, only regular http request may generate session
+        if (request.session instanceof SessionImpl) {
+            SessionImpl session = (SessionImpl) request.session;
+            if (!session.saved) save(session, response, actionLog);
+        }
     }
 
-    void save(SessionImpl session, Response response, ActionLog actionLog) {
+    private void save(SessionImpl session, Response response, ActionLog actionLog) {
         session.saved = true;   // it will try to save session on both normal and exception flows, here is to only attempt once in case of store throws exception
         if (session.invalidated) {
             if (session.id != null) {

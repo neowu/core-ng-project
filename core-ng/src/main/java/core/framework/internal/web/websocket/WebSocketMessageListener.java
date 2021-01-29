@@ -19,7 +19,7 @@ import java.util.List;
  * @author neo
  */
 final class WebSocketMessageListener extends AbstractReceiveListener {
-    private static final long MAX_TEXT_MESSAGE_SIZE = 10L * 1024 * 1024;     // 10M as max text message size to match max POST entity
+    private static final long MAX_TEXT_MESSAGE_SIZE = 10_000_000;     // 10M as max text message size to match max POST entity
     private final Logger logger = LoggerFactory.getLogger(WebSocketMessageListener.class);
     private final LogManager logManager;
     private final RateControl rateControl;
