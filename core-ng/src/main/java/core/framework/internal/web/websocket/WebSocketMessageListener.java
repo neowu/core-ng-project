@@ -8,6 +8,7 @@ import core.framework.web.exception.TooManyRequestsException;
 import io.undertow.websockets.core.AbstractReceiveListener;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.CloseMessage;
+import io.undertow.websockets.core.StreamSourceFrameChannel;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSockets;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ import java.util.List;
  * @author neo
  */
 final class WebSocketMessageListener extends AbstractReceiveListener {
-    private static final long MAX_TEXT_MESSAGE_SIZE = 10_000_000;     // 10M as max text message size to match max POST entity
+    private static final long MAX_TEXT_MESSAGE_SIZE = 10_000_000;     // limit max text message sent by client to 10M
     private final Logger logger = LoggerFactory.getLogger(WebSocketMessageListener.class);
     private final LogManager logManager;
     private final RateControl rateControl;
@@ -103,8 +104,38 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
         return WebSocketCloseCodes.INTERNAL_ERROR;
     }
 
+    // disable binary message completely
+    @Override
+    protected void onBinary(WebSocketChannel webSocketChannel, StreamSourceFrameChannel messageChannel) {
+        WebSockets.sendClose(new CloseMessage(CloseMessage.PROTOCOL_ERROR, "binary message is not supported"), webSocketChannel, null);
+    }
+
     @Override
     protected long getMaxTextBufferSize() {
         return MAX_TEXT_MESSAGE_SIZE;
+    }
+
+    // refer to https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#pings_and_pongs_the_heartbeat_of_websockets
+    @Override
+    protected long getMaxPingBufferSize() {
+        return 125;
+    }
+
+    @Override
+    protected long getMaxPongBufferSize() {
+        return 125;
+    }
+
+    // refer to https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close
+    @Override
+    protected long getMaxCloseBufferSize() {
+        return 123;
+    }
+
+    // log errors on reading incoming messages/ping/pong/close, e.g. message size is too large
+    @Override
+    protected void onError(WebSocketChannel channel, Throwable error) {
+        super.onError(channel, error);
+        logger.warn(error.getMessage(), error);
     }
 }
