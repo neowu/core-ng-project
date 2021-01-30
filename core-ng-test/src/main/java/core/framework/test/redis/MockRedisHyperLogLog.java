@@ -38,17 +38,4 @@ public class MockRedisHyperLogLog implements RedisHyperLogLog {
         }
         return count;
     }
-
-    @Override
-    public long merge(String destinationKey, String... sourceKeys) {
-        Value value = store.putIfAbsent(destinationKey, Sets.newConcurrentHashSet());
-        Set<String> destinationSet = value.set();
-        for (String sourceKey : sourceKeys) {
-            Value sourceValue = store.get(sourceKey);
-            if (sourceValue != null) {
-                destinationSet.addAll(sourceValue.set());
-            }
-        }
-        return destinationSet.size();
-    }
 }

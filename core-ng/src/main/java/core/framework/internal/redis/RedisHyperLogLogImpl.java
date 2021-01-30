@@ -13,7 +13,6 @@ import java.io.UncheckedIOException;
 
 import static core.framework.internal.redis.Protocol.Command.PFADD;
 import static core.framework.internal.redis.Protocol.Command.PFCOUNT;
-import static core.framework.internal.redis.Protocol.Command.PFMERGE;
 import static core.framework.internal.redis.RedisEncodings.validate;
 
 /**
@@ -72,27 +71,4 @@ public class RedisHyperLogLogImpl implements RedisHyperLogLog {
         }
     }
 
-    @Override
-    public long merge(String destinationKey, String... sourceKeys) {
-        var watch = new StopWatch();
-        validate("destinationKey", destinationKey);
-        validate("sourceKeys", sourceKeys);
-        long size = 0;
-        PoolItem<RedisConnection> item = redis.pool.borrowItem();
-        try {
-            RedisConnection connection = item.resource;
-            connection.writeKeyArgumentsCommand(PFMERGE, destinationKey, sourceKeys);
-            size = connection.readLong();
-            return size;
-        } catch (IOException e) {
-            item.broken = true;
-            throw new UncheckedIOException(e);
-        } finally {
-            redis.pool.returnItem(item);
-            long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, 1, sourceKeys.length);
-            logger.debug("pfmerge, destinationKey={}, sourceKeys={}, size={}, elapsed={}", destinationKey, new ArrayLogParam(sourceKeys), size, elapsed);
-            redis.checkSlowOperation(elapsed);
-        }
-    }
 }

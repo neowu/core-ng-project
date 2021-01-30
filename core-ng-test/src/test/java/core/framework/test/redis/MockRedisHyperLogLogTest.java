@@ -40,15 +40,4 @@ public class MockRedisHyperLogLogTest {
         logLog.add("key2", "value1");
         assertThat(logLog.count("key1", "key2")).isEqualTo(3);
     }
-
-    @Test
-    void merge() {
-        logLog.add("key1", "value1", "value2");
-        logLog.add("key2", "value2", "value3");
-        assertThat(logLog.merge("key3", "key1", "key2")).isEqualTo(3);
-        assertThat(logLog.merge("key3", "key1", "key2", "key4")).isEqualTo(3);
-
-        logLog.add("key4", "value2", "value4");
-        assertThat(logLog.merge("key4", "key1", "key2")).isEqualTo(4);
-    }
 }

@@ -82,7 +82,6 @@ final class Protocol {
 
         static final byte[] PFADD = Strings.bytes("PFADD");
         static final byte[] PFCOUNT = Strings.bytes("PFCOUNT");
-        static final byte[] PFMERGE = Strings.bytes("PFMERGE");
 
         static final byte[] SADD = Strings.bytes("SADD");
         static final byte[] SMEMBERS = Strings.bytes("SMEMBERS");
