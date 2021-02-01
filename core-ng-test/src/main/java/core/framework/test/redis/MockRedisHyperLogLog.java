@@ -2,9 +2,9 @@ package core.framework.test.redis;
 
 import core.framework.redis.RedisHyperLogLog;
 import core.framework.test.redis.MockRedisStore.Value;
-import core.framework.util.Sets;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,20 +22,19 @@ public class MockRedisHyperLogLog implements RedisHyperLogLog {
     @Override
     public boolean add(String key, String... values) {
         assertThat(values).isNotEmpty().doesNotContainNull();
-        Value value = store.putIfAbsent(key, Sets.newConcurrentHashSet());
-        Set<String> valueSet = value.set();
-        return Collections.addAll(valueSet, values);
+        var log = store.putIfAbsent(key, new MockRedisStore.HyperLogLog()).hyperLogLog();
+        return Collections.addAll(log, values);
     }
 
     @Override
     public long count(String... keys) {
-        long count = 0;
+        Set<String> merged = new HashSet<>();
         for (String key : keys) {
             Value value = store.get(key);
             if (value != null) {
-                count += value.set().size();
+                merged.addAll(value.hyperLogLog());
             }
         }
-        return count;
+        return merged.size();
     }
 }

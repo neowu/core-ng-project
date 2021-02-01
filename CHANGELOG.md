@@ -5,6 +5,7 @@
 * http: change max allowed url length from 1000 to 2000
   > Microsoft Azure AD oauth call back url may have long query param,
   > by considering browser limitation/search engine/CDN/etc, to use 2000 as default setting
+* redis: add hyperLogLog support
 
 ### 7.6.10 (01/18/2021 - 01/25/2021)
 

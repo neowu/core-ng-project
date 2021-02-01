@@ -52,13 +52,13 @@ public class RedisHyperLogLogImpl implements RedisHyperLogLog {
     public long count(String... keys) {
         var watch = new StopWatch();
         validate("keys", keys);
-        long size = 0;
+        long count = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.writeKeysCommand(PFCOUNT, keys);
-            size = connection.readLong();
-            return size;
+            count = connection.readLong();
+            return count;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
@@ -66,7 +66,7 @@ public class RedisHyperLogLogImpl implements RedisHyperLogLog {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 1, 0);
-            logger.debug("pfcount, keys={}, size={}, elapsed={}", keys, size, elapsed);
+            logger.debug("pfcount, keys={}, returnedValue={}, elapsed={}", keys, count, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
