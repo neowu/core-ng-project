@@ -11,7 +11,7 @@ def jacksonVersion = '2.12.0'
 def junitVersion = '5.7.0'
 def mockitoVersion = '3.7.0'
 def assertjVersion = '3.18.1'
-def mysqlVersion = '8.0.22'
+def mysqlVersion = '8.0.23'
 
 project('core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")

@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.6.11 (01/26/2021 - )
+### 7.6.11 (01/26/2021 - 02/01/2021)
 
 * http: change max allowed url length from 1000 to 2000
   > Microsoft Azure AD oauth call back url may have long query param,
