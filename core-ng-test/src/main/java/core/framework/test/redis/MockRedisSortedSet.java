@@ -38,7 +38,7 @@ public class MockRedisSortedSet implements RedisSortedSet {
     public Map<String, Long> range(String key, long start, long stop) {
         var value = store.get(key);
         if (value == null) return Map.of();
-        Map<String, Long> sortedSet = value.sortedSet();
+        var sortedSet = value.sortedSet();
         int size = sortedSet.size();
         int startIndex = start < 0 ? 0 : (int) start;
         if (startIndex > size) startIndex = size;
@@ -53,7 +53,7 @@ public class MockRedisSortedSet implements RedisSortedSet {
 
     @Override
     public Map<String, Long> rangeByScore(String key, long minScore, long maxScore, long limit) {
-        MockRedisStore.Value value = store.get(key);
+        var value = store.get(key);
         if (value == null) return Map.of();
         var sortedSet = value.sortedSet();
         return sortedSet.entrySet().stream()
@@ -65,7 +65,7 @@ public class MockRedisSortedSet implements RedisSortedSet {
 
     @Override
     public Map<String, Long> popByScore(String key, long minScore, long maxScore, long limit) {
-        MockRedisStore.Value value = store.get(key);
+        var value = store.get(key);
         if (value == null) return Map.of();
         var sortedSet = value.sortedSet();
         return sortedSet.entrySet().stream()
