@@ -2,6 +2,7 @@ package core.framework.test.redis;
 
 import core.framework.util.Maps;
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -78,9 +79,13 @@ class MockRedisStore {
 
     // to distinguish with hash key type
     static class SortedSet extends HashMap<String, Long> {
+        @Serial
+        private static final long serialVersionUID = -1982891940392623040L;
     }
 
     // use hashset as a naive impl, may be replaced by bloom filter in future
     static class HyperLogLog extends HashSet<String> {
+        @Serial
+        private static final long serialVersionUID = -4584074052672348286L;
     }
 }
