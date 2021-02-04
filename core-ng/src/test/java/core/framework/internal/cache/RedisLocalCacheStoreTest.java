@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.UncheckedIOException;
+import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,7 @@ import static core.framework.internal.cache.RedisLocalCacheStore.CHANNEL_INVALID
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -127,6 +130,18 @@ class RedisLocalCacheStoreTest {
         verify(localCacheStore).put("key", value, Duration.ofHours(1), null);
         verify(redisCacheStore).put("key", value, Duration.ofHours(1), null);
         verify(redisPubSub).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
+    }
+
+    @Test
+    void putWithRedisStoreFailed() {
+        when(redis.pubSub()).thenReturn(redisPubSub);
+        doThrow(new UncheckedIOException(new UnknownHostException("cache"))).when(redisPubSub).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
+
+        var value = new TestCache();
+        cacheStore.put("key", value, Duration.ofHours(1), null);
+
+        verify(localCacheStore).put("key", value, Duration.ofHours(1), null);
+        verify(redisCacheStore).put("key", value, Duration.ofHours(1), null);
     }
 
     @Test

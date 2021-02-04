@@ -1,21 +1,29 @@
 package core.framework.internal.cache;
 
 import core.framework.internal.json.JSONWriter;
+import core.framework.internal.redis.RedisException;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.util.Maps;
 import core.framework.util.Network;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static core.framework.log.Markers.errorCode;
+
 /**
  * @author neo
  */
 public class RedisLocalCacheStore implements CacheStore {
     public static final String CHANNEL_INVALIDATE_CACHE = "cache:invalidate";
+
+    private final Logger logger = LoggerFactory.getLogger(RedisLocalCacheStore.class);
     private final CacheStore localCache;
     private final CacheStore redisCache;
     private final RedisImpl redis;
@@ -33,7 +41,7 @@ public class RedisLocalCacheStore implements CacheStore {
         if (value != null) return value;
         value = redisCache.get(key, context);
         if (value == null) return null;
-        long expirationTime = redis.expirationTime(key)[0];
+        long expirationTime = redis.expirationTime(key)[0];     // if redis is not accessible (most likely failure), redisCache return null, so here not to catch exception to keep it simple
         if (expirationTime <= 0) return null;
         localCache.put(key, value, Duration.ofMillis(expirationTime), context);
         return value;
@@ -56,7 +64,7 @@ public class RedisLocalCacheStore implements CacheStore {
         Map<String, T> redisValues = redisCache.getAll(localNotFoundKeys.toArray(String[]::new), context);
         if (!redisValues.isEmpty()) {
             String[] redisKeys = redisValues.keySet().toArray(String[]::new);
-            long[] expirationTimes = redis.expirationTime(redisKeys);
+            long[] expirationTimes = redis.expirationTime(redisKeys);       // if redis is not accessible (most likely failure), redisCache return empty, so here not to catch exception to keep it simple
             for (int i = 0; i < expirationTimes.length; i++) {
                 long expirationTime = expirationTimes[i];
                 if (expirationTime > 0) {
@@ -103,9 +111,13 @@ public class RedisLocalCacheStore implements CacheStore {
     }
 
     private void publishInvalidateLocalCacheMessage(List<String> keys) {
-        var message = new InvalidateLocalCacheMessage();
-        message.keys = keys;
-        message.clientIP = Network.LOCAL_HOST_ADDRESS;
-        redis.pubSub().publish(CHANNEL_INVALIDATE_CACHE, writer.toJSON(message));
+        try {
+            var message = new InvalidateLocalCacheMessage();
+            message.keys = keys;
+            message.clientIP = Network.LOCAL_HOST_ADDRESS;
+            redis.pubSub().publish(CHANNEL_INVALIDATE_CACHE, writer.toJSON(message));
+        } catch (UncheckedIOException | RedisException e) {
+            logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
+        }
     }
 }
