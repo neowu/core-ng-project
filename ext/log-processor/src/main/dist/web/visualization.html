@@ -11,12 +11,9 @@
         width: 100vw;
         height: 100vh;
     }
-
     div.tooltip {
         position: absolute;
         text-align: center;
-        width: 60px;
-        height: 28px;
         padding: 2px;
         font: 12px sans-serif;
         border: 0px;
@@ -25,46 +22,46 @@
     }
 </style>
 <script>
-    var dotSrc = `
-digraph G {
-"0" [label="website\\nAccountAJAXService", shape="box"];
-"1" [label="customer-service\\nRegisterService", shape="box", color=blue];
-"2" [label="wallet-service\\nWalletService", shape="box"];
-"3" [label="customer-service\\nLoginService", shape="box", color=red];
-"5" [label="customer-service\\nLoginHistoryService", shape="box"];
-"0" -> "1" [arrowhead="open", arrowtail="none", fontsize=10, label="action:/customer/register"];
-"1" -> "2" [arrowhead="open", arrowtail="none", fontsize=10, label="action:/wallet/create"];
-"1" -> "3" [arrowhead="open", arrowtail="none", fontsize=10, label="action:/customer/login"];
-"3" -> "5" [arrowhead="open", arrowtail="none", style=dashed, fontsize=10, label="action:/login-history"];
-}
-`;
-
     var graphviz = d3.select("#graph").graphviz();
 
     var div = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
 
-    function render() {
+    function render(dot, nodes, edges) {
         graphviz
             .transition(function () {
                 return d3.transition()
                     .delay(100)
                     .duration(1000);
             })
-            .renderDot(dotSrc)
-            .on("end", interactive);
+            .renderDot(dot)
+            .on("end", () => tooltip(nodes, edges));
     }
 
-    function interactive() {
-        nodes = d3.selectAll('.node');
-        nodes
+    function tooltip(nodes, edges) {
+        nodes.forEach(node => {
+            nodeTooltip(node);
+        })
+
+        edges.forEach(edge => {
+            edgeTooltip(edge);
+        })
+    }
+
+    function nodeTooltip(node) {
+        d3.select(`#${node.id}`)
             .on("mouseover", function () {
-                text = d3.select(this).selectAll('title').text();
+                const html = Object.entries(node).map(([key, value]) => {
+                    if (value !== null && key !== "id") {
+                        return `${key}: ${value}`
+                    }
+                }).filter(Boolean).join("<br/>");
+
                 div.transition()
                     .duration(200)
                     .style("opacity", .9);
-                div.html("node:" + text)
+                div.html(html)
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px")
                     .style("background", "lightsteelblue");
@@ -74,18 +71,23 @@ digraph G {
                     .duration(500)
                     .style("opacity", 0);
             });
+    }
 
-        edges = d3.selectAll('.edge');
-        edges
+    function edgeTooltip(edge) {
+        d3.select(`#${edge.id}`)
             .on("mouseover", function () {
-                text = d3.select(this).selectAll('title').text();
+                const html = [
+                    edge.errorCode,
+                    edge.errorMessage
+                ].filter(_ => _ !== null).join("<br/>");
+
                 div.transition()
                     .duration(200)
                     .style("opacity", .9);
-                div.html("edge:" + text)
+                div.html(html)
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px")
-                    .style("background", "lightyellow");
+                    .style("background", "bisque");
             })
             .on("mouseout", function () {
                 div.transition()
@@ -94,6 +96,22 @@ digraph G {
             });
     }
 
-    render(dotSrc);
+    const actionId = new URLSearchParams(window.location.search).get("actionId");
+    if (actionId) {
+        fetch("/ajax/action-flow/" + actionId).then(response => response.json()).then(response => {
+            response.nodes.forEach(node => {
+                nodeTooltip(node);
+            })
+
+            response.edges.forEach(edge => {
+                edgeTooltip(edge);
+            })
+
+            render(response.graph, response.nodes, response.edges);
+
+        }).catch(error => console.error(error));
+    } else {
+        alert("actionId is missing")
+    }
 
 </script>
