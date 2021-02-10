@@ -1,4 +1,4 @@
-package core.log;
+package core;
 
 import core.framework.http.HTTPClient;
 import core.framework.log.message.ActionLogMessage;
@@ -55,6 +55,8 @@ public class LogProcessorApp extends App {
         configureKafka();
 
         configureJob();
+
+        load(new VisualizationModule());
     }
 
     private void configureKibanaService() {
