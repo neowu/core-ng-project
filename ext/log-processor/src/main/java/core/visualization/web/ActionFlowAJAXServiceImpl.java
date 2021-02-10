@@ -20,6 +20,12 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
             "n3" -> "n4" [id="ddd",arrowhead="open", arrowtail="none", style=dashed, fontsize=10, label="action:/login-history"];
             }""";
 
+        hardcodeEdges(response);
+        hardCodeNodes(response);
+        return response;
+    }
+
+    private void hardcodeEdges(ActionFlowResponse response) {
         var edge1 = new ActionFlowResponse.Edge();
         edge1.id = "aaa";
         edge1.errorCode = "NOT_FOUND";
@@ -31,7 +37,9 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         edge2.errorCode = "BAD_REQUEST";
         edge2.errorMessage = "invalid input";
         response.edges.add(edge2);
+    }
 
+    private void hardCodeNodes(ActionFlowResponse response) {
         ActionFlowResponse.Node node0 = new ActionFlowResponse.Node();
         node0.id = "n0";
         node0.elapsed = 50;
@@ -62,7 +70,5 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         node5.elapsed = 30;
         node5.redisElapsed = 100;
         response.nodes.add(node5);
-
-        return response;
     }
 }
