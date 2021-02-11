@@ -29,25 +29,25 @@ public class ActionFlowResponse {
 
         @NotNull
         @Property(name = "cpuTime")
-        public Integer cpuTime;
+        public Long cpuTime;
 
         @Property(name = "httpElapsed")
-        public Integer httpElapsed;
+        public Long httpElapsed;
 
         @Property(name = "dbElapsed")
-        public Integer dbElapsed;
+        public Long dbElapsed;
 
         @Property(name = "redisElapsed")
-        public Integer redisElapsed;
+        public Long redisElapsed;
 
         @Property(name = "esElapsed")
-        public Integer esElapsed;
+        public Long esElapsed;
 
         @Property(name = "kafkaElapsed")
-        public Integer kafkaElapsed;
+        public Long kafkaElapsed;
 
         @Property(name = "cacheHits")
-        public Integer cacheHits;
+        public Long cacheHits;
     }
 
     public static class Edge {
@@ -57,7 +57,7 @@ public class ActionFlowResponse {
 
         @NotNull
         @Property(name = "elapsed")
-        public Integer elapsed;
+        public Long elapsed;
 
         @NotNull
         @Property(name = "errorCode")
