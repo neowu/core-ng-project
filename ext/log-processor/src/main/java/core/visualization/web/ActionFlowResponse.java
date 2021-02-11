@@ -28,14 +28,9 @@ public class ActionFlowResponse {
         public String id;
 
         @NotNull
-        @Property(name = "elapsed")
-        public Integer elapsed;
-
-        //        @NotNull
         @Property(name = "cpuTime")
         public Integer cpuTime;
 
-        //        @NotNull
         @Property(name = "httpElapsed")
         public Integer httpElapsed;
 
@@ -59,6 +54,10 @@ public class ActionFlowResponse {
         @NotNull
         @Property(name = "id")
         public String id;
+
+        @NotNull
+        @Property(name = "elapsed")
+        public Integer elapsed;
 
         @NotNull
         @Property(name = "errorCode")
