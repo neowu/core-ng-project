@@ -52,7 +52,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
             }
         }
 
-        graphBuilder.append("}");
+        graphBuilder.append('}');
 
         response.graph = graphBuilder.toString();
         return response;
