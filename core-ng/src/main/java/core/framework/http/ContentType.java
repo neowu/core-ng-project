@@ -33,17 +33,28 @@ public final class ContentType {
     public static final ContentType IMAGE_PNG = create("image/png", null);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentType.class);
-    // cache most common ones to save paring time
+    // cache most used ones to save paring time
     private static final Map<String, ContentType> CACHE = Map.of(
             APPLICATION_JSON.contentType, APPLICATION_JSON,
             TEXT_HTML.contentType, TEXT_HTML
     );
 
     // only cover common case, assume pattern is "media-type; charset=" or "multipart/form-data; boundary="
+    // according to https://www.w3.org/Protocols/rfc1341/4_Content-Type.html, content type value is case insensitive
     public static ContentType parse(String contentType) {
-        ContentType type = CACHE.get(contentType);
+        String normalizedContentType = ASCII.toLowerCase(contentType);
+        ContentType type = CACHE.get(normalizedContentType);
         if (type != null) return type;
 
+        return parseContentType(normalizedContentType);
+    }
+
+    public static ContentType create(String mediaType, Charset charset) {
+        String contentType = charset == null ? mediaType : mediaType + "; charset=" + ASCII.toLowerCase(charset.name());
+        return new ContentType(contentType, mediaType, charset);
+    }
+
+    private static ContentType parseContentType(String contentType) {
         String mediaType = contentType;
         Charset charset = null;
 
@@ -58,11 +69,6 @@ public final class ContentType {
             }
         }
 
-        return new ContentType(contentType, mediaType, charset);
-    }
-
-    public static ContentType create(String mediaType, Charset charset) {
-        String contentType = charset == null ? mediaType : mediaType + "; charset=" + ASCII.toLowerCase(charset.name());
         return new ContentType(contentType, mediaType, charset);
     }
 

@@ -3,6 +3,9 @@
 ### 7.6.12 (02/02/2021 - )
 
 * cache: for redis local cache, handle exception as warning if redis is not accessible
+* http: parse content-type value case insensitively
+  > refer to https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
+  > treat, "Application/json" same as "application/json"
 
 ### 7.6.11 (01/26/2021 - 02/01/2021)
 
