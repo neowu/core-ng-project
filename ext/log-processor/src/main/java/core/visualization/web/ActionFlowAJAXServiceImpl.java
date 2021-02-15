@@ -1,74 +1,180 @@
 package core.visualization.web;
 
+import core.framework.inject.Inject;
+import core.framework.search.ElasticSearchType;
+import core.framework.search.GetRequest;
+import core.framework.search.SearchRequest;
+import core.framework.web.exception.NotFoundException;
+import core.log.domain.ActionDocument;
+import org.elasticsearch.index.query.QueryBuilders;
+
+import java.util.List;
+import java.util.Optional;
+
+import static core.framework.util.Strings.format;
+
 /**
  * @author allison
  */
 public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
+    private static final String ACTION_INDEX = "action-*";
+
+    @Inject
+    ElasticSearchType<ActionDocument> actionType;
+
     @Override
     public ActionFlowResponse actionFlow(String actionId) {
-        var response = new ActionFlowResponse();
-        response.graph = """
-            digraph G {
-            "n0" [id="n0", label="website\\nAccountAJAXService", shape="box"];
-            "n1" [id="n1", label="customer-service\\nRegisterService", shape="box", color=blue];
-            "n2" [id="n2", label="wallet-service\\nWalletService", shape="box"];
-            "n3" [id="n3", label="customer-service\\nLoginService", shape="box", color=red];
-            "n4" [id="n4", label="customer-service\\nLoginHistoryService", shape="box"];
-            "n0" -> "n1" [id="aaa", arrowhead="open", arrowtail="none", fontsize=10, label="action:/customer/register"];
-            "n1" -> "n2" [id="bbb",arrowhead="open", arrowtail="none", fontsize=10, label="action:/wallet/create"];
-            "n1" -> "n3" [id="ccc",arrowhead="open", arrowtail="none", fontsize=10, label="action:/customer/login"];
-            "n3" -> "n4" [id="ddd",arrowhead="open", arrowtail="none", style=dashed, fontsize=10, label="action:/login-history"];
-            }""";
+        ActionDocument requestedAction = actionDocument(actionId);
+        boolean isFirstAction = requestedAction.correlationIds == null || requestedAction.correlationIds.isEmpty();
 
-        hardcodeEdges(response);
-        hardCodeNodes(response);
+        List<String> correlationIds = isFirstAction ? List.of(actionId) : requestedAction.correlationIds;
+        StringBuilder graphBuilder = new StringBuilder();
+        graphBuilder.append("digraph G {\n");
+
+        var response = new ActionFlowResponse();
+
+        for (int i = 0; i < correlationIds.size(); i++) {
+            String correlationId = correlationIds.get(i);
+            ActionDocument firstAction = correlationId.equals(actionId) ? requestedAction : actionDocument(correlationId);
+            graphBuilder.append(firstNode(firstAction, actionId.equals(firstAction.id), i));
+            graphBuilder.append(firstEdge(firstAction, i));
+
+            response.nodes.add(nodeInfo(firstAction));
+            edgeInfo(firstAction).ifPresent(edge -> response.edges.add(edge));
+
+            List<ActionDocument> actionDocuments = searchActionDocument(correlationId);
+            for (ActionDocument actionDocument : actionDocuments) {
+                graphBuilder.append(node(actionDocument, actionId.equals(actionDocument.id)));
+                graphBuilder.append(edge(actionDocument));
+
+                response.nodes.add(nodeInfo(actionDocument));
+                edgeInfo(actionDocument).ifPresent(edge -> response.edges.add(edge));
+            }
+        }
+
+        graphBuilder.append("}");
+
+        response.graph = graphBuilder.toString();
         return response;
     }
 
-    private void hardcodeEdges(ActionFlowResponse response) {
-        var edge1 = new ActionFlowResponse.Edge();
-        edge1.id = "aaa";
-        edge1.errorCode = "NOT_FOUND";
-        edge1.errorMessage = "sth not found";
-        response.edges.add(edge1);
-
-        var edge2 = new ActionFlowResponse.Edge();
-        edge2.id = "ccc";
-        edge2.errorCode = "BAD_REQUEST";
-        edge2.errorMessage = "invalid input";
-        response.edges.add(edge2);
+    private ActionDocument actionDocument(String id) {
+        var request = new GetRequest();
+        request.index = ACTION_INDEX;
+        request.id = id;
+        return actionType.get(request).orElseThrow(() -> new NotFoundException("action not found, id=" + id));
     }
 
-    private void hardCodeNodes(ActionFlowResponse response) {
-        ActionFlowResponse.Node node0 = new ActionFlowResponse.Node();
-        node0.id = "n0";
-        node0.elapsed = 50;
-        node0.dbElapsed = 10;
-        response.nodes.add(node0);
+    private List<ActionDocument> searchActionDocument(String correlationId) {
+        var request = new SearchRequest();
+        request.query = QueryBuilders.matchQuery("correlation_id", correlationId);
+        request.index = ACTION_INDEX;
+        return actionType.search(request).hits;
+    }
 
-        ActionFlowResponse.Node node1 = new ActionFlowResponse.Node();
-        node1.id = "n1";
-        node1.elapsed = 60;
-        node1.cacheHits = 1;
-        response.nodes.add(node1);
+    private ActionFlowResponse.Node nodeInfo(ActionDocument actionDocument) {
+        var node = new ActionFlowResponse.Node();
+        node.id = actionDocument.id;
+        node.cpuTime = actionDocument.stats.get("cpu_time").longValue();
+        return node;
+    }
 
-        ActionFlowResponse.Node node2 = new ActionFlowResponse.Node();
-        node2.id = "n2";
-        node2.elapsed = 30;
-        node2.esElapsed = 100;
-        response.nodes.add(node2);
+    private Optional<ActionFlowResponse.Edge> edgeInfo(ActionDocument actionDocument) {
+        if (actionDocument.errorCode == null && actionDocument.errorMessage == null)
+            return Optional.empty();
 
-        ActionFlowResponse.Node node3 = new ActionFlowResponse.Node();
-        node3.id = "n3";
-        node3.elapsed = 80;
-        node3.cpuTime = 20;
-        node3.kafkaElapsed = 10;
-        response.nodes.add(node3);
+        var edge = new ActionFlowResponse.Edge();
+        edge.errorCode = actionDocument.errorCode;
+        edge.errorMessage = actionDocument.errorMessage;
+        return Optional.of(edge);
+    }
 
-        ActionFlowResponse.Node node5 = new ActionFlowResponse.Node();
-        node5.id = "n4";
-        node5.elapsed = 30;
-        node5.redisElapsed = 100;
-        response.nodes.add(node5);
+    private ActionType actionType(ActionDocument actionDocument) {
+        if (actionDocument.context.get("controller") != null)
+            return ActionType.HANDLER;
+        if (actionDocument.context.get("handler") != null)
+            return ActionType.HANDLER;
+        if (actionDocument.context.get("job_class") != null)
+            return ActionType.JOB_CLASS;
+        if (actionDocument.context.get("root_action") != null)
+            return ActionType.EXECUTOR;
+        else
+            throw new IllegalArgumentException("cannot determine action Type");
+    }
+
+    private String firstNode(ActionDocument actionDocument, boolean isRequestedAction, int i) {
+        String startPoint = "p" + i;
+        return format("{} [shape=point];\n", startPoint) + node(actionDocument, isRequestedAction);
+    }
+
+    private String node(ActionDocument actionDocument, boolean isRequestedAction) {
+        String shape = nodeShape(actionDocument);
+        String color = nodeColor(actionDocument, isRequestedAction);
+        String content = nodeContent(actionDocument);
+        return format("{} [id={}, shape={}, color={}, label=\"{}\\n{}\"];\n", actionDocument.id, actionDocument.id, actionDocument.app, shape, color, content);
+    }
+
+    private String nodeShape(ActionDocument actionDocument) {
+        return switch (actionType(actionDocument)) {
+            case CONTROLLER -> "box";
+            case HANDLER -> "hexagon";
+            case JOB_CLASS -> "parallelogram";
+            case EXECUTOR -> "ellipse";
+        };
+    }
+
+    private String nodeContent(ActionDocument actionDocument) {
+        return switch (actionType(actionDocument)) {
+            case CONTROLLER -> actionDocument.context.get("controller").get(0);
+            case HANDLER -> actionDocument.context.get("handler").get(0);
+            case JOB_CLASS -> actionDocument.context.get("job_class").get(0);
+            case EXECUTOR -> "Executor";
+        };
+    }
+
+    private String nodeColor(ActionDocument actionDocument, boolean isRequestedAction) {
+        if (actionDocument.stats.get("cpu_time") > 30000000)
+            return "red";
+        if (isRequestedAction)
+            return "blue";
+        return "black";
+    }
+
+    private String firstEdge(ActionDocument actionDocument, int i) {
+        String startPoint = "p" + i;
+        String edgeStyle = edgeStyle(actionDocument);
+        String edgeColor = edgeColor(actionDocument);
+        return format("{} -> {} [arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", startPoint, actionDocument.id, edgeStyle, edgeColor, actionDocument.action);
+    }
+
+    private String edge(ActionDocument actionDocument) {
+        StringBuilder edgeBuilder = new StringBuilder();
+        for (String refId : actionDocument.refIds) {
+            String edgeStyle = edgeStyle(actionDocument);
+            String edgeColor = edgeColor(actionDocument);
+            edgeBuilder.append(format("{} -> {} [arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", refId, actionDocument.id, edgeStyle, edgeColor, actionDocument.action));
+        }
+        return edgeBuilder.toString();
+    }
+
+    private String edgeStyle(ActionDocument actionDocument) {
+        ActionType actionType = actionType(actionDocument);
+        if (actionType == ActionType.HANDLER || actionType == ActionType.EXECUTOR)
+            return "dashed";
+        if (actionDocument.elapsed > 30000000)
+            return "bold";
+        return "solid";
+    }
+
+    private String edgeColor(ActionDocument actionDocument) {
+        if ("ERROR".equals(actionDocument.result))
+            return "red";
+        if ("WARN".equals(actionDocument.result))
+            return "orange";
+        return "black";
+    }
+
+    private enum ActionType {
+        CONTROLLER, HANDLER, JOB_CLASS, EXECUTOR
     }
 }
