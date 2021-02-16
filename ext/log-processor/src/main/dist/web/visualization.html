@@ -40,6 +40,8 @@
     }
 
     function tooltip(nodes, edges) {
+        d3.selectAll("title").remove();
+
         nodes.forEach(node => {
             nodeTooltip(node);
         })
@@ -76,10 +78,11 @@
     function edgeTooltip(edge) {
         d3.select(`#${edge.id}`)
             .on("mouseover", function () {
-                const html = [
-                    edge.errorCode,
-                    edge.errorMessage
-                ].filter(_ => _ !== null).join("<br/>");
+                const html = Object.entries(edge).map(([key, value]) => {
+                    if (value !== null && key !== "id") {
+                        return `${key}: ${value}`
+                    }
+                }).filter(Boolean).join("<br/>");
 
                 div.transition()
                     .duration(200)
@@ -99,16 +102,7 @@
     const actionId = new URLSearchParams(window.location.search).get("actionId");
     if (actionId) {
         fetch("/ajax/action-flow/" + actionId).then(response => response.json()).then(response => {
-            response.nodes.forEach(node => {
-                nodeTooltip(node);
-            })
-
-            response.edges.forEach(edge => {
-                edgeTooltip(edge);
-            })
-
             render(response.graph, response.nodes, response.edges);
-
         }).catch(error => console.error(error));
     } else {
         alert("actionId is missing")
