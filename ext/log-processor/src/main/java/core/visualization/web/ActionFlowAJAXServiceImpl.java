@@ -2,7 +2,6 @@ package core.visualization.web;
 
 import core.framework.inject.Inject;
 import core.framework.search.ElasticSearchType;
-import core.framework.search.GetRequest;
 import core.framework.search.SearchRequest;
 import core.framework.web.exception.NotFoundException;
 import core.log.domain.ActionDocument;
@@ -60,10 +59,13 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     }
 
     private ActionDocument actionDocument(String id) {
-        var request = new GetRequest();
+        var request = new SearchRequest();
+        request.query = QueryBuilders.matchQuery("id", id);
         request.index = ACTION_INDEX;
-        request.id = id;
-        return actionType.get(request).orElseThrow(() -> new NotFoundException("action not found, id=" + id));
+        List<ActionDocument> documents = actionType.search(request).hits;
+        if (documents.isEmpty())
+            throw new NotFoundException("action not found, id=" + id);
+        return documents.get(0);
     }
 
     private List<ActionDocument> searchActionDocument(String correlationId) {
@@ -131,7 +133,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         String shape = nodeShape(actionDocument);
         String color = nodeColor(actionDocument, isRequestedAction);
         String content = nodeContent(actionDocument);
-        return format("{} [id={}, shape={}, color={}, label=\"{}\\n{}\"];\n", actionDocument.id, actionDocument.id, actionDocument.app, shape, color, content);
+        return format("{} [id=\"{}\", shape={}, color={}, label=\"{}\\n{}\"];\n", actionDocument.id, actionDocument.id, shape, color, actionDocument.app, content);
     }
 
     private String nodeShape(ActionDocument actionDocument) {
@@ -165,7 +167,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         String edgeId = edgeId(startPoint, actionDocument.id);
         String edgeStyle = edgeStyle(actionDocument);
         String edgeColor = edgeColor(actionDocument);
-        return format("{} -> {} [id={}, arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", edgeId, startPoint, actionDocument.id, edgeStyle, edgeColor, actionDocument.action);
+        return format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", startPoint, actionDocument.id, edgeId, edgeStyle, edgeColor, actionDocument.action);
     }
 
     private String edge(ActionDocument actionDocument) {
@@ -174,7 +176,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
             String edgeId = edgeId(refId, actionDocument.id);
             String edgeStyle = edgeStyle(actionDocument);
             String edgeColor = edgeColor(actionDocument);
-            edgeBuilder.append(format("{} -> {} [id={}, arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", edgeId, refId, actionDocument.id, edgeStyle, edgeColor, actionDocument.action));
+            edgeBuilder.append(format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", refId, actionDocument.id, edgeId, edgeStyle, edgeColor, actionDocument.action));
         }
         return edgeBuilder.toString();
     }
