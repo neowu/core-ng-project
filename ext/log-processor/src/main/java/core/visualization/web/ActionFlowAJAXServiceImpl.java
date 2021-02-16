@@ -9,6 +9,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static core.framework.util.Strings.format;
 
@@ -18,6 +19,7 @@ import static core.framework.util.Strings.format;
 public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     private static final String ACTION_INDEX = "action-*";
     private static final String START_POINT = "p{}";
+    private static final String OUTSIDE_GRAPH = "o{}";
     private static final String NODE_ID = "n_{}";
     private static final String EDGE_ID = "e_{}_{}";
 
@@ -26,7 +28,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
 
     @Override
     public ActionFlowResponse actionFlow(String actionId) {
-        ActionDocument requestedAction = actionDocument(actionId);
+        ActionDocument requestedAction = actionDocument(actionId).orElseThrow(() -> new NotFoundException("action not found, id=" + actionId));
         boolean isFirstAction = requestedAction.correlationIds == null || requestedAction.correlationIds.isEmpty();
 
         List<String> correlationIds = isFirstAction ? List.of(actionId) : requestedAction.correlationIds;
@@ -37,12 +39,19 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
 
         for (int i = 0; i < correlationIds.size(); i++) {
             String correlationId = correlationIds.get(i);
-            ActionDocument firstAction = correlationId.equals(actionId) ? requestedAction : actionDocument(correlationId);
-            graphBuilder.append(firstNode(firstAction, actionId.equals(firstAction.id), i));
-            graphBuilder.append(firstEdge(firstAction, i));
 
-            response.nodes.add(nodeInfo(firstAction));
-            response.edges.add(firstEdgeInfo(firstAction, i));
+            ActionDocument firstAction = correlationId.equals(actionId) ? requestedAction : actionDocument(correlationId).orElse(null);
+
+            if (firstAction != null) {
+                graphBuilder.append(firstNode(firstAction, actionId.equals(firstAction.id), i));
+                graphBuilder.append(firstEdge(firstAction, i));
+
+                response.nodes.add(nodeInfo(firstAction));
+                response.edges.add(firstEdgeInfo(firstAction, i));
+            } else {
+                graphBuilder.append(firstNodeOutside(i));
+                graphBuilder.append(firstEdgeOutside(i));
+            }
 
             List<ActionDocument> actionDocuments = searchActionDocument(correlationId);
             for (ActionDocument actionDocument : actionDocuments) {
@@ -60,14 +69,13 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         return response;
     }
 
-    private ActionDocument actionDocument(String id) {
+    private Optional<ActionDocument> actionDocument(String id) {
         var request = new SearchRequest();
         request.query = QueryBuilders.matchQuery("id", id);
         request.index = ACTION_INDEX;
         List<ActionDocument> documents = actionType.search(request).hits;
-        if (documents.isEmpty())
-            throw new NotFoundException("action not found, id=" + id);
-        return documents.get(0);
+        if (documents.isEmpty()) return Optional.empty();
+        return Optional.ofNullable(documents.get(0));
     }
 
     private List<ActionDocument> searchActionDocument(String correlationId) {
@@ -131,6 +139,12 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         return format("{} [shape=point];\n", startPoint) + node(actionDocument, isRequestedAction);
     }
 
+    private String firstNodeOutside(int i) {
+        String startPoint = format(START_POINT, i);
+        String nodeName = format(OUTSIDE_GRAPH, i);
+        return format("{} [shape=point];\n{} [shape=component, label=\"Outside\"];\n", startPoint, nodeName);
+    }
+
     private String node(ActionDocument actionDocument, boolean isRequestedAction) {
         String nodeId = format(NODE_ID, actionDocument.id);
         String shape = nodeShape(actionDocument);
@@ -163,6 +177,12 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         if (isRequestedAction)
             return "blue";
         return "black";
+    }
+
+    private String firstEdgeOutside(int i) {
+        String startPoint = format(START_POINT, i);
+        String nodeName = format(OUTSIDE_GRAPH, i);
+        return format("{} -> {} [arrowhead=open, arrowtail=none];\n", startPoint, nodeName);
     }
 
     private String firstEdge(ActionDocument actionDocument, int i) {
