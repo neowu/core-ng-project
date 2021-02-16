@@ -18,6 +18,7 @@ import static core.framework.util.Strings.format;
  */
 public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     private static final String ACTION_INDEX = "action-*";
+    private static final String START_POINT = "p{}";
 
     @Inject
     ElasticSearchType<ActionDocument> actionType;
@@ -40,7 +41,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
             graphBuilder.append(firstEdge(firstAction, i));
 
             response.nodes.add(nodeInfo(firstAction));
-            response.edges.addAll(edgeInfo(firstAction));
+            response.edges.add(firstEdgeInfo(firstAction, i));
 
             List<ActionDocument> actionDocuments = searchActionDocument(correlationId);
             for (ActionDocument actionDocument : actionDocuments) {
@@ -76,7 +77,23 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         var node = new ActionFlowResponse.Node();
         node.id = actionDocument.id;
         node.cpuTime = actionDocument.stats.get("cpu_time").longValue();
+        node.httpElapsed = actionDocument.performanceStats.get("http") != null ? actionDocument.performanceStats.get("http").totalElapsed : null;
+        node.dbElapsed = actionDocument.performanceStats.get("db") != null ? actionDocument.performanceStats.get("db").totalElapsed : null;
+        node.redisElapsed = actionDocument.performanceStats.get("redis") != null ? actionDocument.performanceStats.get("redis").totalElapsed : null;
+        node.esElapsed = actionDocument.performanceStats.get("elasticsearch") != null ? actionDocument.performanceStats.get("elasticsearch").totalElapsed : null;
+        node.kafkaElapsed = actionDocument.performanceStats.get("kafka") != null ? actionDocument.performanceStats.get("kafka").totalElapsed : null;
+        node.cacheHits = actionDocument.stats.get("cache_hits") != null ? actionDocument.stats.get("cache_hits").longValue() : null;
         return node;
+    }
+
+    private ActionFlowResponse.Edge firstEdgeInfo(ActionDocument actionDocument, int i) {
+        String startPoint = format(START_POINT, i);
+        var edge = new ActionFlowResponse.Edge();
+        edge.id = edgeId(startPoint, actionDocument.id);
+        edge.elapsed = actionDocument.elapsed;
+        edge.errorCode = actionDocument.errorCode;
+        edge.errorMessage = actionDocument.errorMessage;
+        return edge;
     }
 
     private List<ActionFlowResponse.Edge> edgeInfo(ActionDocument actionDocument) {
@@ -94,7 +111,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
 
     private ActionType actionType(ActionDocument actionDocument) {
         if (actionDocument.context.get("controller") != null)
-            return ActionType.HANDLER;
+            return ActionType.CONTROLLER;
         if (actionDocument.context.get("handler") != null)
             return ActionType.HANDLER;
         if (actionDocument.context.get("job_class") != null)
@@ -106,7 +123,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     }
 
     private String firstNode(ActionDocument actionDocument, boolean isRequestedAction, int i) {
-        String startPoint = "p" + i;
+        String startPoint = format(START_POINT, i);
         return format("{} [shape=point];\n", startPoint) + node(actionDocument, isRequestedAction);
     }
 
@@ -144,10 +161,11 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     }
 
     private String firstEdge(ActionDocument actionDocument, int i) {
-        String startPoint = "p" + i;
+        String startPoint = format(START_POINT, i);
+        String edgeId = edgeId(startPoint, actionDocument.id);
         String edgeStyle = edgeStyle(actionDocument);
         String edgeColor = edgeColor(actionDocument);
-        return format("{} -> {} [arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", startPoint, actionDocument.id, edgeStyle, edgeColor, actionDocument.action);
+        return format("{} -> {} [id={}, arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", edgeId, startPoint, actionDocument.id, edgeStyle, edgeColor, actionDocument.action);
     }
 
     private String edge(ActionDocument actionDocument) {

@@ -59,11 +59,9 @@ public class ActionFlowResponse {
         @Property(name = "elapsed")
         public Long elapsed;
 
-        @NotNull
         @Property(name = "errorCode")
         public String errorCode;
 
-        @NotNull
         @Property(name = "errorMessage")
         public String errorMessage;
     }
