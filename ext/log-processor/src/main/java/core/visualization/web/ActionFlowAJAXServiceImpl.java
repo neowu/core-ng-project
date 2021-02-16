@@ -19,7 +19,6 @@ import static core.framework.util.Strings.format;
 public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     private static final String ACTION_INDEX = "action-*";
     private static final String START_POINT = "p{}";
-    private static final String OUTSIDE_GRAPH = "o{}";
     private static final String NODE_ID = "n_{}";
     private static final String EDGE_ID = "e_{}_{}";
 
@@ -49,8 +48,8 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
                 response.nodes.add(nodeInfo(firstAction));
                 response.edges.add(firstEdgeInfo(firstAction, i));
             } else {
-                graphBuilder.append(firstNodeOutside(i));
-                graphBuilder.append(firstEdgeOutside(i));
+                graphBuilder.append(firstNodeOutside(correlationId, i));
+                graphBuilder.append(firstEdgeOutside(correlationId, i));
             }
 
             List<ActionDocument> actionDocuments = searchActionDocument(correlationId);
@@ -139,10 +138,10 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         return format("{} [shape=point];\n", startPoint) + node(actionDocument, isRequestedAction);
     }
 
-    private String firstNodeOutside(int i) {
+    private String firstNodeOutside(String correlationId, int i) {
         String startPoint = format(START_POINT, i);
-        String nodeName = format(OUTSIDE_GRAPH, i);
-        return format("{} [shape=point];\n{} [shape=component, label=\"Outside\"];\n", startPoint, nodeName);
+        String nodeName = format(NODE_ID, correlationId);
+        return format("{} [shape=point];\n{} [id=\"{}\", shape=component, label=\"Outside\"];\n", startPoint, nodeName, correlationId);
     }
 
     private String node(ActionDocument actionDocument, boolean isRequestedAction) {
@@ -150,7 +149,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         String shape = nodeShape(actionDocument);
         String color = nodeColor(actionDocument, isRequestedAction);
         String content = nodeContent(actionDocument);
-        return format("{} [id=\"{}\", shape={}, color={}, label=\"{}\\n{}\"];\n", nodeName(actionDocument.id), nodeId, shape, color, actionDocument.app, content);
+        return format("{} [id=\"{}\", shape={}, color={}, label=\"{}\\n{}\"];\n", nodeId, nodeId, shape, color, actionDocument.app, content);
     }
 
     private String nodeShape(ActionDocument actionDocument) {
@@ -179,27 +178,31 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         return "black";
     }
 
-    private String firstEdgeOutside(int i) {
+    private String firstEdgeOutside(String correlationId, int i) {
         String startPoint = format(START_POINT, i);
-        String nodeName = format(OUTSIDE_GRAPH, i);
-        return format("{} -> {} [arrowhead=open, arrowtail=none];\n", startPoint, nodeName);
+        String nodeId = format(NODE_ID, correlationId);
+        String edgeId = format(EDGE_ID, startPoint, correlationId);
+        return format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none];\n", startPoint, nodeId, edgeId);
     }
 
     private String firstEdge(ActionDocument actionDocument, int i) {
         String startPoint = format(START_POINT, i);
+        String nodeId = format(NODE_ID, actionDocument.id);
         String edgeId = format(EDGE_ID, startPoint, actionDocument.id);
         String edgeStyle = edgeStyle(actionDocument);
         String edgeColor = edgeColor(actionDocument);
-        return format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", startPoint, nodeName(actionDocument.id), edgeId, edgeStyle, edgeColor, actionDocument.action);
+        return format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", startPoint, nodeId, edgeId, edgeStyle, edgeColor, actionDocument.action);
     }
 
     private String edge(ActionDocument actionDocument) {
         StringBuilder edgeBuilder = new StringBuilder();
         for (String refId : actionDocument.refIds) {
+            String refNodeId = format(NODE_ID, refId);
+            String nodeId = format(NODE_ID, actionDocument.id);
             String edgeId = format(EDGE_ID, refId, actionDocument.id);
             String edgeStyle = edgeStyle(actionDocument);
             String edgeColor = edgeColor(actionDocument);
-            edgeBuilder.append(format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", nodeName(refId), nodeName(actionDocument.id), edgeId, edgeStyle, edgeColor, actionDocument.action));
+            edgeBuilder.append(format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", refNodeId, nodeId, edgeId, edgeStyle, edgeColor, actionDocument.action));
         }
         return edgeBuilder.toString();
     }
@@ -219,10 +222,6 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         if ("WARN".equals(actionDocument.result))
             return "orange";
         return "black";
-    }
-
-    private String nodeName(String id) {
-        return id.substring(id.length() - 3);
     }
 
     private enum ActionType {
