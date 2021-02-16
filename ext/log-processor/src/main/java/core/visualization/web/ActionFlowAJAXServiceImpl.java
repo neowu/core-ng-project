@@ -70,8 +70,9 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
 
     private Optional<ActionDocument> actionDocument(String id) {
         var request = new SearchRequest();
-        request.query = QueryBuilders.matchQuery("id", id);
         request.index = ACTION_INDEX;
+        request.query = QueryBuilders.matchQuery("id", id);
+        request.limit = 1;
         List<ActionDocument> documents = actionType.search(request).hits;
         if (documents.isEmpty()) return Optional.empty();
         return Optional.ofNullable(documents.get(0));
@@ -79,8 +80,9 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
 
     private List<ActionDocument> searchActionDocument(String correlationId) {
         var request = new SearchRequest();
-        request.query = QueryBuilders.matchQuery("correlation_id", correlationId);
         request.index = ACTION_INDEX;
+        request.query = QueryBuilders.matchQuery("correlation_id", correlationId);
+        request.limit = 1000;
         return actionType.search(request).hits;
     }
 
