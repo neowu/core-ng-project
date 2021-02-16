@@ -8,8 +8,8 @@ import core.framework.web.exception.NotFoundException;
 import core.log.domain.ActionDocument;
 import org.elasticsearch.index.query.QueryBuilders;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static core.framework.util.Strings.format;
 
@@ -40,7 +40,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
             graphBuilder.append(firstEdge(firstAction, i));
 
             response.nodes.add(nodeInfo(firstAction));
-            edgeInfo(firstAction).ifPresent(edge -> response.edges.add(edge));
+            response.edges.addAll(edgeInfo(firstAction));
 
             List<ActionDocument> actionDocuments = searchActionDocument(correlationId);
             for (ActionDocument actionDocument : actionDocuments) {
@@ -48,7 +48,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
                 graphBuilder.append(edge(actionDocument));
 
                 response.nodes.add(nodeInfo(actionDocument));
-                edgeInfo(actionDocument).ifPresent(edge -> response.edges.add(edge));
+                response.edges.addAll(edgeInfo(actionDocument));
             }
         }
 
@@ -79,14 +79,17 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         return node;
     }
 
-    private Optional<ActionFlowResponse.Edge> edgeInfo(ActionDocument actionDocument) {
-        if (actionDocument.errorCode == null && actionDocument.errorMessage == null)
-            return Optional.empty();
-
-        var edge = new ActionFlowResponse.Edge();
-        edge.errorCode = actionDocument.errorCode;
-        edge.errorMessage = actionDocument.errorMessage;
-        return Optional.of(edge);
+    private List<ActionFlowResponse.Edge> edgeInfo(ActionDocument actionDocument) {
+        List<ActionFlowResponse.Edge> edges = new ArrayList<>();
+        for (String refId : actionDocument.refIds) {
+            var edge = new ActionFlowResponse.Edge();
+            edge.id = edgeId(refId, actionDocument.id);
+            edge.elapsed = actionDocument.elapsed;
+            edge.errorCode = actionDocument.errorCode;
+            edge.errorMessage = actionDocument.errorMessage;
+            edges.add(edge);
+        }
+        return edges;
     }
 
     private ActionType actionType(ActionDocument actionDocument) {
@@ -150,11 +153,16 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     private String edge(ActionDocument actionDocument) {
         StringBuilder edgeBuilder = new StringBuilder();
         for (String refId : actionDocument.refIds) {
+            String edgeId = edgeId(refId, actionDocument.id);
             String edgeStyle = edgeStyle(actionDocument);
             String edgeColor = edgeColor(actionDocument);
-            edgeBuilder.append(format("{} -> {} [arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", refId, actionDocument.id, edgeStyle, edgeColor, actionDocument.action));
+            edgeBuilder.append(format("{} -> {} [id={}, arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", edgeId, refId, actionDocument.id, edgeStyle, edgeColor, actionDocument.action));
         }
         return edgeBuilder.toString();
+    }
+
+    private String edgeId(String refId, String id) {
+        return refId + "_" + id;
     }
 
     private String edgeStyle(ActionDocument actionDocument) {
