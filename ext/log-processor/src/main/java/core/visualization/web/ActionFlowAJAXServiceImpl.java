@@ -121,7 +121,9 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         for (String refId : action.refIds) {
             ActionDocument refAction = actionMap.get(refId);
             if (refAction == null) {
-                refs.compute(OUTSIDE_APP, (key, value) -> value == null ? 1 : value + 1);
+                actionDocument(refId).ifPresentOrElse(
+                    ref -> refs.compute(ref.app, (key, value) -> value == null ? 1 : value + 1),
+                    () -> refs.compute(OUTSIDE_APP, (key, value) -> value == null ? 1 : value + 1));
             } else {
                 refs.compute(refAction.app, (key, value) -> value == null ? 1 : value + 1);
             }
