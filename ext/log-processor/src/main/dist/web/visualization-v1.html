@@ -29,7 +29,7 @@
         .attr("class", "tooltip")
         .style("opacity", 0);
 
-    function render(dot, edges) {
+    function render(dot, nodes, edges) {
         graphviz
             .transition(function () {
                 return d3.transition()
@@ -37,15 +37,43 @@
                     .duration(1000);
             })
             .renderDot(dot)
-            .on("end", () => tooltip(edges));
+            .on("end", () => tooltip(nodes, edges));
     }
 
-    function tooltip(edges) {
+    function tooltip(nodes, edges) {
         d3.selectAll("title").remove();
+
+        nodes.forEach(node => {
+            nodeTooltip(node);
+        })
 
         edges.forEach(edge => {
             edgeTooltip(edge);
         })
+    }
+
+    function nodeTooltip(node) {
+        d3.select(`#${node.id}`)
+            .on("mouseover", function () {
+                const html = Object.entries(node).map(([key, value]) => {
+                    if (value !== null && key !== "id") {
+                        return `${key}: ${value}`
+                    }
+                }).filter(Boolean).join("<br/>");
+
+                div.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                div.html(html)
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px")
+                    .style("background", "lightsteelblue");
+            })
+            .on("mouseout", function () {
+                div.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            });
     }
 
     function edgeTooltip(edge) {
@@ -74,8 +102,8 @@
 
     const actionId = new URLSearchParams(window.location.search).get("actionId");
     if (actionId) {
-        fetch("/ajax/action-flow/" + actionId).then(response => response.json()).then(response => {
-            render(response.graph, response.edges);
+        fetch("/v1/ajax/action-flow/" + actionId).then(response => response.json()).then(response => {
+            render(response.graph, response.nodes, response.edges);
         }).catch(error => console.error(error));
     } else {
         alert("actionId is missing")

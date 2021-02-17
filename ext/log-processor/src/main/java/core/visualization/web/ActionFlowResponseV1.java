@@ -9,27 +9,23 @@ import java.util.List;
 /**
  * @author allison
  */
-public class ActionFlowResponse {
+public class ActionFlowResponseV1 {
     @NotNull
     @Property(name = "graph")
     public String graph;
 
     @NotNull
-    @Property(name = "edges")
-    public List<EdgeInfo> edges = new ArrayList<>();
+    @Property(name = "nodes")
+    public List<Node> nodes = new ArrayList<>();
 
-    public static class EdgeInfo {
+    @NotNull
+    @Property(name = "edges")
+    public List<Edge> edges = new ArrayList<>();
+
+    public static class Node {
         @NotNull
         @Property(name = "id")
         public String id;
-
-        @NotNull
-        @Property(name = "actionName")
-        public String actionName;
-
-        @NotNull
-        @Property(name = "elapsed")
-        public Long elapsed;
 
         @NotNull
         @Property(name = "cpuTime")
@@ -52,6 +48,16 @@ public class ActionFlowResponse {
 
         @Property(name = "cacheHits")
         public Long cacheHits;
+    }
+
+    public static class Edge {
+        @NotNull
+        @Property(name = "id")
+        public String id;
+
+        @NotNull
+        @Property(name = "elapsed")
+        public Long elapsed;
 
         @Property(name = "errorCode")
         public String errorCode;
