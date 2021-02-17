@@ -110,7 +110,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     }
 
     private List<ActionFlowResponse.Edge> edgeInfo(ActionDocument actionDocument) {
-        List<ActionFlowResponse.Edge> edges = new ArrayList<>();
+        List<ActionFlowResponse.Edge> edges = new ArrayList<>(actionDocument.refIds.size());
         for (String refId : actionDocument.refIds) {
             var edge = new ActionFlowResponse.Edge();
             edge.id = format(EDGE_ID, refId, actionDocument.id);
