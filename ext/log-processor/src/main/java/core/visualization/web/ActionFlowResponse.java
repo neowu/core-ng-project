@@ -16,9 +16,9 @@ public class ActionFlowResponse {
 
     @NotNull
     @Property(name = "edges")
-    public List<EdgeInfo> edges = new ArrayList<>();
+    public List<Edge> edges = new ArrayList<>();
 
-    public static class EdgeInfo {
+    public static class Edge {
         @NotNull
         @Property(name = "id")
         public String id;
