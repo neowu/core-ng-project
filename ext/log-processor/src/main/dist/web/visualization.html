@@ -51,16 +51,10 @@
     function edgeTooltip(edge) {
         d3.select(`#${edge.id}`)
             .on("mouseover", function () {
-                const html = Object.entries(edge).map(([key, value]) => {
-                    if (value !== null && key !== "id") {
-                        return `${key}: ${value}`
-                    }
-                }).filter(Boolean).join("<br/>");
-
                 div.transition()
                     .duration(200)
                     .style("opacity", .9);
-                div.html(html)
+                div.html(edge.html)
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px")
                     .style("background", "bisque");

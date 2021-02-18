@@ -192,17 +192,29 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     private ActionFlowResponse.EdgeInfo edgeInfo(String edgeId, ActionDocument action) {
         var edge = new ActionFlowResponse.EdgeInfo();
         edge.id = edgeId;
-        edge.actionName = actionName(action);
-        edge.elapsed = BigDecimal.valueOf(action.elapsed).divide(ELAPSED_TO_SECOND_DIVISOR);
-        edge.errorCode = action.errorCode;
-        edge.errorMessage = action.errorMessage;
-        edge.cpuTime = BigDecimal.valueOf(action.stats.get("cpu_time").longValue()).divide(ELAPSED_TO_SECOND_DIVISOR);
-        edge.httpElapsed = action.performanceStats.get("http") != null ? BigDecimal.valueOf(action.performanceStats.get("http").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR) : null;
-        edge.dbElapsed = action.performanceStats.get("db") != null ? BigDecimal.valueOf(action.performanceStats.get("db").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR) : null;
-        edge.redisElapsed = action.performanceStats.get("redis") != null ? BigDecimal.valueOf(action.performanceStats.get("redis").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR) : null;
-        edge.esElapsed = action.performanceStats.get("elasticsearch") != null ? BigDecimal.valueOf(action.performanceStats.get("elasticsearch").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR) : null;
-        edge.kafkaElapsed = action.performanceStats.get("kafka") != null ? BigDecimal.valueOf(action.performanceStats.get("kafka").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR) : null;
-        edge.cacheHits = action.stats.get("cache_hits") != null ? action.stats.get("cache_hits").intValue() : null;
+
+        var htmlBuilder = new StringBuilder();
+        htmlBuilder.append(actionName(action)).append("<br/>");
+        htmlBuilder.append("elapsed: ").append(BigDecimal.valueOf(action.elapsed).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+        htmlBuilder.append("cpuTime: ").append(BigDecimal.valueOf(action.stats.get("cpu_time").longValue()).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+        if (action.performanceStats.get("http") != null)
+            htmlBuilder.append("httpElapsed: ").append(BigDecimal.valueOf(action.performanceStats.get("http").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+        if (action.performanceStats.get("db") != null)
+            htmlBuilder.append("dbElapsed: ").append(BigDecimal.valueOf(action.performanceStats.get("db").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+        if (action.performanceStats.get("redis") != null)
+            htmlBuilder.append("redisElapsed: ").append(BigDecimal.valueOf(action.performanceStats.get("redis").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+        if (action.performanceStats.get("elasticsearch") != null)
+            htmlBuilder.append("esElapsed: ").append(BigDecimal.valueOf(action.performanceStats.get("elasticsearch").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+        if (action.performanceStats.get("kafka") != null)
+            htmlBuilder.append("kafkaElapsed: ").append(BigDecimal.valueOf(action.performanceStats.get("kafka").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+        if (action.stats.get("cache_hits") != null)
+            htmlBuilder.append("cacheHits: ").append(action.stats.get("cache_hits").intValue()).append("<br/>");
+        if (action.errorCode != null)
+            htmlBuilder.append("errorCode: ").append(action.errorCode).append("<br/>");
+        if (action.errorMessage != null)
+            htmlBuilder.append("errorMessage: ").append(action.errorMessage);
+
+        edge.html = htmlBuilder.toString();
         return edge;
     }
 
