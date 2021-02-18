@@ -37,6 +37,11 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     }
 
     @Override
+    public ActionFlowResponseV2 actionFlowV2(String actionId) {
+        return null;
+    }
+
+    @Override
     public ActionFlowResponse actionFlow(String actionId) {
         ActionDocument requestedAction = actionDocument(actionId).orElseThrow(() -> new NotFoundException("action not found, id=" + actionId));
         boolean isFirstAction = requestedAction.correlationIds == null || requestedAction.correlationIds.isEmpty();

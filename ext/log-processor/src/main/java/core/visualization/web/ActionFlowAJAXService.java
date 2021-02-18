@@ -13,6 +13,10 @@ public interface ActionFlowAJAXService {
     ActionFlowResponseV1 actionFlowV1(@PathParam("actionId") String actionId);
 
     @GET
+    @Path("/v2/ajax/action-flow/:actionId")
+    ActionFlowResponseV2 actionFlowV2(@PathParam("actionId") String actionId);
+
+    @GET
     @Path("/ajax/action-flow/:actionId")
     ActionFlowResponse actionFlow(@PathParam("actionId") String actionId);
 }

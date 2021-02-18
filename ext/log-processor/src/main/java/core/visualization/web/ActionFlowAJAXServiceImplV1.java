@@ -231,6 +231,11 @@ public class ActionFlowAJAXServiceImplV1 implements ActionFlowAJAXService {
         return null;
     }
 
+    @Override
+    public ActionFlowResponseV2 actionFlowV2(String actionId) {
+        return null;
+    }
+
     private enum ActionType {
         CONTROLLER, HANDLER, JOB_CLASS, EXECUTOR
     }
