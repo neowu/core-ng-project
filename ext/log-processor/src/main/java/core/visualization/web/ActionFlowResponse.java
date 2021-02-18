@@ -3,6 +3,7 @@ package core.visualization.web;
 import core.framework.api.json.Property;
 import core.framework.api.validate.NotNull;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,29 +30,29 @@ public class ActionFlowResponse {
 
         @NotNull
         @Property(name = "elapsed")
-        public Long elapsed;
+        public BigDecimal elapsed;
 
         @NotNull
         @Property(name = "cpuTime")
-        public Long cpuTime;
+        public BigDecimal cpuTime;
 
         @Property(name = "httpElapsed")
-        public Long httpElapsed;
+        public BigDecimal httpElapsed;
 
         @Property(name = "dbElapsed")
-        public Long dbElapsed;
+        public BigDecimal dbElapsed;
 
         @Property(name = "redisElapsed")
-        public Long redisElapsed;
+        public BigDecimal redisElapsed;
 
         @Property(name = "esElapsed")
-        public Long esElapsed;
+        public BigDecimal esElapsed;
 
         @Property(name = "kafkaElapsed")
-        public Long kafkaElapsed;
+        public BigDecimal kafkaElapsed;
 
         @Property(name = "cacheHits")
-        public Long cacheHits;
+        public Integer cacheHits;
 
         @Property(name = "errorCode")
         public String errorCode;

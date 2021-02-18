@@ -7,6 +7,7 @@ import core.framework.web.exception.NotFoundException;
 import core.log.domain.ActionDocument;
 import org.elasticsearch.index.query.QueryBuilders;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     private static final String START_POINT = "p{}";
     private static final String OUTSIDE_APP = "OUTSIDE";
     private static final String EDGE_ID = "id_{}";
+    private static final BigDecimal ELAPSED_TO_SECOND_DIVISOR = BigDecimal.valueOf(1000000000);
 
     @Inject
     ElasticSearchType<ActionDocument> actionType;
@@ -66,6 +68,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
             actionMap.put(correlationId, firstAction);
             for (ActionDocument action : actions) {
                 apps.add(action.app);
+
                 Edge edge = edge(action, actionMap);
                 graphBuilder.append(edge.edgeGraph);
                 response.edges.addAll(edge.edgeInfo);
@@ -190,16 +193,16 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         var edge = new ActionFlowResponse.EdgeInfo();
         edge.id = edgeId;
         edge.actionName = actionName(action);
-        edge.elapsed = action.elapsed;
+        edge.elapsed = BigDecimal.valueOf(action.elapsed).divide(ELAPSED_TO_SECOND_DIVISOR);
         edge.errorCode = action.errorCode;
         edge.errorMessage = action.errorMessage;
-        edge.cpuTime = action.stats.get("cpu_time").longValue();
-        edge.httpElapsed = action.performanceStats.get("http") != null ? action.performanceStats.get("http").totalElapsed : null;
-        edge.dbElapsed = action.performanceStats.get("db") != null ? action.performanceStats.get("db").totalElapsed : null;
-        edge.redisElapsed = action.performanceStats.get("redis") != null ? action.performanceStats.get("redis").totalElapsed : null;
-        edge.esElapsed = action.performanceStats.get("elasticsearch") != null ? action.performanceStats.get("elasticsearch").totalElapsed : null;
-        edge.kafkaElapsed = action.performanceStats.get("kafka") != null ? action.performanceStats.get("kafka").totalElapsed : null;
-        edge.cacheHits = action.stats.get("cache_hits") != null ? action.stats.get("cache_hits").longValue() : null;
+        edge.cpuTime = BigDecimal.valueOf(action.stats.get("cpu_time").longValue()).divide(ELAPSED_TO_SECOND_DIVISOR);
+        edge.httpElapsed = action.performanceStats.get("http") != null ? BigDecimal.valueOf(action.performanceStats.get("http").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR) : null;
+        edge.dbElapsed = action.performanceStats.get("db") != null ? BigDecimal.valueOf(action.performanceStats.get("db").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR) : null;
+        edge.redisElapsed = action.performanceStats.get("redis") != null ? BigDecimal.valueOf(action.performanceStats.get("redis").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR) : null;
+        edge.esElapsed = action.performanceStats.get("elasticsearch") != null ? BigDecimal.valueOf(action.performanceStats.get("elasticsearch").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR) : null;
+        edge.kafkaElapsed = action.performanceStats.get("kafka") != null ? BigDecimal.valueOf(action.performanceStats.get("kafka").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR) : null;
+        edge.cacheHits = action.stats.get("cache_hits") != null ? action.stats.get("cache_hits").intValue() : null;
         return edge;
     }
 
