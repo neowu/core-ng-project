@@ -88,10 +88,10 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         for (Map.Entry<EdgeKey, EdgeInfo> edge : edges.entrySet()) {
             String edgeStyle = edgeStyle(edge.getValue().actionType);
             String edgeColor = edgeColor(edge.getValue().errors);
-            int arrowSize = arrowSize(edge.getValue().largestElapsedInNS);
+            String fontColor = edgeFontColor(edge.getValue().largestElapsedInNS);
             int penwidth = Math.min(edge.getValue().count, 3);
-            graphBuilder.append(format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none, style={}, color={}, arrowsize={}, penwidth={}, fontsize=10, label=\"{}\"];\n",
-                nodeName(edge.getKey().srcApp), nodeName(edge.getKey().destApp), format(EDGE_ID, edge.getValue().actionIdWithLargestElapsed), edgeStyle, edgeColor, arrowSize, penwidth, edge.getKey().action));
+            graphBuilder.append(format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none, style={}, color={}, fontcolor={}, penwidth={}, fontsize=10, label=\"{}\"];\n",
+                nodeName(edge.getKey().srcApp), nodeName(edge.getKey().destApp), format(EDGE_ID, edge.getValue().actionIdWithLargestElapsed), edgeStyle, edgeColor, fontColor, penwidth, edge.getKey().action));
 
             response.edges.add(edge(edge.getValue()));
         }
@@ -199,8 +199,8 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
             mergedEdgeInfo.actionIdWithLargestElapsed = newInfo.actionIdWithLargestElapsed;
             mergedEdgeInfo.largestElapsedInNS = newInfo.largestElapsedInNS;
         }
-        if (!newInfo.errors.isEmpty())
-            mergedEdgeInfo.errors.addAll(newInfo.errors);
+        mergedEdgeInfo.errors.addAll(originalInfo.errors);
+        mergedEdgeInfo.errors.addAll(newInfo.errors);
 
         return mergedEdgeInfo;
     }
@@ -244,10 +244,10 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         return "orange";
     }
 
-    private int arrowSize(long largestElapsed) {
+    private String edgeFontColor(long largestElapsed) {
         if (largestElapsed > 30000000000L)
-            return 3;
-        return 1;
+            return "red";
+        return "black";
     }
 
     private ActionFlowAJAXServiceImpl.ActionType actionType(ActionDocument action) {
