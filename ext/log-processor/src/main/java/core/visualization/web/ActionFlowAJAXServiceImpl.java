@@ -116,7 +116,7 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         var request = new SearchRequest();
         request.index = ACTION_INDEX;
         request.query = QueryBuilders.matchQuery("correlation_id", correlationId);
-        request.limit = 1000;
+        request.limit = 10000;
         return actionType.search(request).hits;
     }
 
@@ -259,8 +259,12 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
             return ActionFlowAJAXServiceImpl.ActionType.JOB_CLASS;
         if (action.context.get("root_action") != null)
             return ActionFlowAJAXServiceImpl.ActionType.EXECUTOR;
+        if ("app:start".equals(action.action))
+            return ActionType.APP_START;
+        if ("app:stop".equals(action.action))
+            return ActionType.APP_STOP;
         else
-            throw new IllegalArgumentException("cannot determine action Type");
+            throw new IllegalArgumentException("cannot determine actionType");
     }
 
     private String controller(ActionDocument action) {
@@ -269,11 +273,13 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
             case HANDLER -> action.context.get("handler").get(0);
             case JOB_CLASS -> action.context.get("job_class").get(0);
             case EXECUTOR -> "Executor";
+            case APP_START -> "app:start";
+            case APP_STOP -> "app:stop";
         };
     }
 
     private enum ActionType {
-        CONTROLLER, HANDLER, JOB_CLASS, EXECUTOR
+        CONTROLLER, HANDLER, JOB_CLASS, EXECUTOR, APP_START, APP_STOP
     }
 
     private static class EdgeInfo {

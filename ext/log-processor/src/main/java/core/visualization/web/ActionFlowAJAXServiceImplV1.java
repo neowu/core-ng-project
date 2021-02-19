@@ -82,7 +82,7 @@ public class ActionFlowAJAXServiceImplV1 implements ActionFlowAJAXService {
         var request = new SearchRequest();
         request.index = ACTION_INDEX;
         request.query = QueryBuilders.matchQuery("correlation_id", correlationId);
-        request.limit = 1000;
+        request.limit = 10000;
         return actionType.search(request).hits;
     }
 
@@ -131,6 +131,10 @@ public class ActionFlowAJAXServiceImplV1 implements ActionFlowAJAXService {
             return ActionType.JOB_CLASS;
         if (actionDocument.context.get("root_action") != null)
             return ActionType.EXECUTOR;
+        if ("app:start".equals(actionDocument.action))
+            return ActionFlowAJAXServiceImplV1.ActionType.APP_START;
+        if ("app:stop".equals(actionDocument.action))
+            return ActionFlowAJAXServiceImplV1.ActionType.APP_STOP;
         else
             throw new IllegalArgumentException("cannot determine action Type");
     }
@@ -160,6 +164,7 @@ public class ActionFlowAJAXServiceImplV1 implements ActionFlowAJAXService {
             case HANDLER -> "hexagon";
             case JOB_CLASS -> "parallelogram";
             case EXECUTOR -> "ellipse";
+            case APP_START, APP_STOP -> "circle";
         };
     }
 
@@ -169,6 +174,8 @@ public class ActionFlowAJAXServiceImplV1 implements ActionFlowAJAXService {
             case HANDLER -> actionDocument.context.get("handler").get(0);
             case JOB_CLASS -> actionDocument.context.get("job_class").get(0);
             case EXECUTOR -> "Executor";
+            case APP_START -> "app:start";
+            case APP_STOP -> "app:stop";
         };
     }
 
@@ -237,6 +244,6 @@ public class ActionFlowAJAXServiceImplV1 implements ActionFlowAJAXService {
     }
 
     private enum ActionType {
-        CONTROLLER, HANDLER, JOB_CLASS, EXECUTOR
+        CONTROLLER, HANDLER, JOB_CLASS, EXECUTOR, APP_START, APP_STOP
     }
 }
