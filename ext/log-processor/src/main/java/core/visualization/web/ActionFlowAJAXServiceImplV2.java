@@ -10,11 +10,9 @@ import org.elasticsearch.index.query.QueryBuilders;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static core.framework.util.Strings.format;
@@ -28,6 +26,7 @@ public class ActionFlowAJAXServiceImplV2 implements ActionFlowAJAXService {
     private static final String OUTSIDE_APP = "OUTSIDE";
     private static final String EDGE_ID = "id_{}";
     private static final BigDecimal ELAPSED_TO_SECOND_DIVISOR = BigDecimal.valueOf(1000000000);
+    private static final String HTML_LINE_BREAK = "<br/>{}";
 
     @Inject
     ElasticSearchType<ActionDocument> actionType;
@@ -54,25 +53,26 @@ public class ActionFlowAJAXServiceImplV2 implements ActionFlowAJAXService {
 
         List<String> correlationIds = isFirstAction ? List.of(actionId) : requestedAction.correlationIds;
 
-        Set<String> apps = new HashSet<>();
+//        Set<String> apps = new HashSet<>();
         for (int i = 0; i < correlationIds.size(); i++) {
             String correlationId = correlationIds.get(i);
             ActionDocument firstAction = correlationId.equals(actionId) ? requestedAction : actionDocument(correlationId).orElse(null);
-            if (firstAction == null)
-                apps.add(OUTSIDE_APP);
-            else {
-                apps.add(firstAction.app);
+            if (firstAction != null) {
+//                apps.add(firstAction.app);
 
                 Edge edge = firstEdge(firstAction, i);
                 graphBuilder.append(edge.edgeGraph);
                 response.edges.addAll(edge.edgeInfo);
+//            } else {
+//                apps.add(OUTSIDE_APP);
             }
+
 
             List<ActionDocument> actions = searchActionDocument(correlationId);
             Map<String, ActionDocument> actionMap = actions.stream().collect(Collectors.toMap(action -> action.id, action -> action));
             actionMap.put(correlationId, firstAction);
             for (ActionDocument action : actions) {
-                apps.add(action.app);
+//                apps.add(action.app);
 
                 Edge edge = edge(action, actionMap);
                 graphBuilder.append(edge.edgeGraph);
@@ -80,9 +80,9 @@ public class ActionFlowAJAXServiceImplV2 implements ActionFlowAJAXService {
             }
         }
 
-        for (String app : apps) {
-            graphBuilder.append(format("{} [];\n", nodeName(app)));
-        }
+//        for (String app : apps) {
+//            graphBuilder.append(format("{} [];\n", nodeName(app)));
+//        }
 
         graphBuilder.append('}');
 
@@ -198,26 +198,28 @@ public class ActionFlowAJAXServiceImplV2 implements ActionFlowAJAXService {
         var edge = new ActionFlowResponseV2.EdgeInfo();
         edge.id = edgeId;
 
-        var htmlBuilder = new StringBuilder();
-        htmlBuilder.append(actionName(action)).append("<br/>");
-        htmlBuilder.append("elapsed: ").append(BigDecimal.valueOf(action.elapsed).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
-        htmlBuilder.append("cpuTime: ").append(BigDecimal.valueOf(action.stats.get("cpu_time").longValue()).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+        var htmlBuilder = new StringBuilder(100);
+        htmlBuilder.append(actionName(action));
+        if (action.elapsed != null)
+            htmlBuilder.append(format(HTML_LINE_BREAK, "elapsed: ")).append(BigDecimal.valueOf(action.elapsed).divide(ELAPSED_TO_SECOND_DIVISOR));
+        if (action.stats.get("cpu_time") != null)
+            htmlBuilder.append(format(HTML_LINE_BREAK, "cpuTime: ")).append(BigDecimal.valueOf(action.stats.get("cpu_time").longValue()).divide(ELAPSED_TO_SECOND_DIVISOR));
         if (action.performanceStats.get("http") != null)
-            htmlBuilder.append("httpElapsed: ").append(BigDecimal.valueOf(action.performanceStats.get("http").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+            htmlBuilder.append(format(HTML_LINE_BREAK, "httpElapsed: ")).append(BigDecimal.valueOf(action.performanceStats.get("http").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR));
         if (action.performanceStats.get("db") != null)
-            htmlBuilder.append("dbElapsed: ").append(BigDecimal.valueOf(action.performanceStats.get("db").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+            htmlBuilder.append(format(HTML_LINE_BREAK, "dbElapsed: ")).append(BigDecimal.valueOf(action.performanceStats.get("db").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR));
         if (action.performanceStats.get("redis") != null)
-            htmlBuilder.append("redisElapsed: ").append(BigDecimal.valueOf(action.performanceStats.get("redis").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+            htmlBuilder.append(format(HTML_LINE_BREAK, "redisElapsed: ")).append(BigDecimal.valueOf(action.performanceStats.get("redis").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR));
         if (action.performanceStats.get("elasticsearch") != null)
-            htmlBuilder.append("esElapsed: ").append(BigDecimal.valueOf(action.performanceStats.get("elasticsearch").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+            htmlBuilder.append(format(HTML_LINE_BREAK, "esElapsed: ")).append(BigDecimal.valueOf(action.performanceStats.get("elasticsearch").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR));
         if (action.performanceStats.get("kafka") != null)
-            htmlBuilder.append("kafkaElapsed: ").append(BigDecimal.valueOf(action.performanceStats.get("kafka").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR)).append("<br/>");
+            htmlBuilder.append(format(HTML_LINE_BREAK, "kafkaElapsed: ")).append(BigDecimal.valueOf(action.performanceStats.get("kafka").totalElapsed).divide(ELAPSED_TO_SECOND_DIVISOR));
         if (action.stats.get("cache_hits") != null)
-            htmlBuilder.append("cacheHits: ").append(action.stats.get("cache_hits").intValue()).append("<br/>");
+            htmlBuilder.append(format(HTML_LINE_BREAK, "cacheHits: ")).append(action.stats.get("cache_hits").intValue());
         if (action.errorCode != null)
-            htmlBuilder.append("errorCode: ").append(action.errorCode).append("<br/>");
+            htmlBuilder.append(format(HTML_LINE_BREAK, "errorCode: ")).append(action.errorCode);
         if (action.errorMessage != null)
-            htmlBuilder.append("errorMessage: ").append(action.errorMessage);
+            htmlBuilder.append(format(HTML_LINE_BREAK, "errorMessage: ")).append(action.errorMessage);
 
         edge.html = htmlBuilder.toString();
         return edge;
