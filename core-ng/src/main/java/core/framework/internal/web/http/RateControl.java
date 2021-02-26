@@ -86,9 +86,9 @@ public class RateControl {
 
         boolean acquire(long currentTime, int maxPermits, double fillRatePerNano) {
             synchronized (this) {
-                long timeElapsed = currentTime - lastUpdateTime;
+                long timeElapsed = Math.max(0, currentTime - lastUpdateTime);
                 currentPermits = Math.min(maxPermits, currentPermits + fillRatePerNano * timeElapsed);
-                lastUpdateTime = currentTime;
+                lastUpdateTime = lastUpdateTime + timeElapsed;
 
                 if (currentPermits >= 1) {
                     currentPermits -= 1;
