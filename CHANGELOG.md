@@ -6,6 +6,7 @@
 * http: parse content-type value case insensitively
   > refer to https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
   > treat, "Application/json" same as "application/json"
+* rate: fix concurrent requests might cause negative timeElapsed bug
 
 ### 7.6.11 (01/26/2021 - 02/01/2021)
 
