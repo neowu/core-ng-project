@@ -1,5 +1,7 @@
 ## Change log
 
+### 7.6.13 (03/01/2021 - )
+
 ### 7.6.12 (02/02/2021 - 03/01/2021)
 
 * cache: for redis local cache, handle exception as warning if redis is not accessible
