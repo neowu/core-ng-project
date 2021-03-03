@@ -2,14 +2,19 @@ package core.visualization.web;
 
 import core.framework.inject.Inject;
 import core.framework.search.ElasticSearchType;
-import core.framework.search.GetRequest;
 import core.framework.search.SearchRequest;
 import core.framework.web.exception.NotFoundException;
 import core.log.domain.ActionDocument;
 import org.elasticsearch.index.query.QueryBuilders;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static core.framework.util.Strings.format;
 
@@ -18,38 +23,77 @@ import static core.framework.util.Strings.format;
  */
 public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     private static final String ACTION_INDEX = "action-*";
+    private static final String START_POINT = "p{}";
+    private static final String OUTSIDE_APP = "OUTSIDE";
+    private static final String EDGE_ID = "id_{}";
+    private static final BigDecimal ELAPSED_TO_SECOND_DIVISOR = BigDecimal.valueOf(1000000000);
 
     @Inject
     ElasticSearchType<ActionDocument> actionType;
 
     @Override
+    public ActionFlowResponseV1 actionFlowV1(String actionId) {
+        return null;
+    }
+
+    @Override
+    public ActionFlowResponseV2 actionFlowV2(String actionId) {
+        return null;
+    }
+
+    @Override
     public ActionFlowResponse actionFlow(String actionId) {
-        ActionDocument requestedAction = actionDocument(actionId);
+        ActionDocument requestedAction = actionDocument(actionId).orElseThrow(() -> new NotFoundException("action not found, id=" + actionId));
         boolean isFirstAction = requestedAction.correlationIds == null || requestedAction.correlationIds.isEmpty();
 
-        List<String> correlationIds = isFirstAction ? List.of(actionId) : requestedAction.correlationIds;
         StringBuilder graphBuilder = new StringBuilder();
         graphBuilder.append("digraph G {\n");
 
         var response = new ActionFlowResponse();
 
+        List<String> correlationIds = isFirstAction ? List.of(actionId) : requestedAction.correlationIds;
+
+//        Set<String> apps = new HashSet<>();
+        Map<EdgeKey, EdgeInfo> edges = new HashMap<>();
+
         for (int i = 0; i < correlationIds.size(); i++) {
             String correlationId = correlationIds.get(i);
-            ActionDocument firstAction = correlationId.equals(actionId) ? requestedAction : actionDocument(correlationId);
-            graphBuilder.append(firstNode(firstAction, actionId.equals(firstAction.id), i));
-            graphBuilder.append(firstEdge(firstAction, i));
+            ActionDocument firstAction = correlationId.equals(actionId) ? requestedAction : actionDocument(correlationId).orElse(null);
+            if (firstAction != null) {
+                graphBuilder.append(format("{} [shape=point];\n", format(START_POINT, i)));
 
-            response.nodes.add(nodeInfo(firstAction));
-            edgeInfo(firstAction).ifPresent(edge -> response.edges.add(edge));
+//                apps.add(firstAction.app);
 
-            List<ActionDocument> actionDocuments = searchActionDocument(correlationId);
-            for (ActionDocument actionDocument : actionDocuments) {
-                graphBuilder.append(node(actionDocument, actionId.equals(actionDocument.id)));
-                graphBuilder.append(edge(actionDocument));
-
-                response.nodes.add(nodeInfo(actionDocument));
-                edgeInfo(actionDocument).ifPresent(edge -> response.edges.add(edge));
+                Map.Entry<EdgeKey, EdgeInfo> firstEdge = firstEdgeInfo(firstAction, i);
+                edges.put(firstEdge.getKey(), firstEdge.getValue());
+//            } else {
+//                apps.add(OUTSIDE_APP);
             }
+
+            List<ActionDocument> actions = searchActionDocument(correlationId);
+            Map<String, ActionDocument> actionMap = actions.stream().collect(Collectors.toMap(action -> action.id, action -> action));
+            actionMap.put(correlationId, firstAction);
+
+            for (ActionDocument action : actions) {
+//                apps.add(action.app);
+
+                Map<EdgeKey, EdgeInfo> edgeInfos = edgeInfo(action, actionMap);
+                edgeInfos.forEach((infoKey, infoValue) -> edges.compute(infoKey, (key, value) -> value == null ? infoValue : mergedEdgeInfo(value, infoValue)));
+            }
+        }
+
+//        for (String app : apps) {
+//            graphBuilder.append(format("{} [];\n", nodeName(app)));
+//        }
+        for (Map.Entry<EdgeKey, EdgeInfo> edge : edges.entrySet()) {
+            String edgeStyle = edgeStyle(edge.getValue().actionType);
+            String edgeColor = edgeColor(edge.getValue().errors);
+            String fontColor = edgeFontColor(edge.getValue().largestElapsedInNS);
+            int penwidth = Math.min(edge.getValue().count, 3);
+            graphBuilder.append(format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none, style={}, color={}, fontcolor={}, penwidth={}, fontsize=10, label=\"{}\"];\n",
+                nodeName(edge.getKey().srcApp), nodeName(edge.getKey().destApp), format(EDGE_ID, edge.getValue().actionIdWithLargestElapsed), edgeStyle, edgeColor, fontColor, penwidth, edge.getKey().action));
+
+            response.edges.add(edge(edge.getValue()));
         }
 
         graphBuilder.append('}');
@@ -58,123 +102,225 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         return response;
     }
 
-    private ActionDocument actionDocument(String id) {
-        var request = new GetRequest();
+    private Optional<ActionDocument> actionDocument(String id) {
+        var request = new SearchRequest();
         request.index = ACTION_INDEX;
-        request.id = id;
-        return actionType.get(request).orElseThrow(() -> new NotFoundException("action not found, id=" + id));
+        request.query = QueryBuilders.idsQuery().addIds(id);
+        request.limit = 1;
+        List<ActionDocument> documents = actionType.search(request).hits;
+        if (documents.isEmpty()) return Optional.empty();
+        return Optional.ofNullable(documents.get(0));
     }
 
     private List<ActionDocument> searchActionDocument(String correlationId) {
         var request = new SearchRequest();
-        request.query = QueryBuilders.matchQuery("correlation_id", correlationId);
         request.index = ACTION_INDEX;
+        request.query = QueryBuilders.matchQuery("correlation_id", correlationId);
+        request.limit = 10000;
         return actionType.search(request).hits;
     }
 
-    private ActionFlowResponse.Node nodeInfo(ActionDocument actionDocument) {
-        var node = new ActionFlowResponse.Node();
-        node.id = actionDocument.id;
-        node.cpuTime = actionDocument.stats.get("cpu_time").longValue();
-        return node;
-    }
+    private Map.Entry<EdgeKey, EdgeInfo> firstEdgeInfo(ActionDocument action, int i) {
+        String startPoint = format(START_POINT, i);
+        EdgeKey edgeKey = new EdgeKey(startPoint, action.app, action.action);
 
-    private Optional<ActionFlowResponse.Edge> edgeInfo(ActionDocument actionDocument) {
-        if (actionDocument.errorCode == null && actionDocument.errorMessage == null)
-            return Optional.empty();
+        EdgeInfo edgeInfo = new EdgeInfo();
+        edgeInfo.controller = controller(action);
+        edgeInfo.actionType = actionType(action);
+        edgeInfo.count = 1;
+        edgeInfo.actionIdWithLargestElapsed = action.id;
+        edgeInfo.largestElapsedInNS = action.elapsed;
 
-        var edge = new ActionFlowResponse.Edge();
-        edge.errorCode = actionDocument.errorCode;
-        edge.errorMessage = actionDocument.errorMessage;
-        return Optional.of(edge);
-    }
-
-    private ActionType actionType(ActionDocument actionDocument) {
-        if (actionDocument.context.get("controller") != null)
-            return ActionType.HANDLER;
-        if (actionDocument.context.get("handler") != null)
-            return ActionType.HANDLER;
-        if (actionDocument.context.get("job_class") != null)
-            return ActionType.JOB_CLASS;
-        if (actionDocument.context.get("root_action") != null)
-            return ActionType.EXECUTOR;
-        else
-            throw new IllegalArgumentException("cannot determine action Type");
-    }
-
-    private String firstNode(ActionDocument actionDocument, boolean isRequestedAction, int i) {
-        String startPoint = "p" + i;
-        return format("{} [shape=point];\n", startPoint) + node(actionDocument, isRequestedAction);
-    }
-
-    private String node(ActionDocument actionDocument, boolean isRequestedAction) {
-        String shape = nodeShape(actionDocument);
-        String color = nodeColor(actionDocument, isRequestedAction);
-        String content = nodeContent(actionDocument);
-        return format("{} [id={}, shape={}, color={}, label=\"{}\\n{}\"];\n", actionDocument.id, actionDocument.id, actionDocument.app, shape, color, content);
-    }
-
-    private String nodeShape(ActionDocument actionDocument) {
-        return switch (actionType(actionDocument)) {
-            case CONTROLLER -> "box";
-            case HANDLER -> "hexagon";
-            case JOB_CLASS -> "parallelogram";
-            case EXECUTOR -> "ellipse";
-        };
-    }
-
-    private String nodeContent(ActionDocument actionDocument) {
-        return switch (actionType(actionDocument)) {
-            case CONTROLLER -> actionDocument.context.get("controller").get(0);
-            case HANDLER -> actionDocument.context.get("handler").get(0);
-            case JOB_CLASS -> actionDocument.context.get("job_class").get(0);
-            case EXECUTOR -> "Executor";
-        };
-    }
-
-    private String nodeColor(ActionDocument actionDocument, boolean isRequestedAction) {
-        if (actionDocument.stats.get("cpu_time") > 30000000)
-            return "red";
-        if (isRequestedAction)
-            return "blue";
-        return "black";
-    }
-
-    private String firstEdge(ActionDocument actionDocument, int i) {
-        String startPoint = "p" + i;
-        String edgeStyle = edgeStyle(actionDocument);
-        String edgeColor = edgeColor(actionDocument);
-        return format("{} -> {} [arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", startPoint, actionDocument.id, edgeStyle, edgeColor, actionDocument.action);
-    }
-
-    private String edge(ActionDocument actionDocument) {
-        StringBuilder edgeBuilder = new StringBuilder();
-        for (String refId : actionDocument.refIds) {
-            String edgeStyle = edgeStyle(actionDocument);
-            String edgeColor = edgeColor(actionDocument);
-            edgeBuilder.append(format("{} -> {} [arrowhead=open, arrowtail=none, style={}, color={}, fontsize=10, label=\"{}\"];\n", refId, actionDocument.id, edgeStyle, edgeColor, actionDocument.action));
+        if (!"OK".equals(action.result)) {
+            ActionError error = new ActionError();
+            error.result = action.result;
+            error.errorCode = action.errorCode;
+            error.errorMessage = action.errorMessage;
+            edgeInfo.errors.add(error);
         }
-        return edgeBuilder.toString();
+
+        return Map.entry(edgeKey, edgeInfo);
     }
 
-    private String edgeStyle(ActionDocument actionDocument) {
-        ActionType actionType = actionType(actionDocument);
-        if (actionType == ActionType.HANDLER || actionType == ActionType.EXECUTOR)
+    private Map<EdgeKey, EdgeInfo> edgeInfo(ActionDocument action, Map<String, ActionDocument> actionMap) {
+        Map<String, Integer> refs = refCount(action, actionMap);
+
+        Map<EdgeKey, EdgeInfo> edgeInfos = new HashMap<>(refs.size());
+        for (Map.Entry<String, Integer> ref : refs.entrySet()) {
+            EdgeKey edgeKey = new EdgeKey(ref.getKey(), action.app, action.action);
+
+            EdgeInfo edgeInfo = new EdgeInfo();
+            edgeInfo.controller = controller(action);
+            edgeInfo.actionType = actionType(action);
+            edgeInfo.count = ref.getValue();
+            edgeInfo.actionIdWithLargestElapsed = action.id;
+            edgeInfo.largestElapsedInNS = action.elapsed;
+
+            if (!"OK".equals(action.result)) {
+                ActionError error = new ActionError();
+                error.result = action.result;
+                error.errorCode = action.errorCode;
+                error.errorMessage = action.errorMessage;
+                edgeInfo.errors.add(error);
+            }
+
+            edgeInfos.put(edgeKey, edgeInfo);
+        }
+        return edgeInfos;
+    }
+
+    private Map<String, Integer> refCount(ActionDocument action, Map<String, ActionDocument> actionMap) {
+        Map<String, Integer> refs = new HashMap<>();
+        for (String refId : action.refIds) {
+            ActionDocument refAction = actionMap.get(refId);
+            if (refAction == null) {
+                actionDocument(refId).ifPresentOrElse(
+                    ref -> refs.compute(ref.app, (key, value) -> value == null ? 1 : value + 1),
+                    () -> refs.compute(OUTSIDE_APP, (key, value) -> value == null ? 1 : value + 1));
+            } else {
+                refs.compute(refAction.app, (key, value) -> value == null ? 1 : value + 1);
+            }
+        }
+        return refs;
+    }
+
+    private EdgeInfo mergedEdgeInfo(EdgeInfo originalInfo, EdgeInfo newInfo) {
+        if (originalInfo.actionType != newInfo.actionType || !originalInfo.controller.equals(newInfo.controller))
+            throw new IllegalArgumentException("controller or actionType not match original EdgeInfo");
+
+        EdgeInfo mergedEdgeInfo = new EdgeInfo();
+        mergedEdgeInfo.controller = originalInfo.controller;
+        mergedEdgeInfo.actionType = originalInfo.actionType;
+        mergedEdgeInfo.count = originalInfo.count + newInfo.count;
+        if (originalInfo.largestElapsedInNS > newInfo.largestElapsedInNS) {
+            mergedEdgeInfo.actionIdWithLargestElapsed = originalInfo.actionIdWithLargestElapsed;
+            mergedEdgeInfo.largestElapsedInNS = originalInfo.largestElapsedInNS;
+        } else {
+            mergedEdgeInfo.actionIdWithLargestElapsed = newInfo.actionIdWithLargestElapsed;
+            mergedEdgeInfo.largestElapsedInNS = newInfo.largestElapsedInNS;
+        }
+        mergedEdgeInfo.errors.addAll(originalInfo.errors);
+        mergedEdgeInfo.errors.addAll(newInfo.errors);
+
+        return mergedEdgeInfo;
+    }
+
+    private ActionFlowResponse.Edge edge(EdgeInfo edgeInfo) {
+        ActionFlowResponse.Edge edge = new ActionFlowResponse.Edge();
+        edge.id = format(EDGE_ID, edgeInfo.actionIdWithLargestElapsed);
+        edge.html = tooltipHtml(edgeInfo);
+        return edge;
+    }
+
+    private String tooltipHtml(EdgeInfo edgeInfo) {
+        var htmlBuilder = new StringBuilder(100);
+        htmlBuilder.append(edgeInfo.controller)
+                   .append("<br/>count: ").append(edgeInfo.count)
+                   .append("<br/>largestElapsed: ").append(BigDecimal.valueOf(edgeInfo.largestElapsedInNS).divide(ELAPSED_TO_SECOND_DIVISOR));
+        for (ActionError error : edgeInfo.errors) {
+            htmlBuilder.append("<br/>errorCode: ").append(error.errorCode)
+                       .append("<br/>errorMessage: ").append(error.errorMessage);
+        }
+        return htmlBuilder.toString();
+    }
+
+    private String nodeName(String app) {
+        return app.replaceAll("-", "_");
+    }
+
+    private String edgeStyle(ActionFlowAJAXServiceImpl.ActionType actionType) {
+        if (actionType == ActionFlowAJAXServiceImpl.ActionType.HANDLER || actionType == ActionFlowAJAXServiceImpl.ActionType.EXECUTOR)
             return "dashed";
-        if (actionDocument.elapsed > 30000000)
-            return "bold";
         return "solid";
     }
 
-    private String edgeColor(ActionDocument actionDocument) {
-        if ("ERROR".equals(actionDocument.result))
+    private String edgeColor(List<ActionError> errors) {
+        if (errors.isEmpty()) return "black";
+
+        for (ActionError error : errors) {
+            if ("ERROR".equals(error.result))
+                return "red";
+        }
+        return "orange";
+    }
+
+    private String edgeFontColor(long largestElapsed) {
+        if (largestElapsed > 30000000000L)
             return "red";
-        if ("WARN".equals(actionDocument.result))
-            return "orange";
         return "black";
     }
 
+    private ActionFlowAJAXServiceImpl.ActionType actionType(ActionDocument action) {
+        if (action.context.get("controller") != null)
+            return ActionFlowAJAXServiceImpl.ActionType.CONTROLLER;
+        if (action.context.get("handler") != null)
+            return ActionFlowAJAXServiceImpl.ActionType.HANDLER;
+        if (action.context.get("job_class") != null)
+            return ActionFlowAJAXServiceImpl.ActionType.JOB_CLASS;
+        if (action.context.get("root_action") != null)
+            return ActionFlowAJAXServiceImpl.ActionType.EXECUTOR;
+        if ("app:start".equals(action.action))
+            return ActionType.APP_START;
+        if ("app:stop".equals(action.action))
+            return ActionType.APP_STOP;
+        else
+            throw new IllegalArgumentException("cannot determine actionType");
+    }
+
+    private String controller(ActionDocument action) {
+        return switch (actionType(action)) {
+            case CONTROLLER -> action.context.get("controller").get(0);
+            case HANDLER -> action.context.get("handler").get(0);
+            case JOB_CLASS -> action.context.get("job_class").get(0);
+            case EXECUTOR -> "Executor";
+            case APP_START -> "app:start";
+            case APP_STOP -> "app:stop";
+        };
+    }
+
     private enum ActionType {
-        CONTROLLER, HANDLER, JOB_CLASS, EXECUTOR
+        CONTROLLER, HANDLER, JOB_CLASS, EXECUTOR, APP_START, APP_STOP
+    }
+
+    private static class EdgeInfo {
+        String controller;
+        ActionType actionType;
+        int count;
+        String actionIdWithLargestElapsed;
+        long largestElapsedInNS;
+        List<ActionError> errors = new ArrayList<>();
+    }
+
+    private static final class EdgeKey {
+        final String srcApp;
+        final String destApp;
+        final String action;
+
+        private EdgeKey(String srcApp, String destApp, String action) {
+            this.srcApp = srcApp;
+            this.destApp = destApp;
+            this.action = action;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) return true;
+            if (object == null || getClass() != object.getClass()) return false;
+            EdgeKey edgeKey = (EdgeKey) object;
+            return Objects.equals(srcApp, edgeKey.srcApp)
+                && Objects.equals(destApp, edgeKey.destApp)
+                && Objects.equals(action, edgeKey.action);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(srcApp, destApp, action);
+        }
+    }
+
+    private static class ActionError {
+        String result;
+        String errorCode;
+        String errorMessage;
     }
 }

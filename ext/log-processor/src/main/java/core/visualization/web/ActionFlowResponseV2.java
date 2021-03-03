@@ -9,16 +9,16 @@ import java.util.List;
 /**
  * @author allison
  */
-public class ActionFlowResponse {
+public class ActionFlowResponseV2 {
     @NotNull
     @Property(name = "graph")
     public String graph;
 
     @NotNull
     @Property(name = "edges")
-    public List<Edge> edges = new ArrayList<>();
+    public List<EdgeInfo> edges = new ArrayList<>();
 
-    public static class Edge {
+    public static class EdgeInfo {
         @NotNull
         @Property(name = "id")
         public String id;
