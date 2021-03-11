@@ -65,7 +65,7 @@ project('core-ng-mongo-test') {
     dependencies {
         implementation project(":core-ng-test")
         implementation project(":core-ng-mongo")
-        implementation 'de.bwaldvogel:mongo-java-server:1.36.0'
+        implementation 'de.bwaldvogel:mongo-java-server:1.37.0'
     }
 }
 
