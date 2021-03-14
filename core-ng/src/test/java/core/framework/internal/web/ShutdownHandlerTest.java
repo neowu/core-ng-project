@@ -48,4 +48,16 @@ class ShutdownHandlerTest {
         handler.activeRequests.getAndIncrement();
         handler.awaitTermination(-1);
     }
+
+    @Test
+    void maxActiveRequests() {
+        handler.activeRequests.set(2);
+        handler.handle(exchange);
+        handler.activeRequests.decrementAndGet();
+        assertThat(handler.maxActiveRequests()).isEqualTo(3);
+        assertThat(handler.maxActiveRequests()).isEqualTo(2);
+
+        handler.handle(exchange);
+        assertThat(handler.maxActiveRequests()).isEqualTo(3);
+    }
 }

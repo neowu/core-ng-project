@@ -7,10 +7,10 @@ import java.util.Optional;
 /**
  * @author neo
  */
-class ReadOnlySession implements Session {
+public class ReadOnlySession implements Session {
     private final Session session;
 
-    ReadOnlySession(Session session) {
+    public ReadOnlySession(Session session) {
         this.session = session;
     }
 

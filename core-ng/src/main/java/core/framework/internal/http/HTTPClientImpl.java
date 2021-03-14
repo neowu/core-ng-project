@@ -35,16 +35,17 @@ import static java.lang.String.CASE_INSENSITIVE_ORDER;
  */
 public final class HTTPClientImpl implements HTTPClient {
     private static final MediaType MEDIA_TYPE_APPLICATION_JSON = MediaType.get(ContentType.APPLICATION_JSON.toString());
-
+    public final long timeoutInNano;
     private final Logger logger = LoggerFactory.getLogger(HTTPClientImpl.class);
     private final String userAgent;
     private final long slowOperationThresholdInNanos;
     private final OkHttpClient client;
 
-    public HTTPClientImpl(OkHttpClient client, String userAgent, Duration slowOperationThreshold) {
+    public HTTPClientImpl(OkHttpClient client, String userAgent, Duration slowOperationThreshold, Duration timeout) {
         this.client = client;
         this.userAgent = userAgent;
         slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
+        timeoutInNano = timeout.toNanos();
     }
 
     @Override

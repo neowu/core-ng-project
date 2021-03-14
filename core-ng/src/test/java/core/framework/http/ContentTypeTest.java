@@ -13,6 +13,7 @@ class ContentTypeTest {
     @Test
     void parse() {
         ContentType type = ContentType.parse("application/json");    // within cache
+        assertThat(type).isSameAs(ContentType.APPLICATION_JSON);
         assertThat(type.mediaType).isEqualTo("application/json");
         assertThat(type.charset()).isNotPresent();
 
@@ -31,6 +32,14 @@ class ContentTypeTest {
         type = ContentType.parse("multipart/form-data; boundary=----WebKitFormBoundaryaANA7UQAvnwa2EkM");
         assertThat(type.mediaType).isEqualTo("multipart/form-data");
         assertThat(type.charset()).isNotPresent();
+    }
+
+    @Test
+    void parseWithUpperCase() {
+        ContentType type = ContentType.parse("Application/json; charset=utf-8");
+        assertThat(type.mediaType).isEqualTo(ContentType.APPLICATION_JSON.mediaType);
+
+        assertThat(ContentType.parse("Application/json")).isSameAs(ContentType.APPLICATION_JSON);
     }
 
     @Test

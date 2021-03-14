@@ -15,6 +15,8 @@ import java.util.Map;
 public class ActionDocument {
     @Property(name = "@timestamp")
     public Instant timestamp;
+    @Property(name = "id")
+    public String id;
     @Property(name = "app")
     public String app;
     @Property(name = "host")

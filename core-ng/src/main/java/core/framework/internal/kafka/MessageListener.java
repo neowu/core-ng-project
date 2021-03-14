@@ -124,7 +124,7 @@ public class MessageListener {
             config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");                      // refer to org.apache.kafka.clients.consumer.ConsumerConfig, must be in("latest", "earliest", "none")
             config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
             config.put(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L);                       // longer backoff to reduce cpu usage when kafka is not available
-            config.put(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5L * 1000);
+            config.put(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L);                 // 5s
             config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
             config.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxPollBytes);
             config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);

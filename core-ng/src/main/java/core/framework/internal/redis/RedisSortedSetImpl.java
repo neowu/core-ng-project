@@ -178,7 +178,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
             long elapsed = watch.elapsed();
             int size = values == null ? 0 : values.size();
             ActionLogContext.track("redis", elapsed, fetchedEntries, size);
-            logger.debug("popByScore, key={}, start={}, stop={}, poppedValues={}, size={}, elapsed={}", key, minScore, maxScore, values, size, elapsed);
+            logger.debug("popByScore, key={}, start={}, stop={}, returnedValues={}, size={}, elapsed={}", key, minScore, maxScore, values, size, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }

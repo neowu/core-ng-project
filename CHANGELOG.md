@@ -1,5 +1,31 @@
 ## Change log
 
+### 7.6.13 (03/01/2021 - )
+* mongodb: update driver to 4.2.2
+  > According to official docs, this is a minor version so there are not breaking changes.
+
+### 7.6.12 (02/02/2021 - 03/01/2021)
+
+* cache: for redis local cache, handle exception as warning if redis is not accessible
+* http: parse content-type value case insensitively
+  > refer to https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
+  > treat, "Application/json" same as "application/json"
+* rate: fix concurrent requests might cause negative timeElapsed bug
+
+### 7.6.11 (01/26/2021 - 02/01/2021)
+
+* http: change max allowed url length from 1000 to 2000
+  > Microsoft Azure AD oauth call back url may have long query param,
+  > by considering browser limitation/search engine/CDN/etc, to use 2000 as default setting
+* redis: add hyperLogLog support
+
+### 7.6.10 (01/18/2021 - 01/25/2021)
+
+* api: for max process time, webservice will consider both http client timeout and remaining process time of current action
+* monitor: support multiple alert channels
+* es: update to 7.10.2
+* http: collect http server active requests to reflect how many active requests are in process (to analyze performance with cpu usage, worker thread pool size and etc)
+
 ### 7.6.9 (01/04/2021 - 01/15/2021)
 
 * contentType: according to RFC and iana, application/json should not have charset, and use utf8 as default charset.

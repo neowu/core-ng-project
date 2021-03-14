@@ -250,7 +250,7 @@ class RetryInterceptorTest {
     @Test
     void withinMaxProcessTime() {
         var logManager = new LogManager();
-        ActionLog actionLog = logManager.begin("start", null);
+        ActionLog actionLog = logManager.begin("begin", null);
         actionLog.maxProcessTimeInNano = Duration.ofSeconds(1).toNanos();
 
         assertThat(interceptor.withinMaxProcessTime(1)).isTrue();

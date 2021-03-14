@@ -20,7 +20,7 @@ class RateControlTest {
         assertThat(result).isTrue();
         assertThat(rate.currentPermits).isEqualTo(1);
 
-        result = rate.acquire(101, 2, 1);
+        result = rate.acquire(100, 2, 1);
         assertThat(result).isTrue();
         assertThat(rate.currentPermits).isEqualTo(0);
 

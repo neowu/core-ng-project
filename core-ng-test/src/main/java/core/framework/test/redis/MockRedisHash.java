@@ -21,40 +21,40 @@ public final class MockRedisHash implements RedisHash {
     public Map<String, String> getAll(String key) {
         var value = store.get(key);
         if (value == null) return Map.of();
-        return Map.copyOf(value.map());
+        return Map.copyOf(value.hash());
     }
 
     @Override
     public String get(String key, String field) {
         var value = store.get(key);
         if (value == null) return null;
-        return value.map().get(field);
+        return value.hash().get(field);
     }
 
     @Override
     public void set(String key, String field, String value) {
-        var hashValue = store.putIfAbsent(key, new HashMap<>());
-        hashValue.map().put(field, value);
+        var hash = store.putIfAbsent(key, new HashMap<>()).hash();
+        hash.put(field, value);
     }
 
     @Override
     public void multiSet(String key, Map<String, String> values) {
         assertThat(values).isNotEmpty();
-        var hashValue = store.putIfAbsent(key, new HashMap<>());
-        hashValue.map().putAll(values);
+        var hash = store.putIfAbsent(key, new HashMap<>()).hash();
+        hash.putAll(values);
     }
 
     @Override
     public long increaseBy(String key, String field, long increment) {
-        var hashValue = store.putIfAbsent(key, new HashMap<>());
+        var hash = store.putIfAbsent(key, new HashMap<>()).hash();
 
-        String value = hashValue.map().get(field);
+        String value = hash.get(field);
         if (value == null) {
-            hashValue.map().put(field, String.valueOf(increment));
+            hash.put(field, String.valueOf(increment));
             return increment;
         }
         long result = Long.parseLong(value) + increment;
-        hashValue.map().put(field, String.valueOf(result));
+        hash.put(field, String.valueOf(result));
         return result;
     }
 
@@ -64,9 +64,9 @@ public final class MockRedisHash implements RedisHash {
         MockRedisStore.Value value = store.get(key);
         if (value == null) return 0;
         long deleted = 0;
-        Map<String, String> map = value.map();
+        Map<String, String> hash = value.hash();
         for (String field : fields) {
-            String previous = map.remove(field);
+            String previous = hash.remove(field);
             if (previous != null) deleted++;
         }
         return deleted;

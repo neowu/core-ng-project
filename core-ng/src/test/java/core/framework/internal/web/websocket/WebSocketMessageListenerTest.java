@@ -19,11 +19,6 @@ class WebSocketMessageListenerTest {
     }
 
     @Test
-    void getMaxTextBufferSize() {
-        assertThat(listener.getMaxTextBufferSize()).isGreaterThan(0);
-    }
-
-    @Test
     void closeCode() {
         assertThat(listener.closeCode(new Error()))
                 .isEqualTo(WebSocketCloseCodes.INTERNAL_ERROR);
@@ -33,5 +28,13 @@ class WebSocketMessageListenerTest {
 
         assertThat(listener.closeCode(new BadRequestException("bad request")))
                 .isEqualTo(WebSocketCloseCodes.POLICY_VIOLATION);
+    }
+
+    @Test
+    void maxBufferSize() {
+        assertThat(listener.getMaxCloseBufferSize()).isGreaterThan(-1);
+        assertThat(listener.getMaxPingBufferSize()).isGreaterThan(-1);
+        assertThat(listener.getMaxPongBufferSize()).isGreaterThan(-1);
+        assertThat(listener.getMaxTextBufferSize()).isGreaterThan(-1);
     }
 }

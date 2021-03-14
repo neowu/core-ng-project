@@ -1,6 +1,8 @@
 package core.framework.internal.web.session;
 
 import core.framework.internal.log.ActionLog;
+import core.framework.internal.web.request.RequestImpl;
+import core.framework.internal.web.websocket.ReadOnlySession;
 import core.framework.web.CookieSpec;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -97,10 +99,21 @@ class SessionManagerTest {
     }
 
     @Test
+    void saveWithFailedToConnectWebSocket() {
+        // on websocket onConnect flow, if any exceptions, it will trigger http error handler flow, with readonly session created by WebSocketHandler
+        var request = new RequestImpl(null, null);
+        request.session = new ReadOnlySession(new SessionImpl("localhost"));
+        sessionManager.save(request, response, new ActionLog(null, null));
+
+        verifyNoInteractions(response);
+    }
+
+    @Test
     void saveWithInvalidatedSessionWithoutId() {
-        var session = new SessionImpl("localhost");
-        session.invalidate();
-        sessionManager.save(session, response, new ActionLog(null, null));
+        var request = new RequestImpl(null, null);
+        request.session = new SessionImpl("localhost");
+        request.session.invalidate();
+        sessionManager.save(request, response, new ActionLog(null, null));
 
         verifyNoInteractions(response);
     }
@@ -109,10 +122,12 @@ class SessionManagerTest {
     void saveWithInvalidatedSession() {
         sessionManager.header("SessionId");
 
+        var request = new RequestImpl(null, null);
         var session = new SessionImpl("localhost");
+        request.session = session;
         session.id = UUID.randomUUID().toString();
         session.invalidate();
-        sessionManager.save(session, response, new ActionLog(null, null));
+        sessionManager.save(request, response, new ActionLog(null, null));
 
         verify(response).header("SessionId", "");
     }
@@ -122,9 +137,10 @@ class SessionManagerTest {
         sessionManager.header("SessionId");
         ActionLog actionLog = new ActionLog(null, null);
 
-        var session = new SessionImpl("localhost");
-        session.set("key", "value");
-        sessionManager.save(session, response, actionLog);
+        var request = new RequestImpl(null, null);
+        request.session = new SessionImpl("localhost");
+        request.session.set("key", "value");
+        sessionManager.save(request, response, actionLog);
 
         assertThat(actionLog.context.get("session_hash")).isNotEmpty();
         verify(response).header(eq("SessionId"), anyString());

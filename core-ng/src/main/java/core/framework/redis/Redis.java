@@ -34,13 +34,15 @@ public interface Redis {
 
     void multiSet(Map<String, String> values);
 
+    void forEach(String pattern, Consumer<String> consumer);
+
     RedisHash hash();
 
     RedisList list();
 
     RedisSortedSet sortedSet();
 
-    void forEach(String pattern, Consumer<String> consumer);
-
     RedisAdmin admin();
+
+    RedisHyperLogLog hyperLogLog();
 }

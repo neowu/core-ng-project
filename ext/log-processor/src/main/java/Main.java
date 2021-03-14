@@ -1,4 +1,4 @@
-import core.log.LogProcessorApp;
+import core.LogProcessorApp;
 
 /**
  * @author neo

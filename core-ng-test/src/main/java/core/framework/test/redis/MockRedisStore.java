@@ -2,7 +2,9 @@ package core.framework.test.redis;
 
 import core.framework.util.Maps;
 
+import java.io.Serial;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +51,7 @@ class MockRedisStore {
         }
 
         @SuppressWarnings("unchecked")
-        Map<String, String> map() {
+        Map<String, String> hash() {
             assertThat(value).isInstanceOf(Map.class);
             return (Map<String, String>) value;
         }
@@ -60,14 +62,30 @@ class MockRedisStore {
             return (Set<String>) value;
         }
 
-        @SuppressWarnings("unchecked")
-        Map<String, Long> sortedSet() {
-            assertThat(value).isInstanceOf(Map.class);
-            return (HashMap<String, Long>) value;
+        SortedSet sortedSet() {
+            assertThat(value).isInstanceOf(SortedSet.class);
+            return (SortedSet) value;
+        }
+
+        HyperLogLog hyperLogLog() {
+            assertThat(value).isInstanceOf(HyperLogLog.class);
+            return (HyperLogLog) value;
         }
 
         boolean expired(long now) {
             return expirationTime != null && now >= expirationTime;
         }
+    }
+
+    // to distinguish with hash key type
+    static class SortedSet extends HashMap<String, Long> {
+        @Serial
+        private static final long serialVersionUID = -1982891940392623040L;
+    }
+
+    // use hashset as a naive impl, may be replaced by bloom filter in future
+    static class HyperLogLog extends HashSet<String> {
+        @Serial
+        private static final long serialVersionUID = -4584074052672348286L;
     }
 }

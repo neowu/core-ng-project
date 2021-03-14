@@ -1,6 +1,5 @@
 package app.monitor.kafka;
 
-import app.MonitorApp;
 import app.monitor.alert.AlertService;
 import core.framework.log.Severity;
 import core.framework.log.message.ActionLogMessage;
@@ -35,7 +34,7 @@ class ActionLogMessageHandlerTest {
     void handleSelfAction() {
         var message = new ActionLogMessage();
         message.date = Instant.now();
-        message.app = MonitorApp.MONITOR_APP;
+        message.app = ActionLogMessageHandler.MONITOR_APP;
         handler.handle(null, message);
         verifyNoInteractions(alertService);
     }

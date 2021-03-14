@@ -38,7 +38,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author neo
  */
 public final class RequestParser {
-    private static final int MAX_URL_LENGTH = 1000;
+    static final int MAX_URL_LENGTH = 2000;
     public final ClientIPParser clientIPParser = new ClientIPParser();
     private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
     private final Set<HTTPMethod> withBodyMethods = EnumSet.of(HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.PATCH);

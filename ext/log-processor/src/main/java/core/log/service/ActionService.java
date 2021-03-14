@@ -93,6 +93,7 @@ public class ActionService {
     private ActionDocument action(ActionLogMessage message) {
         var document = new ActionDocument();
         document.timestamp = message.date;
+        document.id = message.id;
         document.app = message.app;
         document.host = message.host;
         document.result = message.result;

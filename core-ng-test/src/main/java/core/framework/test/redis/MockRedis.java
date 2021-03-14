@@ -3,6 +3,7 @@ package core.framework.test.redis;
 import core.framework.redis.Redis;
 import core.framework.redis.RedisAdmin;
 import core.framework.redis.RedisHash;
+import core.framework.redis.RedisHyperLogLog;
 import core.framework.redis.RedisList;
 import core.framework.redis.RedisSet;
 import core.framework.redis.RedisSortedSet;
@@ -24,6 +25,7 @@ public final class MockRedis implements Redis {
     private final MockRedisList list = new MockRedisList(store);
     private final MockRedisSortedSet sortedSet = new MockRedisSortedSet(store);
     private final MockRedisAdmin admin = new MockRedisAdmin();
+    private final MockRedisHyperLogLog hyperLogLog = new MockRedisHyperLogLog(store);
 
     @Override
     public String get(String key) {
@@ -112,6 +114,11 @@ public final class MockRedis implements Redis {
     @Override
     public RedisAdmin admin() {
         return admin;
+    }
+
+    @Override
+    public RedisHyperLogLog hyperLogLog() {
+        return hyperLogLog;
     }
 
     @Override

@@ -9,11 +9,12 @@ import core.framework.internal.template.expression.ExpressionHolder;
  * @author neo
  */
 public class TextContentFragment implements Fragment {
+    @SuppressWarnings({"PMD.InsufficientStringBufferDeclaration", "PMD.ConsecutiveLiteralAppends"})    // pmd false positive
     static String escapeHTML(String text) {
         int length = text.length();
         int index = findHTMLReservedChar(text);
         if (index == length) return text;
-        StringBuilder builder = new StringBuilder(length * 2);
+        var builder = new StringBuilder(length * 2);
         for (int i = 0; i < index; i++) builder.append(text.charAt(i));
         for (; index < length; index++) {
             char ch = text.charAt(index);
