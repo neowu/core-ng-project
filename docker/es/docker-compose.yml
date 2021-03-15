@@ -1,19 +1,29 @@
 version: "3"
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.2
     ports:
     - 9200:9200
     environment:
     - cluster.name=es
     - discovery.type=single-node
     - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    - xpack.security.enabled=false
   kibana:
-    image: docker.elastic.co/kibana/kibana-oss:7.10.2
+    image: docker.elastic.co/kibana/kibana:7.11.2
     ports:
     - 5601:5601
     environment:
     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     - TELEMETRY_ENABLED=false
+    - MONITORING_ENABLED=false
+    - ENTERPRISESEARCH_ENABLED=false
+    - XPACK_LICENSE_MANAGEMENT_ENABLED=false
+    - XPACK_ROLLUP_ENABLED=false
+    - XPACK_APM_ENABLED=false
+    - XPACK_REPORTING_ENABLED=false
+    - XPACK_GRAPH_ENABLED=false
+    - XPACK_MAPS_ENABLED=false
+    - XPACK_ML_ENABLED=false
     depends_on:
     - elasticsearch

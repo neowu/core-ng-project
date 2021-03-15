@@ -1,8 +1,11 @@
 ## Change log
 
 ### 7.6.13 (03/01/2021 - )
+
 * mongodb: update driver to 4.2.2
   > According to official docs, this is a minor version so there are not breaking changes.
+* search: update es to 7.11.2
+  > since 7.11, elasticsearch no longer publishes OSS version, refer to docker/es for latest es/kibana configures
 
 ### 7.6.12 (02/02/2021 - 03/01/2021)
 
