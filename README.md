@@ -12,7 +12,7 @@ repositories {
     maven {
         url 'https://neowu.github.io/maven-repo/'
         content {
-            includeGroup 'core.framework'
+            includeGroupByRegex 'core\\.framework.*'
         }
     }
 }

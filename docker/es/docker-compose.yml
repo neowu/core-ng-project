@@ -15,15 +15,17 @@ services:
     - 5601:5601
     environment:
     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    - LOGGING_JSON=false
+    - ENTERPRISESEARCH_ENABLED=false
     - TELEMETRY_ENABLED=false
     - MONITORING_ENABLED=false
-    - ENTERPRISESEARCH_ENABLED=false
-    - XPACK_LICENSE_MANAGEMENT_ENABLED=false
-    - XPACK_ROLLUP_ENABLED=false
+    - NEWSFEED_ENABLED=false
     - XPACK_APM_ENABLED=false
-    - XPACK_REPORTING_ENABLED=false
     - XPACK_GRAPH_ENABLED=false
     - XPACK_MAPS_ENABLED=false
     - XPACK_ML_ENABLED=false
+    - XPACK_REPORTING_ENABLED=false
+    - XPACK_ROLLUP_ENABLED=false
+    - XPACK_LICENSE_MANAGEMENT_ENABLED=false
     depends_on:
     - elasticsearch

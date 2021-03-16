@@ -5,7 +5,19 @@
 * mongodb: update driver to 4.2.2
   > According to official docs, this is a minor version so there are not breaking changes.
 * search: update es to 7.11.2
-  > since 7.11, elasticsearch no longer publishes OSS version, refer to docker/es for latest es/kibana configures
+  > since 7.11, elasticsearch no longer publishes OSS version, refer to docker/es for latest es/kibana configures.
+  > codelibs stopped to publish modules we use, so we publish them under core.framework.elasticsearch.module. (refer to https://mvnrepository.com/artifact/org.codelibs.elasticsearch.module/lang-painless)
+  > pls update gradle maven repo setting as following
+  ```groovy
+    repositories {
+        maven {
+            url 'https://neowu.github.io/maven-repo/'
+            content {
+                includeGroupByRegex 'core\\.framework.*'
+            }
+        }
+    }
+  ```
 
 ### 7.6.12 (02/02/2021 - 03/01/2021)
 
