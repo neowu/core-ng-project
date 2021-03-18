@@ -1,5 +1,7 @@
 ## Change log
 
+### 7.6.14 ()
+
 ### 7.6.13 (03/01/2021 - 03/18/2021)
 
 * mongodb: update driver to 4.2.2
@@ -17,7 +19,7 @@
         }
     }
   ```
-* db: allow use multiply operator (not wildcard) in sql, e.g. select column*3 from table
+* db: allow using "multiply operator" (not wildcard) in sql, e.g. select column*3 from table
 
 ### 7.6.12 (02/02/2021 - 03/01/2021)
 
