@@ -56,7 +56,7 @@ public class LogProcessorApp extends App {
 
         configureJob();
 
-        load(new VisualizationModule());
+//        load(new VisualizationModule());
     }
 
     private void configureKibanaService() {

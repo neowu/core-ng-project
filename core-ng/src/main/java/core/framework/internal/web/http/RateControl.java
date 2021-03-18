@@ -84,6 +84,7 @@ public class RateControl {
             this.lastUpdateTime = System.nanoTime();
         }
 
+        // under multi-thread condition, the order of acquires are not determined, currentTime can be earlier than lastUpdateTime (e.g. lastUpdateTime was updated by a later acquire first)
         boolean acquire(long currentTime, int maxPermits, double fillRatePerNano) {
             synchronized (this) {
                 long timeElapsed = Math.max(0, currentTime - lastUpdateTime);
