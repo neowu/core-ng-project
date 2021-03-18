@@ -5,11 +5,14 @@ import core.framework.api.web.service.ResponseStatus;
 import core.framework.log.ErrorCode;
 import core.framework.log.Severity;
 
+import java.io.Serial;
+
 /**
  * @author neo
  */
 @ResponseStatus(HTTPStatus.BAD_REQUEST)
 public final class BadRequestException extends RuntimeException implements ErrorCode {
+    @Serial
     private static final long serialVersionUID = -2304226404736886782L;
 
     private final String errorCode;

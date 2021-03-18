@@ -111,13 +111,24 @@ class DatabaseImplTest {
     void validateSQL() {
         assertThatThrownBy(() -> database.select("SELECT * FROM database_test", String.class))
                 .isInstanceOf(Error.class)
-                .hasMessageContaining("sql must not contain asterisk(*)");
+                .hasMessageContaining("sql must not contain wildcard(*)");
         assertThatThrownBy(() -> database.selectOne("SELECT id FROM database_test WHERE string_field = 'value'", Integer.class))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("sql must not contain single quote(')");
         assertThatThrownBy(() -> database.execute("UPDATE database_test SET string_value = 'value' WHERE string_field = 'value'", Integer.class))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("sql must not contain single quote(')");
+    }
+
+    @Test
+    void validateAsterisk() {
+        database.validateAsterisk("select column * 10 from table");
+        database.validateAsterisk("select 3*5, 4*2 from table");
+        database.validateAsterisk("select 3 * ? from table");
+
+        assertThatThrownBy(() -> database.validateAsterisk("select * from table")).isInstanceOf(Error.class);
+        assertThatThrownBy(() -> database.validateAsterisk("select * from")).isInstanceOf(Error.class);
+        assertThatThrownBy(() -> database.validateAsterisk("select t.* , t.column from table t")).isInstanceOf(Error.class);
     }
 
     @Test

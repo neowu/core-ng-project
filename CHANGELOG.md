@@ -18,6 +18,7 @@
         }
     }
   ```
+* db: allow use multiply operator (not wildcard) in sql, e.g. select column*3 from table
 
 ### 7.6.12 (02/02/2021 - 03/01/2021)
 
