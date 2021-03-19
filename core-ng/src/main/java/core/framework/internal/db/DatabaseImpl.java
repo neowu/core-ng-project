@@ -286,19 +286,19 @@ public final class DatabaseImpl implements Database {
 
     void validateAsterisk(String sql) {
         int index = sql.indexOf('*');
-        if (index > -1) {   // check whether it's wildcard or multiply operator
+        while (index > -1) {   // check whether it's wildcard or multiply operator
             int length = sql.length();
-            char ch = ' ';
+            char ch = 0;
             index++;
             for (; index < length; index++) {
                 ch = sql.charAt(index);
-                if (ch != ' ') {
-                    break;
-                }
+                if (ch != ' ') break;   // seek to next non-whitespace
             }
             if (ch == ','
+                    || index == length  // sql ends with *
                     || index + 4 <= length && ASCII.toUpperCase(ch) == 'F' && "FROM".equals(ASCII.toUpperCase(sql.substring(index, index + 4))))
                 throw new Error("sql must not contain wildcard(*), please only select columns needed, sql=" + sql);
+            index = sql.indexOf('*', index + 1);
         }
     }
 

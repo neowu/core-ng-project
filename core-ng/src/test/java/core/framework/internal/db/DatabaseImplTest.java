@@ -129,6 +129,8 @@ class DatabaseImplTest {
         assertThatThrownBy(() -> database.validateAsterisk("select * from table")).isInstanceOf(Error.class);
         assertThatThrownBy(() -> database.validateAsterisk("select * from")).isInstanceOf(Error.class);
         assertThatThrownBy(() -> database.validateAsterisk("select t.* , t.column from table t")).isInstanceOf(Error.class);
+        assertThatThrownBy(() -> database.validateAsterisk("select 3*4, * from table")).isInstanceOf(Error.class);
+        assertThatThrownBy(() -> database.validateAsterisk("select *")).isInstanceOf(Error.class);
     }
 
     @Test
