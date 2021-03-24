@@ -1,7 +1,7 @@
 version: "3"
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.11.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
     ports:
     - 9200:9200
     environment:
@@ -10,7 +10,7 @@ services:
     - ES_JAVA_OPTS=-Xms512m -Xmx512m
     - xpack.security.enabled=false
   kibana:
-    image: docker.elastic.co/kibana/kibana-oss:7.11.2
+    image: docker.elastic.co/kibana/kibana:7.12.0
     ports:
     - 5601:5601
     environment:
@@ -49,7 +49,7 @@ services:
     depends_on:
     - zookeeper
   log-processor:
-    image: neowu/log-processor:7.6.9
+    image: neowu/log-processor:7.6.13
     environment:
     - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092
@@ -60,7 +60,7 @@ services:
     - kafka
     - elasticsearch
   log-collector:
-    image: neowu/log-collector:7.6.9
+    image: neowu/log-collector:7.6.13
     environment:
     - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092
