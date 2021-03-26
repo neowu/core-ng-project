@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.6.0'
+        classpath 'gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.7.0'
     }
 }
 
@@ -17,7 +17,7 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:8.40'
+            checkstyle 'com.puppycrawl.tools:checkstyle:8.41'
             checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.38.0'
         }
 
@@ -60,7 +60,7 @@ subprojects {
 
         reportLevel = 'low'
         includeFilter = rootProject.file('gradle/check/spotbugs.xml')
-        toolVersion = '4.2.0'
+        toolVersion = '4.2.2'
 
         def spotbugsReport = tasks.register('spotbugsReport') {
             group = 'verification'
