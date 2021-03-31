@@ -9,7 +9,6 @@ import core.framework.internal.template.expression.ExpressionHolder;
  * @author neo
  */
 public class TextContentFragment implements Fragment {
-    @SuppressWarnings({"PMD.InsufficientStringBufferDeclaration", "PMD.ConsecutiveLiteralAppends"})    // pmd false positive
     static String escapeHTML(String text) {
         int length = text.length();
         int index = findHTMLReservedChar(text);

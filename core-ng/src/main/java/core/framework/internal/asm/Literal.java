@@ -35,21 +35,11 @@ public final class Literal {
         for (int i = 0; i < length; i++) {
             char ch = text.charAt(i);
             switch (ch) {
-                case '\n':
-                    builder.append("\\n");
-                    break;
-                case '\r':
-                    builder.append("\\r");
-                    break;
-                case '"':
-                    builder.append("\\\"");
-                    break;
-                case '\\':
-                    builder.append("\\\\");
-                    break;
-                default:
-                    builder.append(ch);
-                    break;
+                case '\n' -> builder.append("\\n");
+                case '\r' -> builder.append("\\r");
+                case '"' -> builder.append("\\\"");
+                case '\\' -> builder.append("\\\\");
+                default -> builder.append(ch);
             }
         }
         builder.append('\"');
