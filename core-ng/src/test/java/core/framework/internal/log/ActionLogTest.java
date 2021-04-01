@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -21,9 +20,10 @@ class ActionLogTest {
 
     @Test
     void contextValueIsTooLong() {
-        assertThatThrownBy(() -> log.context("key", "x".repeat(ActionLog.MAX_CONTEXT_VALUE_LENGTH + 1)))
-                .isInstanceOf(Error.class)
-                .hasMessageStartingWith("context value is too long");
+        log.context("key", "x".repeat(ActionLog.MAX_CONTEXT_VALUE_LENGTH + 1));
+        assertThat(log.result()).isEqualTo("WARN");
+        assertThat(log.errorMessage).contains("context value is too long");
+        assertThat(log.context.get("key")).isEmpty();
     }
 
     @Test
