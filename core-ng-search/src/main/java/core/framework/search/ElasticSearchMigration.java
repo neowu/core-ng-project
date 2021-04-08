@@ -1,9 +1,9 @@
 package core.framework.search;
 
+import core.framework.internal.module.PropertyManager;
 import core.framework.search.impl.ElasticSearchHost;
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.search.impl.log.ESLoggerContextFactory;
-import core.framework.util.Properties;
 import org.apache.http.HttpHost;
 import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
@@ -23,9 +23,9 @@ public class ElasticSearchMigration {
         // setup logger
         System.setProperty(LogManager.FACTORY_PROPERTY_NAME, ESLoggerContextFactory.class.getName());
 
-        var properties = new Properties();
-        properties.load(propertyFileClasspath);
-        String host = properties.get("sys.elasticsearch.host").orElseThrow();
+        var properties = new PropertyManager();
+        properties.properties.load(propertyFileClasspath);
+        String host = properties.property("sys.elasticsearch.host").orElseThrow();
         hosts = ElasticSearchHost.parse(host);
     }
 

@@ -4,6 +4,7 @@
 * search: update es to 7.12.0
 * action: change error "action log context value too long" to warning
 * mongo: MongoMigration supports overwriting property by env
+* es: ElasticSearchMigration supports overwriting property by env
 
 ### 7.6.13 (03/01/2021 - 03/18/2021)
 
