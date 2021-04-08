@@ -21,7 +21,7 @@ import static core.framework.util.Strings.format;
 /**
  * @author allison
  */
-public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
+public class DiagramAJAXServiceImpl implements DiagramAJAXService {
     private static final String ACTION_INDEX = "action-*";
     private static final String START_POINT = "p{}";
     private static final String OUTSIDE_APP = "OUTSIDE";
@@ -32,24 +32,19 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
     ElasticSearchType<ActionDocument> actionType;
 
     @Override
-    public ActionFlowResponseV1 actionFlowV1(String actionId) {
+    public DiagramResponse actionFlowV2(String actionId) {
         return null;
     }
 
     @Override
-    public ActionFlowResponseV2 actionFlowV2(String actionId) {
-        return null;
-    }
-
-    @Override
-    public ActionFlowResponse actionFlow(String actionId) {
+    public DiagramResponse actionFlow(String actionId) {
         ActionDocument requestedAction = actionDocument(actionId).orElseThrow(() -> new NotFoundException("action not found, id=" + actionId));
         boolean isFirstAction = requestedAction.correlationIds == null || requestedAction.correlationIds.isEmpty();
 
         StringBuilder graphBuilder = new StringBuilder();
         graphBuilder.append("digraph G {\n");
 
-        var response = new ActionFlowResponse();
+        var response = new DiagramResponse();
 
         List<String> correlationIds = isFirstAction ? List.of(actionId) : requestedAction.correlationIds;
 
@@ -93,13 +88,18 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
             graphBuilder.append(format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none, style={}, color={}, fontcolor={}, penwidth={}, fontsize=10, label=\"{}\"];\n",
                 nodeName(edge.getKey().srcApp), nodeName(edge.getKey().destApp), format(EDGE_ID, edge.getValue().actionIdWithLargestElapsed), edgeStyle, edgeColor, fontColor, penwidth, edge.getKey().action));
 
-            response.edges.add(edge(edge.getValue()));
+            response.tooltips.add(edge(edge.getValue()));
         }
 
         graphBuilder.append('}');
 
         response.graph = graphBuilder.toString();
         return response;
+    }
+
+    @Override
+    public DiagramResponse overall() {
+        return null;
     }
 
     private Optional<ActionDocument> actionDocument(String id) {
@@ -205,21 +205,21 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         return mergedEdgeInfo;
     }
 
-    private ActionFlowResponse.Edge edge(EdgeInfo edgeInfo) {
-        ActionFlowResponse.Edge edge = new ActionFlowResponse.Edge();
-        edge.id = format(EDGE_ID, edgeInfo.actionIdWithLargestElapsed);
-        edge.html = tooltipHtml(edgeInfo);
-        return edge;
+    private DiagramResponse.Tooltip edge(EdgeInfo edgeInfo) {
+        DiagramResponse.Tooltip tooltip = new DiagramResponse.Tooltip();
+        tooltip.id = format(EDGE_ID, edgeInfo.actionIdWithLargestElapsed);
+        tooltip.html = tooltipHtml(edgeInfo);
+        return tooltip;
     }
 
     private String tooltipHtml(EdgeInfo edgeInfo) {
         var htmlBuilder = new StringBuilder(100);
         htmlBuilder.append(edgeInfo.controller)
-                   .append("<br/>count: ").append(edgeInfo.count)
-                   .append("<br/>largestElapsed: ").append(BigDecimal.valueOf(edgeInfo.largestElapsedInNS).divide(ELAPSED_TO_SECOND_DIVISOR));
+                .append("<br/>count: ").append(edgeInfo.count)
+                .append("<br/>largestElapsed: ").append(BigDecimal.valueOf(edgeInfo.largestElapsedInNS).divide(ELAPSED_TO_SECOND_DIVISOR));
         for (ActionError error : edgeInfo.errors) {
             htmlBuilder.append("<br/>errorCode: ").append(error.errorCode)
-                       .append("<br/>errorMessage: ").append(error.errorMessage);
+                    .append("<br/>errorMessage: ").append(error.errorMessage);
         }
         return htmlBuilder.toString();
     }
@@ -228,8 +228,8 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         return app.replaceAll("-", "_");
     }
 
-    private String edgeStyle(ActionFlowAJAXServiceImpl.ActionType actionType) {
-        if (actionType == ActionFlowAJAXServiceImpl.ActionType.HANDLER || actionType == ActionFlowAJAXServiceImpl.ActionType.EXECUTOR)
+    private String edgeStyle(DiagramAJAXServiceImpl.ActionType actionType) {
+        if (actionType == DiagramAJAXServiceImpl.ActionType.HANDLER || actionType == DiagramAJAXServiceImpl.ActionType.EXECUTOR)
             return "dashed";
         return "solid";
     }
@@ -250,15 +250,15 @@ public class ActionFlowAJAXServiceImpl implements ActionFlowAJAXService {
         return "black";
     }
 
-    private ActionFlowAJAXServiceImpl.ActionType actionType(ActionDocument action) {
+    private DiagramAJAXServiceImpl.ActionType actionType(ActionDocument action) {
         if (action.context.get("controller") != null)
-            return ActionFlowAJAXServiceImpl.ActionType.CONTROLLER;
+            return DiagramAJAXServiceImpl.ActionType.CONTROLLER;
         if (action.context.get("handler") != null)
-            return ActionFlowAJAXServiceImpl.ActionType.HANDLER;
+            return DiagramAJAXServiceImpl.ActionType.HANDLER;
         if (action.context.get("job_class") != null)
-            return ActionFlowAJAXServiceImpl.ActionType.JOB_CLASS;
+            return DiagramAJAXServiceImpl.ActionType.JOB_CLASS;
         if (action.context.get("root_action") != null)
-            return ActionFlowAJAXServiceImpl.ActionType.EXECUTOR;
+            return DiagramAJAXServiceImpl.ActionType.EXECUTOR;
         if ("app:start".equals(action.action))
             return ActionType.APP_START;
         if ("app:stop".equals(action.action))
