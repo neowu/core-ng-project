@@ -27,7 +27,7 @@ public class DiagramService {
                         .subAggregation(new TermsAggregationBuilder("client").field("client").size(50))));
         SearchResponse<ActionDocument> searchResponse = actionType.search(request);
 
-        Arch arch = new Arch();
+        var arch = new Arch();
         arch.load(searchResponse);
         return arch.diagram();
     }

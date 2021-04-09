@@ -93,7 +93,7 @@ public class Arch {
         var diagram = new Diagram();
         var dot = new CodeBuilder().append("digraph {\n");
         dot.append("rankdir=LR;\n");
-        dot.append("node [style=rounded, fontname=arial];\n");
+        dot.append("node [style=rounded, fontname=arial, fontsize=20];\n");
         dot.append("edge [arrowsize=0.5];\n");
         for (String app : apps()) {
             if (app.startsWith("_direct_")) {
@@ -101,15 +101,15 @@ public class Arch {
                 continue;
             }
             String color = color(app);
-            dot.append("{} [label=\"{}\", shape=circle, width=2, style=filled, color=\"{}\", fillcolor=\"{}\", fontcolor=white];\n", id(app), app, color, color);
+            dot.append("{} [label=\"{}\", shape=circle, width=3, style=filled, color=\"{}\", fillcolor=\"{}\", fontcolor=white];\n", id(app), app, color, color);
         }
         for (MessageSubscription subscription : messageSubscriptions) {
             dot.append("{} [shape=box, label=\"{}\"];\n", id(subscription.topic), subscription.topic);
         }
         for (APIDependency dependency : apiDependencies) {
             String edgeId = "edge_" + (index++);
-            dot.append("{} -> {} [id=\"{}\", color=\"{}\", weight=3, penwidth=2];\n", id(dependency.client), id(dependency.service), edgeId, colors.get(dependency.client));
-            diagram.tooltips.add(edge(edgeId, tooltip(dependency)));
+            dot.append("{} -> {} [id=\"{}\", color=\"{}\", weight=5, penwidth=2];\n", id(dependency.client), id(dependency.service), edgeId, colors.get(dependency.client));
+            diagram.notes.add(note(edgeId, tooltip(dependency)));
         }
         for (MessageSubscription subscription : messageSubscriptions) {
             for (Map.Entry<String, Long> entry : subscription.publishers.entrySet()) {
@@ -127,9 +127,9 @@ public class Arch {
 
     private String tooltip(APIDependency dependency) {
         var builder = new StringBuilder(512);
-        builder.append("<div>").append(dependency.client.startsWith("_direct_") ? "direct" : dependency.client).append(" > ")
+        builder.append("<table><caption>").append(dependency.client.startsWith("_direct_") ? "direct" : dependency.client).append(" > ")
                 .append(dependency.service)
-                .append("</div><table>");
+                .append("</caption>");
         for (Map.Entry<String, Long> entry : dependency.apis.entrySet()) {
             builder.append("<tr><td>")
                     .append(entry.getKey())
@@ -140,11 +140,11 @@ public class Arch {
         return builder.append("</table>").toString();
     }
 
-    private Diagram.Tooltip edge(String id, String html) {
-        var edge = new Diagram.Tooltip();
-        edge.id = id;
-        edge.html = html;
-        return edge;
+    private Diagram.Note note(String id, String html) {
+        var note = new Diagram.Note();
+        note.id = id;
+        note.html = html;
+        return note;
     }
 
     private Set<String> apps() {

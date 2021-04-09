@@ -118,7 +118,7 @@ public class DiagramAJAXServiceImplV2 {
 
                 Edge edge = firstEdge(firstAction, i);
                 graphBuilder.append(edge.edgeGraph);
-                response.tooltips.addAll(edge.tooltipInfo);
+                response.notes.addAll(edge.tooltipInfo);
 //            } else {
 //                apps.add(OUTSIDE_APP);
             }
@@ -132,7 +132,7 @@ public class DiagramAJAXServiceImplV2 {
 
                 Edge edge = edge(action, actionMap);
                 graphBuilder.append(edge.edgeGraph);
-                response.tooltips.addAll(edge.tooltipInfo);
+                response.notes.addAll(edge.tooltipInfo);
             }
         }
 
@@ -254,8 +254,8 @@ public class DiagramAJAXServiceImplV2 {
         return app.replaceAll("-", "_");
     }
 
-    private Diagram.Tooltip edgeInfo(String edgeId, ActionDocument action) {
-        var edge = new Diagram.Tooltip();
+    private Diagram.Note edgeInfo(String edgeId, ActionDocument action) {
+        var edge = new Diagram.Note();
         edge.id = edgeId;
 
         var htmlBuilder = new StringBuilder(100);
@@ -302,6 +302,6 @@ public class DiagramAJAXServiceImplV2 {
 
     private static class Edge {
         String edgeGraph;
-        List<Diagram.Tooltip> tooltipInfo = new ArrayList<>();
+        List<Diagram.Note> tooltipInfo = new ArrayList<>();
     }
 }

@@ -6,25 +6,26 @@
         svg {
             width: 100vw;
             height: 100vh;
+            z-index: 1;
         }
 
-        #tooltip {
+        #note {
             font-family: arial, sans-serif;
             position: absolute;
+            left: 0;
+            top: 0;
             text-align: left;
-            padding: 10px;
-            border-radius: 8px;
-            pointer-events: none;
-            background: #43aa8b;
+            padding: 5px;
+            border-radius: 5px;
+            background: gray;
             opacity: 0;
+            z-index: 2;
         }
 
-        #tooltip > div {
+        #note > table > caption {
+            white-space: nowrap;
             text-align: center;
-        }
-
-        #graph {
-            text-align: left;
+            border-bottom: solid black 1px;
         }
     </style>
 </head>
@@ -33,54 +34,46 @@
 <script src="https://unpkg.com/@hpcc-js/wasm/dist/index.min.js" type="application/javascript"></script>
 <script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
 <script c:html="dot()" id="dot" type="text/plain"></script>
-<script c:html="tooltips()" id="tooltips" type="application/json"></script>
+<script c:html="notes()" id="notes" type="application/json"></script>
+<div id="note"></div>
 <div id="graph"></div>
-<div id="tooltip"></div>
 <script>
     const graphviz = d3.select("#graph").graphviz();
-    const tooltipDiv = d3.select("#tooltip")
+    const noteDiv = d3.select("#note")
+
+    noteDiv.on("click", () => {
+        noteDiv.transition().duration(200).style("opacity", 0);
+    })
 
     let selectedEdge = d3.select(null);
-    let selectedEdgeStrokeWidth;
 
-    function render(dot, tooltips) {
+    function render(dot, notes) {
         graphviz.renderDot(dot)
             .on("end", () => {
                 d3.select("#graph").selectAll("title").remove();
-                tooltips.forEach(tooltip => {
-                    d3.select(`#${tooltip.id}`)
-                        .on("mouseover", function (event) {
-                            tooltipDiv.transition()
-                                .duration(200)
-                                .style("opacity", 0.9);
-                            tooltipDiv.html(tooltip.html)
-                                .style("left", (event.pageX - 5) + "px")
-                                .style("top", (event.pageY - 50) + "px");
-                        })
-                        .on("mouseout", function () {
-                            tooltipDiv.transition()
-                                .duration(200)
-                                .style("opacity", 0);
-                        })
+                notes.forEach(note => {
+                    d3.select(`#${note.id}`)
                         .on("click mousedown", function (event) {
                             event.preventDefault();
                             event.stopPropagation();
-                            selectEdge(d3.select(this));
+                            const edge = d3.select(this);
+                            selectEdge(edge);
+                            noteDiv.transition().duration(200).style("opacity", 0.9);
+                            noteDiv.html(note.html);
                         });
                 })
             });
     }
 
     function selectEdge(edge) {
-        selectedEdge.selectAll("path, polygon").attr("stroke-width", selectedEdgeStrokeWidth);
+        selectedEdge.selectAll("path, polygon").attr("stroke-width", "2");
         selectedEdge = edge;
-        selectedEdgeStrokeWidth = selectedEdge.selectAll("polygon").attr("stroke-width")
         selectedEdge.selectAll("path, polygon").attr("stroke-width", "10");
     }
 
-    const dot = document.getElementById("dot").innerHTML;
-    const tooltips = JSON.parse(document.getElementById("tooltips").innerHTML);
-    render(dot, tooltips);
+    const dot = d3.select("#dot").text();
+    const notes = JSON.parse(d3.select("#notes").text());
+    render(dot, notes);
 </script>
 </body>
 </html>

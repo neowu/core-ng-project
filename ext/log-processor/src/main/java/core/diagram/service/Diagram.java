@@ -10,9 +10,9 @@ import java.util.List;
  */
 public class Diagram {
     public String dot;
-    public List<Tooltip> tooltips = new ArrayList<>();
+    public List<Note> notes = new ArrayList<>();
 
-    public static class Tooltip {
+    public static class Note {
         @Property(name = "id")
         public String id;
 

@@ -83,7 +83,7 @@ public class DiagramAJAXServiceImpl {
             graphBuilder.append(format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none, style={}, color={}, fontcolor={}, penwidth={}, fontsize=10, label=\"{}\"];\n",
                     nodeName(edge.getKey().srcApp), nodeName(edge.getKey().destApp), format(EDGE_ID, edge.getValue().actionIdWithLargestElapsed), edgeStyle, edgeColor, fontColor, penwidth, edge.getKey().action));
 
-            response.tooltips.add(edge(edge.getValue()));
+            response.notes.add(edge(edge.getValue()));
         }
 
         graphBuilder.append('}');
@@ -195,11 +195,11 @@ public class DiagramAJAXServiceImpl {
         return mergedEdgeInfo;
     }
 
-    private Diagram.Tooltip edge(EdgeInfo edgeInfo) {
-        Diagram.Tooltip tooltip = new Diagram.Tooltip();
-        tooltip.id = format(EDGE_ID, edgeInfo.actionIdWithLargestElapsed);
-        tooltip.html = tooltipHtml(edgeInfo);
-        return tooltip;
+    private Diagram.Note edge(EdgeInfo edgeInfo) {
+        Diagram.Note note = new Diagram.Note();
+        note.id = format(EDGE_ID, edgeInfo.actionIdWithLargestElapsed);
+        note.html = tooltipHtml(edgeInfo);
+        return note;
     }
 
     private String tooltipHtml(EdgeInfo edgeInfo) {

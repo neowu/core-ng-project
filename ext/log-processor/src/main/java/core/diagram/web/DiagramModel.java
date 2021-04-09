@@ -14,7 +14,7 @@ public class DiagramModel {
         return diagram.dot;
     }
 
-    public String tooltips() {
-        return JSON.toJSON(diagram.tooltips);
+    public String notes() {
+        return JSON.toJSON(diagram.notes);
     }
 }
