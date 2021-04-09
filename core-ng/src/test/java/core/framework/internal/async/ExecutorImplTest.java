@@ -45,7 +45,7 @@ class ExecutorImplTest {
 
         Future<Boolean> future = executor.submit("action", () -> {
             ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
-            assertThat(actionLog.action).isEqualTo("parentAction:action");
+            assertThat(actionLog.action).isEqualTo("parentAction:task:action");
             assertThat(actionLog.trace).isTrue();
             assertThat(actionLog.correlationIds).containsExactly("correlationId");
             return Boolean.TRUE;
