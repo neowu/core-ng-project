@@ -1,33 +1,40 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
+<!doctype html>
+<html xmlns:c="http://www.w3.org/1999/xhtml">
+<head>
+    <title c:text="title"></title>
+    <style>
+        svg {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #tooltip {
+            font-family: arial, sans-serif;
+            position: absolute;
+            text-align: left;
+            padding: 5px;
+            border-radius: 8px;
+            pointer-events: none;
+            background: #43aa8b
+        }
+    </style>
+</head>
 <body>
 <script src="https://d3js.org/d3.v6.min.js"></script>
 <script src="https://unpkg.com/@hpcc-js/wasm/dist/index.min.js" type="application/javascript"></script>
 <script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
+<script c:html="dot()" id="dot" type="text/plain"></script>
+<script c:html="tooltips()" id="tooltips" type="application/json"></script>
 <div id="graph" style="text-align: left;"></div>
 <div id="tooltip" style="opacity: 0"></div>
-<style>
-    svg {
-        width: 75vw;
-        height: 75vh;
-    }
-
-    #tooltip {
-        position: absolute;
-        text-align: left;
-        padding: 2px;
-        border-radius: 8px;
-        pointer-events: none;
-    }
-</style>
 <script>
     const graphviz = d3.select("#graph").graphviz();
     const tooltipDiv = d3.select("#tooltip")
 
-    function render(graph, tooltips) {
-        graphviz.renderDot(graph)
+    function render(dot, tooltips) {
+        graphviz.renderDot(dot)
             .on("end", () => {
-                d3.selectAll("title").remove();
+                d3.select("#graph").selectAll("title").remove();
                 tooltips.forEach(tooltip => {
                     d3.select(`#${tooltip.id}`)
                         .on("mouseover", function (event) {
@@ -36,21 +43,20 @@
                                 .style("opacity", 0.9);
                             tooltipDiv.html(tooltip.html)
                                 .style("left", (event.pageX) + "px")
-                                .style("top", (event.pageY - 28) + "px")
-                                .style("background", "bisque");
+                                .style("top", (event.pageY - 28) + "px");
                         })
                         .on("mouseout", function () {
                             tooltipDiv.transition()
-                                .duration(500)
+                                .duration(200)
                                 .style("opacity", 0);
                         });
                 })
             });
     }
 
-    const actionId = new URLSearchParams(window.location.search).get("actionId");
-    const ajaxURL = actionId ? "/v1/ajax/action-flow/" + actionId : "/ajax/action-flow";
-    fetch(ajaxURL).then(response => response.json()).then(response => {
-        render(response.graph, response.tooltips);
-    }).catch(error => console.error(error));
+    const dot = document.getElementById("dot").innerHTML;
+    const tooltips = JSON.parse(document.getElementById("tooltips").innerHTML);
+    render(dot, tooltips);
 </script>
+</body>
+</html>

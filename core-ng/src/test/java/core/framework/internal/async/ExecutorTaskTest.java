@@ -21,11 +21,11 @@ class ExecutorTaskTest {
         var parentActionLog = new ActionLog(null, null);
         parentActionLog.action = "parentAction";
         assertThat(new ExecutorTask<Void>("actionId", "action", Instant.now(), parentActionLog, null, () -> null).action())
-                .isEqualTo("parentAction:action");
+                .isEqualTo("parentAction:task:action");
 
         parentActionLog.context("root_action", "rootAction");
         assertThat(new ExecutorTask<Void>("actionId", "action", Instant.now(), parentActionLog, null, () -> null).action())
-                .isEqualTo("rootAction:action");
+                .isEqualTo("rootAction:task:action");
     }
 
     @Test

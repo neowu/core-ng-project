@@ -1,5 +1,6 @@
-package core.visualization.web;
+package core.diagram.web;
 
+import core.diagram.service.Diagram;
 import core.framework.inject.Inject;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.SearchRequest;
@@ -21,7 +22,7 @@ import static core.framework.util.Strings.format;
 /**
  * @author allison
  */
-public class DiagramAJAXServiceImpl implements DiagramAJAXService {
+public class DiagramAJAXServiceImpl {
     private static final String ACTION_INDEX = "action-*";
     private static final String START_POINT = "p{}";
     private static final String OUTSIDE_APP = "OUTSIDE";
@@ -31,20 +32,14 @@ public class DiagramAJAXServiceImpl implements DiagramAJAXService {
     @Inject
     ElasticSearchType<ActionDocument> actionType;
 
-    @Override
-    public DiagramResponse actionFlowV2(String actionId) {
-        return null;
-    }
-
-    @Override
-    public DiagramResponse actionFlow(String actionId) {
+    public Diagram actionFlow(String actionId) {
         ActionDocument requestedAction = actionDocument(actionId).orElseThrow(() -> new NotFoundException("action not found, id=" + actionId));
         boolean isFirstAction = requestedAction.correlationIds == null || requestedAction.correlationIds.isEmpty();
 
         StringBuilder graphBuilder = new StringBuilder();
         graphBuilder.append("digraph G {\n");
 
-        var response = new DiagramResponse();
+        var response = new Diagram();
 
         List<String> correlationIds = isFirstAction ? List.of(actionId) : requestedAction.correlationIds;
 
@@ -86,20 +81,15 @@ public class DiagramAJAXServiceImpl implements DiagramAJAXService {
             String fontColor = edgeFontColor(edge.getValue().largestElapsedInNS);
             int penwidth = Math.min(edge.getValue().count, 3);
             graphBuilder.append(format("{} -> {} [id=\"{}\", arrowhead=open, arrowtail=none, style={}, color={}, fontcolor={}, penwidth={}, fontsize=10, label=\"{}\"];\n",
-                nodeName(edge.getKey().srcApp), nodeName(edge.getKey().destApp), format(EDGE_ID, edge.getValue().actionIdWithLargestElapsed), edgeStyle, edgeColor, fontColor, penwidth, edge.getKey().action));
+                    nodeName(edge.getKey().srcApp), nodeName(edge.getKey().destApp), format(EDGE_ID, edge.getValue().actionIdWithLargestElapsed), edgeStyle, edgeColor, fontColor, penwidth, edge.getKey().action));
 
             response.tooltips.add(edge(edge.getValue()));
         }
 
         graphBuilder.append('}');
 
-        response.graph = graphBuilder.toString();
+        response.dot = graphBuilder.toString();
         return response;
-    }
-
-    @Override
-    public DiagramResponse overall() {
-        return null;
     }
 
     private Optional<ActionDocument> actionDocument(String id) {
@@ -175,8 +165,8 @@ public class DiagramAJAXServiceImpl implements DiagramAJAXService {
             ActionDocument refAction = actionMap.get(refId);
             if (refAction == null) {
                 actionDocument(refId).ifPresentOrElse(
-                    ref -> refs.compute(ref.app, (key, value) -> value == null ? 1 : value + 1),
-                    () -> refs.compute(OUTSIDE_APP, (key, value) -> value == null ? 1 : value + 1));
+                        ref -> refs.compute(ref.app, (key, value) -> value == null ? 1 : value + 1),
+                        () -> refs.compute(OUTSIDE_APP, (key, value) -> value == null ? 1 : value + 1));
             } else {
                 refs.compute(refAction.app, (key, value) -> value == null ? 1 : value + 1);
             }
@@ -205,8 +195,8 @@ public class DiagramAJAXServiceImpl implements DiagramAJAXService {
         return mergedEdgeInfo;
     }
 
-    private DiagramResponse.Tooltip edge(EdgeInfo edgeInfo) {
-        DiagramResponse.Tooltip tooltip = new DiagramResponse.Tooltip();
+    private Diagram.Tooltip edge(EdgeInfo edgeInfo) {
+        Diagram.Tooltip tooltip = new Diagram.Tooltip();
         tooltip.id = format(EDGE_ID, edgeInfo.actionIdWithLargestElapsed);
         tooltip.html = tooltipHtml(edgeInfo);
         return tooltip;
@@ -308,8 +298,8 @@ public class DiagramAJAXServiceImpl implements DiagramAJAXService {
             if (object == null || getClass() != object.getClass()) return false;
             EdgeKey edgeKey = (EdgeKey) object;
             return Objects.equals(srcApp, edgeKey.srcApp)
-                && Objects.equals(destApp, edgeKey.destApp)
-                && Objects.equals(action, edgeKey.action);
+                   && Objects.equals(destApp, edgeKey.destApp)
+                   && Objects.equals(action, edgeKey.action);
         }
 
         @Override

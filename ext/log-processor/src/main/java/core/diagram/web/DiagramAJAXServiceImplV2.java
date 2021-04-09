@@ -1,11 +1,11 @@
-package core.visualization.web;
+package core.diagram.web;
 
+import core.diagram.service.Diagram;
 import core.framework.inject.Inject;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.SearchRequest;
 import core.framework.web.exception.NotFoundException;
 import core.log.domain.ActionDocument;
-import core.visualization.service.ActionFlowService;
 import org.elasticsearch.index.query.QueryBuilders;
 
 import java.math.BigDecimal;
@@ -21,7 +21,7 @@ import static core.framework.util.Strings.format;
 /**
  * @author allison
  */
-public class DiagramAJAXServiceImplV2 implements DiagramAJAXService {
+public class DiagramAJAXServiceImplV2 {
     private static final String ACTION_INDEX = "action-*";
     private static final String START_POINT = "p{}";
     private static final String OUTSIDE_APP = "OUTSIDE";
@@ -31,8 +31,6 @@ public class DiagramAJAXServiceImplV2 implements DiagramAJAXService {
 
     @Inject
     ElasticSearchType<ActionDocument> actionType;
-    @Inject
-    ActionFlowService actionFlowService;
 
 //    public DiagramResponse actionFlowV1(String actionId) {
 //        final DiagramResponse responseV1 = new DiagramResponse();
@@ -100,25 +98,14 @@ public class DiagramAJAXServiceImplV2 implements DiagramAJAXService {
 //        return responseV1;
 //    }
 
-    @Override
-    public DiagramResponse actionFlow(String actionId) {
-        return null;
-    }
-
-    @Override
-    public DiagramResponse overall() {
-        return actionFlowService.overall();
-    }
-
-    @Override
-    public DiagramResponse actionFlowV2(String actionId) {
+    public Diagram actionFlowV2(String actionId) {
         ActionDocument requestedAction = actionDocument(actionId).orElseThrow(() -> new NotFoundException("action not found, id=" + actionId));
         boolean isFirstAction = requestedAction.correlationIds == null || requestedAction.correlationIds.isEmpty();
 
         StringBuilder graphBuilder = new StringBuilder();
         graphBuilder.append("digraph G {\n");
 
-        var response = new DiagramResponse();
+        var response = new Diagram();
 
         List<String> correlationIds = isFirstAction ? List.of(actionId) : requestedAction.correlationIds;
 
@@ -155,7 +142,7 @@ public class DiagramAJAXServiceImplV2 implements DiagramAJAXService {
 
         graphBuilder.append('}');
 
-        response.graph = graphBuilder.toString();
+        response.dot = graphBuilder.toString();
         return response;
     }
 
@@ -199,8 +186,8 @@ public class DiagramAJAXServiceImplV2 implements DiagramAJAXService {
             ActionDocument refAction = actionMap.get(refId);
             if (refAction == null) {
                 actionDocument(refId).ifPresentOrElse(
-                    ref -> refs.compute(ref.app, (key, value) -> value == null ? 1 : value + 1),
-                    () -> refs.compute(OUTSIDE_APP, (key, value) -> value == null ? 1 : value + 1));
+                        ref -> refs.compute(ref.app, (key, value) -> value == null ? 1 : value + 1),
+                        () -> refs.compute(OUTSIDE_APP, (key, value) -> value == null ? 1 : value + 1));
             } else {
                 refs.compute(refAction.app, (key, value) -> value == null ? 1 : value + 1);
             }
@@ -267,8 +254,8 @@ public class DiagramAJAXServiceImplV2 implements DiagramAJAXService {
         return app.replaceAll("-", "_");
     }
 
-    private DiagramResponse.Tooltip edgeInfo(String edgeId, ActionDocument action) {
-        var edge = new DiagramResponse.Tooltip();
+    private Diagram.Tooltip edgeInfo(String edgeId, ActionDocument action) {
+        var edge = new Diagram.Tooltip();
         edge.id = edgeId;
 
         var htmlBuilder = new StringBuilder(100);
@@ -315,6 +302,6 @@ public class DiagramAJAXServiceImplV2 implements DiagramAJAXService {
 
     private static class Edge {
         String edgeGraph;
-        List<DiagramResponse.Tooltip> tooltipInfo = new ArrayList<>();
+        List<Diagram.Tooltip> tooltipInfo = new ArrayList<>();
     }
 }
