@@ -12,10 +12,19 @@
             font-family: arial, sans-serif;
             position: absolute;
             text-align: left;
-            padding: 5px;
+            padding: 10px;
             border-radius: 8px;
             pointer-events: none;
-            background: #43aa8b
+            background: #43aa8b;
+            opacity: 0;
+        }
+
+        #tooltip > div {
+            text-align: center;
+        }
+
+        #graph {
+            text-align: left;
         }
     </style>
 </head>
@@ -25,11 +34,14 @@
 <script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
 <script c:html="dot()" id="dot" type="text/plain"></script>
 <script c:html="tooltips()" id="tooltips" type="application/json"></script>
-<div id="graph" style="text-align: left;"></div>
-<div id="tooltip" style="opacity: 0"></div>
+<div id="graph"></div>
+<div id="tooltip"></div>
 <script>
     const graphviz = d3.select("#graph").graphviz();
     const tooltipDiv = d3.select("#tooltip")
+
+    let selectedEdge = d3.select(null);
+    let selectedEdgeStrokeWidth;
 
     function render(dot, tooltips) {
         graphviz.renderDot(dot)
@@ -42,16 +54,28 @@
                                 .duration(200)
                                 .style("opacity", 0.9);
                             tooltipDiv.html(tooltip.html)
-                                .style("left", (event.pageX) + "px")
-                                .style("top", (event.pageY - 28) + "px");
+                                .style("left", (event.pageX - 5) + "px")
+                                .style("top", (event.pageY - 50) + "px");
                         })
                         .on("mouseout", function () {
                             tooltipDiv.transition()
                                 .duration(200)
                                 .style("opacity", 0);
+                        })
+                        .on("click mousedown", function (event) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            selectEdge(d3.select(this));
                         });
                 })
             });
+    }
+
+    function selectEdge(edge) {
+        selectedEdge.selectAll("path, polygon").attr("stroke-width", selectedEdgeStrokeWidth);
+        selectedEdge = edge;
+        selectedEdgeStrokeWidth = selectedEdge.selectAll("polygon").attr("stroke-width")
+        selectedEdge.selectAll("path, polygon").attr("stroke-width", "10");
     }
 
     const dot = document.getElementById("dot").innerHTML;
