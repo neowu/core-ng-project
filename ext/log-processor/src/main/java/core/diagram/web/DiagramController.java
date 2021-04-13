@@ -1,6 +1,5 @@
 package core.diagram.web;
 
-import core.diagram.service.Diagram;
 import core.diagram.service.DiagramService;
 import core.framework.inject.Inject;
 import core.framework.web.Request;
@@ -14,10 +13,11 @@ public class DiagramController {
     DiagramService diagramService;
 
     public Response arch(Request request) {
-        Diagram diagram = diagramService.arch();
+        String hours = request.queryParams().get("hours");
+        String dot = diagramService.arch(hours == null ? 24 : Integer.parseInt(hours));
         var model = new DiagramModel();
         model.title = "System Architecture";
-        model.diagram = diagram;
+        model.dot = dot;
         return Response.html("/template/diagram.html", model);
     }
 }

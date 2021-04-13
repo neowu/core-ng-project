@@ -9,7 +9,7 @@
             z-index: 1;
         }
 
-        #note {
+        #tooltip {
             font-family: arial, sans-serif;
             position: absolute;
             left: 0;
@@ -18,11 +18,12 @@
             padding: 5px;
             border-radius: 5px;
             background: gray;
-            opacity: 0;
+            opacity: 0.9;
             z-index: 2;
+            visibility: hidden;
         }
 
-        #note > table > caption {
+        #tooltip > table > caption {
             white-space: nowrap;
             text-align: center;
             border-bottom: solid black 1px;
@@ -33,47 +34,43 @@
 <script src="https://d3js.org/d3.v6.min.js"></script>
 <script src="https://unpkg.com/@hpcc-js/wasm/dist/index.min.js" type="application/javascript"></script>
 <script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
-<script c:html="dot()" id="dot" type="text/plain"></script>
-<script c:html="notes()" id="notes" type="application/json"></script>
-<div id="note"></div>
+<script c:html="dot" id="dot" type="text/plain"></script>
+<div id="tooltip"></div>
 <div id="graph"></div>
 <script>
     const graphviz = d3.select("#graph").graphviz();
-    const noteDiv = d3.select("#note")
+    const tooltipDiv = d3.select("#tooltip")
 
-    noteDiv.on("click", () => {
-        noteDiv.transition().duration(200).style("opacity", 0);
-    })
+    let selectedElement = d3.select(null);
 
-    let selectedEdge = d3.select(null);
-
-    function render(dot, notes) {
+    function render(dot) {
         graphviz.renderDot(dot)
             .on("end", () => {
-                d3.select("#graph").selectAll("title").remove();
-                notes.forEach(note => {
-                    d3.select(`#${note.id}`)
-                        .on("click mousedown", function (event) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            const edge = d3.select(this);
-                            selectEdge(edge);
-                            noteDiv.transition().duration(200).style("opacity", 0.9);
-                            noteDiv.html(note.html);
-                        });
-                })
+                d3.selectAll(".edge, .node").on("click mousedown", function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const element = d3.select(this);
+                    select(element);
+
+                    const tooltip = element.select("a");
+                    if (!tooltip.empty()) {
+                        tooltipDiv.html(tooltip.attr("title"));
+                        tooltipDiv.style("visibility", "visible");
+                    } else {
+                        tooltipDiv.style("visibility", "hidden");
+                    }
+                });
             });
     }
 
-    function selectEdge(edge) {
-        selectedEdge.selectAll("path, polygon").attr("stroke-width", "2");
-        selectedEdge = edge;
-        selectedEdge.selectAll("path, polygon").attr("stroke-width", "10");
+    function select(element) {
+        selectedElement.selectAll("path, polygon, ellipse").attr("stroke-width", "2");
+        selectedElement = element;
+        selectedElement.selectAll("path, polygon, ellipse").attr("stroke-width", "5");
     }
 
     const dot = d3.select("#dot").text();
-    const notes = JSON.parse(d3.select("#notes").text());
-    render(dot, notes);
+    render(dot);
 </script>
 </body>
 </html>

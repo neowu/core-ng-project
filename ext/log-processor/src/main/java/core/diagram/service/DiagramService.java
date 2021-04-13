@@ -17,18 +17,18 @@ public class DiagramService {
     @Inject
     ElasticSearchType<ActionDocument> actionType;
 
-    public Diagram arch() {
+    public String arch(int hours) {
         var request = new SearchRequest();
         request.index = "action-*";
-        request.query = QueryBuilders.rangeQuery("@timestamp").gt(ZonedDateTime.now().minusHours(12));
+        request.query = QueryBuilders.rangeQuery("@timestamp").gt(ZonedDateTime.now().minusHours(hours));
         request.limit = 0;
         request.aggregations.add(new TermsAggregationBuilder("app").field("app").size(50)
                 .subAggregation(new TermsAggregationBuilder("action").field("action").size(500)
                         .subAggregation(new TermsAggregationBuilder("client").field("client").size(50))));
         SearchResponse<ActionDocument> searchResponse = actionType.search(request);
 
-        var arch = new Arch();
-        arch.load(searchResponse);
-        return arch.diagram();
+        var diagram = new ArchDiagram();
+        diagram.load(searchResponse);
+        return diagram.dot();
     }
 }

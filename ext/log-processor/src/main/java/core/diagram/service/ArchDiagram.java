@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class Arch {
+public class ArchDiagram {
     private static final List<String> COLOR_PALETTE = List.of(
             "#F94144", "#F3722C", "#F8961E", "#F9844A", "#F9C74F",
             "#90BE6D", "#43AA8B", "#4D908E", "#577590", "#277DA1"
@@ -89,8 +89,7 @@ public class Arch {
         return subscription;
     }
 
-    public Diagram diagram() {
-        var diagram = new Diagram();
+    public String dot() {
         var dot = new CodeBuilder().append("digraph {\n");
         dot.append("rankdir=LR;\n");
         dot.append("node [style=rounded, fontname=arial, fontsize=20];\n");
@@ -101,15 +100,15 @@ public class Arch {
                 continue;
             }
             String color = color(app);
-            dot.append("{} [label=\"{}\", shape=circle, width=3, style=filled, color=\"{}\", fillcolor=\"{}\", fontcolor=white];\n", id(app), app, color, color);
+            dot.append("{} [label=\"{}\", shape=circle, width=3, style=filled, color=\"{}\", fillcolor=\"{}\", fontcolor=white, tooltip=\"{}\"];\n", id(app), app, color, color, "");
         }
         for (MessageSubscription subscription : messageSubscriptions) {
             dot.append("{} [shape=box, label=\"{}\"];\n", id(subscription.topic), subscription.topic);
         }
         for (APIDependency dependency : apiDependencies) {
             String edgeId = "edge_" + (index++);
-            dot.append("{} -> {} [id=\"{}\", color=\"{}\", weight=5, penwidth=2];\n", id(dependency.client), id(dependency.service), edgeId, colors.get(dependency.client));
-            diagram.notes.add(note(edgeId, tooltip(dependency)));
+            String tooltip = tooltip(dependency);
+            dot.append("{} -> {} [id=\"{}\", color=\"{}\", penwidth=2, weight=5, tooltip=\"{}\"];\n", id(dependency.client), id(dependency.service), edgeId, colors.get(dependency.client), tooltip);
         }
         for (MessageSubscription subscription : messageSubscriptions) {
             for (Map.Entry<String, Long> entry : subscription.publishers.entrySet()) {
@@ -121,30 +120,22 @@ public class Arch {
         }
         dot.append("}\n");
 
-        diagram.dot = dot.build();
-        return diagram;
+        return dot.build();
     }
 
     private String tooltip(APIDependency dependency) {
         var builder = new StringBuilder(512);
-        builder.append("<table><caption>").append(dependency.client.startsWith("_direct_") ? "direct" : dependency.client).append(" > ")
+        builder.append("<table>\n<caption>").append(dependency.client.startsWith("_direct_") ? "direct" : dependency.client).append(" > ")
                 .append(dependency.service)
-                .append("</caption>");
+                .append("</caption>\n");
         for (Map.Entry<String, Long> entry : dependency.apis.entrySet()) {
             builder.append("<tr><td>")
                     .append(entry.getKey())
                     .append("</td><td>")
                     .append(entry.getValue())
-                    .append("</td></tr>");
+                    .append("</td></tr>\n");
         }
         return builder.append("</table>").toString();
-    }
-
-    private Diagram.Note note(String id, String html) {
-        var note = new Diagram.Note();
-        note.id = id;
-        note.html = html;
-        return note;
     }
 
     private Set<String> apps() {
