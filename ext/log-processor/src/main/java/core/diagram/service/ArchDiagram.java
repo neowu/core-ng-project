@@ -9,12 +9,14 @@ import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * @author neo
@@ -64,7 +66,7 @@ public class ArchDiagram {
             String method = action.substring(4, index);
             String uri = action.substring(index + 1);
             APIDependency dependency = apiDependency(service, client);
-            dependency.apis.put(ASCII.toUpperCase(method) + " " + uri, count);
+            dependency.calls.add(new APICall(ASCII.toUpperCase(method), uri, count));
         } else if (action.startsWith("topic:")) {
             String topic = action.substring(6);
             MessageSubscription subscription = messageSubscription(topic);
@@ -133,7 +135,7 @@ public class ArchDiagram {
         Map<String, Long> result = new LinkedHashMap<>();
         for (APIDependency dependency : apiDependencies) {
             if (dependency.client.equals(app)) {
-                result.put(dependency.service, dependency.apis.values().stream().mapToLong(Long::longValue).sum());
+                result.put(dependency.service, dependency.calls.stream().mapToLong(value -> value.count).sum());
             }
         }
         return result;
@@ -141,11 +143,11 @@ public class ArchDiagram {
 
     private String tooltip(MessageSubscription subscription) {
         var builder = new StringBuilder(512);
-        builder.append("<table>\n<caption>").append(subscription.topic).append("</caption>\n<tr><td colspan=2 class=title>publishers:</td><tr>\n");
+        builder.append("<table>\n<caption>").append(subscription.topic).append("</caption>\n<tr><td colspan=2 class=section>publishers</td><tr>\n");
         for (Map.Entry<String, Long> entry : subscription.publishers.entrySet()) {
             builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
         }
-        builder.append("<tr><td colspan=2 class=title>consumers:</td><tr>\n");
+        builder.append("<tr><td colspan=2 class=section>consumers</td><tr>\n");
         for (Map.Entry<String, Long> entry : subscription.consumers.entrySet()) {
             builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
         }
@@ -157,28 +159,28 @@ public class ArchDiagram {
         builder.append("<table>\n<caption>").append(app).append("</caption>\n");
         Map<String, Long> calls = apiCalls(app);
         if (!calls.isEmpty()) {
-            builder.append("<tr><td colspan=2 class=title>api calls:</td><tr>\n");
+            builder.append("<tr><td colspan=2 class=section>api calls</td><tr>\n");
             for (Map.Entry<String, Long> entry : calls.entrySet()) {
                 builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
             }
         }
         Scheduler scheduler = schedulers.get(app);
         if (scheduler != null) {
-            builder.append("<tr><td colspan=2 class=title>jobs:</td><tr>\n");
+            builder.append("<tr><td colspan=2 class=section>jobs</td><tr>\n");
             for (Map.Entry<String, Long> entry : scheduler.jobs.entrySet()) {
                 builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
             }
         }
         Map<String, Long> published = messagePublished(app);
         if (!published.isEmpty()) {
-            builder.append("<tr><td colspan=2 class=title>published messages:</td><tr>\n");
+            builder.append("<tr><td colspan=2 class=section>published messages</td><tr>\n");
             for (Map.Entry<String, Long> entry : published.entrySet()) {
                 builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
             }
         }
         Map<String, Long> consumed = messageConsumed(app);
         if (!consumed.isEmpty()) {
-            builder.append("<tr><td colspan=2 class=title>consumed messages:</td><tr>\n");
+            builder.append("<tr><td colspan=2 class=section>consumed messages</td><tr>\n");
             for (Map.Entry<String, Long> entry : consumed.entrySet()) {
                 builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
             }
@@ -187,12 +189,13 @@ public class ArchDiagram {
     }
 
     private String tooltip(APIDependency dependency) {
+        dependency.calls.sort(Comparator.comparing(call -> call.uri));
         var builder = new StringBuilder(512);
-        builder.append("<table>\n<caption>").append(dependency.client.startsWith("_direct_") ? "direct" : dependency.client).append(" > ")
-                .append(dependency.service)
-                .append("</caption>\n");
-        for (Map.Entry<String, Long> entry : dependency.apis.entrySet()) {
-            builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+        builder.append("<table>\n<caption>").append(dependency.client.startsWith("_direct_") ? "direct" : dependency.client)
+                .append(" > ")
+                .append(dependency.service).append("</caption>\n<tr><td colspan=3 class=section>api calls</td><tr>\n");
+        for (APICall call : dependency.calls) {
+            builder.append("<tr><td>").append(call.method).append("</td><td>").append(call.uri).append("</td><td>").append(call.count).append("</td></tr>\n");
         }
         return builder.append("</table>").toString();
     }
@@ -241,32 +244,44 @@ public class ArchDiagram {
         return subscription;
     }
 
-    public static class APIDependency {
-        public final Map<String, Long> apis = new HashMap<>();         // name, count
-        public final String service;
-        public final String client;
+    static class APIDependency {
+        final List<APICall> calls = new ArrayList<>();
+        final String service;
+        final String client;
 
-        public APIDependency(String service, String client) {
+        APIDependency(String service, String client) {
             this.service = service;
             this.client = client;
         }
     }
 
-    public static class MessageSubscription {
-        public final Map<String, Long> publishers = new HashMap<>();   // name, count
-        public final Map<String, Long> consumers = new HashMap<>();    // name, count
-        public final String topic;
+    static class APICall {
+        final String method;
+        final String uri;
+        final long count;
 
-        public MessageSubscription(String topic) {
+        APICall(String method, String uri, long count) {
+            this.method = method;
+            this.uri = uri;
+            this.count = count;
+        }
+    }
+
+    static class MessageSubscription {
+        final Map<String, Long> publishers = new HashMap<>();   // name, count
+        final Map<String, Long> consumers = new HashMap<>();    // name, count
+        final String topic;
+
+        MessageSubscription(String topic) {
             this.topic = topic;
         }
     }
 
-    public static class Scheduler {
-        public final Map<String, Long> jobs = new LinkedHashMap<>();  // name, count
-        public final String service;
+    static class Scheduler {
+        final Map<String, Long> jobs = new TreeMap<>();  // name, count
+        final String service;
 
-        public Scheduler(String service) {
+        Scheduler(String service) {
             this.service = service;
         }
     }
