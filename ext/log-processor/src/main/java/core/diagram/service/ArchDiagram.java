@@ -214,7 +214,7 @@ public class ArchDiagram {
     }
 
     private String id(String name) {
-        return name.replace('-', '_');
+        return name.replace('-', '_').replace(':', '_');
     }
 
     private String color(String app) {
