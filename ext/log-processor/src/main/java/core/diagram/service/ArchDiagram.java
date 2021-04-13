@@ -75,7 +75,7 @@ public class ArchDiagram {
             subscription.consumers.put(service, count);
         } else if (action.startsWith("job:")) {
             String job = action.substring(4);
-            Scheduler scheduler = schedulers.computeIfAbsent(service, Scheduler::new);
+            Scheduler scheduler = schedulers.computeIfAbsent(service, key -> new Scheduler());
             scheduler.jobs.put(job, count);
         }
     }
@@ -279,10 +279,5 @@ public class ArchDiagram {
 
     static class Scheduler {
         final Map<String, Long> jobs = new TreeMap<>();  // name, count
-        final String service;
-
-        Scheduler(String service) {
-            this.service = service;
-        }
     }
 }
