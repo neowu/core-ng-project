@@ -133,7 +133,7 @@ public class ArchDiagram {
         Map<String, Long> result = new LinkedHashMap<>();
         for (APIDependency dependency : apiDependencies) {
             if (dependency.client.equals(app)) {
-                result.put(dependency.service, dependency.apis.values().stream().mapToLong(value -> value).sum());
+                result.put(dependency.service, dependency.apis.values().stream().mapToLong(Long::longValue).sum());
             }
         }
         return result;
