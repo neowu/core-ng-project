@@ -10,6 +10,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,10 +24,12 @@ public class ArchDiagram {
             "#F94144", "#F3722C", "#F8961E", "#F9844A", "#F9C74F",
             "#90BE6D", "#43AA8B", "#4D908E", "#577590", "#277DA1"
     );
-    public final List<APIDependency> apiDependencies = new ArrayList<>();
-    public final List<MessageSubscription> messageSubscriptions = new ArrayList<>();
+    // grey palette: "#E9ECEF", "#DEE2E6", "#CED4DA", "#ADB5BD", "#6C757D", "#495057"
+
+    private final List<APIDependency> apiDependencies = new ArrayList<>();
+    private final List<MessageSubscription> messageSubscriptions = new ArrayList<>();
+    private final Map<String, Scheduler> schedulers = new HashMap<>();
     private final Map<String, String> colors = new HashMap<>();
-    private int index = 0;
 
     public void load(SearchResponse<ActionDocument> response) {
         List<? extends Terms.Bucket> apps = ((ParsedTerms) response.aggregations.get("app")).getBuckets();
@@ -60,39 +63,25 @@ public class ArchDiagram {
             int index = action.indexOf(':', 4);
             String method = action.substring(4, index);
             String uri = action.substring(index + 1);
-            APIDependency dependency = getOrCreateAPIDependency(service, client);
+            APIDependency dependency = apiDependency(service, client);
             dependency.apis.put(ASCII.toUpperCase(method) + " " + uri, count);
         } else if (action.startsWith("topic:")) {
             String topic = action.substring(6);
-            MessageSubscription subscription = getOrCreateMessageSubscription(topic);
+            MessageSubscription subscription = messageSubscription(topic);
             long publishedCount = Math.max(subscription.publishers.getOrDefault(client, 0L), count);     // one message can be consumed by multiple consumers, use max one to count messages
             subscription.publishers.put(client, publishedCount);
             subscription.consumers.put(service, count);
+        } else if (action.startsWith("job:")) {
+            String job = action.substring(4);
+            Scheduler scheduler = schedulers.computeIfAbsent(service, Scheduler::new);
+            scheduler.jobs.put(job, count);
         }
-    }
-
-    private APIDependency getOrCreateAPIDependency(String service, String client) {
-        for (APIDependency dependency : apiDependencies) {
-            if (dependency.service.equals(service) && dependency.client.equals(client)) return dependency;
-        }
-        var dependency = new APIDependency(service, client);
-        apiDependencies.add(dependency);
-        return dependency;
-    }
-
-    private MessageSubscription getOrCreateMessageSubscription(String topic) {
-        for (MessageSubscription subscription : messageSubscriptions) {
-            if (subscription.topic.equals(topic)) return subscription;
-        }
-        var subscription = new MessageSubscription(topic);
-        messageSubscriptions.add(subscription);
-        return subscription;
     }
 
     public String dot() {
         var dot = new CodeBuilder().append("digraph {\n");
         dot.append("rankdir=LR;\n");
-        dot.append("node [style=rounded, fontname=arial, fontsize=20];\n");
+        dot.append("node [style=\"rounded, filled\", fontname=arial, fontsize=17, fontcolor=white];\n");
         dot.append("edge [arrowsize=0.5];\n");
         for (String app : apps()) {
             if (app.startsWith("_direct_")) {
@@ -100,27 +89,102 @@ public class ArchDiagram {
                 continue;
             }
             String color = color(app);
-            dot.append("{} [label=\"{}\", shape=circle, width=3, style=filled, color=\"{}\", fillcolor=\"{}\", fontcolor=white, tooltip=\"{}\"];\n", id(app), app, color, color, "");
+            String tooltip = tooltip(app);
+            dot.append("{} [label=\"{}\", shape=circle, width=3, color=\"{}\", fillcolor=\"{}\", tooltip=\"{}\"];\n", id(app), app, color, color, tooltip);
         }
         for (MessageSubscription subscription : messageSubscriptions) {
-            dot.append("{} [shape=box, label=\"{}\"];\n", id(subscription.topic), subscription.topic);
+            dot.append("{} [label=\"{}\", shape=box, color=\"#6C757D\", fillcolor=\"#6C757D\", tooltip=\"{}\"];\n", id(subscription.topic), subscription.topic, tooltip(subscription));
         }
         for (APIDependency dependency : apiDependencies) {
-            String edgeId = "edge_" + (index++);
             String tooltip = tooltip(dependency);
-            dot.append("{} -> {} [id=\"{}\", color=\"{}\", penwidth=2, weight=5, tooltip=\"{}\"];\n", id(dependency.client), id(dependency.service), edgeId, colors.get(dependency.client), tooltip);
+            dot.append("{} -> {} [color=\"{}\", weight=5, penwidth=2, tooltip=\"{}\"];\n", id(dependency.client), id(dependency.service), colors.get(dependency.client), tooltip);
         }
         for (MessageSubscription subscription : messageSubscriptions) {
             for (Map.Entry<String, Long> entry : subscription.publishers.entrySet()) {
-                dot.append("{} -> {} [style=dashed];\n", id(entry.getKey()), id(subscription.topic));
+                dot.append("{} -> {} [color=\"#495057\", style=dashed];\n", id(entry.getKey()), id(subscription.topic));
             }
             for (Map.Entry<String, Long> entry : subscription.consumers.entrySet()) {
-                dot.append("{} -> {} [style=dashed];\n", id(subscription.topic), id(entry.getKey()));
+                dot.append("{} -> {} [color=\"#ADB5BD\", style=dashed];\n", id(subscription.topic), id(entry.getKey()));
             }
         }
         dot.append("}\n");
-
         return dot.build();
+    }
+
+    private String tooltip(MessageSubscription subscription) {
+        var builder = new StringBuilder(512);
+        builder.append("<table>\n<caption>").append(subscription.topic).append("</caption>\n");
+        builder.append("<tr><td colspan=2 class=title>publishers:</td><tr>\n");
+        for (Map.Entry<String, Long> entry : subscription.publishers.entrySet()) {
+            builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+        }
+        builder.append("<tr><td colspan=2 class=title>consumers:</td><tr>\n");
+        for (Map.Entry<String, Long> entry : subscription.consumers.entrySet()) {
+            builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+        }
+        return builder.toString();
+    }
+
+    private String tooltip(String app) {
+        var builder = new StringBuilder(512);
+        builder.append("<table>\n<caption>").append(app).append("</caption>\n");
+        Map<String, Long> calls = apiCalls(app);
+        if (!calls.isEmpty()) {
+            builder.append("<tr><td colspan=2 class=title>api calls:</td><tr>\n");
+            for (Map.Entry<String, Long> entry : calls.entrySet()) {
+                builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+            }
+        }
+        Scheduler scheduler = schedulers.get(app);
+        if (scheduler != null) {
+            builder.append("<tr><td colspan=2 class=title>jobs:</td><tr>\n");
+            for (Map.Entry<String, Long> entry : scheduler.jobs.entrySet()) {
+                builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+            }
+        }
+        Map<String, Long> published = messagePublished(app);
+        if (!published.isEmpty()) {
+            builder.append("<tr><td colspan=2 class=title>published messages:</td><tr>\n");
+            for (Map.Entry<String, Long> entry : published.entrySet()) {
+                builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+            }
+        }
+        Map<String, Long> consumed = messageConsumed(app);
+        if (!consumed.isEmpty()) {
+            builder.append("<tr><td colspan=2 class=title>consumed messages:</td><tr>\n");
+            for (Map.Entry<String, Long> entry : consumed.entrySet()) {
+                builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+            }
+        }
+        return builder.toString();
+    }
+
+    private Map<String, Long> messagePublished(String app) {
+        Map<String, Long> result = new LinkedHashMap<>();
+        for (MessageSubscription subscription : messageSubscriptions) {
+            Long published = subscription.publishers.get(app);
+            if (published != null) result.put(subscription.topic, published);
+        }
+        return result;
+    }
+
+    private Map<String, Long> messageConsumed(String app) {
+        Map<String, Long> result = new LinkedHashMap<>();
+        for (MessageSubscription subscription : messageSubscriptions) {
+            Long published = subscription.consumers.get(app);
+            if (published != null) result.put(subscription.topic, published);
+        }
+        return result;
+    }
+
+    private Map<String, Long> apiCalls(String app) {
+        Map<String, Long> result = new LinkedHashMap<>();
+        for (APIDependency dependency : apiDependencies) {
+            if (dependency.client.equals(app)) {
+                result.put(dependency.service, dependency.apis.values().stream().mapToLong(value -> value).sum());
+            }
+        }
+        return result;
     }
 
     private String tooltip(APIDependency dependency) {
@@ -129,11 +193,7 @@ public class ArchDiagram {
                 .append(dependency.service)
                 .append("</caption>\n");
         for (Map.Entry<String, Long> entry : dependency.apis.entrySet()) {
-            builder.append("<tr><td>")
-                    .append(entry.getKey())
-                    .append("</td><td>")
-                    .append(entry.getValue())
-                    .append("</td></tr>\n");
+            builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
         }
         return builder.append("</table>").toString();
     }
@@ -164,6 +224,24 @@ public class ArchDiagram {
         return color;
     }
 
+    private APIDependency apiDependency(String service, String client) {
+        for (APIDependency dependency : apiDependencies) {
+            if (dependency.service.equals(service) && dependency.client.equals(client)) return dependency;
+        }
+        var dependency = new APIDependency(service, client);
+        apiDependencies.add(dependency);
+        return dependency;
+    }
+
+    private MessageSubscription messageSubscription(String topic) {
+        for (MessageSubscription subscription : messageSubscriptions) {
+            if (subscription.topic.equals(topic)) return subscription;
+        }
+        var subscription = new MessageSubscription(topic);
+        messageSubscriptions.add(subscription);
+        return subscription;
+    }
+
     public static class APIDependency {
         public final Map<String, Long> apis = new HashMap<>();         // name, count
         public final String service;
@@ -182,6 +260,15 @@ public class ArchDiagram {
 
         public MessageSubscription(String topic) {
             this.topic = topic;
+        }
+    }
+
+    public static class Scheduler {
+        public final Map<String, Long> jobs = new LinkedHashMap<>();  // name, count
+        public final String service;
+
+        public Scheduler(String service) {
+            this.service = service;
         }
     }
 }

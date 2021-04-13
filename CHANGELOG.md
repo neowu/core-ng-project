@@ -1,13 +1,14 @@
 ## Change log
 
-### 7.6.14 (03/18/2021 - )
+### 7.6.14 (03/18/2021 - 04/13/2021)
 
 * search: update es to 7.12.0
 * action: change error "action log context value too long" to warning
 * mongo: MongoMigration supports overwriting property by env
 * es: ElasticSearchMigration supports overwriting property by env
 * log-processor: generate system arch diagram
-  > call https://log-processor:8443/diagram/arch, use port-forward in kube env
+  > call https://log-processor:8443/diagram/arch?hours=24, use port-forward in kube env, hours param is optional
+  > click nodes and edges to show extra info in tooltip
 
 ### 7.6.13 (03/01/2021 - 03/18/2021)
 

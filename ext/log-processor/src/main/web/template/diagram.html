@@ -17,7 +17,7 @@
             text-align: left;
             padding: 5px;
             border-radius: 5px;
-            background: gray;
+            background: #ADB5BD;
             opacity: 0.9;
             z-index: 2;
             visibility: hidden;
@@ -27,6 +27,10 @@
             white-space: nowrap;
             text-align: center;
             border-bottom: solid black 1px;
+        }
+
+        #tooltip .title {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -41,7 +45,8 @@
     const graphviz = d3.select("#graph").graphviz();
     const tooltipDiv = d3.select("#tooltip")
 
-    let selectedElement = d3.select(null);
+    let selected = null;
+    let selectedStyle = {};
 
     function render(dot) {
         graphviz.renderDot(dot)
@@ -64,9 +69,13 @@
     }
 
     function select(element) {
-        selectedElement.selectAll("path, polygon, ellipse").attr("stroke-width", "2");
-        selectedElement = element;
-        selectedElement.selectAll("path, polygon, ellipse").attr("stroke-width", "5");
+        if (selected != null) {
+            selected.selectAll("path, polygon, ellipse").attr("stroke-width", selectedStyle["stroke-width"]);
+        }
+        selected = element;
+        let shape = selected.selectAll("path, polygon, ellipse");
+        selectedStyle = {"stroke-width": shape.attr("stroke-width")};
+        shape.attr("stroke-width", "5");
     }
 
     const dot = d3.select("#dot").text();
