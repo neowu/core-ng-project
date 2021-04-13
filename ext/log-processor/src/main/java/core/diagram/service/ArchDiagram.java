@@ -111,10 +111,37 @@ public class ArchDiagram {
         return dot.build();
     }
 
+    private Map<String, Long> messagePublished(String app) {
+        Map<String, Long> result = new LinkedHashMap<>();
+        for (MessageSubscription subscription : messageSubscriptions) {
+            Long published = subscription.publishers.get(app);
+            if (published != null) result.put(subscription.topic, published);
+        }
+        return result;
+    }
+
+    private Map<String, Long> messageConsumed(String app) {
+        Map<String, Long> result = new LinkedHashMap<>();
+        for (MessageSubscription subscription : messageSubscriptions) {
+            Long published = subscription.consumers.get(app);
+            if (published != null) result.put(subscription.topic, published);
+        }
+        return result;
+    }
+
+    private Map<String, Long> apiCalls(String app) {
+        Map<String, Long> result = new LinkedHashMap<>();
+        for (APIDependency dependency : apiDependencies) {
+            if (dependency.client.equals(app)) {
+                result.put(dependency.service, dependency.apis.values().stream().mapToLong(value -> value).sum());
+            }
+        }
+        return result;
+    }
+
     private String tooltip(MessageSubscription subscription) {
         var builder = new StringBuilder(512);
-        builder.append("<table>\n<caption>").append(subscription.topic).append("</caption>\n");
-        builder.append("<tr><td colspan=2 class=title>publishers:</td><tr>\n");
+        builder.append("<table>\n<caption>").append(subscription.topic).append("</caption>\n<tr><td colspan=2 class=title>publishers:</td><tr>\n");
         for (Map.Entry<String, Long> entry : subscription.publishers.entrySet()) {
             builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
         }
@@ -122,7 +149,7 @@ public class ArchDiagram {
         for (Map.Entry<String, Long> entry : subscription.consumers.entrySet()) {
             builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
         }
-        return builder.toString();
+        return builder.append("</table>").toString();
     }
 
     private String tooltip(String app) {
@@ -156,35 +183,7 @@ public class ArchDiagram {
                 builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
             }
         }
-        return builder.toString();
-    }
-
-    private Map<String, Long> messagePublished(String app) {
-        Map<String, Long> result = new LinkedHashMap<>();
-        for (MessageSubscription subscription : messageSubscriptions) {
-            Long published = subscription.publishers.get(app);
-            if (published != null) result.put(subscription.topic, published);
-        }
-        return result;
-    }
-
-    private Map<String, Long> messageConsumed(String app) {
-        Map<String, Long> result = new LinkedHashMap<>();
-        for (MessageSubscription subscription : messageSubscriptions) {
-            Long published = subscription.consumers.get(app);
-            if (published != null) result.put(subscription.topic, published);
-        }
-        return result;
-    }
-
-    private Map<String, Long> apiCalls(String app) {
-        Map<String, Long> result = new LinkedHashMap<>();
-        for (APIDependency dependency : apiDependencies) {
-            if (dependency.client.equals(app)) {
-                result.put(dependency.service, dependency.apis.values().stream().mapToLong(value -> value).sum());
-            }
-        }
-        return result;
+        return builder.append("</table>").toString();
     }
 
     private String tooltip(APIDependency dependency) {
