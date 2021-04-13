@@ -64,7 +64,7 @@
 
                     const tooltip = element.select("a");
                     if (!tooltip.empty()) {
-                        tooltipDiv.html(tooltip.attr("title"));
+                        tooltipDiv.html(tooltip.attr("title")); // lgtm[js/xss-through-dom]
                         tooltipDiv.style("visibility", "visible");
                     } else {
                         tooltipDiv.style("visibility", "hidden");
