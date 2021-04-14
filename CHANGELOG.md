@@ -2,6 +2,9 @@
 
 ### 7.6.15 (04/13/2021 - )
 
+* log-processor: support to forward action-log/event to another kafka for data warehouse sink
+  > configure by env APP_LOG_FORWARD_CONFIG
+
 ### 7.6.14 (03/18/2021 - 04/13/2021)
 
 * search: update es to 7.12.0

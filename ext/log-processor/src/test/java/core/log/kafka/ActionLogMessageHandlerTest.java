@@ -2,6 +2,7 @@ package core.log.kafka;
 
 import core.framework.kafka.Message;
 import core.framework.log.message.ActionLogMessage;
+import core.log.service.ActionLogForwarder;
 import core.log.service.ActionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,12 +22,14 @@ import static org.mockito.Mockito.verify;
 class ActionLogMessageHandlerTest {
     @Mock
     ActionService actionService;
+    @Mock
+    ActionLogForwarder forwarder;
 
     private ActionLogMessageHandler handler;
 
     @BeforeEach
     void createActionLogMessageHandler() {
-        handler = new ActionLogMessageHandler();
+        handler = new ActionLogMessageHandler(forwarder);
         handler.actionService = actionService;
     }
 
@@ -36,5 +39,6 @@ class ActionLogMessageHandlerTest {
         handler.handle(messages);
 
         verify(actionService).index(argThat((List<ActionLogMessage> values) -> values.size() == 2));
+        verify(forwarder).forward(argThat((List<ActionLogMessage> values) -> values.size() == 2));
     }
 }
