@@ -3,7 +3,21 @@
 ### 7.6.15 (04/13/2021 - )
 
 * log-processor: support to forward action-log/event to another kafka for data warehouse sink
-  > configure by env APP_LOG_FORWARD_CONFIG
+  > configure by env APP_LOG_FORWARD_CONFIG, kube example:
+    <pre>
+      - name: APP_LOG_FORWARD_CONFIG
+        value: |
+            {
+                "kafkaURI": "kafka-0.kafka",
+                "action": {
+                    "topic": "action",
+                    "apps": ["website", "mobile-api"],
+                    "ignoreErrorCodes": ["FORBIDDEN", "PATH_NOT_FOUND", "UNAUTHORIZED", "METHOD_NOT_ALLOWED"]
+                }
+            }
+    </pre>
+* gradle: compatibility for java 16 (still release under java 15 for now)
+  > refer to app.gradle / project.gradle changes if you use java 16
 
 ### 7.6.14 (03/18/2021 - 04/13/2021)
 
