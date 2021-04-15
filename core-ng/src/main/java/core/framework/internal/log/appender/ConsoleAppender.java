@@ -1,5 +1,6 @@
 package core.framework.internal.log.appender;
 
+import core.framework.log.LogAppender;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.PerformanceStatMessage;
 import core.framework.log.message.StatMessage;

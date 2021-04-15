@@ -1,7 +1,7 @@
 package core.log.service;
 
 import core.framework.inject.Inject;
-import core.framework.internal.log.appender.LogAppender;
+import core.framework.log.LogAppender;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.StatMessage;
 

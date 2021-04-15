@@ -13,7 +13,6 @@
 * action visualization to show service flow/dependency diagram?
 
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled
-* class in interface module generates Validator make interface depends on core-ng module (java module)
 
 * redis using ping/pong to validate connection? for zero downtime upgrading e.g. with gcloud memory store
 * put maxProcessTime/remainingProcessTime in action.stats? (seems not important)

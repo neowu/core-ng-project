@@ -10,7 +10,7 @@ public class CacheStoreConfig {
     private final CacheImpl<?> cache;
     private final CacheConfig config;
 
-    public CacheStoreConfig(CacheImpl<?> cache, CacheConfig config) {
+    CacheStoreConfig(CacheImpl<?> cache, CacheConfig config) {
         this.cache = cache;
         this.config = config;
     }

@@ -4,10 +4,10 @@ import core.framework.internal.kafka.KafkaURI;
 import core.framework.internal.log.CollectStatTask;
 import core.framework.internal.log.appender.ConsoleAppender;
 import core.framework.internal.log.appender.KafkaAppender;
-import core.framework.internal.log.appender.LogAppender;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
+import core.framework.log.LogAppender;
 
 import java.time.Duration;
 

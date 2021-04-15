@@ -1,4 +1,4 @@
-package core.framework.internal.log.appender;
+package core.framework.log;
 
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.StatMessage;
