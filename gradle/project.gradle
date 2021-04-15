@@ -25,7 +25,6 @@ subprojects {
         failFast = true
         testLogging.showStandardStreams = true
         testLogging.exceptionFormat 'full'
-        jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
     }
 
     tasks.register('mkdir') {

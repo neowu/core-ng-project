@@ -1,7 +1,7 @@
-public class TestWebServiceImpl$get implements core.framework.web.Controller {
+public class Controller$TestWebServiceImpl$get implements core.framework.web.Controller {
     private final core.framework.internal.web.service.TestWebService delegate;
 
-    public TestWebServiceImpl$get(core.framework.internal.web.service.TestWebService $1) {
+    public Controller$TestWebServiceImpl$get(core.framework.internal.web.service.TestWebService $1) {
         this.delegate = $1;
     }
 

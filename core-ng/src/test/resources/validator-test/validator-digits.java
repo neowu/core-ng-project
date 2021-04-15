@@ -1,4 +1,4 @@
-public class BeanValidatorDigitsTest$Bean$Validator implements core.framework.internal.validate.BeanValidator {
+public class BeanValidator$Bean implements core.framework.internal.validate.BeanValidator {
     private void validateBean0(core.framework.internal.validate.BeanValidatorDigitsTest.Bean bean, core.framework.internal.validate.ValidationErrors errors, boolean partial) {
         if (bean.num1 == null) {
         } else {

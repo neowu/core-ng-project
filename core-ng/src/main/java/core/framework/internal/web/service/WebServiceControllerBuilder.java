@@ -31,7 +31,7 @@ public class WebServiceControllerBuilder<T> {
         this.serviceInterface = serviceInterface;
         this.service = service;
         this.method = method;
-        builder = new DynamicInstanceBuilder<>(Controller.class, service.getClass().getCanonicalName() + "$" + method.getName());
+        builder = new DynamicInstanceBuilder<>(Controller.class, service.getClass().getSimpleName() + "$" + method.getName());
     }
 
     public Controller build() {

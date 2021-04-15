@@ -11,7 +11,6 @@ import core.framework.util.Lists;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import static core.framework.internal.asm.Literal.type;
 
@@ -19,7 +18,7 @@ import static core.framework.internal.asm.Literal.type;
  * @author neo
  */
 class InsertQueryBuilder<T> {
-    final DynamicInstanceBuilder<Function<T, Object[]>> builder;
+    final DynamicInstanceBuilder<InsertQueryParamBuilder<T>> builder;
     private final Class<T> entityClass;
     private final List<Field> primaryKeyFields = Lists.newArrayList();
 
@@ -29,14 +28,14 @@ class InsertQueryBuilder<T> {
 
     InsertQueryBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
-        builder = new DynamicInstanceBuilder<>(Function.class, InsertQuery.class.getCanonicalName() + "$" + entityClass.getSimpleName() + "$ParamBuilder");
+        builder = new DynamicInstanceBuilder<>(InsertQueryParamBuilder.class, entityClass.getSimpleName());
     }
 
     InsertQuery<T> build() {
         buildSQL();
 
         builder.addMethod(applyMethod(entityClass, paramFields));
-        Function<T, Object[]> paramBuilder = builder.build();
+        InsertQueryParamBuilder<T> paramBuilder = builder.build();
 
         return new InsertQuery<>(sql, generatedColumn, paramBuilder);
     }
@@ -77,8 +76,8 @@ class InsertQueryBuilder<T> {
         var builder = new CodeBuilder();
 
         String entityClassLiteral = type(entityClass);
-        builder.append("public Object apply(Object value) {\n")
-               .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral);
+        builder.append("public Object[] params(Object value) {\n")
+            .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral);
 
         if (generatedColumn == null) {
             for (Field primaryKeyField : primaryKeyFields) {
@@ -94,7 +93,7 @@ class InsertQueryBuilder<T> {
         }
 
         builder.indent(1).append("return params;\n")
-               .append("}");
+            .append("}");
 
         return builder.build();
     }

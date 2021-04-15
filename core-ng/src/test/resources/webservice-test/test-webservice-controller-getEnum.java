@@ -1,7 +1,7 @@
-public class TestWebServiceImpl$getEnum implements core.framework.web.Controller {
+public class Controller$TestWebServiceImpl$getEnum implements core.framework.web.Controller {
     private final core.framework.internal.web.service.TestWebService delegate;
 
-    public TestWebServiceImpl$getEnum(core.framework.internal.web.service.TestWebService $1) {
+    public Controller$TestWebServiceImpl$getEnum(core.framework.internal.web.service.TestWebService $1) {
         this.delegate = $1;
     }
 

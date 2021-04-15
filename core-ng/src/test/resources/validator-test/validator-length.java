@@ -1,4 +1,4 @@
-public class BeanValidatorStringLengthTest$Bean$Validator implements core.framework.internal.validate.BeanValidator {
+public class BeanValidator$Bean implements core.framework.internal.validate.BeanValidator {
     private void validateBean0(core.framework.internal.validate.BeanValidatorStringLengthTest.Bean bean, core.framework.internal.validate.ValidationErrors errors, boolean partial) {
         if (bean.field1 == null) {
             if (!partial) errors.add("field1", "field must not be null", null);

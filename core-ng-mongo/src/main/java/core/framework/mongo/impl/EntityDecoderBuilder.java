@@ -31,7 +31,7 @@ final class EntityDecoderBuilder<T> {
 
     EntityDecoderBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
-        builder = new DynamicInstanceBuilder<>(EntityDecoder.class, EntityDecoder.class.getCanonicalName() + "$" + entityClass.getSimpleName());
+        builder = new DynamicInstanceBuilder<>(EntityDecoder.class, entityClass.getSimpleName());
     }
 
     EntityDecoder<T> build() {
@@ -53,13 +53,13 @@ final class EntityDecoderBuilder<T> {
         methodName = "decode" + entityClass.getSimpleName() + (index++);
         CodeBuilder builder = new CodeBuilder();
         builder.append("public {} {}(org.bson.BsonReader reader, {} wrapper, String parentField) {\n", type(entityClass), methodName, type(BsonReaderWrapper.class))
-               .indent(1).append("boolean hasContent = wrapper.startReadEntity(parentField);\n")
-               .indent(1).append("if (!hasContent) return null;\n")
-               .indent(1).append("{} entity = new {}();\n", type(entityClass), type(entityClass))
-               .indent(1).append("reader.readStartDocument();\n")
-               .indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n")
-               .indent(2).append("String fieldName = reader.readName();\n")
-               .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
+            .indent(1).append("boolean hasContent = wrapper.startReadEntity(parentField);\n")
+            .indent(1).append("if (!hasContent) return null;\n")
+            .indent(1).append("{} entity = new {}();\n", type(entityClass), type(entityClass))
+            .indent(1).append("reader.readStartDocument();\n")
+            .indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n")
+            .indent(2).append("String fieldName = reader.readName();\n")
+            .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
 
         for (Field field : Classes.instanceFields(entityClass)) {
             builder.indent(2).append("if ({}.equals(fieldName)) {\n", variable(mongoField(field)));
@@ -68,7 +68,7 @@ final class EntityDecoderBuilder<T> {
             builder.indent(3).append("entity.{} = {};\n", field.getName(), variable);
 
             builder.indent(3).append("continue;\n")
-                   .indent(2).append("}\n");
+                .indent(2).append("}\n");
         }
 
         builder.indent(2).append("logger.warn({}, fieldPath, reader.getCurrentBsonType());\n", variable("undefined field, field={}, type={}"));
@@ -99,12 +99,12 @@ final class EntityDecoderBuilder<T> {
         methodName = "decodeMap" + keyClass.getSimpleName() + GenericTypes.rawClass(valueType).getSimpleName() + (index++);
         CodeBuilder builder = new CodeBuilder();
         builder.append("private java.util.Map {}(org.bson.BsonReader reader, {} wrapper, String parentField) {\n", methodName, type(BsonReaderWrapper.class))
-               .indent(1).append("java.util.Map map = wrapper.startReadMap(parentField);\n")
-               .indent(1).append("if (map == null) return null;\n")
-               .indent(1).append("reader.readStartDocument();\n")
-               .indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n")
-               .indent(2).append("String fieldName = reader.readName();\n")
-               .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
+            .indent(1).append("java.util.Map map = wrapper.startReadMap(parentField);\n")
+            .indent(1).append("if (map == null) return null;\n")
+            .indent(1).append("reader.readStartDocument();\n")
+            .indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n")
+            .indent(2).append("String fieldName = reader.readName();\n")
+            .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
 
         String variable = decodeValue(builder, valueType, 2);
 
@@ -118,9 +118,9 @@ final class EntityDecoderBuilder<T> {
         }
 
         builder.indent(1).append("}\n")
-               .indent(1).append("reader.readEndDocument();\n")
-               .indent(1).append("return map;\n")
-               .append('}');
+            .indent(1).append("reader.readEndDocument();\n")
+            .indent(1).append("return map;\n")
+            .append('}');
         this.builder.addMethod(builder.build());
 
         decodeMethods.put(mapType, methodName);
@@ -137,7 +137,7 @@ final class EntityDecoderBuilder<T> {
         CodeBuilder builder = new CodeBuilder();
         builder.append("private java.util.List {}(org.bson.BsonReader reader, {} wrapper, String fieldPath) {\n", methodName, type(BsonReaderWrapper.class));
         builder.indent(1).append("java.util.List list = wrapper.startReadList(fieldPath);\n")
-               .indent(1).append("if (list == null) return null;\n");
+            .indent(1).append("if (list == null) return null;\n");
         builder.indent(1).append("reader.readStartArray();\n");
         builder.indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n");
 

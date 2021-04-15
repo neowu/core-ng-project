@@ -16,8 +16,7 @@
                 }
             }
     </pre>
-* gradle: compatibility for java 16 (still release under java 15 for now)
-  > refer to app.gradle / project.gradle changes if you use java 16
+* internal: refactor to be compatible with java 16 (still release under java 15 for now)
 
 ### 7.6.14 (03/18/2021 - 04/13/2021)
 

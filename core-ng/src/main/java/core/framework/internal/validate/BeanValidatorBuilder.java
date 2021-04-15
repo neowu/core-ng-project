@@ -44,7 +44,7 @@ public class BeanValidatorBuilder {
         validate(beanClass);
         if (Classes.instanceFields(beanClass).stream().noneMatch(this::hasValidationAnnotation)) return null;
 
-        builder = new DynamicInstanceBuilder<>(BeanValidator.class, beanClass.getName() + "$Validator");
+        builder = new DynamicInstanceBuilder<>(BeanValidator.class, beanClass.getSimpleName());
         String method = validateMethod(beanClass, null);
         var code = new CodeBuilder().append("public void validate(Object instance, {} errors, boolean partial) {\n", type(ValidationErrors.class));
         code.indent(1).append("{}(({}) instance, errors, partial);\n", method, type(beanClass));
@@ -93,19 +93,19 @@ public class BeanValidatorBuilder {
         Min min = field.getDeclaredAnnotation(Min.class);
         if (min != null)
             builder.indent(2).append("if (bean.{}.doubleValue() < {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}), \"min\", \"{}\"));\n",
-                    field.getName(), min.value(), pathLiteral, variable(min.message()),
-                    field.getName(), min.value());
+                field.getName(), min.value(), pathLiteral, variable(min.message()),
+                field.getName(), min.value());
         Max max = field.getDeclaredAnnotation(Max.class);
         if (max != null)
             builder.indent(2).append("if (bean.{}.doubleValue() > {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}), \"max\", \"{}\"));\n",
-                    field.getName(), max.value(), pathLiteral, variable(max.message()),
-                    field.getName(), max.value());
+                field.getName(), max.value(), pathLiteral, variable(max.message()),
+                field.getName(), max.value());
         Digits digits = field.getDeclaredAnnotation(Digits.class);
         if (digits != null) {
             int integer = digits.integer();
             int fraction = digits.fraction();
             builder.indent(2).append("{}.validateDigits(bean.{}, {}, {}, {}, {}, errors);\n",
-                    type(ValidatorHelper.class), field.getName(), integer, fraction, variable(digits.message()), pathLiteral);
+                type(ValidatorHelper.class), field.getName(), integer, fraction, variable(digits.message()), pathLiteral);
         }
     }
 
@@ -119,10 +119,10 @@ public class BeanValidatorBuilder {
         if (!isValueClass(valueClass)) {
             String method = validateMethod(valueClass, path(field, parentPath));
             builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.entrySet().iterator(); iterator.hasNext(); ) {\n", field.getName())
-                    .indent(3).append("java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();\n")
-                    .indent(3).append("{} value = ({}) entry.getValue();\n", type(valueClass), type(valueClass))
-                    .indent(3).append("if (value != null) {}(value, errors, partial);\n", method)
-                    .indent(2).append("}\n");
+                .indent(3).append("java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();\n")
+                .indent(3).append("{} value = ({}) entry.getValue();\n", type(valueClass), type(valueClass))
+                .indent(3).append("if (value != null) {}(value, errors, partial);\n", method)
+                .indent(2).append("}\n");
         }
     }
 
@@ -133,9 +133,9 @@ public class BeanValidatorBuilder {
         if (!isValueClass(valueClass)) {
             String method = validateMethod(valueClass, path(field, parentPath));
             builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.iterator(); iterator.hasNext(); ) {\n", field.getName())
-                    .indent(3).append("{} value = ({}) iterator.next();\n", type(valueClass), type(valueClass))
-                    .indent(3).append("if (value != null) {}(value, errors, partial);\n", method)
-                    .indent(2).append("}\n");
+                .indent(3).append("{} value = ({}) iterator.next();\n", type(valueClass), type(valueClass))
+                .indent(3).append("if (value != null) {}(value, errors, partial);\n", method)
+                .indent(2).append("}\n");
         }
     }
 
@@ -151,8 +151,8 @@ public class BeanValidatorBuilder {
             String patternVariable = variable(pattern.value());
             this.builder.addField("private final java.util.regex.Pattern {} = java.util.regex.Pattern.compile({});", patternFieldName, patternVariable);
             builder.indent(2).append("if (!this.{}.matcher(bean.{}).matches()) errors.add({}, {}, java.util.Map.of(\"value\", bean.{}, \"pattern\", {}));\n",
-                    patternFieldName, field.getName(), pathLiteral, variable(pattern.message()),
-                    field.getName(), patternVariable);
+                patternFieldName, field.getName(), pathLiteral, variable(pattern.message()),
+                field.getName(), patternVariable);
         }
     }
 
@@ -163,12 +163,12 @@ public class BeanValidatorBuilder {
             int max = size.max();
             if (min > -1)
                 builder.indent(2).append("if (bean.{}.{}() < {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}.{}()), \"min\", \"{}\", \"max\", \"{}\"));\n",
-                        field.getName(), sizeMethod, min, pathLiteral, variable(size.message()),
-                        field.getName(), sizeMethod, min, max == -1 ? "inf" : max);
+                    field.getName(), sizeMethod, min, pathLiteral, variable(size.message()),
+                    field.getName(), sizeMethod, min, max == -1 ? "inf" : max);
             if (max > -1)
                 builder.indent(2).append("if (bean.{}.{}() > {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}.{}()), \"min\", \"{}\", \"max\", \"{}\"));\n",
-                        field.getName(), sizeMethod, max, pathLiteral, variable(size.message()),
-                        field.getName(), sizeMethod, min == -1 ? "0" : min, max);
+                    field.getName(), sizeMethod, max, pathLiteral, variable(size.message()),
+                    field.getName(), sizeMethod, min == -1 ? "0" : min, max);
         }
     }
 
@@ -194,12 +194,12 @@ public class BeanValidatorBuilder {
 
     private boolean hasValidationAnnotation(Field field) {
         boolean hasAnnotation = field.isAnnotationPresent(Digits.class)
-                || field.isAnnotationPresent(NotNull.class)
-                || field.isAnnotationPresent(NotBlank.class)
-                || field.isAnnotationPresent(Max.class)
-                || field.isAnnotationPresent(Min.class)
-                || field.isAnnotationPresent(Pattern.class)
-                || field.isAnnotationPresent(Size.class);
+                                || field.isAnnotationPresent(NotNull.class)
+                                || field.isAnnotationPresent(NotBlank.class)
+                                || field.isAnnotationPresent(Max.class)
+                                || field.isAnnotationPresent(Min.class)
+                                || field.isAnnotationPresent(Pattern.class)
+                                || field.isAnnotationPresent(Size.class);
         if (hasAnnotation) return true;
 
         Class<?> targetClass = targetValidationClass(field);
@@ -266,14 +266,14 @@ public class BeanValidatorBuilder {
 
     private boolean isValueClass(Class<?> fieldClass) {
         return String.class.equals(fieldClass)
-                || Number.class.isAssignableFrom(fieldClass)
-                || Boolean.class.equals(fieldClass)
-                || LocalDateTime.class.equals(fieldClass)
-                || LocalDate.class.equals(fieldClass)
-                || LocalTime.class.equals(fieldClass)
-                || Instant.class.equals(fieldClass)
-                || ZonedDateTime.class.equals(fieldClass)
-                || fieldClass.isEnum()
-                || "org.bson.types.ObjectId".equals(fieldClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver
+               || Number.class.isAssignableFrom(fieldClass)
+               || Boolean.class.equals(fieldClass)
+               || LocalDateTime.class.equals(fieldClass)
+               || LocalDate.class.equals(fieldClass)
+               || LocalTime.class.equals(fieldClass)
+               || Instant.class.equals(fieldClass)
+               || ZonedDateTime.class.equals(fieldClass)
+               || fieldClass.isEnum()
+               || "org.bson.types.ObjectId".equals(fieldClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver
     }
 }

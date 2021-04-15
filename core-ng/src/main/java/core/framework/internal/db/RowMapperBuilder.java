@@ -25,7 +25,7 @@ final class RowMapperBuilder<T> {
     RowMapperBuilder(Class<T> entityClass, EnumDBMapper enumDBMapper) {
         this.entityClass = entityClass;
         this.enumDBMapper = enumDBMapper;
-        builder = new DynamicInstanceBuilder<>(RowMapper.class, RowMapper.class.getCanonicalName() + "$" + entityClass.getSimpleName());
+        builder = new DynamicInstanceBuilder<>(RowMapper.class, entityClass.getSimpleName());
     }
 
     RowMapper<T> build() {

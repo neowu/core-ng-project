@@ -1,4 +1,4 @@
-public class BeanValidatorNotNullTest$Bean$Validator implements core.framework.internal.validate.BeanValidator {
+public class BeanValidator$Bean implements core.framework.internal.validate.BeanValidator {
     private void validateChild1(core.framework.internal.validate.BeanValidatorNotNullTest.Child bean, core.framework.internal.validate.ValidationErrors errors, boolean partial) {
         if (bean.intField == null) {
             if (!partial) errors.add("child.intField", "intField must not be null", null);
