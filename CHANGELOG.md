@@ -17,7 +17,13 @@
                 }
             }
     </pre>
-* internal: refactor to be compatible with java 16 (still release under java 15 for now)
+* internal: support java 16
+  > still will be released under java 15, runtime can update to java 16 first (build server, app docker base image)
+  > !!! to use adoptopenjdk/openjdk16:alpine-jre, must add following to your Dockerfile, the kafka/snappy lib requires it to load native lib
+  > RUN apk add --no-cache gcompat
+* kafka: update to 2.8.0,
+  > it looks like 2.8.0 client works with 2.7.0 server fine, will test more in beta
+* monitor: add kafka disk used metrics / dashboard
 
 ### 7.6.14 (03/18/2021 - 04/13/2021)
 

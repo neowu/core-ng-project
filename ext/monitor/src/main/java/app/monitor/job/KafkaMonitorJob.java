@@ -21,6 +21,7 @@ import javax.management.openmbean.CompositeData;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 
 import static app.monitor.job.JMXClient.objectName;
 
@@ -33,6 +34,7 @@ public class KafkaMonitorJob implements Job {
     static final ObjectName OLD_GC_BEAN = objectName("java.lang:name=G1 Old Generation,type=GarbageCollector");
     static final ObjectName BYTES_IN_RATE_BEAN = objectName("kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec");
     static final ObjectName BYTES_OUT_RATE_BEAN = objectName("kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec");
+    static final ObjectName LOG_SIZE_BEAN = objectName("kafka.log:type=Log,name=Size,topic=*,partition=*");
 
     private final Logger logger = LoggerFactory.getLogger(KafkaMonitorJob.class);
     private final JMXClient jmxClient;
@@ -94,6 +96,14 @@ public class KafkaMonitorJob implements Job {
 
         stats.put("kafka_bytes_out_rate", (Double) connection.getAttribute(BYTES_OUT_RATE_BEAN, "OneMinuteRate"));
         stats.put("kafka_bytes_in_rate", (Double) connection.getAttribute(BYTES_IN_RATE_BEAN, "OneMinuteRate"));
+
+        long diskUsed = 0;
+        Set<ObjectName> sizeBeans = connection.queryNames(LOG_SIZE_BEAN, null); // return one object bean per topic/partition
+        for (ObjectName sizeBean : sizeBeans) {
+            long size = (Long) connection.getAttribute(sizeBean, "Value");
+            diskUsed += size;
+        }
+        stats.put("kafka_disk_used", diskUsed);
 
         return stats;
     }

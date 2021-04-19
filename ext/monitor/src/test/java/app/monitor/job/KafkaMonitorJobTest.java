@@ -11,9 +11,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.management.JMException;
 import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import java.io.IOException;
+import java.util.Set;
 
+import static app.monitor.job.JMXClient.objectName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -51,12 +54,17 @@ class KafkaMonitorJobTest {
         when(connection.getAttribute(KafkaMonitorJob.YOUNG_GC_BEAN, "CollectionTime")).thenReturn(100L);
         when(connection.getAttribute(KafkaMonitorJob.BYTES_OUT_RATE_BEAN, "OneMinuteRate")).thenReturn(10D);
         when(connection.getAttribute(KafkaMonitorJob.BYTES_IN_RATE_BEAN, "OneMinuteRate")).thenReturn(10D);
+        ObjectName sizeBean = objectName("kafka.log:type=Log,name=Size,topic=product-updated,partition=0");
+        when(connection.queryNames(KafkaMonitorJob.LOG_SIZE_BEAN, null)).thenReturn(Set.of(sizeBean));
+        when(connection.getAttribute(sizeBean, "Value")).thenReturn(1000L);
 
         Stats stats = job.collect(connection);
         assertThat(stats.stats).containsKeys("kafka_heap_used", "kafka_heap_max", "kafka_non_heap_used",
-                "kafka_gc_young_count", "kafka_gc_young_elapsed",
-                "kafka_gc_old_count", "kafka_gc_old_elapsed",
-                "kafka_bytes_out_rate", "kafka_bytes_in_rate");
+            "kafka_gc_young_count", "kafka_gc_young_elapsed",
+            "kafka_gc_old_count", "kafka_gc_old_elapsed",
+            "kafka_bytes_out_rate", "kafka_bytes_in_rate")
+            .containsEntry("kafka_disk_used", 1000.0);
+
     }
 
     @Test
@@ -64,7 +72,7 @@ class KafkaMonitorJobTest {
         when(jmxClient.connect()).thenThrow(new IOException("mock"));
         job.execute(null);
         verify(publisher).publish(argThat(message -> "kafka".equals(message.app)
-                && "ERROR".equals(message.result)
-                && "FAILED_TO_COLLECT".equals(message.errorCode)));
+                                                     && "ERROR".equals(message.result)
+                                                     && "FAILED_TO_COLLECT".equals(message.errorCode)));
     }
 }
