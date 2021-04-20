@@ -13,5 +13,8 @@ end_of_line = crlf
 [*.json]
 indent_size = 2
 
-[*.{less,css}]
+[*.yml]
+indent_size = 2
+
+[*.{less, css}]
 indent_size = 2
