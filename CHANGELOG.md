@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.6.15 (04/13/2021 - )
+### 7.6.15-b1 (04/13/2021 - )
 
 * log-processor: support to forward action-log/event to another kafka for data warehouse sink
   > !!! env vars are now starts with APP_, e.g. APP_KIBANA_URL, APP_KIBANA_BANNER (needs to update existing config)

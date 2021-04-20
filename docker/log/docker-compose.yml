@@ -28,7 +28,7 @@ services:
     depends_on:
     - elasticsearch
   zookeeper:
-    image: zookeeper:3.5.8
+      image: zookeeper:3.5.9
     ports:
     - 2181
     environment:
@@ -38,7 +38,7 @@ services:
     - ZOO_DATA_LOG_DIR=/datalog
     - ZOO_ADMINSERVER_ENABLED=false
   kafka:
-    image: neowu/kafka:2.7.0
+      image: neowu/kafka:2.8.0
     ports:
     - 9092:9092
     - 1099:1099
