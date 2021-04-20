@@ -91,15 +91,14 @@ public class ArchDiagram {
         dot.append("node [style=\"rounded, filled\", fontname=arial, fontsize=17, fontcolor=white];\n");
         dot.append("edge [arrowsize=0.5];\n");
         for (String app : apps()) {
+            if (excludeApps.contains(app)) continue;
             if (app.startsWith("_direct_")) {
                 dot.append("{} [label=\"direct\", shape=point];\n", app);
                 continue;
             }
-            if (!excludeApps.contains(app)) {
-                String color = color(app);
-                String tooltip = tooltip(app);
-                dot.append("{} [label=\"{}\", shape=circle, width=3, color=\"{}\", fillcolor=\"{}\", tooltip=\"{}\"];\n", id(app), app, color, color, tooltip);
-            }
+            String color = color(app);
+            String tooltip = tooltip(app);
+            dot.append("{} [label=\"{}\", shape=circle, width=3, color=\"{}\", fillcolor=\"{}\", tooltip=\"{}\"];\n", id(app), app, color, color, tooltip);
         }
         for (MessageSubscription subscription : messageSubscriptions) {
             dot.append("{} [label=\"{}\", shape=box, color=\"#6C757D\", fillcolor=\"#6C757D\", tooltip=\"{}\"];\n", id(subscription.topic), subscription.topic, tooltip(subscription));
@@ -113,13 +112,15 @@ public class ArchDiagram {
         }
         for (MessageSubscription subscription : messageSubscriptions) {
             for (Map.Entry<String, Long> entry : subscription.publishers.entrySet()) {
-                if (!excludeApps.contains(entry.getKey())) {
-                    dot.append("{} -> {} [color=\"#495057\", style=dashed];\n", id(entry.getKey()), id(subscription.topic));
+                String publisher = entry.getKey();
+                if (!excludeApps.contains(publisher)) {
+                    dot.append("{} -> {} [color=\"#495057\", style=dashed];\n", id(publisher), id(subscription.topic));
                 }
             }
             for (Map.Entry<String, Long> entry : subscription.consumers.entrySet()) {
-                if (!excludeApps.contains(entry.getKey())) {
-                    dot.append("{} -> {} [color=\"#ADB5BD\", style=dashed];\n", id(subscription.topic), id(entry.getKey()));
+                String consumer = entry.getKey();
+                if (!excludeApps.contains(consumer)) {
+                    dot.append("{} -> {} [color=\"#ADB5BD\", style=dashed];\n", id(subscription.topic), id(consumer));
                 }
             }
         }
