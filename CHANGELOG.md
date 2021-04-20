@@ -17,6 +17,9 @@
                 }
             }
     </pre>
+* log-processor: arch diagram supports excludes query param
+  > generally many lines are caused by backend-test-service or regression-test-service, now it can be excluded to simplify diagram
+  > e.g. https://localhost:8443/diagram/arch?excludes=backend-test-service,regression-test-service
 * internal: support java 16
   > still will be released under java 15, runtime can update to java 16 first (build server, app docker base image)
   > !!! to use adoptopenjdk/openjdk16:alpine-jre, must add following to your Dockerfile, the kafka/snappy lib requires it to load native lib

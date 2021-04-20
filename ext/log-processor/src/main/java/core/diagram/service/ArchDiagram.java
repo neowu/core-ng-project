@@ -23,8 +23,8 @@ import java.util.TreeMap;
  */
 public class ArchDiagram {
     private static final List<String> COLOR_PALETTE = List.of(
-            "#F94144", "#F3722C", "#F8961E", "#F9844A", "#F9C74F",
-            "#90BE6D", "#43AA8B", "#4D908E", "#577590", "#277DA1"
+        "#F94144", "#F3722C", "#F8961E", "#F9844A", "#F9C74F",
+        "#90BE6D", "#43AA8B", "#4D908E", "#577590", "#277DA1"
     );
     // grey palette: "#E9ECEF", "#DEE2E6", "#CED4DA", "#ADB5BD", "#6C757D", "#495057"
 
@@ -32,6 +32,11 @@ public class ArchDiagram {
     private final List<MessageSubscription> messageSubscriptions = new ArrayList<>();
     private final Map<String, Scheduler> schedulers = new HashMap<>();
     private final Map<String, String> colors = new HashMap<>();
+    private final Set<String> excludeApps;
+
+    public ArchDiagram(Set<String> excludeApps) {
+        this.excludeApps = excludeApps;
+    }
 
     public void load(SearchResponse<ActionDocument> response) {
         List<? extends Terms.Bucket> apps = ((ParsedTerms) response.aggregations.get("app")).getBuckets();
@@ -90,23 +95,32 @@ public class ArchDiagram {
                 dot.append("{} [label=\"direct\", shape=point];\n", app);
                 continue;
             }
-            String color = color(app);
-            String tooltip = tooltip(app);
-            dot.append("{} [label=\"{}\", shape=circle, width=3, color=\"{}\", fillcolor=\"{}\", tooltip=\"{}\"];\n", id(app), app, color, color, tooltip);
+            if (!excludeApps.contains(app)) {
+                String color = color(app);
+                String tooltip = tooltip(app);
+                dot.append("{} [label=\"{}\", shape=circle, width=3, color=\"{}\", fillcolor=\"{}\", tooltip=\"{}\"];\n", id(app), app, color, color, tooltip);
+            }
         }
         for (MessageSubscription subscription : messageSubscriptions) {
             dot.append("{} [label=\"{}\", shape=box, color=\"#6C757D\", fillcolor=\"#6C757D\", tooltip=\"{}\"];\n", id(subscription.topic), subscription.topic, tooltip(subscription));
         }
         for (APIDependency dependency : apiDependencies) {
-            String tooltip = tooltip(dependency);
-            dot.append("{} -> {} [color=\"{}\", weight=5, penwidth=2, tooltip=\"{}\"];\n", id(dependency.client), id(dependency.service), colors.get(dependency.client), tooltip);
+            if (!excludeApps.contains(dependency.client) && !excludeApps.contains(dependency.service)) {
+                String tooltip = tooltip(dependency);
+                dot.append("{} -> {} [color=\"{}\", weight=5, penwidth=2, tooltip=\"{}\"];\n", id(dependency.client), id(dependency.service), colors.get(dependency.client), tooltip);
+            }
+
         }
         for (MessageSubscription subscription : messageSubscriptions) {
             for (Map.Entry<String, Long> entry : subscription.publishers.entrySet()) {
-                dot.append("{} -> {} [color=\"#495057\", style=dashed];\n", id(entry.getKey()), id(subscription.topic));
+                if (!excludeApps.contains(entry.getKey())) {
+                    dot.append("{} -> {} [color=\"#495057\", style=dashed];\n", id(entry.getKey()), id(subscription.topic));
+                }
             }
             for (Map.Entry<String, Long> entry : subscription.consumers.entrySet()) {
-                dot.append("{} -> {} [color=\"#ADB5BD\", style=dashed];\n", id(subscription.topic), id(entry.getKey()));
+                if (!excludeApps.contains(entry.getKey())) {
+                    dot.append("{} -> {} [color=\"#ADB5BD\", style=dashed];\n", id(subscription.topic), id(entry.getKey()));
+                }
             }
         }
         dot.append("}\n");
@@ -192,8 +206,8 @@ public class ArchDiagram {
         dependency.calls.sort(Comparator.comparing(call -> call.uri));
         var builder = new StringBuilder(512);
         builder.append("<table>\n<caption>").append(dependency.client.startsWith("_direct_") ? "direct" : dependency.client)
-                .append(" > ")
-                .append(dependency.service).append("</caption>\n<tr><td colspan=3 class=section>api calls</td><tr>\n");
+            .append(" > ")
+            .append(dependency.service).append("</caption>\n<tr><td colspan=3 class=section>api calls</td><tr>\n");
         for (APICall call : dependency.calls) {
             builder.append("<tr><td>").append(call.method).append("</td><td>").append(call.uri).append("</td><td>").append(call.count).append("</td></tr>\n");
         }
