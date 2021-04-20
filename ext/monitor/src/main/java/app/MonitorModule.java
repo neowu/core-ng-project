@@ -87,6 +87,7 @@ public class MonitorModule extends Module {
             for (String host : kafkaConfig.hosts) {
                 var job = new KafkaMonitorJob(new JMXClient(host), app, host, publisher);
                 job.highHeapUsageThreshold = kafkaConfig.highHeapUsageThreshold;
+                job.highDiskSizeThreshold = kafkaConfig.highDiskSizeThreshold;
                 schedule().fixedRate("monitor:kafka:" + host, job, Duration.ofSeconds(10));
             }
         }

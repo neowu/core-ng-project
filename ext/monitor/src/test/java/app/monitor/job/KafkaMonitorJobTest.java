@@ -64,7 +64,6 @@ class KafkaMonitorJobTest {
             "kafka_gc_old_count", "kafka_gc_old_elapsed",
             "kafka_bytes_out_rate", "kafka_bytes_in_rate")
             .containsEntry("kafka_disk_used", 1000.0);
-
     }
 
     @Test

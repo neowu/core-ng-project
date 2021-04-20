@@ -15,7 +15,8 @@
   "kafka": {
     "log": {
       "hosts": ["log-kafka-0.log-kafka"],
-      "highHeapUsageThreshold": 0.7
+      "highHeapUsageThreshold": 0.7,
+      "highDiskSizeThreshold": 50000000000
     }
   },
   "kube": {

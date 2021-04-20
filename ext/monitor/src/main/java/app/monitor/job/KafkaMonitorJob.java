@@ -44,6 +44,7 @@ public class KafkaMonitorJob implements Job {
     private final GCStat youngGCStats = new GCStat("young");
     private final GCStat oldGCStats = new GCStat("old");
     public double highHeapUsageThreshold;
+    public long highDiskSizeThreshold;
 
     public KafkaMonitorJob(JMXClient jmxClient, String app, String host, MessagePublisher<StatMessage> publisher) {
         this.jmxClient = jmxClient;
@@ -80,6 +81,8 @@ public class KafkaMonitorJob implements Job {
     Stats collect(MBeanServerConnection connection) throws JMException, IOException {
         var stats = new Stats();
 
+        collectDiskUsage(stats, connection);    // disk usage is most important to check, if disk usage is high, requires to expand disk immediately
+
         CompositeData heap = (CompositeData) connection.getAttribute(MEMORY_BEAN, "HeapMemoryUsage");
         double heapUsed = (Long) heap.get("used");
         stats.put("kafka_heap_used", heapUsed);
@@ -97,6 +100,10 @@ public class KafkaMonitorJob implements Job {
         stats.put("kafka_bytes_out_rate", (Double) connection.getAttribute(BYTES_OUT_RATE_BEAN, "OneMinuteRate"));
         stats.put("kafka_bytes_in_rate", (Double) connection.getAttribute(BYTES_IN_RATE_BEAN, "OneMinuteRate"));
 
+        return stats;
+    }
+
+    private void collectDiskUsage(Stats stats, MBeanServerConnection connection) throws IOException, MBeanException, AttributeNotFoundException, InstanceNotFoundException, ReflectionException {
         long diskUsed = 0;
         Set<ObjectName> sizeBeans = connection.queryNames(LOG_SIZE_BEAN, null); // return one object bean per topic/partition
         for (ObjectName sizeBean : sizeBeans) {
@@ -104,8 +111,7 @@ public class KafkaMonitorJob implements Job {
             diskUsed += size;
         }
         stats.put("kafka_disk_used", diskUsed);
-
-        return stats;
+        stats.checkHighUsage(diskUsed, highDiskSizeThreshold, "disk");
     }
 
     private void collectGCStats(Stats stats, MBeanServerConnection connection, GCStat gcStats, ObjectName gcBean) throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException, IOException {

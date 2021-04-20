@@ -23,7 +23,9 @@
   > RUN apk add --no-cache gcompat
 * kafka: update to 2.8.0,
   > it looks like 2.8.0 client works with 2.7.0 server fine, will test more in beta
-* monitor: add kafka disk used metrics / dashboard
+* monitor: add kafka used disk metrics / dashboard, alert
+  > added "highDiskSizeThreshold" in kafka monitor config, use absolute size, not percentage
+  > refer to ext/monitor/src/test/resources/monitor.json to example config
 
 ### 7.6.14 (03/18/2021 - 04/13/2021)
 
