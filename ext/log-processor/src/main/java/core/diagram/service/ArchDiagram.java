@@ -46,6 +46,8 @@ public class ArchDiagram {
     }
 
     private void load(String app, List<? extends Terms.Bucket> actions) {
+        if (excludeApps.contains(app)) return;
+
         for (Terms.Bucket actionBucket : actions) {
             String action = actionBucket.getKeyAsString();
             long totalCount = actionBucket.getDocCount();
@@ -104,7 +106,7 @@ public class ArchDiagram {
             dot.append("{} [label=\"{}\", shape=box, color=\"#6C757D\", fillcolor=\"#6C757D\", tooltip=\"{}\"];\n", id(subscription.topic), subscription.topic, tooltip(subscription));
         }
         for (APIDependency dependency : apiDependencies) {
-            if (!excludeApps.contains(dependency.client) && !excludeApps.contains(dependency.service)) {
+            if (!excludeApps.contains(dependency.client)) {     // excluded services are filtered on loading
                 String tooltip = tooltip(dependency);
                 dot.append("{} -> {} [color=\"{}\", weight=5, penwidth=2, tooltip=\"{}\"];\n", id(dependency.client), id(dependency.service), colors.get(dependency.client), tooltip);
             }
@@ -117,11 +119,8 @@ public class ArchDiagram {
                     dot.append("{} -> {} [color=\"#495057\", style=dashed];\n", id(publisher), id(subscription.topic));
                 }
             }
-            for (Map.Entry<String, Long> entry : subscription.consumers.entrySet()) {
-                String consumer = entry.getKey();
-                if (!excludeApps.contains(consumer)) {
-                    dot.append("{} -> {} [color=\"#ADB5BD\", style=dashed];\n", id(subscription.topic), id(consumer));
-                }
+            for (Map.Entry<String, Long> entry : subscription.consumers.entrySet()) {   // excluded consumers are filtered on loading
+                dot.append("{} -> {} [color=\"#ADB5BD\", style=dashed];\n", id(subscription.topic), id(entry.getKey()));
             }
         }
         dot.append("}\n");
