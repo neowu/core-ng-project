@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.6.15-b1 (04/13/2021 - )
+### 7.6.15 (04/13/2021 - 04/25/2021)
 
 * log-processor: support to forward action-log/event to another kafka for data warehouse sink
   > !!! env vars are now starts with APP_, e.g. APP_KIBANA_URL, APP_KIBANA_BANNER (needs to update existing config)
@@ -24,8 +24,9 @@
   > still will be released under java 15, runtime can update to java 16 first (build server, app docker base image)
   > !!! to use adoptopenjdk/openjdk16:alpine-jre, must add following to your Dockerfile, the kafka/snappy lib requires it to load native lib
   > RUN apk add --no-cache gcompat
-* kafka: update to 2.8.0,
+* kafka: update to 2.8.0
   > it looks like 2.8.0 client works fine with 2.7.0 broker, will test more in beta
+  > in docker/kafka docker compose, it shows kafka kraft preview usage, kafka without zookeeper
 * monitor: add kafka used disk metrics / dashboard, alert
   > added "highDiskSizeThreshold" in kafka monitor config, use absolute size, not percentage
   > refer to ext/monitor/src/test/resources/monitor.json to example config
