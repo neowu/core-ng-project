@@ -1,4 +1,4 @@
-package core.framework.internal.web.management;
+package core.framework.internal.web.sys;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.internal.cache.CacheImpl;

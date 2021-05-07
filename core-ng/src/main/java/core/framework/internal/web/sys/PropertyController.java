@@ -1,4 +1,4 @@
-package core.framework.internal.web.management;
+package core.framework.internal.web.sys;
 
 import core.framework.internal.module.PropertyManager;
 import core.framework.internal.web.http.IPv4AccessControl;

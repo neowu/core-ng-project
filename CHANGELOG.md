@@ -1,5 +1,11 @@
 ## Change log
 
+### 7.6.16-b0 (04/26/2021 - )
+
+* api: created /_sys/api/v2, to expose more structured api info
+  > one purpose is to create api monitoring, to alert if api breaks backward compatibility
+  > will update example script to generate ts api, refer to frontend-demo-project
+
 ### 7.6.15 (04/13/2021 - 04/25/2021)
 
 * log-processor: support to forward action-log/event to another kafka for data warehouse sink
@@ -25,7 +31,7 @@
   > !!! to use adoptopenjdk/openjdk16:alpine-jre, must add following to your Dockerfile, the kafka/snappy lib requires it to load native lib
   > RUN apk add --no-cache gcompat
 * kafka: update to 2.8.0
-  > it looks like 2.8.0 client works fine with 2.7.0 broker, will test more in beta
+  > 2.8.0 client works fine with 2.7.0 broker
   > in docker/kafka docker compose, it shows kafka kraft preview usage, kafka without zookeeper
 * monitor: add kafka used disk metrics / dashboard, alert
   > added "highDiskSizeThreshold" in kafka monitor config, use absolute size, not percentage

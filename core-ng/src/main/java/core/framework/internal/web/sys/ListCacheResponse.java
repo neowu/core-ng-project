@@ -1,4 +1,4 @@
-package core.framework.internal.web.management;
+package core.framework.internal.web.sys;
 
 import core.framework.api.json.Property;
 
