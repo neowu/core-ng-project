@@ -34,7 +34,6 @@ class APIDefinitionBuilderTest {
     @Test
     void buildV2() {
         APIDefinitionV2Response response = builderV2.build();
-        System.out.println(JSON.toJSON(response));
         APIDefinitionV2Response expectedResponse = JSON.fromJSON(APIDefinitionV2Response.class, ClasspathResources.text("api-test/test-webservice-v2.json"));
         assertThat(response).usingRecursiveComparison().isEqualTo(expectedResponse);
     }
