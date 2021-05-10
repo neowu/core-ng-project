@@ -4,7 +4,7 @@
       "name": "TestWebService",
       "operations": [
         {"name": "deprecated", "method": "GET", "path": "/deprecated/test/:id", "pathParams": [{"name": "id", "type": "Integer"}], "requestType": null, "responseType": "TestWebService$TestResponse", "optional": true, "deprecated": true},
-        {"name": "search", "method": "GET", "path": "/test", "pathParams": null, "requestType": "TestWebService$TestSearchRequest", "responseType": "TestWebService$TestResponse", "optional": false, "deprecated": false},
+        {"name": "search", "method": "GET", "path": "/test", "pathParams": [], "requestType": "TestWebService$TestSearchRequest", "responseType": "TestWebService$TestResponse", "optional": false, "deprecated": false},
         {"name": "get", "method": "GET", "path": "/test/:id", "pathParams": [{"name": "id", "type": "Integer"}], "requestType": null, "responseType": "TestWebService$TestResponse", "optional": true, "deprecated": false},
         {"name": "create", "method": "PUT", "path": "/test/:id", "pathParams": [{"name": "id", "type": "Integer"}], "requestType": "TestWebService$TestRequest", "responseType": "void", "optional": false, "deprecated": false},
         {"name": "delete", "method": "DELETE", "path": "/test/:id", "pathParams": [{"name": "id", "type": "String"}], "requestType": null, "responseType": "void", "optional": false, "deprecated": false},

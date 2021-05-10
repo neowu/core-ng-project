@@ -102,7 +102,6 @@ public class APIDefinitionV2Builder {
             var type = parseType(paramTypes[i]);
             PathParam pathParam = Params.annotation(annotations[i], PathParam.class);
             if (pathParam != null) {
-                if (operation.pathParams == null) operation.pathParams = new ArrayList<>();
                 var param = new APIDefinitionV2Response.PathParam();
                 param.name = pathParam.value();
                 param.type = type.type; // path param type must be simple type

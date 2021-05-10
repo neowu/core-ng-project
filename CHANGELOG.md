@@ -2,9 +2,9 @@
 
 ### 7.6.16-b0 (04/26/2021 - )
 
-* api: created /_sys/api/v2, to expose more structured api info
+* api: created /_sys/api/v2, to expose more structured api info, (since it's for manual dev process, will replace /_sys/api when releasing 7.6.16)
   > one purpose is to create api monitoring, to alert if api breaks backward compatibility
-  > will update example script to generate ts api, refer to frontend-demo-project
+  > for ts client code generator, refer to https://github.com/neowu/frontend-demo-project/blob/master/website-frontend/webpack/api.js
 
 ### 7.6.15 (04/13/2021 - 04/25/2021)
 

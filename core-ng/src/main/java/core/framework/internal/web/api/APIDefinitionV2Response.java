@@ -2,6 +2,7 @@ package core.framework.internal.web.api;
 
 import core.framework.api.json.Property;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public class APIDefinitionV2Response {
         public String path;
 
         @Property(name = "pathParams")
-        public List<PathParam> pathParams;
+        public List<PathParam> pathParams = new ArrayList<>();
 
         @Property(name = "requestType")
         public String requestType;
