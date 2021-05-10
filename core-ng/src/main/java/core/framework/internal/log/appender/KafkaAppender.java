@@ -3,6 +3,7 @@ package core.framework.internal.log.appender;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.kafka.KafkaURI;
 import core.framework.internal.kafka.ProducerMetrics;
+import core.framework.log.LogAppender;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.log.message.StatMessage;

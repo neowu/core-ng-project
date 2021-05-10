@@ -22,7 +22,7 @@ class UpdateQueryBuilder<T> {
 
     UpdateQueryBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
-        builder = new DynamicInstanceBuilder<>(UpdateQuery.class, UpdateQueryBuilder.class.getCanonicalName() + "$" + entityClass.getSimpleName());
+        builder = new DynamicInstanceBuilder<>(UpdateQuery.class, entityClass.getSimpleName());
     }
 
     UpdateQuery<T> build() {
@@ -44,7 +44,7 @@ class UpdateQueryBuilder<T> {
         var builder = new CodeBuilder();
         String entityClassLiteral = type(entityClass);
         builder.append("public {} update(Object value, boolean partial) {\n", type(UpdateQuery.Statement.class))
-               .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral);
+            .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral);
 
         for (Field primaryKeyField : primaryKeyFields) {
             builder.indent(1).append("if (entity.{} == null) throw new Error(\"primary key must not be null, field={}\");\n", primaryKeyField.getName(), primaryKeyField.getName());
@@ -55,11 +55,11 @@ class UpdateQueryBuilder<T> {
 
         for (Field field : columnFields) {
             builder.indent(1).append("if (!partial || entity.{} != null) {\n", field.getName())
-                   .indent(2).append("if (index > 0) sql.append(\", \");\n")
-                   .indent(2).append("sql.append(\"{} = ?\");\n", field.getDeclaredAnnotation(Column.class).name())
-                   .indent(2).append("params.add(entity.{});\n", field.getName())
-                   .indent(2).append("index++;\n")
-                   .indent(1).append("}\n");
+                .indent(2).append("if (index > 0) sql.append(\", \");\n")
+                .indent(2).append("sql.append(\"{} = ?\");\n", field.getDeclaredAnnotation(Column.class).name())
+                .indent(2).append("params.add(entity.{});\n", field.getName())
+                .indent(2).append("index++;\n")
+                .indent(1).append("}\n");
         }
 
         builder.indent(1).append("sql.append(\"");
@@ -80,7 +80,7 @@ class UpdateQueryBuilder<T> {
         }
 
         builder.indent(1).append("return new {}(sql.toString(), params.toArray());\n", type(UpdateQuery.Statement.class))
-               .append("}");
+            .append("}");
         return builder.build();
     }
 }

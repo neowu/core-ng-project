@@ -1,24 +1,34 @@
 version: "3"
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
     ports:
     - 9200:9200
     environment:
     - cluster.name=log
     - discovery.type=single-node
     - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    - xpack.security.enabled=false
   kibana:
-    image: docker.elastic.co/kibana/kibana-oss:7.10.2
+    image: docker.elastic.co/kibana/kibana:7.12.0
     ports:
     - 5601:5601
     environment:
     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     - TELEMETRY_ENABLED=false
+    - MONITORING_ENABLED=false
+    - ENTERPRISESEARCH_ENABLED=false
+    - XPACK_LICENSE_MANAGEMENT_ENABLED=false
+    - XPACK_ROLLUP_ENABLED=false
+    - XPACK_APM_ENABLED=false
+    - XPACK_REPORTING_ENABLED=false
+    - XPACK_GRAPH_ENABLED=false
+    - XPACK_MAPS_ENABLED=false
+    - XPACK_ML_ENABLED=false
     depends_on:
     - elasticsearch
   zookeeper:
-    image: zookeeper:3.5.8
+    image: zookeeper:3.5.9
     ports:
     - 2181
     environment:
@@ -28,7 +38,7 @@ services:
     - ZOO_DATA_LOG_DIR=/datalog
     - ZOO_ADMINSERVER_ENABLED=false
   kafka:
-    image: neowu/kafka:2.7.0
+    image: neowu/kafka:2.8.0
     ports:
     - 9092:9092
     - 1099:1099
@@ -39,18 +49,18 @@ services:
     depends_on:
     - zookeeper
   log-processor:
-    image: neowu/log-processor:7.6.9
+    image: neowu/log-processor:7.6.15
     environment:
     - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092
     - SYS_ELASTICSEARCH_HOST=elasticsearch
-    - KIBANA_URL=http://kibana:5601
-    - KIBANA_BANNER=# local
+    - APP_KIBANA_URL=http://kibana:5601
+    - APP_KIBANA_BANNER=# local
     depends_on:
     - kafka
     - elasticsearch
   log-collector:
-    image: neowu/log-collector:7.6.9
+    image: neowu/log-collector:7.6.15
     environment:
     - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092

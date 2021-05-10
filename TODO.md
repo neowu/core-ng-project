@@ -9,11 +9,10 @@
 
 * /_sys/, kafka controller, should call message handler directly?
 * revisit trace log truncation, better/more elegant handling?
-* monitor to collect api/db definition overtime and compare to check backaward compability?
-* way to expose service structure/dependency diagram?
+* monitor to collect api/db definition overtime and compare to check backward compatibility?
+* action visualization to show service flow/dependency diagram?
 
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled
-* class in interface module generates Validator make interface depends on core-ng module (java module)
 
 * redis using ping/pong to validate connection? for zero downtime upgrading e.g. with gcloud memory store
 * put maxProcessTime/remainingProcessTime in action.stats? (seems not important)

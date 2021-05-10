@@ -2,6 +2,7 @@ package core.log.kafka;
 
 import core.framework.kafka.Message;
 import core.framework.log.message.EventMessage;
+import core.log.service.EventForwarder;
 import core.log.service.EventService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,12 +22,14 @@ import static org.mockito.Mockito.verify;
 class EventMessageHandlerTest {
     @Mock
     EventService eventService;
+    @Mock
+    EventForwarder forwarder;
 
     private EventMessageHandler handler;
 
     @BeforeEach
     void createEventMessageHandler() {
-        handler = new EventMessageHandler();
+        handler = new EventMessageHandler(forwarder);
         handler.eventService = eventService;
     }
 
@@ -36,5 +39,6 @@ class EventMessageHandlerTest {
         handler.handle(messages);
 
         verify(eventService).index(argThat((List<EventMessage> values) -> values.size() == 2));
+        verify(forwarder).forward(argThat((List<EventMessage> values) -> values.size() == 2));
     }
 }

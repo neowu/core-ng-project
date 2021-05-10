@@ -66,6 +66,8 @@ public abstract class App extends Module {
         // free static objects not used anymore
         Validator.cleanup();
         JSONMapper.cleanup();
-        DynamicInstanceBuilder.cleanup();
+        if (!context.httpServer.siteManager.webDirectory.localEnv) {    // for local env, it may rebuild html template at runtime
+            DynamicInstanceBuilder.cleanup();
+        }
     }
 }

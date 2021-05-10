@@ -31,7 +31,7 @@ public class WebServiceClientBuilder<T> {
     public WebServiceClientBuilder(Class<T> serviceInterface, WebServiceClient client) {
         this.serviceInterface = serviceInterface;
         this.client = client;
-        builder = new DynamicInstanceBuilder<>(serviceInterface, serviceInterface.getCanonicalName() + "$Client");
+        builder = new DynamicInstanceBuilder<>(serviceInterface, "Client");
     }
 
     public T build() {
@@ -54,8 +54,8 @@ public class WebServiceClientBuilder<T> {
     private String buildInterceptMethod() {
         var builder = new CodeBuilder();
         builder.append("public void intercept({} interceptor) {\n", type(WebServiceClientInterceptor.class))
-                .indent(1).append("client.intercept(interceptor);\n")
-                .append("}");
+            .indent(1).append("client.intercept(interceptor);\n")
+            .append("}");
         return builder.build();
     }
 
@@ -115,7 +115,7 @@ public class WebServiceClientBuilder<T> {
                 int variableEnd = path.indexOf('/', variableStart);
                 if (variableEnd < 0) variableEnd = path.length();
                 builder.indent(1).append("builder.append({}).append({}.toString(param{}));\n", variable(path.substring(currentIndex, variableStart)),
-                        type(PathParamHelper.class), pathParamIndexes.get(path.substring(variableStart + 1, variableEnd)));
+                    type(PathParamHelper.class), pathParamIndexes.get(path.substring(variableStart + 1, variableEnd)));
                 currentIndex = variableEnd;
             }
             if (currentIndex < path.length()) {

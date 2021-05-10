@@ -28,7 +28,7 @@ class QueryParamReaderBuilder<T> {
     }
 
     public QueryParamReader<T> build() {
-        builder = new DynamicInstanceBuilder<>(QueryParamReader.class, QueryParamReader.class.getCanonicalName() + "$" + beanClass.getSimpleName());
+        builder = new DynamicInstanceBuilder<>(QueryParamReader.class, beanClass.getSimpleName());
         builder.addMethod(fromParamsMethod());
         return builder.build();
     }

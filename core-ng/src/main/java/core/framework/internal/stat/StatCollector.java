@@ -3,7 +3,6 @@ package core.framework.internal.stat;
 import com.sun.management.OperatingSystemMXBean;
 import core.framework.util.Files;
 import core.framework.util.Lists;
-import kotlin.text.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +11,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.ThreadMXBean;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,14 +64,14 @@ public class StatCollector {
     public void collectMemoryUsage(Stats stats) {
         if (!supportMemoryTracking) return;
 
-        var content = new String(Files.bytes(procPath), Charsets.US_ASCII);
+        var content = new String(Files.bytes(procPath), StandardCharsets.US_ASCII);
         double vmRSS = parseVmRSS(content);
         stats.put("vm_rss", vmRSS);
         double maxMemory = os.getTotalMemorySize();
         stats.put("mem_max", maxMemory);
         boolean highUsage = stats.checkHighUsage(vmRSS / maxMemory, highMemUsageThreshold, "mem");
         if (highUsage) {
-            stats.info("proc_status", new String(Files.bytes(Path.of("/proc/self/status")), Charsets.US_ASCII));
+            stats.info("proc_status", new String(Files.bytes(Path.of("/proc/self/status")), StandardCharsets.US_ASCII));
             stats.info("native_memory", Diagnostic.nativeMemory());
         }
     }

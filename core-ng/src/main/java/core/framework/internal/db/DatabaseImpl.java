@@ -9,6 +9,7 @@ import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
 import core.framework.internal.resource.Pool;
 import core.framework.log.ActionLogContext;
+import core.framework.util.ASCII;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -283,9 +284,22 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    private void validateAsterisk(String sql) {
-        if (sql.indexOf('*') != -1)
-            throw new Error("sql must not contain asterisk(*), please only select columns needed, sql=" + sql);
+    void validateAsterisk(String sql) {
+        int index = sql.indexOf('*');
+        while (index > -1) {   // check whether it's wildcard or multiply operator
+            int length = sql.length();
+            char ch = 0;
+            index++;
+            for (; index < length; index++) {
+                ch = sql.charAt(index);
+                if (ch != ' ') break;   // seek to next non-whitespace
+            }
+            if (ch == ','
+                    || index == length  // sql ends with *
+                    || index + 4 <= length && ASCII.toUpperCase(ch) == 'F' && "FROM".equals(ASCII.toUpperCase(sql.substring(index, index + 4))))
+                throw new Error("sql must not contain wildcard(*), please only select columns needed, sql=" + sql);
+            index = sql.indexOf('*', index + 1);
+        }
     }
 
     // by this way, it also disallows functions with string values, e.g. IFNULL(column, 'value'), but it usually can be prevented by different design,

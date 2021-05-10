@@ -1,23 +1,21 @@
 package core.framework.internal.db;
 
-import java.util.function.Function;
-
 /**
  * @author neo
  */
 final class InsertQuery<T> {
     final String sql;
     final String generatedColumn;
-    private final Function<T, Object[]> paramBuilder;
+    private final InsertQueryParamBuilder<T> paramBuilder;
 
-    InsertQuery(String sql, String generatedColumn, Function<T, Object[]> paramBuilder) {
+    InsertQuery(String sql, String generatedColumn, InsertQueryParamBuilder<T> paramBuilder) {
         this.sql = sql;
         this.generatedColumn = generatedColumn;
         this.paramBuilder = paramBuilder;
     }
 
     Object[] params(T entity) {
-        return paramBuilder.apply(entity);
+        return paramBuilder.params(entity);
     }
 
     String insertIgnoreSQL() {

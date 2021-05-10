@@ -21,7 +21,7 @@ final class EntityIdHandlerBuilder<T> {
     EntityIdHandlerBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
         idField = idField();
-        builder = new DynamicInstanceBuilder<>(EntityIdHandler.class, EntityIdHandler.class.getCanonicalName() + "$" + entityClass.getSimpleName());
+        builder = new DynamicInstanceBuilder<>(EntityIdHandler.class, entityClass.getSimpleName());
     }
 
     EntityIdHandler<T> build() {
@@ -41,26 +41,26 @@ final class EntityIdHandlerBuilder<T> {
     private String buildGenerateIdIfAbsentMethod() {
         var builder = new CodeBuilder();
         builder.append("public boolean generateIdIfAbsent() {\n")
-                .indent(1).append("return {};\n", ObjectId.class.equals(idField.getType()) ? "true" : "false")
-                .append("}");
+            .indent(1).append("return {};\n", ObjectId.class.equals(idField.getType()) ? "true" : "false")
+            .append("}");
         return builder.build();
     }
 
     private String buildGetMethod() {
         var builder = new CodeBuilder();
         builder.append("public Object get(Object value) {\n")
-                .indent(1).append("{} entity = ({}) value;\n", type(entityClass), type(entityClass))
-                .indent(1).append("return entity.{};\n", idField.getName())
-                .append("}");
+            .indent(1).append("{} entity = ({}) value;\n", type(entityClass), type(entityClass))
+            .indent(1).append("return entity.{};\n", idField.getName())
+            .append("}");
         return builder.build();
     }
 
     private String buildSetMethod() {
         var builder = new CodeBuilder();
         builder.append("public void set(Object value, Object id) {\n")
-                .indent(1).append("{} entity = ({}) value;\n", type(entityClass), type(entityClass))
-                .indent(1).append("entity.{} = ({}) id;\n", idField.getName(), type(idField.getType()))
-                .append("}");
+            .indent(1).append("{} entity = ({}) value;\n", type(entityClass), type(entityClass))
+            .indent(1).append("entity.{} = ({}) id;\n", idField.getName(), type(idField.getType()))
+            .append("}");
         return builder.build();
     }
 }

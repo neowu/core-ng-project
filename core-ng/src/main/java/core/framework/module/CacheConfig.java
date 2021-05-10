@@ -17,7 +17,7 @@ import core.framework.internal.redis.RedisHost;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.redis.RedisSubscribeThread;
 import core.framework.internal.resource.PoolMetrics;
-import core.framework.internal.web.management.CacheController;
+import core.framework.internal.web.sys.CacheController;
 import core.framework.util.ASCII;
 import core.framework.util.Types;
 import org.slf4j.Logger;

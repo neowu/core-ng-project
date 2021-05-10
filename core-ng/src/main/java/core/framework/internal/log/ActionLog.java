@@ -1,5 +1,6 @@
 package core.framework.internal.log;
 
+import core.framework.log.Markers;
 import core.framework.util.Strings;
 
 import java.lang.management.ManagementFactory;
@@ -14,7 +15,6 @@ import java.util.Map;
 
 import static core.framework.internal.log.LogLevel.DEBUG;
 import static core.framework.internal.log.LogLevel.WARN;
-import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -133,10 +133,12 @@ public final class ActionLog {
         for (Object value : values) {
             String contextValue = String.valueOf(value);
             if (contextValue.length() > MAX_CONTEXT_VALUE_LENGTH) { // prevent application code from putting large blob as context, e.g. xml or json response
-                throw new Error(format("context value is too long, key={}, value={}...(truncated)", key, contextValue.substring(0, MAX_CONTEXT_VALUE_LENGTH)));
+                // use new Error() to print calling stack
+                process(new LogEvent(LOGGER, Markers.errorCode("CONTEXT_TOO_LONG"), WARN, "context value is too long, key={}, value={}", new Object[]{key, contextValue}, new Error("context value is too long")));
+            } else {
+                contextValues.add(contextValue);
+                add(event("[context] {}={}", key, contextValue));
             }
-            contextValues.add(contextValue);
-            add(event("[context] {}={}", key, contextValue));
         }
     }
 

@@ -1,0 +1,90 @@
+<!doctype html>
+<html xmlns:c="http://www.w3.org/1999/xhtml">
+<head>
+    <title c:text="title"></title>
+    <style>
+        svg {
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        #tooltip {
+            font-family: arial, sans-serif;
+            white-space: nowrap;
+            padding: 5px;
+            position: fixed;
+            overflow-y: scroll;
+            left: 0;
+            top: 0;
+            max-height: 90vh;
+            border-radius: 5px;
+            background: #ADB5BD;
+            opacity: 0.9;
+            z-index: 2;
+            visibility: hidden;
+        }
+
+        #tooltip > table {
+            min-width: 300px;
+        }
+
+        #tooltip td {
+            padding: 0 3px 0
+        }
+
+        #tooltip .section {
+            border-radius: 5px;
+            background: #6C757D;
+        }
+    </style>
+</head>
+<body>
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src="https://unpkg.com/@hpcc-js/wasm/dist/index.min.js" type="application/javascript"></script>
+<script src="https://unpkg.com/d3-graphviz@4.0.0/build/d3-graphviz.js"></script>
+<script c:html="dot" id="dot" type="text/plain"></script>
+<div id="tooltip"></div>
+<div id="graph"></div>
+<script>
+    const graphviz = d3.select("#graph").graphviz();
+    const tooltipDiv = d3.select("#tooltip")
+
+    let selected = null;
+    let selectedStyle = {};
+
+    function render(dot) {
+        graphviz.renderDot(dot)
+            .on("end", () => {
+                d3.selectAll(".edge, .node").on("click mousedown", function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const element = d3.select(this);
+                    select(element);
+
+                    const tooltip = element.select("a");
+                    if (!tooltip.empty()) {
+                        tooltipDiv.html(tooltip.attr("title")); // lgtm[js/xss-through-dom]
+                        tooltipDiv.style("visibility", "visible");
+                    } else {
+                        tooltipDiv.style("visibility", "hidden");
+                    }
+                });
+            });
+    }
+
+    function select(element) {
+        if (selected != null) {
+            selected.selectAll("path, polygon, ellipse").attr("stroke-width", selectedStyle["stroke-width"]);
+        }
+        selected = element;
+        let shape = selected.selectAll("path, polygon, ellipse");
+        selectedStyle = {"stroke-width": shape.attr("stroke-width")};
+        shape.attr("stroke-width", "5");
+    }
+
+    const dot = d3.select("#dot").text();
+    render(dot);
+</script>
+</body>
+</html>

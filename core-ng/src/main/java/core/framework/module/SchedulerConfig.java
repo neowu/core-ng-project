@@ -10,7 +10,7 @@ import core.framework.internal.scheduler.HourlyTrigger;
 import core.framework.internal.scheduler.MonthlyTrigger;
 import core.framework.internal.scheduler.Scheduler;
 import core.framework.internal.scheduler.WeeklyTrigger;
-import core.framework.internal.web.management.SchedulerController;
+import core.framework.internal.web.sys.SchedulerController;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.Trigger;
 import core.framework.util.Strings;

@@ -5,11 +5,14 @@ import core.framework.api.web.service.ResponseStatus;
 import core.framework.log.ErrorCode;
 import core.framework.log.Severity;
 
+import java.io.Serial;
+
 /**
  * @author neo
  */
 @ResponseStatus(HTTPStatus.TOO_MANY_REQUESTS)
 public final class TooManyRequestsException extends RuntimeException implements ErrorCode {
+    @Serial
     private static final long serialVersionUID = 6657854760603154454L;
 
     public TooManyRequestsException(String message) {

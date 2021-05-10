@@ -114,7 +114,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         elasticSearch.refreshIndex("document");
 
         // test synonyms
-        SearchRequest request = new SearchRequest();
+        var request = new SearchRequest();
         request.query = boolQuery()
                 .must(matchQuery("string_field", "first"))
                 .filter(termQuery("enum_field", JSON.toEnumValue(TestDocument.TestEnum.VALUE1)));

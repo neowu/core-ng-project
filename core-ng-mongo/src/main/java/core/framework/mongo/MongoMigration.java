@@ -1,8 +1,8 @@
 package core.framework.mongo;
 
 import com.mongodb.ConnectionString;
+import core.framework.internal.module.PropertyManager;
 import core.framework.mongo.impl.MongoImpl;
-import core.framework.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +20,9 @@ public class MongoMigration {
     }
 
     public MongoMigration(String propertyFileClasspath, String key) {
-        var properties = new Properties();
-        properties.load(propertyFileClasspath);
-        uri = properties.get(key).orElseThrow();
+        var properties = new PropertyManager();
+        properties.properties.load(propertyFileClasspath);
+        uri = properties.property(key).orElseThrow();
     }
 
     public void migrate(Consumer<Mongo> consumer) {

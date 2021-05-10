@@ -1,7 +1,7 @@
-public class TestWebServiceImpl$patch implements core.framework.web.Controller {
+public class Controller$TestWebServiceImpl$patch implements core.framework.web.Controller {
     private final core.framework.internal.web.service.TestWebService delegate;
 
-    public TestWebServiceImpl$patch(core.framework.internal.web.service.TestWebService $1) {
+    public Controller$TestWebServiceImpl$patch(core.framework.internal.web.service.TestWebService $1) {
         this.delegate = $1;
     }
 

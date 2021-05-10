@@ -22,7 +22,7 @@ class QueryParamWriterBuilder<T> {
     }
 
     public QueryParamWriter<T> build() {
-        builder = new DynamicInstanceBuilder<>(QueryParamWriter.class, QueryParamWriter.class.getCanonicalName() + "$" + beanClass.getSimpleName());
+        builder = new DynamicInstanceBuilder<>(QueryParamWriter.class, beanClass.getSimpleName());
         builder.addMethod(toParamsMethod());
         return builder.build();
     }

@@ -12,7 +12,6 @@ import core.framework.internal.web.bean.ResponseBeanReader;
 import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.internal.web.http.IPv4AccessControl;
 import core.framework.internal.web.http.IPv4Ranges;
-import core.framework.internal.web.management.APIController;
 import core.framework.internal.web.service.HTTPMethods;
 import core.framework.internal.web.service.WebServiceClient;
 import core.framework.internal.web.service.WebServiceClientBuilder;
@@ -20,6 +19,7 @@ import core.framework.internal.web.service.WebServiceControllerBuilder;
 import core.framework.internal.web.service.WebServiceImplValidator;
 import core.framework.internal.web.service.WebServiceInterfaceValidator;
 import core.framework.internal.web.site.AJAXErrorResponse;
+import core.framework.internal.web.sys.APIController;
 import core.framework.util.ASCII;
 import core.framework.web.Controller;
 import core.framework.web.service.WebServiceClientProxy;
@@ -114,7 +114,9 @@ public class APIConfig extends Config {
         logger.info("publish typescript api definition, cidrs={}", cidrs);
         var accessControl = new IPv4AccessControl();
         accessControl.allow = new IPv4Ranges(cidrs);
-        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceRegistry, accessControl), true);
+        var controller = new APIController(context.serviceRegistry, accessControl);
+        context.route(HTTPMethod.GET, "/_sys/api", controller::v1, true);
+        context.route(HTTPMethod.GET, "/_sys/api/v2", controller::v2, true);
         context.serviceRegistry.beanClasses.add(AJAXErrorResponse.class);   // publish default ajax error response
     }
 

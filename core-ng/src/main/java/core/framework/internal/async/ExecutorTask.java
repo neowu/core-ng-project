@@ -68,6 +68,6 @@ public class ExecutorTask<T> implements Callable<T> {
     }
 
     String action() {
-        return rootAction == null ? "task:" + action : rootAction + ":" + action;
+        return rootAction == null ? "task:" + action : rootAction + ":task:" + action;
     }
 }

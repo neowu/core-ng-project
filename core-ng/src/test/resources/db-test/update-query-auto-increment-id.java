@@ -1,4 +1,4 @@
-public class UpdateQueryBuilder$AutoIncrementIdEntity implements core.framework.internal.db.UpdateQuery {
+public class UpdateQuery$AutoIncrementIdEntity implements core.framework.internal.db.UpdateQuery {
     public core.framework.internal.db.UpdateQuery.Statement update(Object value, boolean partial) {
         core.framework.internal.db.AutoIncrementIdEntity entity = (core.framework.internal.db.AutoIncrementIdEntity) value;
         if (entity.id == null) throw new Error("primary key must not be null, field=id");

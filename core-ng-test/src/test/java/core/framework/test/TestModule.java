@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.mock;
 
@@ -97,6 +98,7 @@ public class TestModule extends AbstractTestModule {
         http().maxEntitySize(10000000);
         http().access().allow(List.of("0.0.0.0/0"));
         http().access().deny(List.of("10.0.0.0/24"));
+        http().errorHandler((request, e) -> Optional.empty());
     }
 
     private void configureKafka() {

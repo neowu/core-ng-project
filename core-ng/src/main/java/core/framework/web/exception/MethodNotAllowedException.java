@@ -5,11 +5,14 @@ import core.framework.api.web.service.ResponseStatus;
 import core.framework.log.ErrorCode;
 import core.framework.log.Severity;
 
+import java.io.Serial;
+
 /**
  * @author neo
  */
 @ResponseStatus(HTTPStatus.METHOD_NOT_ALLOWED)
 public final class MethodNotAllowedException extends RuntimeException implements ErrorCode {
+    @Serial
     private static final long serialVersionUID = 2349080664326196294L;
 
     public MethodNotAllowedException(String message) {

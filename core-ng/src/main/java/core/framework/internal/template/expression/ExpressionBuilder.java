@@ -36,7 +36,7 @@ public class ExpressionBuilder {
 
     private Expression buildExpression() {
         try {
-            DynamicInstanceBuilder<Expression> builder = new DynamicInstanceBuilder<>(Expression.class, Expression.class.getCanonicalName());
+            DynamicInstanceBuilder<Expression> builder = new DynamicInstanceBuilder<>(Expression.class, null);
             builder.addMethod(buildEvalMethod());
             return builder.build();
         } catch (Throwable e) {

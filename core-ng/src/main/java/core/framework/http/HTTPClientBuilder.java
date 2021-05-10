@@ -190,7 +190,7 @@ public final class HTTPClientBuilder {
                 for (TrustManager trustManager : factory.getTrustManagers()) {
                     if (trustManager instanceof X509TrustManager) {
                         for (X509Certificate issuer : ((X509TrustManager) trustManager).getAcceptedIssuers()) {
-                            trustStore.setCertificateEntry(issuer.getSubjectDN().getName(), issuer);
+                            trustStore.setCertificateEntry(issuer.getSubjectX500Principal().getName(), issuer);
                         }
                     }
                 }

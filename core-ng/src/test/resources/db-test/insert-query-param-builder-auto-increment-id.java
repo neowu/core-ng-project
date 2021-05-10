@@ -1,5 +1,5 @@
-public class InsertQuery$AutoIncrementIdEntity$ParamBuilder implements java.util.function.Function {
-    public Object apply(Object value) {
+public class InsertQueryParamBuilder$AutoIncrementIdEntity implements core.framework.internal.db.InsertQueryParamBuilder {
+    public Object[] params(Object value) {
         core.framework.internal.db.AutoIncrementIdEntity entity = (core.framework.internal.db.AutoIncrementIdEntity) value;
         Object[] params = new Object[5];
         params[0] = entity.stringField;

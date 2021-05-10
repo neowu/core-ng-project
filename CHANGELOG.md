@@ -1,8 +1,70 @@
 ## Change log
 
-### 7.6.13 (03/01/2021 - )
+### 7.6.16-b0 (04/26/2021 - )
+
+* api: created /_sys/api/v2, to expose more structured api info
+  > one purpose is to create api monitoring, to alert if api breaks backward compatibility
+  > will update example script to generate ts api, refer to frontend-demo-project
+
+### 7.6.15 (04/13/2021 - 04/25/2021)
+
+* log-processor: support to forward action-log/event to another kafka for data warehouse sink
+  > !!! env vars are now starts with APP_, e.g. APP_KIBANA_URL, APP_KIBANA_BANNER (needs to update existing config)
+  > configure by env APP_LOG_FORWARD_CONFIG, kube example:
+    <pre>
+      - name: APP_LOG_FORWARD_CONFIG
+        value: |
+            {
+                "kafkaURI": "kafka-0.kafka",
+                "action": {
+                    "topic": "action",
+                    "apps": ["website", "mobile-api"],
+                    "ignoreErrorCodes": ["FORBIDDEN", "PATH_NOT_FOUND", "UNAUTHORIZED", "METHOD_NOT_ALLOWED"]
+                }
+            }
+    </pre>
+* log-processor: arch diagram supports excludes query param
+  > generally many lines are caused by backend-test-service or regression-test-service, now it can be excluded to simplify diagram
+  > e.g. https://localhost:8443/diagram/arch?excludes=backend-test-service,regression-test-service
+* internal: support java 16
+  > still will be released under java 15, runtime can update to java 16 first (build server, app docker base image)
+  > !!! to use adoptopenjdk/openjdk16:alpine-jre, must add following to your Dockerfile, the kafka/snappy lib requires it to load native lib
+  > RUN apk add --no-cache gcompat
+* kafka: update to 2.8.0
+  > 2.8.0 client works fine with 2.7.0 broker
+  > in docker/kafka docker compose, it shows kafka kraft preview usage, kafka without zookeeper
+* monitor: add kafka used disk metrics / dashboard, alert
+  > added "highDiskSizeThreshold" in kafka monitor config, use absolute size, not percentage
+  > refer to ext/monitor/src/test/resources/monitor.json to example config
+
+### 7.6.14 (03/18/2021 - 04/13/2021)
+
+* search: update es to 7.12.0
+* action: change error "action log context value too long" to warning
+* mongo: MongoMigration supports overwriting property by env
+* es: ElasticSearchMigration supports overwriting property by env
+* log-processor: generate system arch diagram
+  > call https://log-processor:8443/diagram/arch?hours=24, use port-forward in kube env, hours param is optional
+  > click nodes and edges to show extra info in tooltip
+
+### 7.6.13 (03/01/2021 - 03/18/2021)
+
 * mongodb: update driver to 4.2.2
-  > According to official docs, this is a minor version so there are not breaking changes.
+* search: update es to 7.11.2
+  > since 7.11, elasticsearch no longer publishes OSS version, refer to docker/es for latest es/kibana configures.
+  > codelibs stopped to publish modules we use, so we publish them under core.framework.elasticsearch.module. (refer to https://mvnrepository.com/artifact/org.codelibs.elasticsearch.module/lang-painless)
+  > pls update gradle maven repo setting as following
+  ```groovy
+    repositories {
+        maven {
+            url 'https://neowu.github.io/maven-repo/'
+            content {
+                includeGroupByRegex 'core\\.framework.*'
+            }
+        }
+    }
+  ```
+* db: allow using "multiply operator" (not wildcard) in sql, e.g. select column*3 from table
 
 ### 7.6.12 (02/02/2021 - 03/01/2021)
 

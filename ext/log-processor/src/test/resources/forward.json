@@ -1,0 +1,12 @@
+{
+  "kafkaURI": "kafka-0.kafka:9092",
+  "action": {
+    "topic": "action",
+    "apps": ["website", "mobile-api"],
+    "ignoreErrorCodes": ["PATH_NOT_FOUND"]
+  },
+  "event": {
+    "topic": "event",
+    "apps": ["website"]
+  }
+}

@@ -70,6 +70,11 @@ public class MonitorConfig {
         @Max(1)
         @Property(name = "highHeapUsageThreshold")
         public Double highHeapUsageThreshold = 0.85;    // with Kafka default setting, it generally does GC at 80%
+
+        @NotNull
+        @Min(0)
+        @Property(name = "highDiskSizeThreshold")
+        public Long highDiskSizeThreshold = 50_000_000_000L;    // use 50G as default
     }
 
     public static class KubeConfig {

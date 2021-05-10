@@ -48,9 +48,7 @@ public final class WebDirectory {
     }
 
     private Path findLocalRootDirectory() {
-        Path path = Paths.get("./src/main/web");
-        if (Files.isDirectory(path)) return path;
-        path = Paths.get("./src/main/dist/web");
+        Path path = Paths.get("./src/main/dist/web");
         if (Files.isDirectory(path)) return path;
         return null;
     }
