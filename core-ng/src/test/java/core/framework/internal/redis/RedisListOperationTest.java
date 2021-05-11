@@ -21,11 +21,11 @@ class RedisListOperationTest extends AbstractRedisOperationTest {
 
     @Test
     void pop() {
-        response("$5\r\nitem1\r\n");
-        String item = redis.list().pop("key");
+        response("*3\r\n$1\r\n1\r\n$1\r\n2\r\n$1\r\n3\r\n");
+        List<String> items = redis.list().pop("key", 3);
 
-        assertThat(item).isEqualTo("item1");
-        assertRequestEquals("*2\r\n$4\r\nLPOP\r\n$3\r\nkey\r\n");
+        assertThat(items).containsOnly("1", "2", "3");
+        assertRequestEquals("*3\r\n$4\r\nLPOP\r\n$3\r\nkey\r\n$1\r\n3\r\n");
     }
 
     @Test

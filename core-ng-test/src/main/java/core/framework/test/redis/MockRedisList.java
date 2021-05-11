@@ -4,6 +4,7 @@ import core.framework.redis.RedisList;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,10 +20,22 @@ public final class MockRedisList implements RedisList {
     }
 
     @Override
-    public String pop(String key) {
+    public List<String> pop(String key, long count) {
         var value = store.get(key);
-        if (value == null) return null;
-        return value.list().remove(0);
+        if (value == null) return List.of();
+        List<String> list = value.list();
+
+        List<String> results = new ArrayList<>();
+        long removed = 0;
+        for (Iterator<String> iterator = list.iterator(); iterator.hasNext(); ) {
+            if (removed == count) break;
+
+            String item = iterator.next();
+            iterator.remove();
+            results.add(item);
+            removed++;
+        }
+        return results;
     }
 
     @Override
