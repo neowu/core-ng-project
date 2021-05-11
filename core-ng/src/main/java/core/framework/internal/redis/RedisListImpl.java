@@ -4,7 +4,6 @@ import core.framework.internal.log.filter.ArrayLogParam;
 import core.framework.internal.resource.PoolItem;
 import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisList;
-import core.framework.util.Lists;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ public final class RedisListImpl implements RedisList {
     }
 
     @Override
-    public List<String> pop(String key, long count) {
+    public List<String> pop(String key, int count) {
         var watch = new StopWatch();
         validate("key", key);
         if (count <= 0) throw new Error("count must be greater than 0");
@@ -43,7 +42,8 @@ public final class RedisListImpl implements RedisList {
             RedisConnection connection = item.resource;
             connection.writeKeyArgumentCommand(LPOP, key, encode(count));
             Object[] response = connection.readArray();
-            values = Lists.newArrayList();
+            if (response == null) return List.of(); // lpop returns nil array if no element, this is different behavior of other pop (e.g. spop), it's likely due to blpop impl, use nil array to distinguish between timeout and empty list
+            values = new ArrayList<>(response.length);
             for (Object value : response) {
                 values.add(decode((byte[]) value));
             }

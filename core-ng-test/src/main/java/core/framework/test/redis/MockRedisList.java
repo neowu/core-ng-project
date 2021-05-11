@@ -20,16 +20,16 @@ public final class MockRedisList implements RedisList {
     }
 
     @Override
-    public List<String> pop(String key, long count) {
+    public List<String> pop(String key, int count) {
         var value = store.get(key);
         if (value == null) return List.of();
         List<String> list = value.list();
 
-        List<String> results = new ArrayList<>();
+        List<String> results = new ArrayList<>(count);
         long removed = 0;
-        for (Iterator<String> iterator = list.iterator(); iterator.hasNext(); ) {
+        Iterator<String> iterator = list.iterator();
+        while (iterator.hasNext()) {
             if (removed == count) break;
-
             String item = iterator.next();
             iterator.remove();
             results.add(item);

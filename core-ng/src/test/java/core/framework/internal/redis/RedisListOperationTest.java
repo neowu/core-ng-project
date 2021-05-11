@@ -29,6 +29,25 @@ class RedisListOperationTest extends AbstractRedisOperationTest {
     }
 
     @Test
+    void popWithSingleItem() {
+        // lpop returns nil array if no element
+        response("*1\r\n$1\r\n1\r\n");
+        String item = redis.list().pop("key");
+
+        assertThat(item).isEqualTo("1");
+        assertRequestEquals("*3\r\n$4\r\nLPOP\r\n$3\r\nkey\r\n$1\r\n1\r\n");
+    }
+
+    @Test
+    void popWithEmptyList() {
+        response("*-1\r\n");
+        String item = redis.list().pop("key");
+
+        assertThat(item).isNull();
+        assertRequestEquals("*3\r\n$4\r\nLPOP\r\n$3\r\nkey\r\n$1\r\n1\r\n");
+    }
+
+    @Test
     void range() {
         response("*2\r\n$5\r\nitem1\r\n$5\r\nitem2\r\n");
         List<String> items = redis.list().range("key");

@@ -5,6 +5,8 @@
 * api: created /_sys/api/v2, to expose more structured api info, (since it's for manual dev process, will replace /_sys/api when releasing 7.6.16)
   > one purpose is to create api monitoring, to alert if api breaks backward compatibility
   > for ts client code generator, refer to https://github.com/neowu/frontend-demo-project/blob/master/website-frontend/webpack/api.js
+* redis: support pop with multiple items
+  > !!! only be supported since redis 6.2, use latest redis docker image if you want to use this
 
 ### 7.6.15 (04/13/2021 - 04/25/2021)
 

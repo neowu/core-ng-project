@@ -28,6 +28,15 @@ class MockRedisListTest {
     }
 
     @Test
+    void pop() {
+        redis.list().push("key1", "v1", "v2", "v3");
+
+        assertThat(redis.list().pop("key1")).isEqualTo("v1");
+        assertThat(redis.list().pop("key1", 3)).containsExactly("v2", "v3");
+        assertThat(redis.list().pop("key1", 5)).isEmpty();
+    }
+
+    @Test
     void range() {
         redis.list().push("key2", "v1", "v2", "v3");
 

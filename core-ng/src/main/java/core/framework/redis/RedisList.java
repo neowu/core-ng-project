@@ -13,7 +13,7 @@ public interface RedisList {
         return list.isEmpty() ? null : list.get(0);
     }
 
-    List<String> pop(String key, long size);
+    List<String> pop(String key, int size);
 
     long push(String key, String... values);
 
