@@ -9,8 +9,8 @@ import java.util.List;
 public interface RedisList {
     @Nullable
     default String pop(String key) {
-        List<String> list = pop(key, 1);
-        return list.isEmpty() ? null : list.get(0);
+        List<String> values = pop(key, 1);
+        return values.isEmpty() ? null : values.get(0);
     }
 
     List<String> pop(String key, int size);

@@ -6,7 +6,8 @@
   > one purpose is to create api monitoring, to alert if api breaks backward compatibility
   > for ts client code generator, refer to https://github.com/neowu/frontend-demo-project/blob/master/website-frontend/webpack/api.js
 * redis: support pop with multiple items
-  > !!! only be supported since redis 6.2, use latest redis docker image if you want to use this
+  > !!! only be supported since redis 6.2, use latest redis docker image if you use this feature
+  > pop without count still uses old protocol, so it's optional to upgrade redis
 
 ### 7.6.15 (04/13/2021 - 04/25/2021)
 
