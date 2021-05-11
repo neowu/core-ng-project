@@ -42,7 +42,8 @@ public final class RedisListImpl implements RedisList {
             RedisConnection connection = item.resource;
             if (count == 1) {   // "lpop key count" only be supported since redis 6.2, to use old protocol if count=1
                 connection.writeKeyCommand(LPOP, key);
-                values.add(decode(connection.readBlobString()));
+                String value = decode(connection.readBlobString());
+                if (value != null) values.add(value);
             } else {
                 connection.writeKeyArgumentCommand(LPOP, key, encode(count));
                 Object[] response = connection.readArray();
