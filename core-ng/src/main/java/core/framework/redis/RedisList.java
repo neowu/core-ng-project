@@ -8,7 +8,12 @@ import java.util.List;
  */
 public interface RedisList {
     @Nullable
-    String pop(String key);
+    default String pop(String key) {
+        List<String> list = pop(key, 1);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    List<String> pop(String key, long size);
 
     long push(String key, String... values);
 

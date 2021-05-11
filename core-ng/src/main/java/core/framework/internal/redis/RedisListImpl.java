@@ -4,6 +4,7 @@ import core.framework.internal.log.filter.ArrayLogParam;
 import core.framework.internal.resource.PoolItem;
 import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisList;
+import core.framework.util.Lists;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,24 +33,29 @@ public final class RedisListImpl implements RedisList {
     }
 
     @Override
-    public String pop(String key) {
+    public List<String> pop(String key, long count) {
         var watch = new StopWatch();
         validate("key", key);
-        String value = null;
+        if (count <= 0) throw new Error("count must be greater than 0");
+        List<String> values = null;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.writeKeyCommand(LPOP, key);
-            value = decode(connection.readBlobString());
-            return value;
+            connection.writeKeyArgumentCommand(LPOP, key, encode(count));
+            Object[] response = connection.readArray();
+            values = Lists.newArrayList();
+            for (Object value : response) {
+                values.add(decode((byte[]) value));
+            }
+            return values;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, 1, 0);
-            logger.debug("lpop, key={}, returnedValue={}, elapsed={}", key, value, elapsed);
+            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
+            logger.debug("lpop, key={}, count={}, returnedValues={}, elapsed={}", key, count, values, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
