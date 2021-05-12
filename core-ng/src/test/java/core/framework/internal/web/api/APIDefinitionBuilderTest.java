@@ -43,6 +43,6 @@ class APIDefinitionBuilderTest {
         @Property(name = "ERROR_CODE_1")
         ERROR_CODE_1,
         @Property(name = "ERROR_CODE_2")
-        ERROR_CODE_2,
+        ERROR_CODE_2
     }
 }
