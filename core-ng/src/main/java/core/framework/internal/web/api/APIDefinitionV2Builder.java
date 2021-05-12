@@ -53,7 +53,11 @@ public class APIDefinitionV2Builder {
         var response = new APIDefinitionV2Response();
         response.services = services();
         for (Class<?> beanClass : beanClasses) {
-            parseBeanType(beanClass);
+            if (beanClass.isEnum()) {
+                parseEnumType(beanClass);
+            } else {
+                parseBeanType(beanClass);
+            }
         }
         response.types = new ArrayList<>(types.values());
         return response;
@@ -124,7 +128,7 @@ public class APIDefinitionV2Builder {
             if (String.class.equals(keyClass)) {
                 definition.addParam("String");
             } else {        // Map key can only be String or enum
-                definition.addParam(parseEnum(keyClass));
+                definition.addParam(parseEnumType(keyClass));
             }
             var valueType = parseType(GenericTypes.mapValueType(type));
             definition.addParam(valueType.type);
@@ -135,7 +139,7 @@ public class APIDefinitionV2Builder {
         if (valueClasses.contains(rawClass)) return new TypeDefinition(rawClass.getSimpleName());
         if (Instant.class.equals(type)) return new TypeDefinition("ZonedDateTime");
         if (rawClass.isEnum()) {
-            return new TypeDefinition(parseEnum((Class<?>) type));
+            return new TypeDefinition(parseEnumType((Class<?>) type));
         }
         return new TypeDefinition(parseBeanType(rawClass));
     }
@@ -162,24 +166,7 @@ public class APIDefinitionV2Builder {
         return className;
     }
 
-    private void parseConstraints(Field field, APIDefinitionV2Response.Constraints constraints) {
-        if (field.isAnnotationPresent(NotNull.class)) constraints.notNull = Boolean.TRUE;
-        if (field.isAnnotationPresent(NotBlank.class)) constraints.notBlank = Boolean.TRUE;
-        Min min = field.getDeclaredAnnotation(Min.class);
-        if (min != null) constraints.min = min.value();
-        Max max = field.getDeclaredAnnotation(Max.class);
-        if (max != null) constraints.max = max.value();
-        Size size = field.getDeclaredAnnotation(Size.class);
-        if (size != null) {
-            constraints.size = new APIDefinitionV2Response.Size();
-            constraints.size.min = size.min();
-            constraints.size.max = size.max();
-        }
-        Pattern pattern = field.getDeclaredAnnotation(Pattern.class);
-        if (pattern != null) constraints.pattern = pattern.value();
-    }
-
-    private String parseEnum(Class<?> enumClass) {
+    private String parseEnumType(Class<?> enumClass) {
         String className = Classes.className(enumClass);
         types.computeIfAbsent(className, key -> {
             List<Field> fields = Classes.enumConstantFields(enumClass);
@@ -196,6 +183,23 @@ public class APIDefinitionV2Builder {
             return definition;
         });
         return className;
+    }
+
+    private void parseConstraints(Field field, APIDefinitionV2Response.Constraints constraints) {
+        if (field.isAnnotationPresent(NotNull.class)) constraints.notNull = Boolean.TRUE;
+        if (field.isAnnotationPresent(NotBlank.class)) constraints.notBlank = Boolean.TRUE;
+        Min min = field.getDeclaredAnnotation(Min.class);
+        if (min != null) constraints.min = min.value();
+        Max max = field.getDeclaredAnnotation(Max.class);
+        if (max != null) constraints.max = max.value();
+        Size size = field.getDeclaredAnnotation(Size.class);
+        if (size != null) {
+            constraints.size = new APIDefinitionV2Response.Size();
+            constraints.size.min = size.min();
+            constraints.size.max = size.max();
+        }
+        Pattern pattern = field.getDeclaredAnnotation(Pattern.class);
+        if (pattern != null) constraints.pattern = pattern.value();
     }
 
     private String fieldName(Field field) {

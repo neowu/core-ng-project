@@ -63,6 +63,12 @@
         {"name": "map_list_field", "type": "Map", "typeParams": ["String", "List", "String"], "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}}
       ],
       "enumConstants": null
+    },
+    {
+      "name": "APIDefinitionBuilderTest$ErrorCode",
+      "type": "enum",
+      "fields": null,
+      "enumConstants": [{"name": "ERROR_CODE_1", "value": "ERROR_CODE_1"}, {"name": "ERROR_CODE_2", "value": "ERROR_CODE_2"}]
     }
   ]
 }

@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.6.16-b0 (04/26/2021 - )
+### 7.6.16-b1 (04/26/2021 - )
 
 * api: created /_sys/api/v2, to expose more structured api info, (since it's for manual dev process, will replace /_sys/api when releasing 7.6.16)
   > one purpose is to create api monitoring, to alert if api breaks backward compatibility
