@@ -18,11 +18,11 @@
       "name": "TestWebService$TestResponse",
       "type": "bean",
       "fields": [
-        {"name": "int_field", "type": "Integer", "typeParams": null, "constraints": {"notNull": true, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "decimal_field", "type": "BigDecimal", "typeParams": null, "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "string_map", "type": "Map", "typeParams": ["String", "String"], "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": {"min": 1, "max": -1}, "pattern": null}},
-        {"name": "items", "type": "Map", "typeParams": ["String", "TestWebService$TestItem"], "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "enum_map", "type": "Map", "typeParams": ["TestWebService$TestEnum", "String"], "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}}
+        {"name": "int_field", "type": "Integer", "typeParams": null, "constraints": {"notNull": true, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "decimal_field", "type": "BigDecimal", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "string_map", "type": "Map", "typeParams": ["String", "String"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": {"min": 1, "max": -1}, "pattern": null}},
+        {"name": "items", "type": "Map", "typeParams": ["String", "TestWebService$TestItem"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "enum_map", "type": "Map", "typeParams": ["TestWebService$TestEnum", "String"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}}
       ],
       "enumConstants": null
     },
@@ -30,8 +30,8 @@
       "name": "TestWebService$TestItem",
       "type": "bean",
       "fields": [
-        {"name": "zoned_date_time_field", "type": "ZonedDateTime", "typeParams": null, "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "enum_field", "type": "TestWebService$TestEnum", "typeParams": null, "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}}
+        {"name": "zoned_date_time_field", "type": "ZonedDateTime", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "enum_field", "type": "TestWebService$TestEnum", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}}
       ],
       "enumConstants": null
     },
@@ -44,13 +44,13 @@
     {
       "name": "TestWebService$TestSearchRequest", "type": "bean",
       "fields": [
-        {"name": "int_field", "type": "Integer", "typeParams": null, "constraints": {"notNull": true, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "boolean_field", "type": "Boolean", "typeParams": null, "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "long_field", "type": "Long", "typeParams": null, "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "double_field", "type": "Long", "typeParams": null, "constraints": {"notNull": null, "notBlank": null, "min": 1.0, "max": 100.0, "size": null, "pattern": null}},
-        {"name": "date_field", "type": "LocalDate", "typeParams": null, "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "time_field", "type": "LocalTime", "typeParams": null, "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "date_time_field", "type": "LocalDateTime", "typeParams": null, "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}}
+        {"name": "int_field", "type": "Integer", "typeParams": null, "constraints": {"notNull": true, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "boolean_field", "type": "Boolean", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "long_field", "type": "Long", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "double_field", "type": "Long", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": 1.0, "max": 100.0, "size": null, "pattern": null}},
+        {"name": "date_field", "type": "LocalDate", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "time_field", "type": "LocalTime", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "date_time_field", "type": "LocalDateTime", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}}
       ],
       "enumConstants": null
     },
@@ -58,9 +58,9 @@
       "name": "TestWebService$TestRequest",
       "type": "bean",
       "fields": [
-        {"name": "string_field", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": null, "min": null, "max": null, "size": {"min": -1, "max": 10}, "pattern": "\\d+.*"}},
-        {"name": "items", "type": "List", "typeParams": ["TestWebService$TestItem"], "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "map_list_field", "type": "Map", "typeParams": ["String", "List", "String"], "constraints": {"notNull": null, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}}
+        {"name": "string_field", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": false, "min": null, "max": null, "size": {"min": -1, "max": 10}, "pattern": "\\d+.*"}},
+        {"name": "items", "type": "List", "typeParams": ["TestWebService$TestItem"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "map_list_field", "type": "Map", "typeParams": ["String", "List", "String"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}}
       ],
       "enumConstants": null
     },

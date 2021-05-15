@@ -30,7 +30,7 @@ class APIValidatorTest {
         String result = validator.validate();
         assertThat(result).isEqualTo("ERROR");
         assertThat(validator.warnings)
-            .containsExactly("added GetCustomerAJAXResponse.group");
+            .containsExactly("added field GetCustomerAJAXResponse.group");
         assertThat(validator.errors)
             .containsExactly("added field @NotNull RegisterAJAXRequest.group");
     }
@@ -56,6 +56,17 @@ class APIValidatorTest {
         assertThat(validator.errors)
             .containsExactly("changed response type of CustomerAJAXService.get from GetCustomerAJAXResponse to Optional<GetCustomerAJAXResponse>",
                 "changed response type of CustomerAJAXService.create from void to GetCustomerAJAXResponse");
+    }
+
+    @Test
+    void deprecateMethod() {
+        var validator = new APIValidator(response("api-validator-test/previous.json"),
+            response("api-validator-test/deprecate-method.json"));
+        String result = validator.validate();
+        assertThat(result).isEqualTo("WARN");
+        assertThat(validator.warnings)
+            .containsExactly("added @Deprecated to method CustomerAJAXService.get",
+                "added method CustomerAJAXService.getV2");
     }
 
     private APIDefinitionV2Response response(String path) {

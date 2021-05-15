@@ -118,6 +118,13 @@ class APIValidator {
         } else {
             validateType(previous.operation.responseType, current.operation.responseType, false);
         }
+
+        if (Boolean.compare(previous.deprecated(), current.deprecated()) != 0) {
+            if (previous.deprecated())
+                warnings.add(Strings.format("removed @Deprecated from method {}", previousMethod));
+            else
+                warnings.add(Strings.format("added @Deprecated to method {}", previousMethod));
+        }
     }
 
     private void validateType(String previousType, String currentType, boolean isRequest) {
@@ -170,7 +177,7 @@ class APIValidator {
             if (isRequest && Boolean.TRUE.equals(currentField.constraints.notNull)) {
                 errors.add(Strings.format("added field @NotNull {}.{}", current.name, currentField.name));
             } else {
-                warnings.add(Strings.format("added {}.{}", current.name, currentField.name));
+                warnings.add(Strings.format("added field {}.{}", current.name, currentField.name));
             }
         }
     }
@@ -286,6 +293,10 @@ class APIValidator {
 
         boolean optional() {
             return Boolean.TRUE.equals(operation.optional);
+        }
+
+        boolean deprecated() {
+            return Boolean.TRUE.equals(operation.deprecated);
         }
     }
 }
