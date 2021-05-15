@@ -8,6 +8,10 @@
 * redis: support pop with multiple items
   > !!! only be supported since redis 6.2, use latest redis docker image if you use this feature
   > pop without count still uses old protocol, so it's optional to upgrade redis
+* monitor: support to monitor api changes
+  > refer to ext/monitor/src/test/resources/monitor.json for example config
+  > {"errorCodes": "API_CHANGED", "indices": ["stat"]}
+  > TODO: will change alert config notification to channel:List<Matcher>, to publish stat API_CHANGED error to frontend team channel
 
 ### 7.6.15 (04/13/2021 - 04/25/2021)
 

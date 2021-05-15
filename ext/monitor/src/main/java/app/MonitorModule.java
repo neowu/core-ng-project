@@ -1,6 +1,7 @@
 package app;
 
 import app.monitor.MonitorConfig;
+import app.monitor.job.APIMonitorJob;
 import app.monitor.job.ElasticSearchClient;
 import app.monitor.job.ElasticSearchMonitorJob;
 import app.monitor.job.JMXClient;
@@ -43,6 +44,14 @@ public class MonitorModule extends Module {
         if (config.kube != null) {
             configureKubeJob(publisher, config.kube);
         }
+        if (!config.api.isEmpty()) {
+            configureAPIJob(publisher, config.api);
+        }
+    }
+
+    private void configureAPIJob(MessagePublisher<StatMessage> publisher, Map<String, String> serviceURLs) {
+        var job = new APIMonitorJob(serviceURLs, publisher);
+        schedule().fixedRate("monitor:api", job, Duration.ofMinutes(10));  // not check api too often
     }
 
     private void configureKubeJob(MessagePublisher<StatMessage> publisher, MonitorConfig.KubeConfig config) {
@@ -53,7 +62,7 @@ public class MonitorModule extends Module {
     }
 
     private void configureESJob(MessagePublisher<StatMessage> publisher, Map<String, MonitorConfig.ElasticSearchConfig> config) {
-        ElasticSearchClient elasticSearchClient = new ElasticSearchClient();
+        var elasticSearchClient = new ElasticSearchClient();
         for (Map.Entry<String, MonitorConfig.ElasticSearchConfig> entry : config.entrySet()) {
             String app = entry.getKey();
             MonitorConfig.ElasticSearchConfig esConfig = entry.getValue();

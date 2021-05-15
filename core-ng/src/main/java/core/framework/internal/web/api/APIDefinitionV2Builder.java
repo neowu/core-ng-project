@@ -186,8 +186,8 @@ public class APIDefinitionV2Builder {
     }
 
     private void parseConstraints(Field field, APIDefinitionV2Response.Constraints constraints) {
-        if (field.isAnnotationPresent(NotNull.class)) constraints.notNull = Boolean.TRUE;
-        if (field.isAnnotationPresent(NotBlank.class)) constraints.notBlank = Boolean.TRUE;
+        constraints.notNull = field.isAnnotationPresent(NotNull.class);
+        constraints.notBlank = field.isAnnotationPresent(NotBlank.class);
         Min min = field.getDeclaredAnnotation(Min.class);
         if (min != null) constraints.min = min.value();
         Max max = field.getDeclaredAnnotation(Max.class);
