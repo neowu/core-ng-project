@@ -69,6 +69,17 @@ class APIValidatorTest {
                 "added method CustomerAJAXService.getV2");
     }
 
+    @Test
+    void changeEnumValues() {
+        var validator = new APIValidator(response("api-validator-test/previous.json"),
+            response("api-validator-test/change-enum-values.json"));
+        String result = validator.validate();
+        assertThat(result).isEqualTo("ERROR");
+        assertThat(validator.errors)
+            .containsExactly("removed enum value ErrorCode.ERROR_1",
+                "added enum value ErrorCode.ERROR_2");
+    }
+
     private APIDefinitionV2Response response(String path) {
         return JSON.fromJSON(APIDefinitionV2Response.class, ClasspathResources.text(path));
     }
