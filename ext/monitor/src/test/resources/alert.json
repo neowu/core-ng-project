@@ -4,11 +4,11 @@
   ],
   "criticalErrors": [],
   "kibanaURL": "http://kibana:5601",
-  "channels": {
-    "actionWarnChannel": {"severity": "WARN", "indices": ["trace", "stat"]},
-    "actionErrorChannel": {"severity": "ERROR", "indices": ["trace", "stat"]},
-    "eventWarnChannel": {"severity": "WARN", "indices": ["event"]},
-    "eventErrorChannel": {"severity": "ERROR", "indices": ["event"]},
-    "additionalErrorCodeChannel": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}
-  }
+  "notifications": [
+    {"channel": "actionWarnChannel", "matcher": {"severity": "WARN", "indices": ["trace", "stat"]}},
+    {"channel": "actionErrorChannel", "matcher": {"severity": "ERROR", "indices": ["trace", "stat"]}},
+    {"channel": "eventWarnChannel", "matcher": {"severity": "WARN", "indices": ["event"]}},
+    {"channel": "eventErrorChannel", "matcher": {"severity": "ERROR", "indices": ["event"]}},
+    {"channel": "additionalErrorCodeChannel", "matcher": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}}
+  ]
 }

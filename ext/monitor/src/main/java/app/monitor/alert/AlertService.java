@@ -16,22 +16,22 @@ import java.util.stream.Collectors;
 public class AlertService {
     private final LRUMap<String, AlertStat> stats = new LRUMap<>(1000);
     private final String kibanaURL;
-    private final AlertMatcher ignoredErrors;
-    private final AlertMatcher criticalErrors;
+    private final Matchers ignoredErrors;
+    private final Matchers criticalErrors;
     private final int timespanInMinutes;
     private final String site;
-    private final List<NotificationChannel> channels;
+    private final List<Notification> notifications;
     @Inject
     ChannelManager channelManager;
 
     public AlertService(AlertConfig config) {
         site = config.site;
         kibanaURL = config.kibanaURL;
-        ignoredErrors = new AlertMatcher(config.ignoreErrors);
-        criticalErrors = new AlertMatcher(config.criticalErrors);
-        channels = config.channels.entrySet().stream()
-                .map(entry -> new NotificationChannel(entry.getKey(), new AlertMatcher(List.of(entry.getValue()))))
-                .collect(Collectors.toList());
+        ignoredErrors = new Matchers(config.ignoreErrors);
+        criticalErrors = new Matchers(config.criticalErrors);
+        notifications = config.notifications.stream()
+            .map(notification -> new Notification(notification.channel, new Matcher(notification.matcher)))
+            .collect(Collectors.toList());
         timespanInMinutes = config.timespanInHours * 60;
     }
 
@@ -45,17 +45,17 @@ public class AlertService {
     }
 
     private void notify(Alert alert, Result result) {
-        for (NotificationChannel channel : channels) {
-            if (channel.matcher.matches(alert)) {
-                channelManager.notify(channel.channel, alert, result.alertCountSinceLastSent);
+        for (Notification notification : notifications) {
+            if (notification.matcher.match(alert)) {
+                channelManager.notify(notification.channel, alert, result.alertCountSinceLastSent);
             }
         }
     }
 
     Result check(Alert alert) {
-        if (ignoredErrors.matches(alert))
+        if (ignoredErrors.match(alert))
             return new Result(false, -1);
-        if (criticalErrors.matches(alert))
+        if (criticalErrors.match(alert))
             return new Result(true, -1);
 
         String key = alertKey(alert);

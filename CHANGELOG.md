@@ -1,17 +1,27 @@
 ## Change log
 
-### 7.6.16-b1 (04/26/2021 - )
+### 7.7.0-b0 (04/26/2021 - ) !!! still in beta, not released yet
 
-* api: created /_sys/api/v2, to expose more structured api info, (since it's for manual dev process, will replace /_sys/api when releasing 7.6.16)
+* api: created /_sys/api/v2, to expose more structured api info, (since it's for manual dev process, will replace /_sys/api when releasing 7.7.0)
   > one purpose is to create api monitoring, to alert if api breaks backward compatibility
   > for ts client code generator, refer to https://github.com/neowu/frontend-demo-project/blob/master/website-frontend/webpack/api.js
 * redis: support pop with multiple items
   > !!! only be supported since redis 6.2, use latest redis docker image if you use this feature
   > pop without count still uses old protocol, so it's optional to upgrade redis
-* monitor: support to monitor api changes
-  > refer to ext/monitor/src/test/resources/monitor.json for example config
-  > {"errorCodes": "API_CHANGED", "indices": ["stat"]}
-  > TODO: will change alert config notification to channel:List<Matcher>, to publish stat API_CHANGED error to frontend team channel
+* monitor: support to monitor api changes, alert config json schema changed !!!
+  > refer to ext/monitor/src/test/resources/monitor.json, ext/monitor/src/test/resources/alert.json for example config
+  > !!! alert config -> channels changed, to support one channel with multiple matchers, e.g.
+  ```json 
+    "notifications": [
+        {"channel": "backendWarnChannel", "matcher": {"severity": "WARN", "indices": ["trace", "stat"]}},
+        {"channel": "backendErrorChannel", "matcher": {"severity": "ERROR", "indices": ["trace", "stat"]}},
+        {"channel": "frontendWarnChannel", "matcher": {"severity": "WARN", "indices": ["event"]}},
+        {"channel": "frontendWarnChannel", "matcher": {"severity": "WARN", "errorCodes": ["API_CHANGED"], "indices": ["stat"]}},
+        {"channel": "frontendErrorChannel", "matcher": {"severity": "ERROR", "indices": ["event"]}},
+        {"channel": "frontendErrorChannel", "matcher": {"severity": "ERROR", "errorCodes": ["API_CHANGED"], "indices": ["stat"]}},
+        {"channel": "additionalErrorCodeChannel", "matcher": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}}
+    ]
+  ```
 
 ### 7.6.15 (04/13/2021 - 04/25/2021)
 

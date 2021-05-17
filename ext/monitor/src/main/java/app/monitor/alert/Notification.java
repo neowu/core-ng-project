@@ -3,11 +3,11 @@ package app.monitor.alert;
 /**
  * @author neo
  */
-public class NotificationChannel {
+public class Notification {
     public final String channel;
-    public final AlertMatcher matcher;
+    public final Matcher matcher;
 
-    public NotificationChannel(String channel, AlertMatcher matcher) {
+    public Notification(String channel, Matcher matcher) {
         this.channel = channel;
         this.matcher = matcher;
     }
