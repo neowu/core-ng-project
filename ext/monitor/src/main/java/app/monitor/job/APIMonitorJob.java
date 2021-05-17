@@ -25,7 +25,7 @@ import java.util.Map;
  */
 public class APIMonitorJob implements Job {
     private final Logger logger = LoggerFactory.getLogger(APIMonitorJob.class);
-    private final HTTPClient httpClient = HTTPClient.builder().build();
+    private final HTTPClient httpClient = HTTPClient.builder().userAgent("monitor").trustAll().build();
     private final Map<String, String> serviceURLs;
     private final MessagePublisher<StatMessage> publisher;
     private final Map<String, APIDefinitionV2Response> previousDefinitions = Maps.newConcurrentHashMap();
