@@ -12,6 +12,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class APIValidatorTest {
     @Test
+    void noChange() {
+        var validator = new APIValidator(response("api-validator-test/previous.json"),
+            response("api-validator-test/previous.json"));
+        String result = validator.validate();
+        assertThat(result).isNull();
+    }
+
+    @Test
     void rename() {
         var validator = new APIValidator(response("api-validator-test/previous.json"),
             response("api-validator-test/rename.json"));
@@ -43,7 +51,8 @@ class APIValidatorTest {
         assertThat(result).isEqualTo("ERROR");
         assertThat(validator.warnings).isEmpty();
         assertThat(validator.errors)
-            .containsExactly("changed field type of GetCustomerAJAXResponse.name from String to List<String>");
+            .containsExactly("changed field type of GetCustomerAJAXResponse.name from String to List<String>",
+                "changed field type of RegisterAJAXRequest.email from String to Map<String, GetCustomerAJAXResponse>");
     }
 
     @Test

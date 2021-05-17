@@ -241,7 +241,7 @@ class APIValidator {
         if ("List".equals(field.type)) return "List<" + field.typeParams.get(0) + ">";
         if ("Map".equals(field.type)) {
             if ("List".equals(field.typeParams.get(1))) return "Map<" + field.typeParams.get(0) + ", List<" + field.typeParams.get(2) + ">";
-            return "Map<" + field.typeParams.get(0) + ", " + field.typeParams.get(2) + ">";
+            return "Map<" + field.typeParams.get(0) + ", " + field.typeParams.get(1) + ">";
         }
         return field.type;
     }
