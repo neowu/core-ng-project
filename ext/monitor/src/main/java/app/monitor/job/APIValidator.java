@@ -208,7 +208,7 @@ class APIValidator {
         } else {
             var previous = previousTypes.get(previousType);
             var current = currentTypes.get(currentType);
-            if (previous == null || current == null || Strings.equals(previous.type, current.type)) return CompareTypeResult.NOT_MATCH;
+            if (previous == null || current == null || !Strings.equals(previous.type, current.type)) return CompareTypeResult.NOT_MATCH;
             return CompareTypeResult.FURTHER_COMPARE;
         }
     }
