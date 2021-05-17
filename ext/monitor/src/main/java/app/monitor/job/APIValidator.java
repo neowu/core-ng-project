@@ -255,12 +255,12 @@ class APIValidator {
     public String errorMessage() {
         StringBuilder builder = new StringBuilder();
         if (!errors.isEmpty()) {
-            builder.append("* incompatible changes *\n");
-            errors.forEach(error -> builder.append(error).append('\n'));
+            builder.append("*incompatible changes*\n");
+            errors.forEach(error -> builder.append("* ").append(error).append('\n'));
         }
         if (!warnings.isEmpty()) {
-            builder.append("* compatible changes *\n");
-            warnings.forEach(warning -> builder.append(warning).append('\n'));
+            builder.append("*compatible changes*\n");
+            warnings.forEach(warning -> builder.append("* ").append(warning).append('\n'));
         }
         return builder.toString();
     }
