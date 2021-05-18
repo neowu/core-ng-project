@@ -91,6 +91,20 @@ class APIValidatorIntegrationTest {
     }
 
     @Test
+    void removeMethod() {
+        var validator = new APIValidator(response("api-validator-test/previous.json"),
+            response("api-validator-test/remove-method.json"));
+        String result = validator.validate();
+        assertThat(result).isEqualTo("ERROR");
+        assertThat(validator.warnings).isEmpty();
+        assertThat(validator.errors)
+            .containsExactly("removed method CustomerAJAXService.get",
+                "removed type GetCustomerAJAXResponse",
+                "removed type ErrorCode",
+                "removed type Address");
+    }
+
+    @Test
     void changeEnumValue() {
         var validator = new APIValidator(response("api-validator-test/previous.json"),
             response("api-validator-test/change-enum-values.json"));

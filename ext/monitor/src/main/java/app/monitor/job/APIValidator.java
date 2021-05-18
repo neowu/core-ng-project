@@ -1,6 +1,7 @@
 package app.monitor.job;
 
 import core.framework.internal.web.api.APIDefinitionV2Response;
+import core.framework.log.Severity;
 import core.framework.util.Strings;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ class APIValidator {
 
     final Set<String> visitedPreviousTypes = new HashSet<>();
     final Set<String> visitedCurrentTypes = new HashSet<>();
-    final Set<String> removedReferenceTypes = new HashSet<>();  // types referred by removed field (compatible), deprecated methods
+    final Map<String, Severity> removedReferenceTypes = new HashMap<>();  // types referred by removed methods and fields
 
     APIValidator(APIDefinitionV2Response previous, APIDefinitionV2Response current) {
         previousOperations = operations(previous);
@@ -51,13 +52,11 @@ class APIValidator {
             Operation previous = entry.getValue();
             Operation current = currentOperations.remove(entry.getKey());
             if (current == null) {
-                if (Boolean.TRUE.equals(previous.operation.deprecated)) {
-                    warnings.add(Strings.format("removed method @Deprecated {}", previous.methodLiteral()));
-                    removedReferenceTypes.add(previous.operation.requestType);   // it doesn't matter to add null
-                    removedReferenceTypes.add(previous.operation.responseType);  // it doesn't matter to add List/Map/SimpleTypes to visited
-                } else {
-                    errors.add(Strings.format("removed method {}", previous.methodLiteral()));
-                }
+                boolean deprecated = Boolean.TRUE.equals(previous.operation.deprecated);
+                addError(deprecated, Strings.format("removed method {}{}", deprecated ? "@Deprecated " : "", previous.methodLiteral()));
+                Severity severity = deprecated ? Severity.WARN : Severity.ERROR;
+                removeReferenceType(previous.operation.requestType, severity);
+                removeReferenceType(previous.operation.responseType, severity);
             } else {
                 validateOperation(previous, current);
             }
@@ -77,7 +76,8 @@ class APIValidator {
         for (var previousType : leftPreviousTypes.values()) {
             var currentType = leftCurrentTypes.remove(previousType.name);
             if (currentType == null) {
-                addError(removedReferenceTypes.contains(previousType.name), Strings.format("removed type {}", previousType.name));
+                boolean warning = removedReferenceTypes.get(previousType.name) == Severity.WARN;
+                addError(warning, Strings.format("removed type {}", previousType.name));
             } else if (!Strings.equals(previousType.type, currentType.type)) {
                 errors.add(Strings.format("changed type {} from {} to {}", previousType.name, previousType.type, currentType.type));
             } else {
@@ -156,7 +156,10 @@ class APIValidator {
             if (currentField == null) {
                 boolean warning = isRequest || !Boolean.TRUE.equals(previousField.constraints.notNull);
                 addError(warning, Strings.format("removed field {}.{}", previous.name, previousField.name));
-                if (warning) removedReferenceTypes.addAll(List.of(previousTypes));  // it doesn't matter to add List/Map/SimpleTypes to visited
+                Severity severity = warning ? Severity.WARN : Severity.ERROR;
+                for (String previousType : previousTypes) {
+                    removeReferenceType(previousType, severity);
+                }
                 continue;
             }
 
@@ -229,6 +232,23 @@ class APIValidator {
         return types.toArray(String[]::new);
     }
 
+    private void removeReferenceType(String typeName, Severity severity) {
+        APIDefinitionV2Response.Type type = previousTypes.get(typeName);
+        if (type == null) return;   // not bean type, e.g. simple type, collection type, void, null
+        Severity value = severity;
+        if (value == Severity.WARN) value = removedReferenceTypes.getOrDefault(typeName, Severity.WARN);
+        removedReferenceTypes.put(typeName, value);
+
+        if ("bean".equals(type.type)) {
+            for (var field : type.fields) {
+                final String[] candidateTypes = candidateTypes(field);
+                for (String candidateType : candidateTypes) {
+                    removeReferenceType(candidateType, severity);
+                }
+            }
+        }
+    }
+
     private Map<String, Operation> operations(APIDefinitionV2Response response) {
         Map<String, Operation> operations = new LinkedHashMap<>();
         for (APIDefinitionV2Response.Service service : response.services) {
@@ -239,8 +259,8 @@ class APIValidator {
         return operations;
     }
 
-    void addError(boolean warn, String error) {
-        if (warn) {
+    void addError(boolean warning, String error) {
+        if (warning) {
             warnings.add(error);
         } else {
             errors.add(error);
