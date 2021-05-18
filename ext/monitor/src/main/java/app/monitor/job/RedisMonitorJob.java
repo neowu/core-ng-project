@@ -1,17 +1,14 @@
 package app.monitor.job;
 
-import core.framework.internal.log.LogManager;
 import core.framework.internal.stat.Stats;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import core.framework.redis.Redis;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
-import core.framework.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -34,27 +31,14 @@ public class RedisMonitorJob implements Job {
 
     @Override
     public void execute(JobContext context) {
-        var message = new StatMessage();
-        Instant now = Instant.now();
-        message.id = LogManager.ID_GENERATOR.next(now);
-        message.date = now;
-        message.app = app;
-        message.host = host;
         try {
             Map<String, String> info = redis.admin().info();
             Stats stats = stats(info);
-            message.result = stats.result();
-            message.stats = stats.stats;
-            message.errorCode = stats.errorCode;
-            message.errorMessage = stats.errorMessage;
+            publisher.publish(StatMessageFactory.stats(app, host, stats));
         } catch (Throwable e) {
-            logger.warn(e.getMessage(), e);
-            message.result = "ERROR";
-            message.errorCode = "FAILED_TO_COLLECT";
-            message.errorMessage = e.getMessage();
-            message.info = Map.of("stack_trace", Exceptions.stackTrace(e));
+            logger.error(e.getMessage(), e);
+            publisher.publish(StatMessageFactory.failedToCollect(app, host, e));
         }
-        publisher.publish(message);
     }
 
     Stats stats(Map<String, String> info) {

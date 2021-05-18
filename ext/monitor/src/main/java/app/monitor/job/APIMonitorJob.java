@@ -12,7 +12,6 @@ import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +24,13 @@ import java.util.Map;
  */
 public class APIMonitorJob implements Job {
     private final Logger logger = LoggerFactory.getLogger(APIMonitorJob.class);
-    private final HTTPClient httpClient = HTTPClient.builder().userAgent("monitor").trustAll().build();
+    private final HTTPClient httpClient;
     private final Map<String, String> serviceURLs;
     private final MessagePublisher<StatMessage> publisher;
     private final Map<String, APIDefinitionV2Response> previousDefinitions = Maps.newConcurrentHashMap();
 
-    public APIMonitorJob(Map<String, String> serviceURLs, MessagePublisher<StatMessage> publisher) {
+    public APIMonitorJob(HTTPClient httpClient, Map<String, String> serviceURLs, MessagePublisher<StatMessage> publisher) {
+        this.httpClient = httpClient;
         this.serviceURLs = serviceURLs;
         this.publisher = publisher;
     }
@@ -44,7 +44,7 @@ public class APIMonitorJob implements Job {
                 checkAPI(app, serviceURL);
             } catch (Throwable e) {
                 logger.error(e.getMessage(), e);
-                publishError(app, e);
+                publisher.publish(StatMessageFactory.failedToCollect(app, null, e));
             }
         }
     }
@@ -71,27 +71,14 @@ public class APIMonitorJob implements Job {
     }
 
     private void publishAPIChanged(String app, String result, String errorMessage) {
+        var now = Instant.now();
         var message = new StatMessage();
-        Instant now = Instant.now();
         message.id = LogManager.ID_GENERATOR.next(now);
-        message.date = Instant.now();
+        message.date = now;
         message.result = result;
         message.app = app;
         message.errorCode = "API_CHANGED";
         message.errorMessage = errorMessage;
-        publisher.publish(message);
-    }
-
-    private void publishError(String app, Throwable e) {
-        var message = new StatMessage();
-        Instant now = Instant.now();
-        message.id = LogManager.ID_GENERATOR.next(now);
-        message.date = now;
-        message.result = "ERROR";
-        message.app = app;
-        message.errorCode = "FAILED_TO_COLLECT";
-        message.errorMessage = e.getMessage();
-        message.info = Map.of("stack_trace", Exceptions.stackTrace(e));
         publisher.publish(message);
     }
 }

@@ -6,7 +6,6 @@ import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
-import core.framework.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +45,7 @@ public class KubeMonitorJob implements Job {
             }
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
-            publishError(e);
+            publisher.publish(StatMessageFactory.failedToCollect("kubernetes", null, e));
         }
     }
 
@@ -97,29 +96,16 @@ public class KubeMonitorJob implements Job {
     }
 
     private void publishPodFailure(KubePodList.Pod pod, String errorMessage) {
+        var now = Instant.now();
         var message = new StatMessage();
-        Instant now = Instant.now();
         message.id = LogManager.ID_GENERATOR.next(now);
-        message.date = Instant.now();
+        message.date = now;
         message.result = "ERROR";
         message.app = pod.metadata.labels.getOrDefault("app", pod.metadata.name);
         message.host = pod.metadata.name;
         message.errorCode = "POD_FAILURE";
         message.errorMessage = errorMessage;
         message.info = Map.of("pod", JSON.toJSON(pod));
-        publisher.publish(message);
-    }
-
-    private void publishError(Throwable e) {
-        var message = new StatMessage();
-        Instant now = Instant.now();
-        message.id = LogManager.ID_GENERATOR.next(now);
-        message.date = now;
-        message.result = "ERROR";
-        message.app = "kubernetes";
-        message.errorCode = "FAILED_TO_COLLECT";
-        message.errorMessage = e.getMessage();
-        message.info = Map.of("stack_trace", Exceptions.stackTrace(e));
         publisher.publish(message);
     }
 }

@@ -9,6 +9,7 @@ import app.monitor.job.KafkaMonitorJob;
 import app.monitor.job.KubeClient;
 import app.monitor.job.KubeMonitorJob;
 import app.monitor.job.RedisMonitorJob;
+import core.framework.http.HTTPClient;
 import core.framework.json.Bean;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.LogTopics;
@@ -50,7 +51,8 @@ public class MonitorModule extends Module {
     }
 
     private void configureAPIJob(MessagePublisher<StatMessage> publisher, Map<String, String> serviceURLs) {
-        var job = new APIMonitorJob(serviceURLs, publisher);
+        HTTPClient httpClient = HTTPClient.builder().userAgent("monitor").trustAll().build();
+        var job = new APIMonitorJob(httpClient, serviceURLs, publisher);
         schedule().fixedRate("monitor:api", job, Duration.ofMinutes(10));  // not check api too often
     }
 

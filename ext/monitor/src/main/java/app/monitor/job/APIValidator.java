@@ -231,10 +231,11 @@ class APIValidator {
     }
 
     void addError(boolean warn, String error) {
-        if (warn)
+        if (warn) {
             warnings.add(error);
-        else
+        } else {
             errors.add(error);
+        }
     }
 
     String fieldType(APIDefinitionV2Response.Field field) {
