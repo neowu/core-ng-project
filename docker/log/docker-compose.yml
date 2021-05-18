@@ -9,6 +9,7 @@ services:
     - discovery.type=single-node
     - ES_JAVA_OPTS=-Xms512m -Xmx512m
     - xpack.security.enabled=false
+    - xpack.ml.enabled=false
   kibana:
     image: docker.elastic.co/kibana/kibana:7.12.0
     ports:
