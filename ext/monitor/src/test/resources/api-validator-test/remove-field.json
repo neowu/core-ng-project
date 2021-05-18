@@ -28,15 +28,6 @@
       "enumConstants": null
     },
     {
-      "name": "Address",
-      "type": "bean",
-      "fields": [
-        {"name": "address", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "zip", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}}
-      ],
-      "enumConstants": null
-    },
-    {
       "name": "ErrorCode",
       "type": "enum",
       "fields": null,

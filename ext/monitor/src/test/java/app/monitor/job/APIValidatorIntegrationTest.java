@@ -75,7 +75,19 @@ class APIValidatorIntegrationTest {
         assertThat(result).isEqualTo("WARN");
         assertThat(validator.warnings)
             .containsExactly("added @Deprecated to method CustomerAJAXService.get",
-                "added method CustomerAJAXService.getV2");
+                "added method CustomerAJAXService.getV2",
+                "added type GetCustomerAJAXResponseV2");
+    }
+
+    @Test
+    void removeDeprecatedMethod() {
+        var validator = new APIValidator(response("api-validator-test/deprecate-method.json"),
+            response("api-validator-test/remove-deprecated-method.json"));
+        String result = validator.validate();
+        assertThat(result).isEqualTo("WARN");
+        assertThat(validator.warnings)
+            .containsExactly("removed method @Deprecated CustomerAJAXService.get",
+                "removed type GetCustomerAJAXResponse");
     }
 
     @Test
@@ -97,7 +109,8 @@ class APIValidatorIntegrationTest {
         assertThat(result).isEqualTo("WARN");
         assertThat(validator.warnings)
             .containsExactly("removed field GetCustomerAJAXResponse.address",
-                "removed field RegisterAJAXRequest.password");
+                "removed field RegisterAJAXRequest.password",
+                "removed type Address");
     }
 
     private APIDefinitionV2Response response(String path) {

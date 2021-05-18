@@ -31,6 +31,7 @@ class APIValidator {
 
     final Set<String> visitedPreviousTypes = new HashSet<>();
     final Set<String> visitedCurrentTypes = new HashSet<>();
+    final Set<String> removedReferenceTypes = new HashSet<>();  // types referred by removed field (compatible), deprecated methods
 
     APIValidator(APIDefinitionV2Response previous, APIDefinitionV2Response current) {
         previousOperations = operations(previous);
@@ -50,7 +51,13 @@ class APIValidator {
             Operation previous = entry.getValue();
             Operation current = currentOperations.remove(entry.getKey());
             if (current == null) {
-                addError(Boolean.TRUE.equals(previous.operation.deprecated), Strings.format("removed method {}", previous.methodLiteral()));
+                if (Boolean.TRUE.equals(previous.operation.deprecated)) {
+                    warnings.add(Strings.format("removed method @Deprecated {}", previous.methodLiteral()));
+                    removedReferenceTypes.add(previous.operation.requestType);   // it doesn't matter to add null
+                    removedReferenceTypes.add(previous.operation.responseType);  // it doesn't matter to add List/Map/SimpleTypes to visited
+                } else {
+                    errors.add(Strings.format("removed method {}", previous.methodLiteral()));
+                }
             } else {
                 validateOperation(previous, current);
             }
@@ -70,7 +77,7 @@ class APIValidator {
         for (var previousType : leftPreviousTypes.values()) {
             var currentType = leftCurrentTypes.remove(previousType.name);
             if (currentType == null) {
-                errors.add(Strings.format("removed type {}", previousType.name));
+                addError(removedReferenceTypes.contains(previousType.name), Strings.format("removed type {}", previousType.name));
             } else if (!Strings.equals(previousType.type, currentType.type)) {
                 errors.add(Strings.format("changed type {} from {} to {}", previousType.name, previousType.type, currentType.type));
             } else {
@@ -143,14 +150,16 @@ class APIValidator {
     private void validateBeanType(APIDefinitionV2Response.Type current, APIDefinitionV2Response.Type previous, boolean isRequest) {
         var currentFields = current.fields.stream().collect(Collectors.toMap(field -> field.name, Function.identity()));
         for (APIDefinitionV2Response.Field previousField : previous.fields) {
+            String[] previousTypes = candidateTypes(previousField);
+
             var currentField = currentFields.remove(previousField.name);
             if (currentField == null) {
-                addError(isRequest || !Boolean.TRUE.equals(previousField.constraints.notNull),
-                    Strings.format("removed field {}.{}", previous.name, previousField.name));
+                boolean warning = isRequest || !Boolean.TRUE.equals(previousField.constraints.notNull);
+                addError(warning, Strings.format("removed field {}.{}", previous.name, previousField.name));
+                if (warning) removedReferenceTypes.addAll(List.of(previousTypes));  // it doesn't matter to add List/Map/SimpleTypes to visited
                 continue;
             }
 
-            String[] previousTypes = candidateTypes(previousField);
             String[] currentTypes = candidateTypes(currentField);
             if (previousTypes.length != currentTypes.length) {
                 errors.add(Strings.format("changed field type of {}.{} from {} to {}", previous.name, previousField.name, fieldType(previousField), fieldType(currentField)));

@@ -3,23 +3,12 @@
     {
       "name": "CustomerAJAXService",
       "operations": [
-        {"name": "get", "method": "GET", "path": "/ajax/customer/:id", "pathParams": [{"name": "id", "type": "String"}], "requestType": null, "responseType": "GetCustomerAJAXResponse", "optional": false, "deprecated": true},
         {"name": "create", "method": "POST", "path": "/ajax/register", "pathParams": [], "requestType": "RegisterAJAXRequest", "responseType": "void", "optional": false, "deprecated": false},
         {"name": "getV2", "method": "GET", "path": "/ajax/customer/:id/v2", "pathParams": [{"name": "id", "type": "String"}], "requestType": null, "responseType": "GetCustomerAJAXResponseV2", "optional": false, "deprecated": false}
       ]
     }
   ],
   "types": [
-    {
-      "name": "GetCustomerAJAXResponse",
-      "type": "bean",
-      "fields": [
-        {"name": "id", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "name", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
-        {"name": "address", "type": "Address", "typeParams": null, "constraints": {"notNull": false, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}}
-      ],
-      "enumConstants": null
-    },
     {
       "name": "GetCustomerAJAXResponseV2",
       "type": "bean",
