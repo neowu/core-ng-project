@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.7.0-b0 (04/26/2021 - ) !!! still in beta, not released yet
+### 7.7.0-b1 (04/26/2021 - ) !!! still in beta, not released yet
 
 * api: created /_sys/api/v2, to expose more structured api info, (since it's for manual dev process, will replace /_sys/api when releasing 7.7.0)
   > one purpose is to create api monitoring, to alert if api breaks backward compatibility
@@ -22,6 +22,7 @@
         {"channel": "additionalErrorCodeChannel", "matcher": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}}
     ]
   ```
+* log-processor: updated kibana objects to be compatible with kibana 7.12.0
 
 ### 7.6.15 (04/13/2021 - 04/25/2021)
 
