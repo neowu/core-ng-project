@@ -53,7 +53,7 @@ class APIValidator {
             Operation current = currentOperations.remove(entry.getKey());
             if (current == null) {
                 boolean deprecated = Boolean.TRUE.equals(previous.operation.deprecated);
-                addError(deprecated, Strings.format("removed method {}{}", deprecated ? "@Deprecated " : "", previous.methodLiteral()));
+                addError(deprecated, Strings.format("removed method {}", previous.signature()));
                 Severity severity = deprecated ? Severity.WARN : Severity.ERROR;
                 removeReferenceType(previous.operation.requestType, severity);
                 removeReferenceType(previous.operation.responseType, severity);
@@ -63,7 +63,7 @@ class APIValidator {
         }
         if (!currentOperations.isEmpty()) {
             for (Operation operation : currentOperations.values()) {
-                warnings.add(Strings.format("added method {}", operation.methodLiteral()));
+                warnings.add(Strings.format("added method {}", operation.signature()));
             }
         }
     }
@@ -308,6 +308,15 @@ class APIValidator {
         Operation(String service, APIDefinitionV2Response.Operation operation) {
             this.service = service;
             this.operation = operation;
+        }
+
+        String signature() {
+            var builder = new StringBuilder(64);
+            if (deprecated()) builder.append("@Deprecated ");
+            builder.append('@').append(operation.method)
+                .append(" @Path(\"").append(operation.path).append("\") ")
+                .append(service).append('.').append(operation.name);
+            return builder.toString();
         }
 
         String methodLiteral() {

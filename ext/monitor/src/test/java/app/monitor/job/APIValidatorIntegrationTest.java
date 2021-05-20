@@ -75,7 +75,8 @@ class APIValidatorIntegrationTest {
         assertThat(result).isEqualTo("WARN");
         assertThat(validator.warnings)
             .containsExactly("added @Deprecated to method CustomerAJAXService.get",
-                "added method CustomerAJAXService.getV2",
+                """
+                    added method @GET @Path("/ajax/customer/:id/v2") CustomerAJAXService.getV2""",
                 "added type GetCustomerAJAXResponseV2");
     }
 
@@ -86,7 +87,8 @@ class APIValidatorIntegrationTest {
         String result = validator.validate();
         assertThat(result).isEqualTo("WARN");
         assertThat(validator.warnings)
-            .containsExactly("removed method @Deprecated CustomerAJAXService.get",
+            .containsExactly("""
+                    removed method @Deprecated @GET @Path("/ajax/customer/:id") CustomerAJAXService.get""",
                 "removed type GetCustomerAJAXResponse");
     }
 
@@ -98,7 +100,8 @@ class APIValidatorIntegrationTest {
         assertThat(result).isEqualTo("ERROR");
         assertThat(validator.warnings).isEmpty();
         assertThat(validator.errors)
-            .containsExactly("removed method CustomerAJAXService.get",
+            .containsExactly("""
+                    removed method @GET @Path("/ajax/customer/:id") CustomerAJAXService.get""",
                 "removed type GetCustomerAJAXResponse",
                 "removed type ErrorCode",
                 "removed type Address");
