@@ -44,6 +44,7 @@ class APIValidator {
     String validate() {
         validateOperations();
         validateTypes();
+        warnings.removeAll(errors);   // remove warnings if there is already errors, e.g. one change is referred by both request/response bean
         return result();
     }
 
