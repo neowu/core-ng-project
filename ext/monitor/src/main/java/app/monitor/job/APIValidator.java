@@ -44,7 +44,7 @@ class APIValidator {
     String validate() {
         validateOperations();
         validateTypes();
-        warnings.removeAll(errors);   // remove warnings if there is already errors, e.g. one change is referred by both request/response bean
+        warnings.removeAll(errors);   // remove warnings if there is same error, e.g. one change is referred by both request/response bean
         return result();
     }
 
@@ -79,7 +79,7 @@ class APIValidator {
             if (currentType == null) {
                 boolean warning = removedReferenceTypes.get(previousType.name) == Severity.WARN;
                 addError(warning, Strings.format("removed type {}", previousType.name));
-            } else if (!Strings.equals(previousType.type, currentType.type)) {
+            } else if (!Strings.equals(previousType.type, currentType.type)) {  // changed bean to enum or vice versa
                 errors.add(Strings.format("changed type {} from {} to {}", previousType.name, previousType.type, currentType.type));
             } else {
                 validateType(previousType.name, currentType.name, false);
@@ -123,7 +123,7 @@ class APIValidator {
             if (!Strings.equals(previous.operation.responseType, current.operation.responseType)) {
                 errors.add(Strings.format("changed response type of {} from {} to {}", previousMethod, previous.responseTypeLiteral(), current.responseTypeLiteral()));
             }
-        } else {
+        } else {    // both are not void
             validateType(previous.operation.responseType, current.operation.responseType, false);
         }
 
