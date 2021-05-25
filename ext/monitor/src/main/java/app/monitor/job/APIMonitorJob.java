@@ -50,7 +50,7 @@ public class APIMonitorJob implements Job {
     }
 
     private void checkAPI(String app, String serviceURL) {
-        HTTPResponse response = httpClient.execute(new HTTPRequest(HTTPMethod.GET, serviceURL + "/_sys/api/v2"));
+        HTTPResponse response = httpClient.execute(new HTTPRequest(HTTPMethod.GET, serviceURL + "/_sys/api"));
         if (response.statusCode != HTTPStatus.OK.code) {
             throw new Error("failed to call sys api, statusCode=" + response.statusCode + ", message=" + response.text());
         }
