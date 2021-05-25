@@ -1,5 +1,7 @@
 ## Change log
 
+### 7.7.1 (05/25/2021 - )
+
 ### 7.7.0 (04/26/2021 - 05/25/2021)
 
 * api: replaced /_sys/api, to expose more structured api info

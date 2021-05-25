@@ -179,7 +179,7 @@
       {"id": "stat-kafka_disk", "name": "panel_10", "type": "visualization"},
       {"id": "stat-kafka_bytes_rate", "name": "panel_11", "type": "visualization"},
       {"id": "stat-kafka_log-forwarder_produced_rate", "name": "panel_12", "type": "visualization"},
-      {"id": "stat-kafka_log-forwarder_request_size_avg", "name": "panel_13", "type": "visualization"}
+      {"id": "stat-kafka_log-forwarder_producer_request_size_avg", "name": "panel_13", "type": "visualization"}
     ]
   },
   {
