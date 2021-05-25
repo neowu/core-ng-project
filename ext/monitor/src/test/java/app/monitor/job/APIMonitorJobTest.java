@@ -3,7 +3,7 @@ package app.monitor.job;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPResponse;
-import core.framework.internal.web.api.APIDefinitionV2Response;
+import core.framework.internal.web.api.APIDefinitionResponse;
 import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
@@ -41,7 +41,7 @@ class APIMonitorJobTest {
 
     @Test
     void checkAPI() {
-        var response = new APIDefinitionV2Response();
+        var response = new APIDefinitionResponse();
         response.services = List.of();
         response.types = List.of();
         when(httpClient.execute(any())).thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes(JSON.toJSON(response))));
@@ -52,7 +52,7 @@ class APIMonitorJobTest {
         job.execute(null);
         verifyNoInteractions(publisher);    // no changes
 
-        var type = new APIDefinitionV2Response.Type();
+        var type = new APIDefinitionResponse.Type();
         type.type = "bean";
         type.name = "MockType";
         response.types = List.of(type);

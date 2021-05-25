@@ -1,6 +1,6 @@
 package app.monitor.job;
 
-import core.framework.internal.web.api.APIDefinitionV2Response;
+import core.framework.internal.web.api.APIDefinitionResponse;
 import core.framework.log.Severity;
 import core.framework.util.Strings;
 
@@ -25,16 +25,16 @@ class APIValidator {
     final Set<String> errors = new LinkedHashSet<>();
 
     final Map<String, Operation> previousOperations;
-    final Map<String, APIDefinitionV2Response.Type> previousTypes;
+    final Map<String, APIDefinitionResponse.Type> previousTypes;
 
     final Map<String, Operation> currentOperations;
-    final Map<String, APIDefinitionV2Response.Type> currentTypes;
+    final Map<String, APIDefinitionResponse.Type> currentTypes;
 
     final Set<String> visitedPreviousTypes = new HashSet<>();
     final Set<String> visitedCurrentTypes = new HashSet<>();
     final Map<String, Severity> removedReferenceTypes = new HashMap<>();  // types referred by removed methods and fields
 
-    APIValidator(APIDefinitionV2Response previous, APIDefinitionV2Response current) {
+    APIValidator(APIDefinitionResponse previous, APIDefinitionResponse current) {
         previousOperations = operations(previous);
         previousTypes = previous.types.stream().collect(Collectors.toMap(type -> type.name, Function.identity()));
         currentOperations = operations(current);
@@ -85,7 +85,7 @@ class APIValidator {
                 validateType(previousType.name, currentType.name, false);
             }
         }
-        for (APIDefinitionV2Response.Type currentType : leftCurrentTypes.values()) {
+        for (APIDefinitionResponse.Type currentType : leftCurrentTypes.values()) {
             warnings.add(Strings.format("added type {}", currentType.name));
         }
     }
@@ -97,11 +97,11 @@ class APIValidator {
             warnings.add(Strings.format("renamed method {} to {}", previousMethod, currentMethod));
         }
 
-        APIDefinitionV2Response.PathParam[] previousPathParams = previous.operation.pathParams.toArray(new APIDefinitionV2Response.PathParam[0]);
-        APIDefinitionV2Response.PathParam[] currentPathParams = current.operation.pathParams.toArray(new APIDefinitionV2Response.PathParam[0]);
+        APIDefinitionResponse.PathParam[] previousPathParams = previous.operation.pathParams.toArray(new APIDefinitionResponse.PathParam[0]);
+        APIDefinitionResponse.PathParam[] currentPathParams = current.operation.pathParams.toArray(new APIDefinitionResponse.PathParam[0]);
         for (int i = 0; i < previousPathParams.length; i++) {   // previous length must equal to current size, as the "method/path" is same
-            APIDefinitionV2Response.PathParam previousPathParam = previousPathParams[i];
-            APIDefinitionV2Response.PathParam currentPathParam = currentPathParams[i];
+            APIDefinitionResponse.PathParam previousPathParam = previousPathParams[i];
+            APIDefinitionResponse.PathParam currentPathParam = currentPathParams[i];
             if (!Strings.equals(previousPathParam.type, currentPathParam.type)) {
                 errors.add(Strings.format("changed pathParam {} of {} from {} to {}", previousPathParam.name, previousMethod, previousPathParam.type, currentPathParam.type));
             }
@@ -139,8 +139,8 @@ class APIValidator {
         visitedPreviousTypes.add(previousType);
         visitedCurrentTypes.add(currentType);
 
-        APIDefinitionV2Response.Type previous = previousTypes.get(previousType);
-        APIDefinitionV2Response.Type current = currentTypes.get(currentType);
+        APIDefinitionResponse.Type previous = previousTypes.get(previousType);
+        APIDefinitionResponse.Type current = currentTypes.get(currentType);
         if ("enum".equals(previous.type)) {
             validateEnumType(previous, current, isRequest);
         } else {    // bean
@@ -148,9 +148,9 @@ class APIValidator {
         }
     }
 
-    private void validateBeanType(APIDefinitionV2Response.Type current, APIDefinitionV2Response.Type previous, boolean isRequest) {
+    private void validateBeanType(APIDefinitionResponse.Type current, APIDefinitionResponse.Type previous, boolean isRequest) {
         var currentFields = current.fields.stream().collect(Collectors.toMap(field -> field.name, Function.identity()));
-        for (APIDefinitionV2Response.Field previousField : previous.fields) {
+        for (APIDefinitionResponse.Field previousField : previous.fields) {
             String[] previousTypes = candidateTypes(previousField);
 
             var currentField = currentFields.remove(previousField.name);
@@ -195,7 +195,7 @@ class APIValidator {
         }
     }
 
-    private void validateEnumType(APIDefinitionV2Response.Type previous, APIDefinitionV2Response.Type current, boolean isRequest) {
+    private void validateEnumType(APIDefinitionResponse.Type previous, APIDefinitionResponse.Type current, boolean isRequest) {
         var previousEnums = previous.enumConstants.stream().collect(Collectors.toMap(constant -> constant.name, constant -> constant.value));
         var currentEnums = current.enumConstants.stream().collect(Collectors.toMap(constant -> constant.name, constant -> constant.value));
         for (var entry : previousEnums.entrySet()) {
@@ -226,7 +226,7 @@ class APIValidator {
         }
     }
 
-    private String[] candidateTypes(APIDefinitionV2Response.Field field) {
+    private String[] candidateTypes(APIDefinitionResponse.Field field) {
         List<String> types = new ArrayList<>();
         types.add(field.type);
         if (field.typeParams != null) types.addAll(field.typeParams);
@@ -234,7 +234,7 @@ class APIValidator {
     }
 
     private void removeReferenceType(String typeName, Severity severity) {
-        APIDefinitionV2Response.Type type = previousTypes.get(typeName);
+        APIDefinitionResponse.Type type = previousTypes.get(typeName);
         if (type == null) return;   // not bean type, e.g. simple type, collection type, void, null
         Severity value = severity;
         if (value == Severity.WARN) value = removedReferenceTypes.getOrDefault(typeName, Severity.WARN);
@@ -250,10 +250,10 @@ class APIValidator {
         }
     }
 
-    private Map<String, Operation> operations(APIDefinitionV2Response response) {
+    private Map<String, Operation> operations(APIDefinitionResponse response) {
         Map<String, Operation> operations = new LinkedHashMap<>();
-        for (APIDefinitionV2Response.Service service : response.services) {
-            for (APIDefinitionV2Response.Operation operation : service.operations) {
+        for (APIDefinitionResponse.Service service : response.services) {
+            for (APIDefinitionResponse.Operation operation : service.operations) {
                 operations.put(operation.method + "/" + operation.path, new Operation(service.name, operation));
             }
         }
@@ -268,7 +268,7 @@ class APIValidator {
         }
     }
 
-    String fieldType(APIDefinitionV2Response.Field field) {
+    String fieldType(APIDefinitionResponse.Field field) {
         if ("List".equals(field.type)) return "List<" + field.typeParams.get(0) + ">";
         if ("Map".equals(field.type)) {
             if ("List".equals(field.typeParams.get(1))) return "Map<" + field.typeParams.get(0) + ", List<" + field.typeParams.get(2) + ">";
@@ -304,9 +304,9 @@ class APIValidator {
 
     static class Operation {
         String service;
-        APIDefinitionV2Response.Operation operation;
+        APIDefinitionResponse.Operation operation;
 
-        Operation(String service, APIDefinitionV2Response.Operation operation) {
+        Operation(String service, APIDefinitionResponse.Operation operation) {
             this.service = service;
             this.operation = operation;
         }

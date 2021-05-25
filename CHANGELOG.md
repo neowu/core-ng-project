@@ -1,10 +1,10 @@
 ## Change log
 
-### 7.7.0-b1 (04/26/2021 - ) !!! still in beta, not released yet
+### 7.7.0 (04/26/2021 - )
 
-* api: created /_sys/api/v2, to expose more structured api info, (since it's for manual dev process, will replace /_sys/api when releasing 7.7.0)
+* api: replaced /_sys/api, to expose more structured api info
   > one purpose is to create api monitoring, to alert if api breaks backward compatibility
-  > for ts client code generator, refer to https://github.com/neowu/frontend-demo-project/blob/master/website-frontend/webpack/api.js
+  > !!! for ts client code generator, refer to https://github.com/neowu/frontend-demo-project/blob/master/website-frontend/webpack/api.js
 * redis: support pop with multiple items
   > !!! only be supported since redis 6.2, use latest redis docker image if you use this feature
   > pop without count still uses old protocol, so it's optional to upgrade redis
@@ -22,7 +22,8 @@
         {"channel": "additionalErrorCodeChannel", "matcher": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}}
     ]
   ```
-* log-processor: updated kibana objects to be compatible with kibana 7.12.0
+* log-processor: updated kibana objects to be compatible with kibana 7.12.0, rebuild objects with kibana object builder
+  > refer to
 
 ### 7.6.15 (04/13/2021 - 04/25/2021)
 

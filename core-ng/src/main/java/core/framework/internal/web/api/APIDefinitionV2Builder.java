@@ -39,7 +39,7 @@ import java.util.Set;
 public class APIDefinitionV2Builder {
     private final Set<Class<?>> serviceInterfaces;
     private final Set<Class<?>> beanClasses;
-    private final Map<String, APIDefinitionV2Response.Type> types = Maps.newLinkedHashMap();
+    private final Map<String, APIDefinitionResponse.Type> types = Maps.newLinkedHashMap();
     private final Set<Class<?>> valueClasses = Set.of(String.class, Boolean.class,
         Integer.class, Long.class, Double.class, BigDecimal.class,
         LocalDate.class, LocalDateTime.class, ZonedDateTime.class, LocalTime.class);
@@ -49,8 +49,8 @@ public class APIDefinitionV2Builder {
         this.beanClasses = beanClasses;
     }
 
-    public APIDefinitionV2Response build() {
-        var response = new APIDefinitionV2Response();
+    public APIDefinitionResponse build() {
+        var response = new APIDefinitionResponse();
         response.services = services();
         for (Class<?> beanClass : beanClasses) {
             if (beanClass.isEnum()) {
@@ -63,22 +63,22 @@ public class APIDefinitionV2Builder {
         return response;
     }
 
-    private List<APIDefinitionV2Response.Service> services() {
-        var services = new ArrayList<APIDefinitionV2Response.Service>(serviceInterfaces.size());
+    private List<APIDefinitionResponse.Service> services() {
+        var services = new ArrayList<APIDefinitionResponse.Service>(serviceInterfaces.size());
         for (Class<?> serviceInterface : serviceInterfaces) {
             services.add(service(serviceInterface));
         }
         return services;
     }
 
-    private APIDefinitionV2Response.Service service(Class<?> serviceInterface) {
-        var service = new APIDefinitionV2Response.Service();
+    private APIDefinitionResponse.Service service(Class<?> serviceInterface) {
+        var service = new APIDefinitionResponse.Service();
         service.name = serviceInterface.getSimpleName();
         Method[] methods = serviceInterface.getMethods();
         Arrays.sort(methods, Comparator.comparing((Method method) -> method.getDeclaredAnnotation(Path.class).value()).thenComparing(method -> HTTPMethods.httpMethod(method).ordinal()));
         service.operations = new ArrayList<>(methods.length);
         for (Method method : methods) {
-            var operation = new APIDefinitionV2Response.Operation();
+            var operation = new APIDefinitionResponse.Operation();
             operation.name = method.getName();
             operation.method = String.valueOf(HTTPMethods.httpMethod(method));
             operation.path = method.getDeclaredAnnotation(Path.class).value();
@@ -99,14 +99,14 @@ public class APIDefinitionV2Builder {
         return parseType(returnType).type;
     }
 
-    private void parseParams(APIDefinitionV2Response.Operation operation, Method method) {
+    private void parseParams(APIDefinitionResponse.Operation operation, Method method) {
         Annotation[][] annotations = method.getParameterAnnotations();
         Type[] paramTypes = method.getGenericParameterTypes();
         for (int i = 0; i < paramTypes.length; i++) {
             var type = parseType(paramTypes[i]);
             PathParam pathParam = Params.annotation(annotations[i], PathParam.class);
             if (pathParam != null) {
-                var param = new APIDefinitionV2Response.PathParam();
+                var param = new APIDefinitionResponse.PathParam();
                 param.name = pathParam.value();
                 param.type = type.type; // path param type must be simple type
                 operation.pathParams.add(param);
@@ -148,13 +148,13 @@ public class APIDefinitionV2Builder {
         String className = Classes.className(beanClass);
         if (!types.containsKey(className)) {
             List<Field> fields = Classes.instanceFields(beanClass);
-            var definition = new APIDefinitionV2Response.Type();
+            var definition = new APIDefinitionResponse.Type();
             definition.type = "bean";
             definition.name = className;
             definition.fields = new ArrayList<>(fields.size());
             types.put(className, definition);  // put into map before parsing fields to handle circular reference
             for (Field field : fields) {
-                var fieldDefinition = new APIDefinitionV2Response.Field();
+                var fieldDefinition = new APIDefinitionResponse.Field();
                 fieldDefinition.name = fieldName(field);
                 var type = parseType(field.getGenericType());
                 fieldDefinition.type = type.type;
@@ -170,12 +170,12 @@ public class APIDefinitionV2Builder {
         String className = Classes.className(enumClass);
         types.computeIfAbsent(className, key -> {
             List<Field> fields = Classes.enumConstantFields(enumClass);
-            var definition = new APIDefinitionV2Response.Type();
+            var definition = new APIDefinitionResponse.Type();
             definition.type = "enum";
             definition.name = className;
             definition.enumConstants = new ArrayList<>(fields.size());
             for (Field field : fields) {
-                var constant = new APIDefinitionV2Response.EnumConstant();
+                var constant = new APIDefinitionResponse.EnumConstant();
                 constant.name = field.getName();
                 constant.value = field.getDeclaredAnnotation(Property.class).name();
                 definition.enumConstants.add(constant);
@@ -185,7 +185,7 @@ public class APIDefinitionV2Builder {
         return className;
     }
 
-    private void parseConstraints(Field field, APIDefinitionV2Response.Constraints constraints) {
+    private void parseConstraints(Field field, APIDefinitionResponse.Constraints constraints) {
         constraints.notNull = field.isAnnotationPresent(NotNull.class);
         constraints.notBlank = field.isAnnotationPresent(NotBlank.class);
         Min min = field.getDeclaredAnnotation(Min.class);
@@ -194,7 +194,7 @@ public class APIDefinitionV2Builder {
         if (max != null) constraints.max = max.value();
         Size size = field.getDeclaredAnnotation(Size.class);
         if (size != null) {
-            constraints.size = new APIDefinitionV2Response.Size();
+            constraints.size = new APIDefinitionResponse.Size();
             constraints.size.min = size.min();
             constraints.size.max = size.max();
         }

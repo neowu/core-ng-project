@@ -1,6 +1,6 @@
 package app.monitor.job;
 
-import core.framework.internal.web.api.APIDefinitionV2Response;
+import core.framework.internal.web.api.APIDefinitionResponse;
 import core.framework.json.JSON;
 import core.framework.util.ClasspathResources;
 import org.junit.jupiter.api.Test;
@@ -130,7 +130,7 @@ class APIValidatorIntegrationTest {
                 "removed type Address");
     }
 
-    private APIDefinitionV2Response response(String path) {
-        return JSON.fromJSON(APIDefinitionV2Response.class, ClasspathResources.text(path));
+    private APIDefinitionResponse response(String path) {
+        return JSON.fromJSON(APIDefinitionResponse.class, ClasspathResources.text(path));
     }
 }

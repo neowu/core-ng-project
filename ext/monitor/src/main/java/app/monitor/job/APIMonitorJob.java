@@ -6,7 +6,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 import core.framework.internal.log.LogManager;
-import core.framework.internal.web.api.APIDefinitionV2Response;
+import core.framework.internal.web.api.APIDefinitionResponse;
 import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
@@ -27,7 +27,7 @@ public class APIMonitorJob implements Job {
     private final HTTPClient httpClient;
     private final Map<String, String> serviceURLs;
     private final MessagePublisher<StatMessage> publisher;
-    private final Map<String, APIDefinitionV2Response> previousDefinitions = Maps.newConcurrentHashMap();
+    private final Map<String, APIDefinitionResponse> previousDefinitions = Maps.newConcurrentHashMap();
 
     public APIMonitorJob(HTTPClient httpClient, Map<String, String> serviceURLs, MessagePublisher<StatMessage> publisher) {
         this.httpClient = httpClient;
@@ -54,15 +54,15 @@ public class APIMonitorJob implements Job {
         if (response.statusCode != HTTPStatus.OK.code) {
             throw new Error("failed to call sys api, statusCode=" + response.statusCode + ", message=" + response.text());
         }
-        APIDefinitionV2Response currentDefinition = JSON.fromJSON(APIDefinitionV2Response.class, response.text());
-        APIDefinitionV2Response previousDefinition = previousDefinitions.get(app);
+        APIDefinitionResponse currentDefinition = JSON.fromJSON(APIDefinitionResponse.class, response.text());
+        APIDefinitionResponse previousDefinition = previousDefinitions.get(app);
         if (previousDefinition != null) {
             checkAPI(app, previousDefinition, currentDefinition);
         }
         previousDefinitions.put(app, currentDefinition);
     }
 
-    private void checkAPI(String app, APIDefinitionV2Response previous, APIDefinitionV2Response current) {
+    private void checkAPI(String app, APIDefinitionResponse previous, APIDefinitionResponse current) {
         var validator = new APIValidator(previous, current);
         String result = validator.validate();
         if (result != null) {

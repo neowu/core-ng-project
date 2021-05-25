@@ -1,6 +1,6 @@
 package app.monitor.job;
 
-import core.framework.internal.web.api.APIDefinitionV2Response;
+import core.framework.internal.web.api.APIDefinitionResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ class APIValidatorTest {
 
     @BeforeEach
     void createAPIValidator() {
-        var response = new APIDefinitionV2Response();
+        var response = new APIDefinitionResponse();
         response.services = List.of();
         response.types = List.of();
         validator = new APIValidator(response, response);
