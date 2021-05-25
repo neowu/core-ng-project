@@ -7,6 +7,7 @@ import core.framework.search.ElasticSearchType;
 import core.framework.util.StopWatch;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.support.ActiveShardCount;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
@@ -18,9 +19,13 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CloseIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.client.indices.PutIndexTemplateRequest;
+import org.elasticsearch.client.indices.PutComposableIndexTemplateRequest;
 import org.elasticsearch.client.indices.PutMappingRequest;
+import org.elasticsearch.cluster.metadata.ComposableIndexTemplate;
 import org.elasticsearch.common.bytes.BytesArray;
+import org.elasticsearch.common.xcontent.DeprecationHandler;
+import org.elasticsearch.common.xcontent.NamedXContentRegistry;
+import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,10 +52,10 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void initialize() {
         RestClientBuilder builder = RestClient.builder(hosts);
         builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
-                .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
+            .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
         builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
-                .setMaxConnPerRoute(100)
-                .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis()));
+            .setMaxConnPerRoute(100)
+            .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis()));
         client = new RestHighLevelClient(builder);
     }
 
@@ -97,7 +102,8 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void putIndexTemplate(String name, String source) {
         var watch = new StopWatch();
         try {
-            client().indices().putTemplate(new PutIndexTemplateRequest(name).source(new BytesArray(source), XContentType.JSON), RequestOptions.DEFAULT);
+            XContentParser parser = XContentType.JSON.xContent().createParser(NamedXContentRegistry.EMPTY, DeprecationHandler.THROW_UNSUPPORTED_OPERATION, source);
+            client().indices().putIndexTemplate(new PutComposableIndexTemplateRequest().name(name).indexTemplate(ComposableIndexTemplate.parse(parser)), RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
@@ -121,7 +127,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void closeIndex(String index) {
         var watch = new StopWatch();
         try {
-            client().indices().close(new CloseIndexRequest(index), RequestOptions.DEFAULT);
+            client().indices().close(new CloseIndexRequest(index).waitForActiveShards(ActiveShardCount.NONE), RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {

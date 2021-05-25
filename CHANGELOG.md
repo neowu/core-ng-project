@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.7.0 (04/26/2021 - )
+### 7.7.0 (04/26/2021 - 05/25/2021)
 
 * api: replaced /_sys/api, to expose more structured api info
   > one purpose is to create api monitoring, to alert if api breaks backward compatibility
@@ -23,7 +23,11 @@
     ]
   ```
 * log-processor: updated kibana objects to be compatible with kibana 7.12.0, rebuild objects with kibana object builder
-  > refer to
+  > refer to core-ng-demo-project/kibana-generator
+
+* es: update to 7.13.0, updated ElasticSearch.putIndexTemplate impl to use new PutComposableIndexTemplateRequest
+  > !!! refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html
+  > must update index template format to match new API, refer to ext/log-processor/src/main/resources/index/action-index-template.json as example
 
 ### 7.6.15 (04/13/2021 - 04/25/2021)
 
