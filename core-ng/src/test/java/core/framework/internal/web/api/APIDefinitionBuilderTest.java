@@ -15,11 +15,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author neo
  */
 class APIDefinitionBuilderTest {
-    private APIDefinitionV2Builder builder;
+    private APIDefinitionBuilder builder;
 
     @BeforeEach
     void createAPIDefinitionBuilder() {
-        builder = new APIDefinitionV2Builder(Set.of(TestWebService.class), Set.of(ErrorCode.class));
+        builder = new APIDefinitionBuilder(Set.of(TestWebService.class), Set.of(ErrorCode.class));
     }
 
     @Test

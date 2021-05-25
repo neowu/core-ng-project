@@ -2,8 +2,8 @@ package core.framework.internal.web.sys;
 
 import core.framework.http.ContentType;
 import core.framework.internal.module.ServiceRegistry;
+import core.framework.internal.web.api.APIDefinitionBuilder;
 import core.framework.internal.web.api.APIDefinitionResponse;
-import core.framework.internal.web.api.APIDefinitionV2Builder;
 import core.framework.internal.web.http.IPv4AccessControl;
 import core.framework.json.JSON;
 import core.framework.web.Controller;
@@ -26,7 +26,7 @@ public class APIController implements Controller {
     public Response execute(Request request) {
         accessControl.validate(request.clientIP());
 
-        var builder = new APIDefinitionV2Builder(registry.serviceInterfaces, registry.beanClasses);
+        var builder = new APIDefinitionBuilder(registry.serviceInterfaces, registry.beanClasses);
         APIDefinitionResponse response = builder.build();
 
         return Response.text(JSON.toJSON(response)).contentType(ContentType.APPLICATION_JSON);

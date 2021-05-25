@@ -36,7 +36,7 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class APIDefinitionV2Builder {
+public class APIDefinitionBuilder {
     private final Set<Class<?>> serviceInterfaces;
     private final Set<Class<?>> beanClasses;
     private final Map<String, APIDefinitionResponse.Type> types = Maps.newLinkedHashMap();
@@ -44,7 +44,7 @@ public class APIDefinitionV2Builder {
         Integer.class, Long.class, Double.class, BigDecimal.class,
         LocalDate.class, LocalDateTime.class, ZonedDateTime.class, LocalTime.class);
 
-    public APIDefinitionV2Builder(Set<Class<?>> serviceInterfaces, Set<Class<?>> beanClasses) {
+    public APIDefinitionBuilder(Set<Class<?>> serviceInterfaces, Set<Class<?>> beanClasses) {
         this.serviceInterfaces = serviceInterfaces;
         this.beanClasses = beanClasses;
     }
