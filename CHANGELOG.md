@@ -1,6 +1,7 @@
 ## Change log
 
 ### 7.7.1 (05/25/2021 - )
+* log-processor/kibana: added http dashboard and visualizations (http / dns / conn)
 
 ### 7.7.0 (04/26/2021 - 05/25/2021)
 
