@@ -52,13 +52,17 @@ public final class HTTPClientImpl implements HTTPClient {
     public HTTPResponse execute(HTTPRequest request) {
         var watch = new StopWatch();
         Request httpRequest = httpRequest(request);
+        int requestBodyLength = request.body == null ? 0 : request.body.length;
+        int responseBodyLength = 0;
         try (Response httpResponse = client.newCall(httpRequest).execute()) {
-            return response(httpResponse);
+            HTTPResponse response = response(httpResponse);
+            responseBodyLength = response.body.length;
+            return response;
         } catch (IOException e) {
             throw new HTTPClientException(Strings.format("http request failed, uri={}, error={}", request.uri, e.getMessage()), "HTTP_REQUEST_FAILED", e);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("http", elapsed);
+            ActionLogContext.track("http", elapsed, responseBodyLength, requestBodyLength);
             logger.debug("execute, elapsed={}", elapsed);
             if (elapsed > slowOperationThresholdInNanos(request)) {
                 logger.warn(errorCode("SLOW_HTTP"), "slow http operation, method={}, uri={}, elapsed={}", request.method, request.uri, Duration.ofNanos(elapsed));

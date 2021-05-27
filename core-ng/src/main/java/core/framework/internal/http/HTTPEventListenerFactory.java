@@ -1,6 +1,7 @@
 package core.framework.internal.http;
 
-import core.framework.log.ActionLogContext;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import okhttp3.Call;
 import okhttp3.EventListener;
 import okhttp3.Protocol;
@@ -18,13 +19,21 @@ import java.util.List;
 public class HTTPEventListenerFactory implements EventListener.Factory {
     @Override
     public EventListener create(Call call) {
-        return new Listener();
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        if (actionLog == null) return EventListener.NONE;
+        return new Listener(actionLog);
     }
 
     static class Listener extends EventListener {   // okHTTP create listener for each realCall, no threading issue
         private static final Logger LOGGER = LoggerFactory.getLogger(Listener.class);
+        private final ActionLog actionLog;
         private long dnsStart;
         private long connectStart;
+        private long readStart;
+
+        public Listener(ActionLog actionLog) {
+            this.actionLog = actionLog;
+        }
 
         // okHTTP uses URL Host/Address as key to acquire connection, refer to okhttp3.internal.connection.RealConnectionPool -> callAcquirePooledConnection
         // if conn pool doesn't have matched connection, it creates new connection object, resolves dns(dnsStart/End), connects socket (connectStart/End)
@@ -38,7 +47,7 @@ public class HTTPEventListenerFactory implements EventListener.Factory {
         public void dnsEnd(Call call, String domain, List<InetAddress> addresses) {
             long elapsed = System.nanoTime() - dnsStart;
             LOGGER.debug("resolve domain, domain={}, addresses={}, elapsed={}", domain, addresses, elapsed);
-            ActionLogContext.track("http_dns", elapsed);
+            actionLog.track("http_dns", elapsed, 0, 0);
         }
 
         @Override
@@ -50,7 +59,18 @@ public class HTTPEventListenerFactory implements EventListener.Factory {
         public void connectEnd(Call call, InetSocketAddress address, Proxy proxy, Protocol protocol) {
             long elapsed = System.nanoTime() - connectStart;
             LOGGER.debug("create http connection, address={}, elapsed={}", address, elapsed);
-            ActionLogContext.track("http_conn", elapsed);
+            actionLog.track("http_conn", elapsed, 0, 0);
+        }
+
+        @Override
+        public void responseHeadersStart(Call call) {
+            readStart = System.nanoTime();
+        }
+
+        @Override
+        public void responseBodyEnd(Call call, long byteCount) {
+            long elapsed = System.nanoTime() - readStart;
+            actionLog.track("http_read", elapsed, 0, 0);
         }
     }
 }

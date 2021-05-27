@@ -12,6 +12,7 @@ import core.framework.internal.http.TimeoutInterceptor;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
 import okhttp3.ConnectionPool;
+import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,12 +84,12 @@ public final class HTTPClientBuilder {
         var watch = new StopWatch();
         try {
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .connectTimeout(connectTimeout)
-                    .readTimeout(timeout)
-                    .writeTimeout(timeout)
-                    .callTimeout(callTimeout()) // call timeout is only used as last defense, timeout for complete call includes connect/retry/etc
-                    .connectionPool(new ConnectionPool(100, keepAlive.toSeconds(), TimeUnit.SECONDS))
-                    .eventListenerFactory(new HTTPEventListenerFactory());
+                .connectTimeout(connectTimeout)
+                .readTimeout(timeout)
+                .writeTimeout(timeout)
+                .callTimeout(callTimeout()) // call timeout is only used as last defense, timeout for complete call includes connect/retry/etc
+                .connectionPool(new ConnectionPool(100, keepAlive.toSeconds(), TimeUnit.SECONDS))
+                .eventListenerFactory(new HTTPEventListenerFactory());
 
             configureHTTPS(builder);
 
@@ -100,7 +101,11 @@ public final class HTTPClientBuilder {
             if (enableCookie) builder.cookieJar(new CookieManager());
             if (enableFallbackDNSCache) builder.dns(new FallbackDNSCache());
 
-            return new HTTPClientImpl(builder.build(), userAgent, slowOperationThreshold, timeout);
+            OkHttpClient httpClient = builder.build();
+            Dispatcher dispatcher = httpClient.dispatcher();
+            dispatcher.setMaxRequests(128);     // allow more concurrent requests per client
+            dispatcher.setMaxRequestsPerHost(64);
+            return new HTTPClientImpl(httpClient, userAgent, slowOperationThreshold, timeout);
         } finally {
             logger.info("create http client, elapsed={}", watch.elapsed());
         }
@@ -120,7 +125,7 @@ public final class HTTPClientBuilder {
             }
             sslContext.init(null, new TrustManager[]{trustManager}, null);
             builder.hostnameVerifier((hostname, sslSession) -> true)
-                    .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
+                .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new Error(e);
         }
@@ -208,7 +213,7 @@ public final class HTTPClientBuilder {
         int attempts = maxRetries == null ? 1 : maxRetries;
         long timeout = connectTimeout.toMillis() + this.timeout.toMillis() * attempts;
         for (int i = 1; i < attempts; i++) {
-            timeout += 600 << i - 1;    // rough sleep can be +20% of 500ms
+            timeout += 600L << i - 1;    // rough sleep can be +20% of 500ms
         }
         timeout += 2000;  // add 2 seconds as extra buffer
         return Duration.ofMillis(timeout);
