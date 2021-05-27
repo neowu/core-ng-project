@@ -31,7 +31,7 @@ public class HTTPEventListenerFactory implements EventListener.Factory {
         private long connectStart;
         private long readStart;
 
-        public Listener(ActionLog actionLog) {
+        Listener(ActionLog actionLog) {
             this.actionLog = actionLog;
         }
 
