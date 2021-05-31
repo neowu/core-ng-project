@@ -1,8 +1,8 @@
 ## Change log
 
-### 7.7.1-b1 (05/25/2021 - )
+### 7.7.1 (05/25/2021 - )
 
-* log-processor/kibana: added http dashboard and visualizations (http / dns / conn)
+* log-processor/kibana: added http server/client dashboard and visualizations (http / dns / conn / reties / delays)
 * http: added action.stat.http_delay to track time between http request start to action start (time spent on HTTPIOHandler)
   added action.stat.request_body_length/action.stat.response_body_length to track
 * httpClient: track request/response body length thru perf_stats.http.write_entries/read_entries

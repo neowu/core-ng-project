@@ -14,7 +14,4 @@
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled
 
 * redis using ping/pong to validate connection? for zero downtime upgrading e.g. with gcloud memory store
-* put maxProcessTime/remainingProcessTime in action.stats? (seems not important)
 * websocket, replace AbstractReceiveListener, so it can include IO/error handling within action lifecycle?
-
-* http: should track time spend after action elapsed until response finished? httpClient tracks time spent on read response
