@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author neo
  */
 class RepositoryImplTest {
-    private RepositoryImpl repository;
+    private RepositoryImpl<AssignedIdEntity> repository;
 
     @BeforeEach
     void createRepository() {
