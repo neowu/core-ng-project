@@ -38,6 +38,7 @@ public class RetryInterceptor implements Interceptor {
         Request request = chain.request();
         int attempts = 1;
         while (true) {
+            if (chain.call().isCanceled()) throw new IOException("call timeout");   // AsyncTimout cancels call if callTimeout, refer to RealCall.kt/timout field
             try {
                 Response response = chain.proceed(request);
                 int statusCode = response.code();
@@ -83,7 +84,7 @@ public class RetryInterceptor implements Interceptor {
 
     boolean shouldRetry(int attempts, int statusCode) {
         return attempts < maxRetries
-                && (statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code);
+               && (statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code);
     }
 
     boolean shouldRetry(int attempts, String method, IOException e) {

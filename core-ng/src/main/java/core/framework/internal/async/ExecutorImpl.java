@@ -71,7 +71,7 @@ public final class ExecutorImpl implements Executor {
 
     @Override
     public <T> Future<T> submit(String action, Callable<T> task) {
-        Instant now = Instant.now();
+        var now = Instant.now();
         String actionId = LogManager.ID_GENERATOR.next(now);
         logger.debug("submit task, action={}, id={}", action, actionId);
         ExecutorTask<T> execution = execution(actionId, action, now, task);
@@ -93,7 +93,7 @@ public final class ExecutorImpl implements Executor {
     }
 
     boolean scheduleDelayedTask(String action, Task task, Duration delay) {
-        Instant now = Instant.now();
+        var now = Instant.now();
         String actionId = LogManager.ID_GENERATOR.next(now);
         logger.debug("submit delayed task, action={}, id={}, delay={}", action, actionId, delay);
 

@@ -12,7 +12,6 @@ import core.framework.internal.http.TimeoutInterceptor;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
 import okhttp3.ConnectionPool;
-import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,11 +100,7 @@ public final class HTTPClientBuilder {
             if (enableCookie) builder.cookieJar(new CookieManager());
             if (enableFallbackDNSCache) builder.dns(new FallbackDNSCache());
 
-            OkHttpClient httpClient = builder.build();
-            Dispatcher dispatcher = httpClient.dispatcher();
-            dispatcher.setMaxRequests(128);     // allow more concurrent requests per client
-            dispatcher.setMaxRequestsPerHost(64);
-            return new HTTPClientImpl(httpClient, userAgent, slowOperationThreshold, timeout);
+            return new HTTPClientImpl(builder.build(), userAgent, slowOperationThreshold, timeout);
         } finally {
             logger.info("create http client, elapsed={}", watch.elapsed());
         }
@@ -209,13 +204,14 @@ public final class HTTPClientBuilder {
         return this;
     }
 
+    // this is rough estimate, like read timeout doesn't mean fetching full response will complete within duration of timeout
     Duration callTimeout() {
         int attempts = maxRetries == null ? 1 : maxRetries;
-        long timeout = connectTimeout.toMillis() + this.timeout.toMillis() * attempts;
+        long callTimeout = connectTimeout.toMillis() + timeout.toMillis() * attempts;
         for (int i = 1; i < attempts; i++) {
-            timeout += 600L << i - 1;    // rough sleep can be +20% of 500ms
+            callTimeout += retryWaitTime.toMillis() << i - 1;
         }
-        timeout += 2000;  // add 2 seconds as extra buffer
-        return Duration.ofMillis(timeout);
+        callTimeout += 2000;  // add 2 seconds as extra buffer
+        return Duration.ofMillis(callTimeout);
     }
 }

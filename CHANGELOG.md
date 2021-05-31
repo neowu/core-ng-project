@@ -3,8 +3,9 @@
 ### 7.7.1-b1 (05/25/2021 - )
 
 * log-processor/kibana: added http dashboard and visualizations (http / dns / conn)
-* httpClient: increased maxRequest to 128 and maxRequestsPerHost to 64, to allow more concurrent requests to same service
-* httpClient: improve perf_http to track request/response body size on read_entries/write_entries, added perf_stats.http_read.total_elapsed to track time spent on reading response
+* http: added action.stat.http_delay to track time between http request start to action start (time spent on HTTPIOHandler)
+  added action.stat.request_body_length/action.stat.response_body_length to track
+* httpClient: track request/response body length thru perf_stats.http.write_entries/read_entries
 
 ### 7.7.0 (04/26/2021 - 05/25/2021)
 

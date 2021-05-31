@@ -38,14 +38,16 @@ public class ResponseHandler {
 
         HTTPStatus status = response.status();
         exchange.setStatusCode(status.code);
+        actionLog.context.put("response_code", List.of(String.valueOf(status.code)));
+        logger.debug("[response] statusCode={}", status.code);
 
         putHeaders(response, exchange);
         putCookies(response, exchange);
 
         response.body.send(exchange.getResponseSender(), context);
-
-        actionLog.context.put("response_code", List.of(String.valueOf(status.code)));  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
-        logger.debug("[response] statusCode={}", status.code);
+        long bytesSent = exchange.getResponseBytesSent();
+        logger.debug("[response] bodyLength={}", bytesSent);    // with gzip bodyLength can be smaller than actual body content length
+        actionLog.stats.put("response_body_length", (double) bytesSent);
     }
 
     private void putHeaders(ResponseImpl response, HttpServerExchange exchange) {
@@ -66,7 +68,7 @@ public class ResponseHandler {
                 CookieImpl cookie = cookie(spec, value);
                 exchange.setResponseCookie(cookie);
                 logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
-                        spec.name, new FieldLogParam(spec.name, cookie.getValue()), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
+                    spec.name, new FieldLogParam(spec.name, cookie.getValue()), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
             }
         }
     }
