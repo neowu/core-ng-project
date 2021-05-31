@@ -58,7 +58,7 @@
       "title": "action",
       "description": "Action stats",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "panelsJSON": "[\n  {\"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"panelIndex\": \"1\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_1\"},\n  {\"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 15, \"i\": \"2\"}, \"panelIndex\": \"2\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_2\"},\n  {\"gridData\": {\"x\": 0, \"y\": 30, \"w\": 48, \"h\": 15, \"i\": \"3\"}, \"panelIndex\": \"3\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_3\"},\n  {\"gridData\": {\"x\": 0, \"y\": 45, \"w\": 48, \"h\": 15, \"i\": \"4\"}, \"panelIndex\": \"4\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_4\"},\n  {\"gridData\": {\"x\": 0, \"y\": 60, \"w\": 48, \"h\": 90, \"i\": \"5\"}, \"panelIndex\": \"5\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_5\"}\n]",
+      "panelsJSON": "[\n  {\"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"panelIndex\": \"1\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_1\"},\n  {\"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 15, \"i\": \"2\"}, \"panelIndex\": \"2\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_2\"},\n  {\"gridData\": {\"x\": 0, \"y\": 30, \"w\": 48, \"h\": 15, \"i\": \"3\"}, \"panelIndex\": \"3\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_3\"},\n  {\"gridData\": {\"x\": 0, \"y\": 45, \"w\": 48, \"h\": 15, \"i\": \"4\"}, \"panelIndex\": \"4\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_4\"},\n  {\"gridData\": {\"x\": 0, \"y\": 60, \"w\": 48, \"h\": 105, \"i\": \"5\"}, \"panelIndex\": \"5\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_5\"}\n]",
       "timeRestore": false
     },
     "references": [
@@ -107,7 +107,7 @@
       "title": "errors",
       "description": "Application errors",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "panelsJSON": "[\n  {\"panelIndex\": \"1\", \"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_1\"},\n  {\"panelIndex\": \"2\", \"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 150, \"i\": \"2\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_2\"}\n]",
+      "panelsJSON": "[\n  {\"panelIndex\": \"1\", \"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_1\"},\n  {\"panelIndex\": \"2\", \"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 300, \"i\": \"2\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_2\"}\n]",
       "timeFrom": "now-24h",
       "timeRestore": true,
       "timeTo": "now"

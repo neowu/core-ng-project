@@ -178,7 +178,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         }
     }
 
-    private int insertedRows(int[] results) {
+    int insertedRows(int[] results) {
         int insertedRows = 0;
         for (int result : results) {
             if (result == Statement.SUCCESS_NO_INFO) insertedRows++;    // with insertIgnore, mysql returns -2 if insert succeeds
