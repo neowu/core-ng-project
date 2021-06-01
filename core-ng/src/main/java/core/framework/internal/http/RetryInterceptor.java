@@ -3,7 +3,6 @@ package core.framework.internal.http;
 import core.framework.api.http.HTTPStatus;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
-import core.framework.log.ActionLogContext;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -57,7 +56,10 @@ public class RetryInterceptor implements Interceptor {
             }
             sleep.sleep(waitTime(attempts));
             attempts++;
-            ActionLogContext.stat("http_retries", 1);
+
+            // set to actionLog directly to keep trace log concise
+            ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+            if (actionLog != null) actionLog.stats.compute("http_retries", (key, oldValue) -> (oldValue == null) ? 1.0 : oldValue + 1);
         }
     }
 
