@@ -37,7 +37,8 @@ class CookieManagerTest {
         HttpUrl url = HttpUrl.get("http://localhost/");
         Cookie cookie1 = Cookie.parse(url, "key1=v1; Path=/;");
         Cookie cookie2 = Cookie.parse(url, "key2=v2; Domain=localhost; Max-Age=0;");
-        cookieManager.saveFromResponse(url, List.of(cookie1, cookie2));
+        cookieManager.store.put("localhost:/:key1", cookie1);
+        cookieManager.store.put("localhost:/:key2", cookie2);
 
         List<Cookie> cookies = cookieManager.loadForRequest(url);
         assertThat(cookies).hasSize(1);

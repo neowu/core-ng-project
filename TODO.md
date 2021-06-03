@@ -15,3 +15,5 @@
 
 * redis using ping/pong to validate connection? for zero downtime upgrading e.g. with gcloud memory store
 * websocket, replace AbstractReceiveListener, so it can include IO/error handling within action lifecycle?
+
+* provide general support/framework for backend-test/regression-test/load-test?
