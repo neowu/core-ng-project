@@ -1,6 +1,7 @@
 ## Change log
 
 ### 7.7.2 (06/03/2021 - )
+* monitor: fixed overflowed vmRSS value, use long instead of int
 
 ### 7.7.1 (05/25/2021 - 06/02/2021)
 
