@@ -15,4 +15,4 @@ jobs:
       with:
         file: "ext/docker/log-collector/Dockerfile"
         push: true
-        tags: "neowu/log-collector:${{ TAG }}"
+        tags: "neowu/log-collector:${{ env.TAG }}"
