@@ -1,6 +1,7 @@
 ## Change log
 
 ### 7.7.2 (06/03/2021 - )
+
 * monitor: fixed overflowed vmRSS value, use long instead of int
 
 ### 7.7.1 (05/25/2021 - 06/02/2021)
@@ -245,20 +246,20 @@
 
 ```json
 {
-  "ignoreErrors": [
-    {"apps": ["website"], "errorCodes": ["PATH_NOT_FOUND"], "severity": "WARN"}
-  ],
-  "criticalErrors": [
-    {"errorCodes": ["FAILED_TO_START", "POD_FAILURE"]}
-  ],
-  "kibanaURL": "http://kibana:5601",
-  "channels": {
-    "actionWarnChannel": {"severity": "WARN", "indices": ["trace", "stat"]},
-    "actionErrorChannel": {"severity": "ERROR", "indices": ["trace", "stat"]},
-    "eventWarnChannel": {"severity": "WARN", "indices": ["event"]},
-    "eventErrorChannel": {"severity": "ERROR", "indices": ["event"]},
-    "additionalErrorCodeChannel": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}
-  }
+    "ignoreErrors": [
+        {"apps": ["website"], "errorCodes": ["PATH_NOT_FOUND"], "severity": "WARN"}
+    ],
+    "criticalErrors": [
+        {"errorCodes": ["FAILED_TO_START", "POD_FAILURE"]}
+    ],
+    "kibanaURL": "http://kibana:5601",
+    "channels": {
+        "actionWarnChannel": {"severity": "WARN", "indices": ["trace", "stat"]},
+        "actionErrorChannel": {"severity": "ERROR", "indices": ["trace", "stat"]},
+        "eventWarnChannel": {"severity": "WARN", "indices": ["event"]},
+        "eventErrorChannel": {"severity": "ERROR", "indices": ["event"]},
+        "additionalErrorCodeChannel": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}
+    }
 }
 ```    
 
