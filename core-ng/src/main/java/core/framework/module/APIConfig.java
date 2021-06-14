@@ -111,7 +111,7 @@ public class APIConfig extends Config {
     }
 
     public void publishAPI(List<String> cidrs) {
-        logger.info("publish typescript api definition, cidrs={}", cidrs);
+        logger.info("publish api definition, cidrs={}", cidrs);
         var accessControl = new IPv4AccessControl();
         accessControl.allow = new IPv4Ranges(cidrs);
         context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceRegistry, accessControl), true);

@@ -3,6 +3,7 @@ package app.monitor.job;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPResponse;
+import core.framework.internal.log.LogManager;
 import core.framework.internal.web.api.APIDefinitionResponse;
 import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
@@ -36,12 +37,13 @@ class APIMonitorJobTest {
 
     @BeforeEach
     void createAPIMonitorJob() {
-        job = new APIMonitorJob(httpClient, Map.of("website", "https://website"), publisher);
+        job = new APIMonitorJob(httpClient, List.of("https://website"), publisher);
     }
 
     @Test
     void checkAPI() {
         var response = new APIDefinitionResponse();
+        response.app = "website";
         response.services = List.of();
         response.types = List.of();
         when(httpClient.execute(any())).thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes(JSON.toJSON(response))));
@@ -68,7 +70,7 @@ class APIMonitorJobTest {
     void publishError() {
         when(httpClient.execute(any())).thenThrow(new HTTPClientException("mock", "MOCK_ERROR_CODE", null));
         job.execute(null);
-        verify(publisher).publish(argThat(message -> "website".equals(message.app)
+        verify(publisher).publish(argThat(message -> LogManager.APP_NAME.equals(message.app)
                                                      && "ERROR".equals(message.result)
                                                      && "FAILED_TO_COLLECT".equals(message.errorCode)));
     }

@@ -3,6 +3,16 @@
 ### 7.7.2 (06/03/2021 - )
 
 * monitor: fixed overflowed vmRSS value, use long instead of int
+* api: added "app" in APIDefinitionResponse
+* monitor: api config json schema changed !!!
+  > changed from map to List<ServiceURL>, to simplify config. it requires the latest framework, refers to above
+    ```json
+        {
+          "api": {
+            "services": ["https://website", "https://backoffice"]
+          } 
+        }
+    ```
 
 ### 7.7.1 (05/25/2021 - 06/02/2021)
 

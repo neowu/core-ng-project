@@ -30,7 +30,7 @@ public class MonitorConfig {
 
     @NotNull
     @Property(name = "api")
-    public Map<String, String> api = Map.of();
+    public APIConfig api;
 
     public static class RedisConfig {
         @NotNull
@@ -86,5 +86,12 @@ public class MonitorConfig {
         @Size(min = 1)
         @Property(name = "namespaces")
         public List<String> namespaces = List.of();
+    }
+
+    public static class APIConfig {
+        @NotNull
+        @Size(min = 1)
+        @Property(name = "services")
+        public List<String> services = List.of();
     }
 }
