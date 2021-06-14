@@ -1,22 +1,75 @@
 {
+  "app": "local",
   "services": [
     {
       "name": "TestWebService",
       "operations": [
-        {"name": "search", "method": "GET", "path": "/test", "pathParams": [], "responseType": "TestWebService$TestResponse", "requestType": "TestWebService$TestSearchRequest"},
-        {"name": "get", "method": "GET", "path": "/test/:id", "pathParams": [{"name": "id", "type": "number"}], "responseType": "TestWebService$TestResponse | null", "requestType": null},
-        {"name": "create", "method": "PUT", "path": "/test/:id", "pathParams": [{"name": "id", "type": "number"}], "responseType": "void", "requestType": "TestWebService$TestRequest"},
-        {"name": "delete", "method": "DELETE", "path": "/test/:id", "pathParams": [{"name": "id", "type": "string"}], "responseType": "void", "requestType": null},
-        {"name": "patch", "method": "PATCH", "path": "/test/:id", "pathParams": [{"name": "id", "type": "number"}], "responseType": "void", "requestType": "TestWebService$TestRequest"},
-        {"name": "getEnum", "method": "GET", "path": "/test/:id/:enum", "pathParams": [{"name": "id", "type": "number"}, {"name": "enum", "type": "TestWebService$TestEnum"}], "responseType": "TestWebService$TestResponse", "requestType": null}
+        {"name": "deprecated", "method": "GET", "path": "/deprecated/test/:id", "pathParams": [{"name": "id", "type": "Integer"}], "requestType": null, "responseType": "TestWebService$TestResponse", "optional": true, "deprecated": true},
+        {"name": "search", "method": "GET", "path": "/test", "pathParams": [], "requestType": "TestWebService$TestSearchRequest", "responseType": "TestWebService$TestResponse", "optional": false, "deprecated": false},
+        {"name": "get", "method": "GET", "path": "/test/:id", "pathParams": [{"name": "id", "type": "Integer"}], "requestType": null, "responseType": "TestWebService$TestResponse", "optional": true, "deprecated": false},
+        {"name": "create", "method": "PUT", "path": "/test/:id", "pathParams": [{"name": "id", "type": "Integer"}], "requestType": "TestWebService$TestRequest", "responseType": "void", "optional": false, "deprecated": false},
+        {"name": "delete", "method": "DELETE", "path": "/test/:id", "pathParams": [{"name": "id", "type": "String"}], "requestType": null, "responseType": "void", "optional": false, "deprecated": false},
+        {"name": "patch", "method": "PATCH", "path": "/test/:id", "pathParams": [{"name": "id", "type": "Integer"}], "requestType": "TestWebService$TestRequest", "responseType": "void", "optional": false, "deprecated": false},
+        {"name": "getEnum", "method": "GET", "path": "/test/:id/:enum", "pathParams": [{"name": "id", "type": "Long"}, {"name": "enum", "type": "TestWebService$TestEnum"}], "requestType": null, "responseType": "TestWebService$TestResponse", "optional": false, "deprecated": false}
       ]
     }
   ],
   "types": [
-    {"name": "TestWebService$TestSearchRequest", "type": "interface", "definition": "{ int_field: number; boolean_field: boolean | null; long_field: number | null; double_field: number | null; date_field: string | null; time_field: string | null; date_time_field: string | null; }"},
-    {"name": "TestWebService$TestResponse", "type": "interface", "definition": "{ int_field: number; decimal_field: number | null; string_map: {[key:string]: string;} | null; items: {[key:string]: TestWebService$TestItem;} | null; enum_map: {[key in TestWebService$TestEnum]?: string;} | null; }"},
-    {"name": "TestWebService$TestItem", "type": "interface", "definition": "{ zoned_date_time_field: Date | null; enum_field: TestWebService$TestEnum | null; }"},
-    {"name": "TestWebService$TestRequest", "type": "interface", "definition": "{ string_field: string; items: TestWebService$TestItem[] | null; map_list_field: {[key:string]: string[];} | null; }"},
-    {"name": "TestWebService$TestEnum", "type": "enum", "definition": "{ A = \"A1\", B = \"B1\", }"}
+    {
+      "name": "TestWebService$TestResponse",
+      "type": "bean",
+      "fields": [
+        {"name": "int_field", "type": "Integer", "typeParams": null, "constraints": {"notNull": true, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "decimal_field", "type": "BigDecimal", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "string_map", "type": "Map", "typeParams": ["String", "String"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": {"min": 1, "max": -1}, "pattern": null}},
+        {"name": "items", "type": "Map", "typeParams": ["String", "TestWebService$TestItem"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "enum_map", "type": "Map", "typeParams": ["TestWebService$TestEnum", "String"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}}
+      ],
+      "enumConstants": null
+    },
+    {
+      "name": "TestWebService$TestItem",
+      "type": "bean",
+      "fields": [
+        {"name": "zoned_date_time_field", "type": "ZonedDateTime", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "enum_field", "type": "TestWebService$TestEnum", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}}
+      ],
+      "enumConstants": null
+    },
+    {
+      "name": "TestWebService$TestEnum",
+      "type": "enum",
+      "fields": null,
+      "enumConstants": [{"name": "A", "value": "A1"}, {"name": "B", "value": "B1"}]
+    },
+    {
+      "name": "TestWebService$TestSearchRequest", "type": "bean",
+      "fields": [
+        {"name": "int_field", "type": "Integer", "typeParams": null, "constraints": {"notNull": true, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "boolean_field", "type": "Boolean", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "long_field", "type": "Long", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "double_field", "type": "Long", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": 1.0, "max": 100.0, "size": null, "pattern": null}},
+        {"name": "date_field", "type": "LocalDate", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "time_field", "type": "LocalTime", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "date_time_field", "type": "LocalDateTime", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}}
+      ],
+      "enumConstants": null
+    },
+    {
+      "name": "TestWebService$TestRequest",
+      "type": "bean",
+      "fields": [
+        {"name": "string_field", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": false, "min": null, "max": null, "size": {"min": -1, "max": 10}, "pattern": "\\d+.*"}},
+        {"name": "items", "type": "List", "typeParams": ["TestWebService$TestItem"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "map_list_field", "type": "Map", "typeParams": ["String", "List", "String"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}}
+      ],
+      "enumConstants": null
+    },
+    {
+      "name": "APIDefinitionBuilderTest$ErrorCode",
+      "type": "enum",
+      "fields": null,
+      "enumConstants": [{"name": "ERROR_CODE_1", "value": "ERROR_CODE_1"}, {"name": "ERROR_CODE_2", "value": "ERROR_CODE_2"}]
+    }
   ]
 }
