@@ -18,7 +18,7 @@ jobs:
       with:
         path: ~/.gradle/wrapper
         key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-    - run: ./gradlew -p ext docker
+    - run: ./gradlew -Penv=prod -p ext docker
     - run: echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
     - uses: docker/login-action@v1
       with:
