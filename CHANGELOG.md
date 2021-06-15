@@ -1,5 +1,9 @@
 ## Change log
 
+### 7.7.3 (06/14/2021 - )
+
+* log: fixed error when third-party lib calls slf4f logger with empty var args (Azure SDK)
+
 ### 7.7.2 (06/03/2021 - 06/14/2021)
 
 * monitor: fixed overflowed vmRSS value, use long instead of int
