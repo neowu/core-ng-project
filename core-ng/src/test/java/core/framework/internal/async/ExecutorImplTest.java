@@ -88,6 +88,15 @@ class ExecutorImplTest {
     }
 
     @Test
+    void shutdownWithCanceledTask() {
+        executor.scheduler = ThreadPools.singleThreadScheduler("test-");
+        boolean scheduled = executor.scheduleDelayedTask("action", () -> {
+        }, Duration.ofHours(1));
+        executor.shutdown();
+        assertThat(scheduled).isTrue();
+    }
+
+    @Test
     void submitAfterShutdown() {
         executor.shutdown();
         Future<Object> future = executor.submit("task", () -> null);

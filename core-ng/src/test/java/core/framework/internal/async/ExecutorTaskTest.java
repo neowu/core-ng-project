@@ -34,9 +34,15 @@ class ExecutorTaskTest {
             throw new Error("test");
         });
         assertThatThrownBy(task::call)
-                .isInstanceOf(TaskException.class)
-                .hasMessageContaining("task failed")
-                .hasMessageContaining("id=")
-                .hasMessageContaining("action=action");
+            .isInstanceOf(TaskException.class)
+            .hasMessageContaining("task failed")
+            .hasMessageContaining("id=")
+            .hasMessageContaining("action=action");
+    }
+
+    @Test
+    void convertToString() {
+        assertThat(new ExecutorTask<Void>("actionId", "action", Instant.now(), null, null, () -> null).toString())
+            .isEqualTo("task:action:actionId");
     }
 }

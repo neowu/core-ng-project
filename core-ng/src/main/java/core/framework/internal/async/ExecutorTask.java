@@ -70,4 +70,10 @@ public class ExecutorTask<T> implements Callable<T> {
     String action() {
         return rootAction == null ? "task:" + action : rootAction + ":task:" + action;
     }
+
+    // used to print all canceled tasks during shutdown
+    @Override
+    public String toString() {
+        return action() + ":" + actionId;
+    }
 }
