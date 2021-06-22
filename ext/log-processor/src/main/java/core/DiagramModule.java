@@ -17,5 +17,6 @@ public class DiagramModule extends Module {
         site().template("/template/diagram.html", DiagramModel.class);
         DiagramController controller = bind(DiagramController.class);
         http().route(HTTPMethod.GET, "/diagram/arch", controller::arch);
+        http().route(HTTPMethod.GET, "/diagram/action", controller::action);
     }
 }
