@@ -72,7 +72,8 @@ class BeanFactoryTest {
     }
 
     public static class BeanWithInjectStaticField {
+        @SuppressWarnings("PMD.MutableStaticState")     // for invalid case
         @Inject
-        final static Dependency1 dependency1 = new Dependency1();
+        static Dependency1 dependency1;
     }
 }
