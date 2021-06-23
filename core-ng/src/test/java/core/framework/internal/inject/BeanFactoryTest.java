@@ -73,6 +73,6 @@ class BeanFactoryTest {
 
     public static class BeanWithInjectStaticField {
         @Inject
-        static Dependency1 dependency1;
+        final static Dependency1 dependency1 = new Dependency1();
     }
 }

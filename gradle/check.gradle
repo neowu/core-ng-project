@@ -17,7 +17,7 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:8.42'
+            checkstyle 'com.puppycrawl.tools:checkstyle:8.43'
             checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.39.0'
         }
 
@@ -45,7 +45,7 @@ subprojects {
     pmd {
         ruleSets = []
         ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
-        toolVersion = '6.34.0'
+        toolVersion = '6.35.0'
         consoleOutput = true
 
         tasks.withType(Pmd).configureEach {
@@ -83,7 +83,7 @@ subprojects {
     }
 
     jacoco {
-        toolVersion = '0.8.6'
+        toolVersion = '0.8.7'
 
         tasks.named('jacocoTestReport').configure {
             // to generate cross sub project report, run: gradlew test && gradlew jacocoTestReport

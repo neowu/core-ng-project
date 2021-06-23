@@ -1,5 +1,7 @@
 ## Change log
 
+### 7.7.4 (06/23/2021 - )
+
 ### 7.7.3 (06/14/2021 - 06/22/2021)
 
 * log: fixed error when third-party lib calls slf4f logger with empty var args (Azure SDK)
