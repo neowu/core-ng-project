@@ -12,10 +12,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -37,9 +40,9 @@ class RedisSessionStoreTest {
     @Test
     void sessionKey() {
         assertThat(store.sessionKey("someSessionId", "domain"))
-                .doesNotContain("someSessionId")
-                .doesNotContain("domain")
-                .startsWith("session:");
+            .doesNotContain("someSessionId")
+            .doesNotContain("domain")
+            .startsWith("session:");
     }
 
     @Test
@@ -49,7 +52,7 @@ class RedisSessionStoreTest {
         when(redisHash.getAll(anyString())).thenThrow(new UncheckedIOException(new IOException("unexpected end of stream")));
 
         assertThatThrownBy(() -> store.getAndRefresh("sessionId", "localhost", Duration.ofMinutes(30)))
-                .isInstanceOf(UncheckedIOException.class);
+            .isInstanceOf(UncheckedIOException.class);
     }
 
     @Test
@@ -58,5 +61,27 @@ class RedisSessionStoreTest {
         when(redis.hash()).thenReturn(redisHash);
         when(redisHash.getAll(anyString())).thenThrow(new RedisException("WRONGTYPE Operation against a key holding the wrong kind of value"));
         assertThat(store.getAndRefresh("sessionId", "localhost", Duration.ofMinutes(30))).isNull();
+    }
+
+    @Test
+    void getAndRefreshWithCustomTimeout() {
+        var values = Map.of(SessionImpl.TIMEOUT_FIELD, "100", "USER_ID", "1");
+
+        when(redis.hash()).thenReturn(redisHash);
+        when(redisHash.getAll(anyString())).thenReturn(values);
+
+        store.getAndRefresh("sessionId", "localhost", Duration.ofSeconds(30));
+
+        verify(redis).expire(anyString(), eq(Duration.ofSeconds(100)));
+    }
+
+    @Test
+    void saveWithOverrideTimeout() {
+        when(redis.hash()).thenReturn(redisHash);
+        var values = Map.of(SessionImpl.TIMEOUT_FIELD, "100", "USER_ID", "1");
+        store.save("sessionId", "localhost", values, values.keySet(), Duration.ofSeconds(30));
+
+        verify(redisHash).multiSet(anyString(), eq(values));
+        verify(redis).expire(anyString(), eq(Duration.ofSeconds(100)));
     }
 }

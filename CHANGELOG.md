@@ -2,6 +2,9 @@
 
 ### 7.7.4 (06/23/2021 - )
 
+* site: added Session.timeout(Duration), to allow application set different timeout
+  > e.g. use cases are like longer mobile app session expiration time, or "rememberMe" feature
+
 ### 7.7.3 (06/14/2021 - 06/22/2021)
 
 * log: fixed error when third-party lib calls slf4f logger with empty var args (Azure SDK)
