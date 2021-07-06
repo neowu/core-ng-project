@@ -20,6 +20,11 @@ public class CodeBuilder {
         return this;
     }
 
+    public CodeBuilder append(Object object) {
+        builder.append(object);
+        return this;
+    }
+
     public CodeBuilder append(String pattern, Object... argument) {
         builder.append(Strings.format(pattern, argument));
         return this;
