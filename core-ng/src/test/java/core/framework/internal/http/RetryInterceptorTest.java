@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLException;
-import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -32,14 +31,14 @@ class RetryInterceptorTest {
 
     @Test
     void shouldRetryWithConnectionException() {
-        assertThat(interceptor.shouldRetry(1, "GET", new HttpTimeoutException("read timeout"))).isTrue();
-        assertThat(interceptor.shouldRetry(2, "GET", new ConnectException("connection failed"))).isTrue();
-        assertThat(interceptor.shouldRetry(3, "GET", new ConnectException("connection failed"))).isFalse();
+        assertThat(interceptor.shouldRetry(false, "GET", 1, new HttpTimeoutException("read timeout"))).isTrue();
+        assertThat(interceptor.shouldRetry(false, "GET", 2, new ConnectException("connection failed"))).isTrue();
+        assertThat(interceptor.shouldRetry(false, "GET", 3, new ConnectException("connection failed"))).isFalse();
 
-        assertThat(interceptor.shouldRetry(1, "GET", new SSLException("Connection reset"))).isTrue();
+        assertThat(interceptor.shouldRetry(false, "GET", 1, new SSLException("Connection reset"))).isTrue();
 
-        assertThat(interceptor.shouldRetry(1, "POST", new HttpConnectTimeoutException("connection timeout"))).isTrue();
-        assertThat(interceptor.shouldRetry(1, "POST", new ConnectException("connection refused"))).isTrue();
+        assertThat(interceptor.shouldRetry(false, "POST", 1, new HttpConnectTimeoutException("connection timeout"))).isTrue();
+        assertThat(interceptor.shouldRetry(false, "POST", 1, new ConnectException("connection refused"))).isTrue();
 
         /* connect timeout stack trace
         Caused by: java.net.SocketTimeoutException: connect timed out
@@ -55,7 +54,7 @@ class RetryInterceptorTest {
             at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:236)
             at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:109)
         */
-        assertThat(interceptor.shouldRetry(1, "POST", new SocketTimeoutException("connect timed out"))).isTrue();
+        assertThat(interceptor.shouldRetry(false, "POST", 1, new SocketTimeoutException("connect timed out"))).isTrue();
     }
 
     /* Read timeout stack trace with http 1.1
@@ -136,42 +135,43 @@ class RetryInterceptorTest {
         // socket read timeout caught by AsyncTimeout
         var timeout = new SocketTimeoutException("timeout");
         timeout.initCause(new SocketTimeoutException("Read timed out"));
-        assertThat(interceptor.shouldRetry(1, "POST", timeout)).isFalse();
-        assertThat(interceptor.shouldRetry(2, "PUT", timeout)).isTrue();
-
-        timeout = new SocketTimeoutException("timeout");
-        assertThat(interceptor.shouldRetry(1, "POST", timeout)).isFalse();
-        assertThat(interceptor.shouldRetry(2, "PUT", timeout)).isTrue();
+        assertThat(interceptor.shouldRetry(false, "POST", 1, timeout)).isFalse();
+        assertThat(interceptor.shouldRetry(false, "PUT", 2, timeout)).isTrue();
 
         // okio AsyncTimeout close socket when timeout
         timeout = new SocketTimeoutException("timeout");
         timeout.initCause(new SocketException("Socket closed"));
-        assertThat(interceptor.shouldRetry(1, "POST", timeout)).isFalse();
-        assertThat(interceptor.shouldRetry(2, "PUT", timeout)).isTrue();
+        assertThat(interceptor.shouldRetry(false, "POST", 1, timeout)).isFalse();
+        assertThat(interceptor.shouldRetry(false, "PUT", 2, timeout)).isTrue();
+    }
 
+    @Test
+    void shouldRetryWithCallTimeout() {
         // okio AsyncTimout cancels call when if call timout
-        var cancelled = new IOException("Canceled");
-        assertThat(interceptor.shouldRetry(1, "POST", cancelled)).isFalse();
-        assertThat(interceptor.shouldRetry(2, "PUT", cancelled)).isTrue();
+        var exception = new ConnectException("connection failed");
+        assertThat(interceptor.shouldRetry(true, "POST", 1, exception)).isFalse();
+        assertThat(interceptor.shouldRetry(true, "PUT", 2, exception)).isFalse();
+
+        assertThat(interceptor.shouldRetry(true, 2, HTTPStatus.SERVICE_UNAVAILABLE.code)).isFalse();
     }
 
     @Test
     void shouldRetryWithUnknownHost() {
         // if failed to query DNS
-        assertThat(interceptor.shouldRetry(1, "POST", new UnknownHostException("unknown.host: System error"))).isTrue();
+        assertThat(interceptor.shouldRetry(false, "POST", 1, new UnknownHostException("unknown.host: System error"))).isTrue();
     }
 
     @Test
     void shouldRetryWithServiceUnavailable() {
-        assertThat(interceptor.shouldRetry(1, HTTPStatus.OK.code)).isFalse();
-        assertThat(interceptor.shouldRetry(1, HTTPStatus.SERVICE_UNAVAILABLE.code)).isTrue();
-        assertThat(interceptor.shouldRetry(3, HTTPStatus.SERVICE_UNAVAILABLE.code)).isFalse();
+        assertThat(interceptor.shouldRetry(false, 1, HTTPStatus.OK.code)).isFalse();
+        assertThat(interceptor.shouldRetry(false, 1, HTTPStatus.SERVICE_UNAVAILABLE.code)).isTrue();
+        assertThat(interceptor.shouldRetry(false, 3, HTTPStatus.SERVICE_UNAVAILABLE.code)).isFalse();
     }
 
     @Test
     void shouldRetryWithTooManyRequest() {
-        assertThat(interceptor.shouldRetry(1, HTTPStatus.TOO_MANY_REQUESTS.code)).isTrue();
-        assertThat(interceptor.shouldRetry(3, HTTPStatus.TOO_MANY_REQUESTS.code)).isFalse();
+        assertThat(interceptor.shouldRetry(false, 1, HTTPStatus.TOO_MANY_REQUESTS.code)).isTrue();
+        assertThat(interceptor.shouldRetry(false, 3, HTTPStatus.TOO_MANY_REQUESTS.code)).isFalse();
     }
 
     @Test

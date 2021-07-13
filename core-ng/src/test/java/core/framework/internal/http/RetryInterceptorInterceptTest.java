@@ -22,6 +22,7 @@ import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -93,11 +94,20 @@ class RetryInterceptorInterceptTest {
     }
 
     @Test
-    void callTimeout() {
+    void callTimeout() throws IOException {
         when(call.isCanceled()).thenReturn(Boolean.TRUE);
+        var source = mock(BufferedSource.class);
+        var serviceUnavailableResponse = new Response.Builder().request(request)
+            .protocol(Protocol.HTTP_2)
+            .code(HTTPStatus.SERVICE_UNAVAILABLE.code)
+            .message("service unavailable")
+            .body(ResponseBody.create(source, MediaType.get("application/json"), 0))
+            .build();
+        when(chain.proceed(request)).thenReturn(serviceUnavailableResponse);
 
-        assertThatThrownBy(() -> interceptor.intercept(chain))
-            .isInstanceOf(IOException.class)
-            .hasMessageContaining("timeout");
+        Response response = interceptor.intercept(chain);
+        assertThat(response).isSameAs(serviceUnavailableResponse);
+
+        verify(chain, times(1)).proceed(request);
     }
 }

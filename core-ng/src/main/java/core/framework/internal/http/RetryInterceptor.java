@@ -7,6 +7,7 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.internal.connection.RouteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,18 +38,17 @@ public class RetryInterceptor implements Interceptor {
         Request request = chain.request();
         int attempts = 1;
         while (true) {
-            if (chain.call().isCanceled()) throw new IOException("call timeout");   // AsyncTimout cancels call if callTimeout, refer to RealCall.kt/timout field
             try {
                 Response response = chain.proceed(request);
                 int statusCode = response.code();
-                if (shouldRetry(attempts, statusCode) && withinMaxProcessTime(attempts)) {
+                if (shouldRetry(chain.call().isCanceled(), attempts, statusCode)) {
                     logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, responseStatus={}, uri={}", statusCode, uri(request));
                     closeResponseBody(response);
                 } else {
                     return response;
                 }
-            } catch (IOException e) {
-                if (shouldRetry(attempts, request.method(), e) && withinMaxProcessTime(attempts)) {
+            } catch (IOException | RouteException e) {
+                if (shouldRetry(chain.call().isCanceled(), request.method(), attempts, e)) {
                     logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, uri={}, error={}", uri(request), e.getMessage(), e);
                 } else {
                     throw e;
@@ -84,22 +84,26 @@ public class RetryInterceptor implements Interceptor {
         if (body != null) closeQuietly(body);
     }
 
-    boolean shouldRetry(int attempts, int statusCode) {
-        return attempts < maxRetries
-               && (statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code);
+    boolean shouldRetry(boolean canceled, int attempts, int statusCode) {
+        if (canceled) return false;    // AsyncTimout cancels call if callTimeout, refer to RealCall.kt/timout field
+        if (attempts >= maxRetries) return false;
+        if (!withinMaxProcessTime(attempts)) return false;
+
+        return statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code;
     }
 
-    boolean shouldRetry(int attempts, String method, IOException e) {
+    // refer to RetryAndFollowUpInterceptor.intercept for built-in error handling
+    boolean shouldRetry(boolean canceled, String method, int attempts, Exception e) {
+        if (canceled) return false;    // AsyncTimout cancels call if callTimeout, refer to RealCall.kt/timout field
         if (attempts >= maxRetries) return false;
+        if (!withinMaxProcessTime(attempts)) return false;
+
+        if (e instanceof RouteException) return true;   // if it's route failure, then request is not sent yet
 
         // only not retry on POST with read time out
         // okHTTP uses both socket timeout and AsyncTimeout, it closes socket/connection when timeout is detected by background thread, so no need to close exchange
-        // refer to SocketAsyncTimeout.timeout()
-        if (!"POST".equals(method)) return true;
         // refer to AsyncTimeout.newTimeoutException() -> SocketAsyncTimeout.newTimeoutException()
-        if (e instanceof SocketTimeoutException && "timeout".equals(e.getMessage())) return false;
-        // it throws IOException("Canceled") hits callTimeout, refer to RetryAndFollowUpInterceptor.intercept()
-        return !"Canceled".equals(e.getMessage());
+        return (!("POST".equals(method) && e instanceof SocketTimeoutException && "timeout".equals(e.getMessage())));
     }
 
     Duration waitTime(int attempts) {
