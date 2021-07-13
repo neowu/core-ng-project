@@ -103,7 +103,7 @@ public class RetryInterceptor implements Interceptor {
         // only not retry on POST with read time out
         // okHTTP uses both socket timeout and AsyncTimeout, it closes socket/connection when timeout is detected by background thread, so no need to close exchange
         // refer to AsyncTimeout.newTimeoutException() -> SocketAsyncTimeout.newTimeoutException()
-        return (!("POST".equals(method) && e instanceof SocketTimeoutException && "timeout".equals(e.getMessage())));
+        return !("POST".equals(method) && e instanceof SocketTimeoutException && "timeout".equals(e.getMessage()));
     }
 
     Duration waitTime(int attempts) {
