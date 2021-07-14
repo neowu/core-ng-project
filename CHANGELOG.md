@@ -4,7 +4,7 @@
 
 * site: added Session.timeout(Duration), to allow application set different timeout
   > e.g. use cases are like longer mobile app session expiration time, or "remember me" feature
-* http: disabled okHTTP builtin retryOnConnectionFailure, use RetryInterceptor to log all connection failures explicitly
+* http: disabled okHTTP builtin retryOnConnectionFailure, use RetryInterceptor to log all connection failures explicitly, more failure case handling
 
 ### 7.7.3 (06/14/2021 - 06/22/2021)
 

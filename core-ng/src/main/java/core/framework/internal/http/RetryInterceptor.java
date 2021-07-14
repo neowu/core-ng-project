@@ -8,9 +8,12 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okhttp3.internal.connection.RouteException;
+import okhttp3.internal.http2.ErrorCode;
+import okhttp3.internal.http2.StreamResetException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
@@ -100,10 +103,16 @@ public class RetryInterceptor implements Interceptor {
 
         if (e instanceof RouteException) return true;   // if it's route failure, then request is not sent yet
 
-        // only not retry on POST with read time out
+        // only not retry on POST if request sent
+        if (!"POST".equals(method)) return true;
+
+        // should not retry on connection reset, the request could be sent already, and server side may continue to complete it
+        if (e instanceof SSLException && "Connection reset".equals(e.getMessage())) return false;
+        if (e instanceof StreamResetException && ((StreamResetException) e).errorCode == ErrorCode.CANCEL) return false;
+
         // okHTTP uses both socket timeout and AsyncTimeout, it closes socket/connection when timeout is detected by background thread, so no need to close exchange
         // refer to AsyncTimeout.newTimeoutException() -> SocketAsyncTimeout.newTimeoutException()
-        return !("POST".equals(method) && e instanceof SocketTimeoutException && "timeout".equals(e.getMessage()));
+        return !(e instanceof SocketTimeoutException && "timeout".equals(e.getMessage()));
     }
 
     Duration waitTime(int attempts) {
