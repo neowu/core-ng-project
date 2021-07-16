@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.7.4 (06/23/2021 - )
+### 7.7.4 (06/23/2021 - 07/16/2021)
 
 * site: added Session.timeout(Duration), to allow application set different timeout
   > e.g. use cases are like longer mobile app session expiration time, or "remember me" feature
