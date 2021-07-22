@@ -3,6 +3,7 @@
 ### 7.7.5 (07/20/2021 - )
 
 * mongo: updated driver to 4.3.0
+* action: added ActionLogContext.remainingProcessTime() to provide how long left for current action, to control external calling timeout
 
 ### 7.7.4 (06/23/2021 - 07/16/2021)
 
