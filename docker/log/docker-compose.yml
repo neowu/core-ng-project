@@ -15,6 +15,7 @@ services:
     ports:
     - 5601:5601
     environment:
+    - SERVER_HOST=0.0.0.0
     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     - TELEMETRY_ENABLED=false
     - MONITORING_ENABLED=false
