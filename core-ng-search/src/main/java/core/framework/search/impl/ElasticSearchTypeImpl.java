@@ -31,8 +31,8 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.indices.AnalyzeResponse;
 import org.elasticsearch.common.bytes.BytesReference;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -158,9 +158,9 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             esTook = response.getTook().nanos();
 
             List<String> suggestions = response.getSuggest().filter(CompletionSuggestion.class).stream()
-                    .map(CompletionSuggestion::getOptions).flatMap(Collection::stream).map(option -> option.getText().string())
-                    .distinct()
-                    .collect(Collectors.toList());
+                .map(CompletionSuggestion::getOptions).flatMap(Collection::stream).map(option -> option.getText().string())
+                .distinct()
+                .collect(Collectors.toList());
             options = suggestions.size();
             return suggestions;
         } catch (IOException e) {

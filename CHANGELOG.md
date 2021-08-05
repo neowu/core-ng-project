@@ -1,5 +1,9 @@
 ## Change log
 
+### 7.7.6 (08/04/2021 - )
+
+* es: update to 7.14.0
+
 ### 7.7.5 (07/20/2021 - 07/26/2021)
 
 * mongo: updated driver to 4.3.0
