@@ -12,6 +12,7 @@ import core.framework.internal.web.controller.ControllerClassValidator;
 import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.internal.web.controller.ControllerInspector;
 import core.framework.internal.web.route.PathPatternValidator;
+import core.framework.internal.web.sys.APIController;
 import core.framework.internal.web.sys.DiagnosticController;
 import core.framework.internal.web.sys.PropertyController;
 import core.framework.module.LambdaController;
@@ -42,7 +43,7 @@ public class ModuleContext {
     public final PropertyManager propertyManager = new PropertyManager();
     public final StatCollector collector = new StatCollector();
     public final HTTPServer httpServer;
-    public final ServiceRegistry serviceRegistry = new ServiceRegistry();
+    public final APIController apiController = new APIController();
     public final BeanClassValidator beanClassValidator = new BeanClassValidator();
     protected final Map<String, Config> configs = Maps.newHashMap();
     final PropertyValidator propertyValidator = new PropertyValidator();
@@ -59,6 +60,8 @@ public class ModuleContext {
         route(HTTPMethod.GET, "/_sys/heap", (LambdaController) diagnosticController::heap, true);
         route(HTTPMethod.GET, "/_sys/proc", (LambdaController) diagnosticController::proc, true);
         route(HTTPMethod.GET, "/_sys/property", new PropertyController(propertyManager), true);
+        route(HTTPMethod.GET, "/_sys/api", apiController::service, true);
+        route(HTTPMethod.GET, "/_sys/api/message", apiController::message, true);
     }
 
     private HTTPServer createHTTPServer(LogManager logManager) {

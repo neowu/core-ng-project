@@ -48,13 +48,13 @@ class HTTPConfigTest {
     @Test
     void bean() {
         config.bean(TestBean.class);
-        assertThat(config.context.serviceRegistry.beanClasses).contains(TestBean.class);
+        assertThat(config.context.apiController.registry.beanClasses).contains(TestBean.class);
 
         config.bean(TestQueryParamBean.class);
-        assertThat(config.context.serviceRegistry.beanClasses).contains(TestQueryParamBean.class);
+        assertThat(config.context.apiController.registry.beanClasses).contains(TestQueryParamBean.class);
 
         config.bean(TestEnum.class);
-        assertThat(config.context.serviceRegistry.beanClasses).contains(TestEnum.class);
+        assertThat(config.context.apiController.registry.beanClasses).contains(TestEnum.class);
 
         assertThatThrownBy(() -> config.bean(TestBean.class))
                 .isInstanceOf(Error.class)

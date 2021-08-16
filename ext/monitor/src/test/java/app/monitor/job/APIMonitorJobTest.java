@@ -5,6 +5,7 @@ import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPResponse;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.web.api.APIDefinitionResponse;
+import core.framework.internal.web.api.APIType;
 import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
@@ -54,7 +55,7 @@ class APIMonitorJobTest {
         job.execute(null);
         verifyNoInteractions(publisher);    // no changes
 
-        var type = new APIDefinitionResponse.Type();
+        var type = new APIType();
         type.type = "bean";
         type.name = "MockType";
         response.types = List.of(type);

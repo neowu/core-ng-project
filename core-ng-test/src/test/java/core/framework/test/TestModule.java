@@ -45,7 +45,7 @@ public class TestModule extends AbstractTestModule {
 
         configureHTTP();
         configureSite();
-        configureAPI();
+        api().client(TestWebService.class, "https://localhost:8443").intercept(new TestWebServiceClientInterceptor());
 
         bind(new TestBean(requiredProperty("test.inject-test.property")));
 
@@ -57,11 +57,6 @@ public class TestModule extends AbstractTestModule {
 
         onShutdown(() -> {
         });
-    }
-
-    private void configureAPI() {
-        api().client(TestWebService.class, "https://localhost:8443").intercept(new TestWebServiceClientInterceptor());
-        api().publishAPI(List.of("0.0.0.0/0"));
     }
 
     private void configureRedis() {
@@ -87,6 +82,7 @@ public class TestModule extends AbstractTestModule {
         site().session().cookie("SessionId", "localhost");
         site().cdn().host("//cdn");
         site().security().contentSecurityPolicy("default-src 'self' https://cdn; img-src 'self' https://cdn data:; object-src 'none'; frame-src 'none';");
+        site().publishAPI(List.of("0.0.0.0/0"));
     }
 
     private void configureHTTP() {

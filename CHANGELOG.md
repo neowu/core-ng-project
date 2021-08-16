@@ -5,6 +5,8 @@
 * es: update to 7.14.0
 * log-processor: kibana 7.14 added duration human precise formatter, updated all time fields of index pattern
   > must update es to 7.14 if use this version of log-processor
+* api: always publish /_sys/api, for internal api change monitoring
+* api: added /_sys/api/message to publish message definition, for future message change monitoring
 
 ### 7.7.5 (07/20/2021 - 07/26/2021)
 

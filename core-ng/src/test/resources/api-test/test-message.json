@@ -1,0 +1,22 @@
+{
+  "app": "local",
+  "topics": [
+    {"name": "topic", "messageType": "TestMessage"}
+  ],
+  "types": [
+    {
+      "name": "TestMessage", "type": "bean", "fields": [
+      {"name": "zoned_date_time_field", "type": "ZonedDateTime", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+      {"name": "date_time_field", "type": "LocalDateTime", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+      {"name": "string_field", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+      {"name": "list_field", "type": "List", "typeParams": ["String"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+      {"name": "map_field", "type": "Map", "typeParams": ["String", "String"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+      {"name": "child_field", "type": "TestMessage$Child", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+      {"name": "children_field", "type": "List", "typeParams": ["TestMessage$Child"], "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}},
+      {"name": "enum_field", "type": "TestMessage$TestEnum", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}}
+    ], "enumConstants": null
+    },
+    {"name": "TestMessage$Child", "type": "bean", "fields": [{"name": "boolean_field", "type": "Boolean", "typeParams": null, "constraints": {"notNull": false, "notBlank": false, "min": null, "max": null, "size": null, "pattern": null}}], "enumConstants": null},
+    {"name": "TestMessage$TestEnum", "type": "enum", "fields": null, "enumConstants": [{"name": "VALUE1", "value": "V1"}, {"name": "VALUE2", "value": "V2"}]}
+  ]
+}
