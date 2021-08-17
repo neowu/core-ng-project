@@ -102,6 +102,11 @@ public class LogProcessorApp extends App {
     private void configureSearch() {
         SearchConfig search = config(SearchConfig.class);
         search.host(requiredProperty("sys.elasticsearch.host"));
+        var apiKeyId = property("sys.elasticsearch.apiKeyId");
+        var apiKeySecret = property("sys.elasticsearch.apiKeySecret");
+        if (apiKeyId.isPresent() && apiKeySecret.isPresent()) {
+            search.auth(apiKeyId.get(), apiKeySecret.get());
+        }
         search.timeout(Duration.ofSeconds(20)); // use longer timeout/slowES threshold as log indexing can be slower with large batches
         search.slowOperationThreshold(Duration.ofSeconds(10));
         search.type(ActionDocument.class);

@@ -5,8 +5,10 @@ import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.util.StopWatch;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.message.BasicHeader;
 import org.elasticsearch.action.support.ActiveShardCount;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.Request;
@@ -34,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.time.Duration;
+import java.util.Base64;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -45,12 +48,17 @@ public class ElasticSearchImpl implements ElasticSearch {
     public Duration timeout = Duration.ofSeconds(10);
     public Duration slowOperationThreshold = Duration.ofSeconds(5);
     public HttpHost[] hosts;
+    public ElasticSearchAuth auth;
     public int maxResultWindow = 10000;
     private RestHighLevelClient client;
 
     // initialize will be called in startup hook, so no need to synchronize
     public void initialize() {
         RestClientBuilder builder = RestClient.builder(hosts);
+        if (auth != null) {
+            Header[] authHeader = new Header[]{new BasicHeader("Authorization", "ApiKey " + apiKeyAuth())};
+            builder.setDefaultHeaders(authHeader);
+        }
         builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
             .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
         builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
@@ -159,6 +167,12 @@ public class ElasticSearchImpl implements ElasticSearch {
         } finally {
             logger.info("get cluster state, elapsed={}", watch.elapsed());
         }
+    }
+
+    private String apiKeyAuth() {
+        return Base64.getEncoder().encodeToString(
+            (auth.apiKeyId + ":" + auth.apiSecret).getBytes(UTF_8)
+        );
     }
 
     private byte[] responseBody(HttpEntity entity) throws IOException {

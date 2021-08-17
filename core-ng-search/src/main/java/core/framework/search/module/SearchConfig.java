@@ -5,6 +5,7 @@ import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
+import core.framework.search.impl.ElasticSearchAuth;
 import core.framework.search.impl.ElasticSearchHost;
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.search.impl.log.ESLoggerContextFactory;
@@ -46,6 +47,13 @@ public class SearchConfig extends Config {
     // comma separated hosts
     public void host(String host) {
         search.hosts = ElasticSearchHost.parse(host);
+    }
+
+    public void auth(String apiKeyId, String apiKeySecret) {
+        if (apiKeyId.isEmpty() || apiKeySecret.isEmpty()) {
+            throw new Error("search auth is configured but apiKeyId or apiSecret is empty");
+        }
+        search.auth = new ElasticSearchAuth(apiKeyId, apiKeySecret);
     }
 
     void configureLogger() {
