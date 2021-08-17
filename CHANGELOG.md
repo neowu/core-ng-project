@@ -1,12 +1,17 @@
 ## Change log
 
-### 7.7.6 (08/04/2021 - )
+### 7.8.0 (08/04/2021 - )   !!! breaking changes, pls read details
 
 * es: update to 7.14.0
 * log-processor: kibana 7.14 added duration human precise formatter, updated all time fields of index pattern
   > must update es to 7.14 if use this version of log-processor
 * api: always publish /_sys/api, for internal api change monitoring
 * api: added /_sys/api/message to publish message definition, for future message change monitoring
+* error: refactored ErrorResponse and AJAXErrorResponse, !!! changed ErrorResponse json field from "error_code" to "errorCode"
+  > !!! for consistency, it breaks contract, it's transparent if both client/server upgrade to same framework version, ErrorResponse only be used when client is from coreng
+  > if client uses old version of framework, RemoteServiceException will not have errorCode
+  > ErrorResponse is renamed to InternalErrorResponse, AJAXErrorResponse is renamed to ErrorResponse
+* api: changed system property "sys.publishAPI.allowCIDR" to "sys.api.allowCIDR", !!! update sys.properties if this is used
 
 ### 7.7.5 (07/20/2021 - 07/26/2021)
 

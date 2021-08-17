@@ -43,7 +43,7 @@ public final class SystemModule extends Module {
         });
         property("sys.cdn.host").ifPresent(host -> site().cdn().host(host));
         property("sys.security.csp").ifPresent(policy -> site().security().contentSecurityPolicy(policy));
-        property("sys.publishAPI.allowCIDR").ifPresent(cidrs -> site().publishAPI(new IPv4RangePropertyValueParser(cidrs).parse()));
+        property("sys.api.allowCIDR").ifPresent(cidrs -> site().allowAPI(new IPv4RangePropertyValueParser(cidrs).parse()));
     }
 
     void configureHTTP() {

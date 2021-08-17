@@ -6,6 +6,7 @@ import core.framework.internal.web.api.APIDefinitionResponse;
 import core.framework.internal.web.api.APIMessageDefinitionBuilder;
 import core.framework.internal.web.api.APIMessageDefinitionResponse;
 import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.internal.web.service.ErrorResponse;
 import core.framework.json.JSON;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -25,25 +26,17 @@ public class APIController {
     public Set<Class<?>> beanClasses = new LinkedHashSet<>();  // custom bean classes not referred by service interfaces
     public List<MessagePublish> messages = new ArrayList<>();
 
-    private APIDefinitionResponse apiDefinition;
+    private APIDefinitionResponse serviceDefinition;
     private APIMessageDefinitionResponse messageDefinition;
+
+    public APIController() {
+        beanClasses.add(ErrorResponse.class);   // publish default error response
+    }
 
     public Response service(Request request) {
         accessControl.validate(request.clientIP());
-        APIDefinitionResponse response = apiDefinition();
+        APIDefinitionResponse response = serviceDefinition();
         return Response.text(JSON.toJSON(response)).contentType(ContentType.APPLICATION_JSON);
-    }
-
-    private APIDefinitionResponse apiDefinition() {
-        synchronized (this) {
-            if (apiDefinition == null) {
-                var builder = new APIDefinitionBuilder(serviceInterfaces, beanClasses);
-                apiDefinition = builder.build();
-                serviceInterfaces = null;
-                beanClasses = null;
-            }
-            return apiDefinition;
-        }
     }
 
     public Response message(Request request) {
@@ -52,12 +45,24 @@ public class APIController {
         return Response.text(JSON.toJSON(response)).contentType(ContentType.APPLICATION_JSON);
     }
 
-    private APIMessageDefinitionResponse messageDefinition() {
+    APIDefinitionResponse serviceDefinition() {
+        synchronized (this) {
+            if (serviceDefinition == null) {
+                var builder = new APIDefinitionBuilder(serviceInterfaces, beanClasses);
+                serviceDefinition = builder.build();
+                serviceInterfaces = null;   // release memory
+                beanClasses = null;
+            }
+            return serviceDefinition;
+        }
+    }
+
+    APIMessageDefinitionResponse messageDefinition() {
         synchronized (this) {
             if (messageDefinition == null) {
                 var builder = new APIMessageDefinitionBuilder(messages);
                 messageDefinition = builder.build();
-                messages = null;
+                messages = null;    // release memory
             }
             return messageDefinition;
         }

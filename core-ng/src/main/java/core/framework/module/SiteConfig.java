@@ -4,7 +4,6 @@ import core.framework.http.HTTPMethod;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.http.IPv4Ranges;
-import core.framework.internal.web.site.AJAXErrorResponse;
 import core.framework.internal.web.site.StaticContentController;
 import core.framework.internal.web.site.StaticDirectoryController;
 import core.framework.internal.web.site.StaticFileController;
@@ -81,9 +80,8 @@ public class SiteConfig extends Config {
         return new WebSecurityConfig(webSecurityInterceptor);
     }
 
-    public void publishAPI(List<String> cidrs) {
-        logger.info("publish api definition, cidrs={}", cidrs);
-        context.apiController.beanClasses.add(AJAXErrorResponse.class);   // publish default ajax error response
+    public void allowAPI(List<String> cidrs) {
+        logger.info("allow /_sys/api access, cidrs={}", cidrs);
         context.apiController.accessControl.allow = new IPv4Ranges(cidrs);
     }
 }
