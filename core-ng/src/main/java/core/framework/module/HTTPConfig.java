@@ -45,7 +45,7 @@ public final class HTTPConfig extends Config {
         } else {
             registerBean(beanClass);
         }
-        boolean added = context.apiController.registry.beanClasses.add(beanClass);
+        boolean added = context.apiController.beanClasses.add(beanClass);
         if (!added) throw new Error("bean class is already registered, class=" + beanClass.getCanonicalName());
     }
 

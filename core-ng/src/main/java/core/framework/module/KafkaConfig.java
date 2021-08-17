@@ -8,8 +8,8 @@ import core.framework.internal.kafka.MessageProducer;
 import core.framework.internal.kafka.MessagePublisherImpl;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
-import core.framework.internal.module.ServiceRegistry;
 import core.framework.internal.module.ShutdownHook;
+import core.framework.internal.web.sys.APIController;
 import core.framework.internal.web.sys.KafkaController;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
@@ -64,7 +64,7 @@ public class KafkaConfig extends Config {
         context.beanClassValidator.validate(messageClass);
         MessagePublisher<T> publisher = createMessagePublisher(topic, messageClass);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), name, publisher);
-        context.apiController.registry.messages.add(new ServiceRegistry.MessagePublish(topic, messageClass));
+        context.apiController.messages.add(new APIController.MessagePublish(topic, messageClass));
         handlerAdded = true;
         return publisher;
     }

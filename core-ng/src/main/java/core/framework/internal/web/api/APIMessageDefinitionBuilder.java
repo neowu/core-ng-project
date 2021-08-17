@@ -1,7 +1,7 @@
 package core.framework.internal.web.api;
 
 import core.framework.internal.log.LogManager;
-import core.framework.internal.module.ServiceRegistry;
+import core.framework.internal.web.sys.APIController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +10,10 @@ import java.util.List;
  * @author neo
  */
 public class APIMessageDefinitionBuilder {
-    private final List<ServiceRegistry.MessagePublish> messages;
+    private final List<APIController.MessagePublish> messages;
     private final APITypeParser parser = new APITypeParser();
 
-    public APIMessageDefinitionBuilder(List<ServiceRegistry.MessagePublish> messages) {
+    public APIMessageDefinitionBuilder(List<APIController.MessagePublish> messages) {
         this.messages = messages;
     }
 
@@ -21,7 +21,7 @@ public class APIMessageDefinitionBuilder {
         var response = new APIMessageDefinitionResponse();
         response.app = LogManager.APP_NAME;
         response.topics = new ArrayList<>(messages.size());
-        for (ServiceRegistry.MessagePublish publish : messages) {
+        for (APIController.MessagePublish publish : messages) {
             var topic = new APIMessageDefinitionResponse.Topic();
             topic.name = publish.topic;
             topic.messageType = parser.parseBeanType(publish.messageClass);

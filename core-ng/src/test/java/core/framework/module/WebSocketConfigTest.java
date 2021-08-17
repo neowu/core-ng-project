@@ -44,6 +44,6 @@ class WebSocketConfigTest {
         config.listen("/ws2", TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener());
         var webSocketContext = (WebSocketContext) config.context.beanFactory.bean(WebSocketContext.class, null);
         assertThat(webSocketContext).isNotNull();
-        assertThat(config.context.apiController.registry.beanClasses).contains(TestWebSocketMessage.class);
+        assertThat(config.context.apiController.beanClasses).contains(TestWebSocketMessage.class);
     }
 }

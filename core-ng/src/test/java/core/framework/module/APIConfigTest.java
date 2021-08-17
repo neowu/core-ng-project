@@ -27,7 +27,7 @@ class APIConfigTest {
     void service() {
         config.service(TestWebService.class, new TestWebServiceImpl());
 
-        assertThat(config.context.apiController.registry.serviceInterfaces).contains(TestWebService.class);
+        assertThat(config.context.apiController.serviceInterfaces).contains(TestWebService.class);
     }
 
     @Test

@@ -60,7 +60,7 @@ public class APIConfig extends Config {
         validator.validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
         new InjectValidator(service).validate();
-        context.apiController.registry.serviceInterfaces.add(serviceInterface);    // doesn't need to check duplicate, duplication will failed to register route
+        context.apiController.serviceInterfaces.add(serviceInterface);    // doesn't need to check duplicate, duplication will failed to register route
 
         for (Method method : serviceInterface.getMethods()) {
             HTTPMethod httpMethod = HTTPMethods.httpMethod(method);

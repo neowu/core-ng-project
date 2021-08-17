@@ -83,7 +83,7 @@ public class SiteConfig extends Config {
 
     public void publishAPI(List<String> cidrs) {
         logger.info("publish api definition, cidrs={}", cidrs);
-        context.apiController.registry.beanClasses.add(AJAXErrorResponse.class);   // publish default ajax error response
+        context.apiController.beanClasses.add(AJAXErrorResponse.class);   // publish default ajax error response
         context.apiController.accessControl.allow = new IPv4Ranges(cidrs);
     }
 }

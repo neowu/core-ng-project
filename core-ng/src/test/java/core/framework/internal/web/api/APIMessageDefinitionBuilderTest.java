@@ -1,7 +1,7 @@
 package core.framework.internal.web.api;
 
 import core.framework.internal.kafka.TestMessage;
-import core.framework.internal.module.ServiceRegistry;
+import core.framework.internal.web.sys.APIController;
 import core.framework.json.JSON;
 import core.framework.util.ClasspathResources;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,8 +19,8 @@ class APIMessageDefinitionBuilderTest {
 
     @BeforeEach
     void createAPIDefinitionBuilder() {
-        var messages = new ArrayList<ServiceRegistry.MessagePublish>();
-        messages.add(new ServiceRegistry.MessagePublish("topic", TestMessage.class));
+        var messages = new ArrayList<APIController.MessagePublish>();
+        messages.add(new APIController.MessagePublish("topic", TestMessage.class));
         builder = new APIMessageDefinitionBuilder(messages);
     }
 
