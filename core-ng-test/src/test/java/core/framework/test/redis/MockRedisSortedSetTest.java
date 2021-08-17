@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author tempo
  */
-public class MockRedisSortedSetTest {
+class MockRedisSortedSetTest {
     private RedisSortedSet sortedSet;
 
     @BeforeEach
@@ -61,19 +61,19 @@ public class MockRedisSortedSetTest {
         assertThat(sortedSet.rangeByScore("key", -10, 0)).isEmpty();
 
         assertThat(sortedSet.rangeByScore("key", 0, 4, 1))
-                .containsExactly(entry("1", 1L));
+            .containsExactly(entry("1", 1L));
         assertThat(sortedSet.rangeByScore("key", 0, 4, 1).keySet().toArray())
-                .isEqualTo(new String[]{"1"});
+            .isEqualTo(new String[]{"1"});
 
         assertThat(sortedSet.rangeByScore("key", 0, 4, 3))
-                .containsExactly(entry("1", 1L), entry("2", 2L), entry("3", 3L));
+            .containsExactly(entry("1", 1L), entry("2", 2L), entry("3", 3L));
         assertThat(sortedSet.rangeByScore("key", 0, 4, 3).keySet().toArray())
-                .isEqualTo(new String[]{"1", "2", "3"});
+            .isEqualTo(new String[]{"1", "2", "3"});
 
         assertThat(sortedSet.rangeByScore("key", 0, 4, 4))
-                .containsExactly(entry("1", 1L), entry("2", 2L), entry("3", 3L));
+            .containsExactly(entry("1", 1L), entry("2", 2L), entry("3", 3L));
         assertThat(sortedSet.rangeByScore("key", 0, 4, 4).keySet().toArray())
-                .isEqualTo(new String[]{"1", "2", "3"});
+            .isEqualTo(new String[]{"1", "2", "3"});
     }
 
     @Test
@@ -84,18 +84,18 @@ public class MockRedisSortedSetTest {
         sortedSet.add("key", "3", 3);
 
         assertThat(sortedSet.range("key", 0, -1))
-                .containsExactly(entry("1", 1L), entry("2", 2L), entry("3", 3L), entry("4", 4L));
+            .containsExactly(entry("1", 1L), entry("2", 2L), entry("3", 3L), entry("4", 4L));
 
         assertThat(sortedSet.range("key", 2, -1))
-                .containsExactly(entry("3", 3L), entry("4", 4L));
+            .containsExactly(entry("3", 3L), entry("4", 4L));
 
         assertThat(sortedSet.range("key", 1, 2))
-                .containsExactly(entry("2", 2L), entry("3", 3L));
+            .containsExactly(entry("2", 2L), entry("3", 3L));
         assertThat(sortedSet.range("key", 1, 2).keySet().toArray())
-                .isEqualTo(new String[]{"2", "3"});
+            .isEqualTo(new String[]{"2", "3"});
 
         assertThat(sortedSet.range("key", -1, 5))
-                .containsOnlyKeys(List.of("1", "2", "3", "4"));
+            .containsOnlyKeys(List.of("1", "2", "3", "4"));
         assertThat(sortedSet.range("key", 9, 10)).isEmpty();
     }
 }

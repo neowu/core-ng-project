@@ -46,13 +46,13 @@ public class APIConfig extends Config {
         this.context = context;
         // default value is for internal api call only, targeting for kube env (with short connect timeout and more retries)
         httpClientBuilder = HTTPClient.builder()
-                .userAgent(WebServiceClient.USER_AGENT)
-                .trustAll()
-                .connectTimeout(Duration.ofSeconds(2))
-                .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
-                .keepAlive(Duration.ofMinutes(5))   // use longer keep alive timeout within cluster, to reduce connection creation overhead
-                .slowOperationThreshold(Duration.ofSeconds(10))
-                .maxRetries(5);
+            .userAgent(WebServiceClient.USER_AGENT)
+            .trustAll()
+            .connectTimeout(Duration.ofSeconds(2))
+            .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
+            .keepAlive(Duration.ofMinutes(5))   // use longer keep alive timeout within cluster, to reduce connection creation overhead
+            .slowOperationThreshold(Duration.ofSeconds(10))
+            .maxRetries(5);
         writer = new RequestBeanWriter();
         reader = new ResponseBeanReader();
     }
@@ -111,12 +111,10 @@ public class APIConfig extends Config {
     }
 
     public void publishAPI(List<String> cidrs) {
-        logger.info("publish typescript api definition, cidrs={}", cidrs);
+        logger.info("publish api definition, cidrs={}", cidrs);
         var accessControl = new IPv4AccessControl();
         accessControl.allow = new IPv4Ranges(cidrs);
-        var controller = new APIController(context.serviceRegistry, accessControl);
-        context.route(HTTPMethod.GET, "/_sys/api", controller::v1, true);
-        context.route(HTTPMethod.GET, "/_sys/api/v2", controller::v2, true);
+        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceRegistry, accessControl), true);
         context.serviceRegistry.beanClasses.add(AJAXErrorResponse.class);   // publish default ajax error response
     }
 

@@ -1,17 +1,14 @@
 package app.monitor.job;
 
-import core.framework.internal.log.LogManager;
 import core.framework.internal.stat.Stats;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -39,13 +36,13 @@ public class ElasticSearchMonitorJob implements Job {
         try {
             ElasticSearchNodeStats nodeStats = elasticSearchClient.stats(host);
             for (ElasticSearchNodeStats.Node node : nodeStats.nodes.values()) {
-                String host = node.name;
                 Stats stats = collect(node);
-                publishStats(host, stats);
+                var message = StatMessageFactory.stats(app, node.name, stats);
+                publisher.publish(message);
             }
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
-            publishError(e);
+            publisher.publish(StatMessageFactory.failedToCollect(app, host, e));
         }
     }
 
@@ -76,33 +73,5 @@ public class ElasticSearchMonitorJob implements Job {
 
         stats.put("es_docs", node.indices.docs.count);
         return stats;
-    }
-
-    private void publishStats(String host, Stats stats) {
-        Instant now = Instant.now();
-        var message = new StatMessage();
-        message.id = LogManager.ID_GENERATOR.next(now);
-        message.date = now;
-        message.app = app;
-        message.host = host;
-        message.result = stats.result();
-        message.stats = stats.stats;
-        message.errorCode = stats.errorCode;
-        message.errorMessage = stats.errorMessage;
-        publisher.publish(message);
-    }
-
-    private void publishError(Throwable e) {
-        Instant now = Instant.now();
-        var message = new StatMessage();
-        message.id = LogManager.ID_GENERATOR.next(now);
-        message.date = now;
-        message.result = "ERROR";
-        message.app = app;
-        message.host = host;
-        message.errorCode = "FAILED_TO_COLLECT";
-        message.errorMessage = e.getMessage();
-        message.info = Map.of("stack_trace", Exceptions.stackTrace(e));
-        publisher.publish(message);
     }
 }

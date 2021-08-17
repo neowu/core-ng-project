@@ -28,9 +28,12 @@ class StatCollectorTest {
 
     @Test
     void parseVmRSS() {
-        double vmRSS = collector.parseVmRSS("913415 52225 7215 1 0 66363 0");
-
+        long vmRSS = collector.parseVmRSS("913415 52225 7215 1 0 66363 0");
         assertThat(vmRSS).isEqualTo(52225 * 4096);
+
+        // the vmRSS is over Int.MAX_VALUE
+        vmRSS = collector.parseVmRSS("1555592 804536 6204 2 0 823015 0");
+        assertThat(vmRSS).isEqualTo(804536L * 4096);
     }
 
     @Test

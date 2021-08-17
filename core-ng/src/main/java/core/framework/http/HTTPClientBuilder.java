@@ -83,12 +83,13 @@ public final class HTTPClientBuilder {
         var watch = new StopWatch();
         try {
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .connectTimeout(connectTimeout)
-                    .readTimeout(timeout)
-                    .writeTimeout(timeout)
-                    .callTimeout(callTimeout()) // call timeout is only used as last defense, timeout for complete call includes connect/retry/etc
-                    .connectionPool(new ConnectionPool(100, keepAlive.toSeconds(), TimeUnit.SECONDS))
-                    .eventListenerFactory(new HTTPEventListenerFactory());
+                .connectTimeout(connectTimeout)
+                .readTimeout(timeout)
+                .writeTimeout(timeout)
+                .callTimeout(callTimeout()) // call timeout is only used as last defense, timeout for complete call includes connect/retry/etc
+                .connectionPool(new ConnectionPool(100, keepAlive.toSeconds(), TimeUnit.SECONDS))
+                .eventListenerFactory(new HTTPEventListenerFactory())
+                .retryOnConnectionFailure(false);   // use RetryInterceptor to record all failures, RetryAndFollowUpInterceptor will always be added to chain by okHTTP, so it still supports followup
 
             configureHTTPS(builder);
 
@@ -120,7 +121,7 @@ public final class HTTPClientBuilder {
             }
             sslContext.init(null, new TrustManager[]{trustManager}, null);
             builder.hostnameVerifier((hostname, sslSession) -> true)
-                    .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
+                .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new Error(e);
         }
@@ -204,13 +205,14 @@ public final class HTTPClientBuilder {
         return this;
     }
 
+    // this is rough estimate, like read timeout doesn't mean fetching full response will complete within duration of timeout
     Duration callTimeout() {
         int attempts = maxRetries == null ? 1 : maxRetries;
-        long timeout = connectTimeout.toMillis() + this.timeout.toMillis() * attempts;
+        long callTimeout = connectTimeout.toMillis() + timeout.toMillis() * attempts;
         for (int i = 1; i < attempts; i++) {
-            timeout += 600 << i - 1;    // rough sleep can be +20% of 500ms
+            callTimeout += retryWaitTime.toMillis() << i - 1;
         }
-        timeout += 2000;  // add 2 seconds as extra buffer
-        return Duration.ofMillis(timeout);
+        callTimeout += 2000;  // add 2 seconds as extra buffer
+        return Duration.ofMillis(callTimeout);
     }
 }

@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author tempo
  */
-public class RedisHyperLogLogOperationTest extends AbstractRedisOperationTest {
+class RedisHyperLogLogOperationTest extends AbstractRedisOperationTest {
     @Test
     void add() {
         response(":1\r\n");

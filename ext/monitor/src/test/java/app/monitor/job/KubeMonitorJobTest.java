@@ -1,5 +1,6 @@
 package app.monitor.job;
 
+import core.framework.internal.log.LogManager;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +53,7 @@ class KubeMonitorJobTest {
         status.state.waiting.message = "Back-off 5m0s restarting failed container";
 
         assertThat(job.check(pod, ZonedDateTime.now()))
-                .isEqualTo("CrashLoopBackOff: Back-off 5m0s restarting failed container");
+            .isEqualTo("CrashLoopBackOff: Back-off 5m0s restarting failed container");
     }
 
     @Test
@@ -66,7 +67,7 @@ class KubeMonitorJobTest {
         status.lastState = lastState;
 
         assertThat(job.check(pod, ZonedDateTime.now()))
-                .isEqualTo("pod was terminated, reason=OOMKilled, exitCode=137");
+            .isEqualTo("pod was terminated, reason=OOMKilled, exitCode=137");
     }
 
     @Test
@@ -80,7 +81,7 @@ class KubeMonitorJobTest {
         status.lastState = lastState;
 
         assertThat(job.check(pod, ZonedDateTime.now()))
-                .isEqualTo("pod was terminated, reason=Error, exitCode=1");
+            .isEqualTo("pod was terminated, reason=Error, exitCode=1");
 
         status.ready = Boolean.TRUE;
         assertThat(job.check(pod, ZonedDateTime.now())).isNull();
@@ -113,17 +114,17 @@ class KubeMonitorJobTest {
         status.state.waiting.message = "Back-off pulling image \"gcr.io/project/ops/debug:latest\"";
 
         assertThat(job.check(pod, ZonedDateTime.now()))
-                .contains(status.state.waiting.reason)
-                .contains(status.state.waiting.message);
+            .contains(status.state.waiting.reason)
+            .contains(status.state.waiting.message);
     }
 
     @Test
     void publishError() throws IOException {
         when(kubeClient.listPods("ns")).thenThrow(new Error("mock"));
         job.execute(null);
-        verify(publisher).publish(argThat(message -> "kubernetes".equals(message.app)
-                && "ERROR".equals(message.result)
-                && "FAILED_TO_COLLECT".equals(message.errorCode)));
+        verify(publisher).publish(argThat(message -> LogManager.APP_NAME.equals(message.app)
+                                                     && "ERROR".equals(message.result)
+                                                     && "FAILED_TO_COLLECT".equals(message.errorCode)));
     }
 
     private KubePodList.Pod pod(String phase) {

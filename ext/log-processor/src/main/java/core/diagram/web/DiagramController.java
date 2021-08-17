@@ -5,6 +5,7 @@ import core.framework.inject.Inject;
 import core.framework.util.Strings;
 import core.framework.web.Request;
 import core.framework.web.Response;
+import core.framework.web.exception.BadRequestException;
 
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,16 @@ public class DiagramController {
         String dot = diagramService.arch(hours, excludes);
         var model = new DiagramModel();
         model.title = "System Architecture";
+        model.dot = dot;
+        return Response.html("/template/diagram.html", model);
+    }
+
+    public Response action(Request request) {
+        String actionId = request.queryParams().get("actionId");
+        if (actionId == null) throw new BadRequestException("actionId must not be null");
+        String dot = diagramService.action(actionId);
+        var model = new DiagramModel();
+        model.title = "Action Flow";
         model.dot = dot;
         return Response.html("/template/diagram.html", model);
     }

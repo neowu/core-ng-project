@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -36,14 +35,21 @@ class AlertServiceTest {
         config.timespanInHours = 4;
         config.kibanaURL = "http://kibana:5601";
 
-        config.channels = Map.of("actionWarnChannel", matcher(null, null, Severity.WARN, List.of("trace", "stat")),
-                "actionErrorChannel", matcher(null, null, Severity.ERROR, List.of("trace", "stat")),
-                "eventWarnChannel", matcher(null, null, Severity.WARN, List.of("event")),
-                "eventErrorChannel", matcher(null, null, Severity.ERROR, List.of("event")),
-                "productChannel", matcher(List.of("website"), List.of("PRODUCT_ERROR"), null, null));
+        config.notifications = List.of(notification("actionWarnChannel", null, null, Severity.WARN, List.of("trace", "stat")),
+            notification("actionErrorChannel", null, null, Severity.ERROR, List.of("trace", "stat")),
+            notification("eventWarnChannel", null, null, Severity.WARN, List.of("event")),
+            notification("eventErrorChannel", null, null, Severity.ERROR, List.of("event")),
+            notification("productChannel", List.of("website"), List.of("PRODUCT_ERROR"), null, null));
 
         service = new AlertService(config);
         service.channelManager = channelManager;
+    }
+
+    private AlertConfig.Notification notification(String channel, List<String> apps, List<String> errorCodes, Severity severity, List<String> indices) {
+        var notification = new AlertConfig.Notification();
+        notification.channel = channel;
+        notification.matcher = matcher(apps, errorCodes, severity, indices);
+        return notification;
     }
 
     private AlertConfig.Matcher matcher(List<String> apps, List<String> errorCodes, Severity severity, List<String> indices) {

@@ -4,6 +4,7 @@ import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public final class ActionLogContext {
         }
     }
 
-    // used to collect business metrics, and can be aggregated by Elasticsearch/Kibana
+    // to collect numeric metrics, and can be aggregated by Elasticsearch/Kibana
     public static void stat(String key, double value) {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {
@@ -49,5 +50,12 @@ public final class ActionLogContext {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog == null) return 1;    // be called without action context
         return actionLog.track(operation, elapsed, readEntries, writeEntries);
+    }
+
+    @Nullable
+    public static Duration remainingProcessTime() {
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        if (actionLog == null) return null;
+        return Duration.ofNanos(actionLog.remainingProcessTimeInNano());
     }
 }

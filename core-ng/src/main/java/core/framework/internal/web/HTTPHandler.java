@@ -24,6 +24,8 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.List;
@@ -49,6 +51,7 @@ public class HTTPHandler implements HttpHandler {
 
     public final RateControl rateControl = new RateControl(1000);   // save at max 1000 group/ip combination
 
+    private final Logger logger = LoggerFactory.getLogger(HTTPHandler.class);
     private final LogManager logManager;
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;
@@ -76,10 +79,15 @@ public class HTTPHandler implements HttpHandler {
     }
 
     private void handle(HttpServerExchange exchange) {
+        long httpDelay = System.nanoTime() - exchange.getRequestStartTime();
         ActionLog actionLog = logManager.begin("=== http transaction begin ===", null);
         var request = new RequestImpl(exchange, requestBeanReader);
         try {
             webContext.initialize(request);
+
+            logger.debug("httpDelay={}", httpDelay);    // http delay is usually low, so not to use Duration format
+            actionLog.stats.put("http_delay", (double) httpDelay);
+
             requestParser.parse(request, exchange, actionLog);
 
             if (accessControl != null) accessControl.validate(request.clientIP());  // check ip before checking routing/web socket, return 403 asap

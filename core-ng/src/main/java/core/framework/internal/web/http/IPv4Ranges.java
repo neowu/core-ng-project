@@ -38,7 +38,6 @@ public class IPv4Ranges {
         return low % 2 == 0;
     }
 
-    @SuppressWarnings("PMD.UseVarargs") // int[][] is accurate type of param
     static int[] mergeRanges(int[][] ranges) {
         int index;
         Arrays.sort(ranges, Comparator.comparingInt(range -> range[0]));

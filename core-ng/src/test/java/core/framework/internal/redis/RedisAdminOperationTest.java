@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-public class RedisAdminOperationTest extends AbstractRedisOperationTest {
+class RedisAdminOperationTest extends AbstractRedisOperationTest {
     @Test
     void info() {
         response("$31\r\n# Server\r\nredis_version:5.0.7\r\n\r\n");

@@ -4,6 +4,8 @@ import core.framework.internal.web.session.SessionImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -33,6 +35,13 @@ class ReadOnlySessionTest {
     @Test
     void set() {
         assertThatThrownBy(() -> session.set("key", "value"))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("readonly");
+    }
+
+    @Test
+    void timeout() {
+        assertThatThrownBy(() -> session.timeout(Duration.ofDays(30)))
             .isInstanceOf(Error.class)
             .hasMessageContaining("readonly");
     }

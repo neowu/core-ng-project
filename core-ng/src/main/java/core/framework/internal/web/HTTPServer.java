@@ -35,7 +35,7 @@ public class HTTPServer {
     public Integer httpPort;
     public Integer httpsPort;
     public boolean gzip;
-    public long maxEntitySize = 10_000_000;    // limit max post body to 10M
+    public long maxEntitySize = 10_000_000;    // limit max post body to 10M, apply to multipart as well
     private Undertow server;
 
     public HTTPServer(LogManager logManager) {
@@ -52,23 +52,24 @@ public class HTTPServer {
             if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
 
             builder.setHandler(handler())
-                    // undertow accepts incoming connection very quick, backlog is hard to be filled even under load test, this setting is more for DDOS protection
-                    // and not necessary under cloud env, here to set to match linux default value
-                    // to use larger value, it requires to update kernel accordingly, e.g. sysctl -w net.core.somaxconn=1024 && sysctl -w net.ipv4.tcp_max_syn_backlog=4096
-                    .setSocketOption(Options.BACKLOG, 1024)
-                    .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
-                    .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)
-                    .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, Boolean.TRUE)
-                    // since we don't use Expires or Last-Modified header, so it's not necessary to set Date header, for cache, prefer cache-control/max-age
-                    // refer to https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.18.1
-                    .setServerOption(UndertowOptions.ALWAYS_SET_DATE, Boolean.FALSE)
-                    .setServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE, Boolean.FALSE)
-                    // set tcp idle timeout to 620s, by default AWS ALB uses 60s, GCloud LB uses 600s, since it is always deployed with LB, longer timeout doesn't hurt
-                    // refer to https://cloud.google.com/load-balancing/docs/https/#timeouts_and_retries
-                    // refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout
-                    .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620_000)         // 620s
-                    .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10_000)            // 10s
-                    .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, maxEntitySize);
+                // undertow accepts incoming connection very quick, backlog is hard to be filled even under load test, this setting is more for DDOS protection
+                // and not necessary under cloud env, here to set to match linux default value
+                // to use larger value, it requires to update kernel accordingly, e.g. sysctl -w net.core.somaxconn=1024 && sysctl -w net.ipv4.tcp_max_syn_backlog=4096
+                .setSocketOption(Options.BACKLOG, 1024)
+                .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
+                .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)
+                .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, Boolean.TRUE)
+                // since we don't use Expires or Last-Modified header, so it's not necessary to set Date header, for cache, prefer cache-control/max-age
+                // refer to https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.18.1
+                .setServerOption(UndertowOptions.ALWAYS_SET_DATE, Boolean.FALSE)
+                .setServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE, Boolean.FALSE)
+                // set tcp idle timeout to 620s, by default AWS ALB uses 60s, GCloud LB uses 600s, since it is always deployed with LB, longer timeout doesn't hurt
+                // refer to https://cloud.google.com/load-balancing/docs/https/#timeouts_and_retries
+                // refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout
+                .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620_000)         // 620s
+                .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10_000)            // 10s
+                .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, maxEntitySize)
+                .setServerOption(UndertowOptions.RECORD_REQUEST_START_TIME, Boolean.TRUE);
 
             server = builder.build();
             server.start();
@@ -82,7 +83,7 @@ public class HTTPServer {
         if (gzip) {
             // only support gzip, deflate is less popular
             handler = new EncodingHandler(handler, new ContentEncodingRepository()
-                    .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, new GZipPredicate()));
+                .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, new GZipPredicate()));
         }
         return handler;
     }

@@ -1,31 +1,33 @@
 {
   "index_patterns": "trace-*",
-  "order": 1,
-  "settings": {
-    "number_of_shards": "${NUMBER_OF_SHARDS}",
-    "refresh_interval": "${REFRESH_INTERVAL}"
-  },
-  "mappings": {
-    "properties": {
-      "@timestamp": {
-        "type": "date",
-        "format": "strict_date_optional_time"
-      },
-      "app": {
-        "type": "keyword"
-      },
-      "result": {
-        "type": "keyword"
-      },
-      "action": {
-        "type": "keyword"
-      },
-      "error_code": {
-        "type": "keyword"
-      },
-      "content": {
-        "type": "text",
-        "index": "false"
+  "priority": 1,
+  "template": {
+    "settings": {
+      "number_of_shards": "${NUMBER_OF_SHARDS}",
+      "refresh_interval": "${REFRESH_INTERVAL}"
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date",
+          "format": "strict_date_optional_time"
+        },
+        "app": {
+          "type": "keyword"
+        },
+        "result": {
+          "type": "keyword"
+        },
+        "action": {
+          "type": "keyword"
+        },
+        "error_code": {
+          "type": "keyword"
+        },
+        "content": {
+          "type": "text",
+          "index": "false"
+        }
       }
     }
   }

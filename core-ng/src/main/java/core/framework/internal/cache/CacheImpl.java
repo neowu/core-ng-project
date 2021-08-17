@@ -1,7 +1,8 @@
 package core.framework.internal.cache;
 
 import core.framework.cache.Cache;
-import core.framework.log.ActionLogContext;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,14 +40,14 @@ public class CacheImpl<T> implements Cache<T> {
         String cacheKey = cacheKey(key);
         T cacheValue = cacheStore.get(cacheKey, context);
         if (cacheValue != null) {
-            ActionLogContext.stat("cache_hits", 1);
+            stat("cache_hits", 1);
             return cacheValue;
         }
 
         logger.debug("load value, key={}", key);
         T value = load(loader, key);
         cacheStore.put(cacheKey, value, duration, context);
-        ActionLogContext.stat("cache_misses", 1);
+        stat("cache_misses", 1);
         return value;
     }
 
@@ -64,7 +65,7 @@ public class CacheImpl<T> implements Cache<T> {
         Map<String, T> values = Maps.newHashMapWithExpectedSize(size);
         List<CacheStore.Entry<T>> newValues = new ArrayList<>(size);
         Map<String, T> cacheValues = cacheStore.getAll(cacheKeys, context);
-        ActionLogContext.stat("cache_hits", cacheValues.size());
+        stat("cache_hits", cacheValues.size());
         for (String key : keys) {
             String cacheKey = cacheKeys[index];
             T result = cacheValues.get(cacheKey);
@@ -78,7 +79,7 @@ public class CacheImpl<T> implements Cache<T> {
         }
         if (!newValues.isEmpty()) {
             cacheStore.putAll(newValues, duration, context);
-            ActionLogContext.stat("cache_misses", newValues.size());
+            stat("cache_misses", newValues.size());
         }
         return values;
     }
@@ -126,5 +127,13 @@ public class CacheImpl<T> implements Cache<T> {
         T value = loader.apply(key);
         if (value == null) throw new Error("value must not be null, key=" + key);
         return value;
+    }
+
+    // set to actionLog directly to keep trace log concise
+    private void stat(String key, double value) {
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        if (actionLog != null) {
+            actionLog.stats.compute(key, (k, oldValue) -> (oldValue == null) ? value : oldValue + value);
+        }
     }
 }

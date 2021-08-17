@@ -28,6 +28,10 @@ public class MonitorConfig {
     @Property(name = "kube")
     public KubeConfig kube;
 
+    @NotNull
+    @Property(name = "api")
+    public APIConfig api;
+
     public static class RedisConfig {
         @NotNull
         @Size(min = 1)
@@ -82,5 +86,12 @@ public class MonitorConfig {
         @Size(min = 1)
         @Property(name = "namespaces")
         public List<String> namespaces = List.of();
+    }
+
+    public static class APIConfig {
+        @NotNull
+        @Size(min = 1)
+        @Property(name = "services")
+        public List<String> services = List.of();
     }
 }

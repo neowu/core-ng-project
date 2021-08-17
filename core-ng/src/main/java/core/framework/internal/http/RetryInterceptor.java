@@ -3,14 +3,17 @@ package core.framework.internal.http;
 import core.framework.api.http.HTTPStatus;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
-import core.framework.log.ActionLogContext;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.internal.connection.RouteException;
+import okhttp3.internal.http2.ErrorCode;
+import okhttp3.internal.http2.StreamResetException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
@@ -41,14 +44,14 @@ public class RetryInterceptor implements Interceptor {
             try {
                 Response response = chain.proceed(request);
                 int statusCode = response.code();
-                if (shouldRetry(attempts, statusCode) && withinMaxProcessTime(attempts)) {
+                if (shouldRetry(chain.call().isCanceled(), attempts, statusCode)) {
                     logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, responseStatus={}, uri={}", statusCode, uri(request));
                     closeResponseBody(response);
                 } else {
                     return response;
                 }
-            } catch (IOException e) {
-                if (shouldRetry(attempts, request.method(), e) && withinMaxProcessTime(attempts)) {
+            } catch (IOException | RouteException e) {
+                if (shouldRetry(chain.call().isCanceled(), request.method(), attempts, e)) {
                     logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, uri={}, error={}", uri(request), e.getMessage(), e);
                 } else {
                     throw e;
@@ -56,7 +59,10 @@ public class RetryInterceptor implements Interceptor {
             }
             sleep.sleep(waitTime(attempts));
             attempts++;
-            ActionLogContext.stat("http_retries", 1);
+
+            // set to actionLog directly to keep trace log concise
+            ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+            if (actionLog != null) actionLog.stats.compute("http_retries", (key, oldValue) -> (oldValue == null) ? 1.0 : oldValue + 1);
         }
     }
 
@@ -81,22 +87,32 @@ public class RetryInterceptor implements Interceptor {
         if (body != null) closeQuietly(body);
     }
 
-    boolean shouldRetry(int attempts, int statusCode) {
-        return attempts < maxRetries
-                && (statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code);
+    boolean shouldRetry(boolean canceled, int attempts, int statusCode) {
+        if (canceled) return false;    // AsyncTimout cancels call if callTimeout, refer to RealCall.kt/timout field
+        if (attempts >= maxRetries) return false;
+        if (!withinMaxProcessTime(attempts)) return false;
+
+        return statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code;
     }
 
-    boolean shouldRetry(int attempts, String method, IOException e) {
+    // refer to RetryAndFollowUpInterceptor.intercept for built-in error handling
+    boolean shouldRetry(boolean canceled, String method, int attempts, Exception e) {
+        if (canceled) return false;    // AsyncTimout cancels call if callTimeout, refer to RealCall.kt/timout field
         if (attempts >= maxRetries) return false;
+        if (!withinMaxProcessTime(attempts)) return false;
 
-        // only not retry on POST with read time out
-        // okHTTP uses both socket timeout and AsyncTimeout, it closes socket/connection when timeout is detected by background thread, so no need to close exchange
-        // refer to SocketAsyncTimeout.timeout()
+        if (e instanceof RouteException) return true;   // if it's route failure, then request is not sent yet
+
+        // only not retry on POST if request sent
         if (!"POST".equals(method)) return true;
+
+        // should not retry on connection reset, the request could be sent already, and server side may continue to complete it
+        if (e instanceof SSLException && "Connection reset".equals(e.getMessage())) return false;
+        if (e instanceof StreamResetException && ((StreamResetException) e).errorCode == ErrorCode.CANCEL) return false;
+
+        // okHTTP uses both socket timeout and AsyncTimeout, it closes socket/connection when timeout is detected by background thread, so no need to close exchange
         // refer to AsyncTimeout.newTimeoutException() -> SocketAsyncTimeout.newTimeoutException()
-        if (e instanceof SocketTimeoutException && "timeout".equals(e.getMessage())) return false;
-        // it throws IOException("Canceled") hits callTimeout, refer to RetryAndFollowUpInterceptor.intercept()
-        return !"Canceled".equals(e.getMessage());
+        return !(e instanceof SocketTimeoutException && "timeout".equals(e.getMessage()));
     }
 
     Duration waitTime(int attempts) {

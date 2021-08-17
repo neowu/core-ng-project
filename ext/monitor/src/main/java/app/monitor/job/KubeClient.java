@@ -35,7 +35,7 @@ public class KubeClient {
         request.accept(ContentType.APPLICATION_JSON);
         HTTPResponse response = httpClient.execute(request);
         if (response.statusCode != HTTPStatus.OK.code) {
-            throw new Error("failed to call kube api, statusCode=" + response.statusCode + ", message=" + response.text());
+            throw new Error("failed to call kube api server, statusCode=" + response.statusCode + ", message=" + response.text());
         }
         // not using validation to reduce overhead
         return reader.fromJSON(response.body);

@@ -1,0 +1,22 @@
+{
+  "services": [
+    {
+      "name": "CustomerAJAXService",
+      "operations": [
+        {"name": "create", "method": "POST", "path": "/ajax/register", "pathParams": [], "requestType": "RegisterAJAXRequest", "responseType": "void", "optional": false, "deprecated": false}
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "RegisterAJAXRequest",
+      "type": "bean",
+      "fields": [
+        {"name": "customerName", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "password", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "email", "type": "String", "typeParams": null, "constraints": {"notNull": false, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}}
+      ],
+      "enumConstants": null
+    }
+  ]
+}

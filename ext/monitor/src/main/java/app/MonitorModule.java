@@ -1,6 +1,7 @@
 package app;
 
 import app.monitor.MonitorConfig;
+import app.monitor.job.APIMonitorJob;
 import app.monitor.job.ElasticSearchClient;
 import app.monitor.job.ElasticSearchMonitorJob;
 import app.monitor.job.JMXClient;
@@ -8,6 +9,7 @@ import app.monitor.job.KafkaMonitorJob;
 import app.monitor.job.KubeClient;
 import app.monitor.job.KubeMonitorJob;
 import app.monitor.job.RedisMonitorJob;
+import core.framework.http.HTTPClient;
 import core.framework.json.Bean;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.LogTopics;
@@ -43,6 +45,15 @@ public class MonitorModule extends Module {
         if (config.kube != null) {
             configureKubeJob(publisher, config.kube);
         }
+        if (config.api != null) {
+            configureAPIJob(publisher, config.api);
+        }
+    }
+
+    private void configureAPIJob(MessagePublisher<StatMessage> publisher, MonitorConfig.APIConfig config) {
+        HTTPClient httpClient = HTTPClient.builder().userAgent("monitor").trustAll().build();
+        var job = new APIMonitorJob(httpClient, config.services, publisher);
+        schedule().fixedRate("monitor:api", job, Duration.ofMinutes(10));  // not check api too often
     }
 
     private void configureKubeJob(MessagePublisher<StatMessage> publisher, MonitorConfig.KubeConfig config) {
@@ -53,7 +64,7 @@ public class MonitorModule extends Module {
     }
 
     private void configureESJob(MessagePublisher<StatMessage> publisher, Map<String, MonitorConfig.ElasticSearchConfig> config) {
-        ElasticSearchClient elasticSearchClient = new ElasticSearchClient();
+        var elasticSearchClient = new ElasticSearchClient();
         for (Map.Entry<String, MonitorConfig.ElasticSearchConfig> entry : config.entrySet()) {
             String app = entry.getKey();
             MonitorConfig.ElasticSearchConfig esConfig = entry.getValue();

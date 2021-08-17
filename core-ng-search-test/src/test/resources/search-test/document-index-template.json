@@ -1,16 +1,18 @@
 {
-  "index_patterns": "document-*",
-  "order": 1,
-  "settings": {
-    "number_of_shards": 1
-  },
-  "mappings": {
-    "properties": {
-      "string_field": {
-        "type": "text"
-      },
-      "int_field": {
-        "type": "integer"
+  "index_patterns": ["document-*"],
+  "priority": 1,
+  "template": {
+    "settings": {
+      "number_of_shards": 1
+    },
+    "mappings": {
+      "properties": {
+        "string_field": {
+          "type": "text"
+        },
+        "int_field": {
+          "type": "integer"
+        }
       }
     }
   }

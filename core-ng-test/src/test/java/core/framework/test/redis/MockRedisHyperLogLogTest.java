@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author tempo
  */
-public class MockRedisHyperLogLogTest {
+class MockRedisHyperLogLogTest {
     private RedisHyperLogLog log;
 
     @BeforeEach

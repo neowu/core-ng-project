@@ -3,7 +3,7 @@ apply from: file("${rootDir}/gradle/publish.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '7.6.16'
+    version = '7.7.5'
 
     repositories {
         maven {
@@ -15,13 +15,13 @@ subprojects {
     }
 }
 
-def elasticVersion = '7.12.0'
+def elasticVersion = '7.13.0'
 def kafkaVersion = '2.8.0'
-def jacksonVersion = '2.12.0'
-def junitVersion = '5.7.1'
-def mockitoVersion = '3.7.0'
+def jacksonVersion = '2.12.3'
+def junitVersion = '5.7.2'
+def mockitoVersion = '3.11.1'
 def assertjVersion = '3.19.0'
-def mysqlVersion = '8.0.23'
+def mysqlVersion = '8.0.25'
 
 project('core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -34,19 +34,20 @@ project('core-ng') {
         api project(":core-ng-json")
         api project(":core-ng-common")
         api 'org.slf4j:slf4j-api:1.8.0-beta4'
-        implementation 'org.javassist:javassist:3.27.0-GA'
+        implementation 'org.javassist:javassist:3.28.0-GA'
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-        implementation 'com.squareup.okhttp3:okhttp:4.9.0'
-        implementation 'io.undertow:undertow-core:2.2.7.Final'
+        implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+        implementation 'io.undertow:undertow-core:2.2.9.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.8.4'      // used by kafka message compression
         compileOnly "mysql:mysql-connector-java:${mysqlVersion}"
+        compileOnly 'org.jboss.logging:jboss-logging-annotations:2.2.1.Final'
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-        testRuntimeOnly 'org.hsqldb:hsqldb:2.5.1'
+        testRuntimeOnly 'org.hsqldb:hsqldb:2.6.0'
     }
 }
 
@@ -59,7 +60,7 @@ project('core-ng-test') {
         implementation project(":core-ng")
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
-        testRuntimeOnly 'org.hsqldb:hsqldb:2.5.1'
+        testRuntimeOnly 'org.hsqldb:hsqldb:2.6.0'
     }
 }
 
@@ -90,7 +91,7 @@ project('core-ng-mongo') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        api 'org.mongodb:mongodb-driver-sync:4.2.2'
+        api 'org.mongodb:mongodb-driver-sync:4.3.0'
         testImplementation project(":core-ng-test")
     }
 }
@@ -111,8 +112,8 @@ project('core-ng-search') {
         api "org.elasticsearch:elasticsearch:${elasticVersion}@jar"
         api "org.elasticsearch:elasticsearch-x-content:${elasticVersion}@jar"
         implementation "org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticVersion}"
-        testImplementation project(":core-ng-test")
         implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"              // override transitive jackson dependencies of elasticsearch
+        testImplementation project(":core-ng-test")
     }
 }
 

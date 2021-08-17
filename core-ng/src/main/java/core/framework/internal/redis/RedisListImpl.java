@@ -32,24 +32,36 @@ public final class RedisListImpl implements RedisList {
     }
 
     @Override
-    public String pop(String key) {
+    public List<String> pop(String key, int count) {
         var watch = new StopWatch();
         validate("key", key);
-        String value = null;
+        if (count <= 0) throw new Error("count must be greater than 0");
+        List<String> values = new ArrayList<>(count);
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.writeKeyCommand(LPOP, key);
-            value = decode(connection.readBlobString());
-            return value;
+            if (count == 1) {   // "lpop key count" only be supported since redis 6.2, to use old protocol if count=1
+                connection.writeKeyCommand(LPOP, key);
+                String value = decode(connection.readBlobString());
+                if (value != null) values.add(value);
+            } else {
+                connection.writeKeyArgumentCommand(LPOP, key, encode(count));
+                Object[] response = connection.readArray();
+                if (response != null) {     // lpop returns nil array if no element, this is different behavior of other pop (e.g. spop), it's likely due to blpop impl, use nil array to distinguish between timeout and empty list
+                    for (Object value : response) {
+                        values.add(decode((byte[]) value));
+                    }
+                }
+            }
+            return values;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, 1, 0);
-            logger.debug("lpop, key={}, returnedValue={}, elapsed={}", key, value, elapsed);
+            ActionLogContext.track("redis", elapsed, values.size(), 0);
+            logger.debug("lpop, key={}, count={}, returnedValues={}, elapsed={}", key, count, values, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }

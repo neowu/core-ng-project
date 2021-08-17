@@ -1,51 +1,53 @@
 {
   "index_patterns": "stat-*",
-  "order": 1,
-  "settings": {
-    "number_of_shards": "${NUMBER_OF_SHARDS}",
-    "refresh_interval": "${REFRESH_INTERVAL}"
-  },
-  "mappings": {
-    "dynamic_templates": [
-      {
-        "stats": {
-          "path_match": "stats.*",
-          "mapping": {
-            "type": "scaled_float",
-            "scaling_factor": 1000
+  "priority": 1,
+  "template": {
+    "settings": {
+      "number_of_shards": "${NUMBER_OF_SHARDS}",
+      "refresh_interval": "${REFRESH_INTERVAL}"
+    },
+    "mappings": {
+      "dynamic_templates": [
+        {
+          "stats": {
+            "path_match": "stats.*",
+            "mapping": {
+              "type": "scaled_float",
+              "scaling_factor": 1000
+            }
+          }
+        },
+        {
+          "info": {
+            "path_match": "info.*",
+            "mapping": {
+              "type": "text",
+              "index": "false"
+            }
           }
         }
-      },
-      {
-        "info": {
-          "path_match": "info.*",
-          "mapping": {
-            "type": "text",
-            "index": "false"
-          }
+      ],
+      "properties": {
+        "@timestamp": {
+          "type": "date",
+          "format": "strict_date_optional_time"
+        },
+        "app": {
+          "type": "keyword"
+        },
+        "host": {
+          "type": "keyword"
+        },
+        "result": {
+          "type": "keyword"
+        },
+        "error_code": {
+          "type": "keyword"
+        },
+        "error_message": {
+          "type": "text",
+          "index": "false"
         }
-      }
-    ],
-    "properties": {
-      "@timestamp": {
-        "type": "date",
-        "format": "strict_date_optional_time"
-      },
-      "app": {
-        "type": "keyword"
-      },
-      "host": {
-        "type": "keyword"
-      },
-      "result": {
-        "type": "keyword"
-      },
-      "error_code": {
-        "type": "keyword"
-      },
-      "error_message": {
-        "type": "text",
-        "index": "false"
       }
     }
   }
