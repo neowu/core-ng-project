@@ -56,7 +56,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void initialize() {
         RestClientBuilder builder = RestClient.builder(hosts);
         if (auth != null) {
-            Header[] authHeader = new Header[]{new BasicHeader("Authorization", "ApiKey " + apiKeyAuth())};
+            Header[] authHeader = {new BasicHeader("Authorization", "ApiKey " + apiKeyAuth())};
             builder.setDefaultHeaders(authHeader);
         }
         builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
