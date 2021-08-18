@@ -45,6 +45,7 @@ class APIMonitorJobTest {
     void checkAPI() {
         var response = new APIDefinitionResponse();
         response.app = "website";
+        response.version = "1";
         response.services = List.of();
         response.types = List.of();
         when(httpClient.execute(any())).thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes(JSON.toJSON(response))));
@@ -59,6 +60,7 @@ class APIMonitorJobTest {
         type.type = "bean";
         type.name = "MockType";
         response.types = List.of(type);
+        response.version = "2";
         when(httpClient.execute(any())).thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes(JSON.toJSON(response))));
 
         job.execute(null);      // added new type
