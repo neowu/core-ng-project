@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.time.Duration;
-import java.util.Base64;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -48,15 +47,15 @@ public class ElasticSearchImpl implements ElasticSearch {
     public Duration timeout = Duration.ofSeconds(10);
     public Duration slowOperationThreshold = Duration.ofSeconds(5);
     public HttpHost[] hosts;
-    public ElasticSearchAuth auth;
+    public String apiKey;
     public int maxResultWindow = 10000;
     private RestHighLevelClient client;
 
     // initialize will be called in startup hook, so no need to synchronize
     public void initialize() {
         RestClientBuilder builder = RestClient.builder(hosts);
-        if (auth != null) {
-            Header[] authHeader = {new BasicHeader("Authorization", "ApiKey " + apiKeyAuth())};
+        if (apiKey != null) {
+            Header[] authHeader = {new BasicHeader("Authorization", "ApiKey " + apiKey)};
             builder.setDefaultHeaders(authHeader);
         }
         builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
@@ -167,12 +166,6 @@ public class ElasticSearchImpl implements ElasticSearch {
         } finally {
             logger.info("get cluster state, elapsed={}", watch.elapsed());
         }
-    }
-
-    private String apiKeyAuth() {
-        return Base64.getEncoder().encodeToString(
-            (auth.apiKeyId + ":" + auth.apiSecret).getBytes(UTF_8)
-        );
     }
 
     private byte[] responseBody(HttpEntity entity) throws IOException {
