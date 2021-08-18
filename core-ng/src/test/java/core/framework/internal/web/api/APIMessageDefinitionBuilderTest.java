@@ -28,6 +28,8 @@ class APIMessageDefinitionBuilderTest {
     void build() {
         APIMessageDefinitionResponse response = builder.build();
         APIMessageDefinitionResponse expectedResponse = JSON.fromJSON(APIMessageDefinitionResponse.class, ClasspathResources.text("api-test/test-message.json"));
-        assertThat(response).usingRecursiveComparison().isEqualTo(expectedResponse);
+        assertThat(response).usingRecursiveComparison()
+            .ignoringFields("version")
+            .isEqualTo(expectedResponse);
     }
 }
