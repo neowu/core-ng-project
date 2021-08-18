@@ -11,6 +11,9 @@ public class APIMessageDefinitionResponse {
     @Property(name = "app")
     public String app;
 
+    @Property(name = "version")
+    public String version;      // used to fast compare
+
     @Property(name = "topics")
     public List<Topic> topics;
 

@@ -1,10 +1,10 @@
 ## Change log
 
-### 7.8.0 (08/04/2021 - )   !!! breaking changes, pls read details
+### 7.8.0 (08/04/2021 - 08/17/2021)   !!! breaking changes, pls read details
 
 * es: update to 7.14.0
 * log-processor: kibana 7.14 added duration human precise formatter, updated all time fields of index pattern
-  > must update es to 7.14 if use this version of log-processor
+  > must update kibana/es to 7.14 to use this version of log-processor
 * api: always publish /_sys/api, for internal api change monitoring
 * api: added /_sys/api/message to publish message definition, for future message change monitoring
 * error: refactored ErrorResponse and AJAXErrorResponse, !!! changed ErrorResponse json field from "error_code" to "errorCode"

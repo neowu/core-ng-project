@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author neo
@@ -32,6 +33,7 @@ public class APIDefinitionBuilder {
     public APIDefinitionResponse build() {
         var response = new APIDefinitionResponse();
         response.app = LogManager.APP_NAME;
+        response.version = UUID.randomUUID().toString();
         response.services = services();
         for (Class<?> beanClass : beanClasses) {
             if (beanClass.isEnum()) {

@@ -13,6 +13,7 @@ import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
 import core.framework.util.Maps;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ public class APIMonitorJob implements Job {
         }
         APIDefinitionResponse currentDefinition = JSON.fromJSON(APIDefinitionResponse.class, response.text());
         APIDefinitionResponse previousDefinition = previousDefinitions.get(currentDefinition.app);
-        if (previousDefinition != null) {
+        if (previousDefinition != null && !Strings.equals(previousDefinition.version, currentDefinition.version)) {
             checkAPI(previousDefinition, currentDefinition);
         }
         previousDefinitions.put(currentDefinition.app, currentDefinition);

@@ -12,6 +12,9 @@ public class APIDefinitionResponse {
     @Property(name = "app")
     public String app;
 
+    @Property(name = "version")
+    public String version;      // used to fast compare
+
     @Property(name = "services")
     public List<Service> services;
 

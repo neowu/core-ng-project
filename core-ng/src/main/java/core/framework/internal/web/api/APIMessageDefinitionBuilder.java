@@ -5,6 +5,7 @@ import core.framework.internal.web.sys.APIController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author neo
@@ -20,6 +21,7 @@ public class APIMessageDefinitionBuilder {
     public APIMessageDefinitionResponse build() {
         var response = new APIMessageDefinitionResponse();
         response.app = LogManager.APP_NAME;
+        response.version = UUID.randomUUID().toString();
         response.topics = new ArrayList<>(messages.size());
         for (APIController.MessagePublish publish : messages) {
             var topic = new APIMessageDefinitionResponse.Topic();
