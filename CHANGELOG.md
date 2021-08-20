@@ -1,5 +1,7 @@
 ## Change log
 
+### 7.8.1 (08/19/2021 - )
+
 ### 7.8.0 (08/04/2021 - 08/17/2021)   !!! breaking changes, pls read details
 
 * es: update to 7.14.0
