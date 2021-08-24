@@ -5,8 +5,10 @@ import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.util.StopWatch;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.message.BasicHeader;
 import org.elasticsearch.action.support.ActiveShardCount;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.Request;
@@ -45,12 +47,17 @@ public class ElasticSearchImpl implements ElasticSearch {
     public Duration timeout = Duration.ofSeconds(10);
     public Duration slowOperationThreshold = Duration.ofSeconds(5);
     public HttpHost[] hosts;
+    public String apiKey;
     public int maxResultWindow = 10000;
     private RestHighLevelClient client;
 
     // initialize will be called in startup hook, so no need to synchronize
     public void initialize() {
         RestClientBuilder builder = RestClient.builder(hosts);
+        if (apiKey != null) {
+            Header[] authHeader = {new BasicHeader("Authorization", "ApiKey " + apiKey)};
+            builder.setDefaultHeaders(authHeader);
+        }
         builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
             .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
         builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)

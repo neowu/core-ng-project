@@ -48,6 +48,11 @@ public class SearchConfig extends Config {
         search.hosts = ElasticSearchHost.parse(host);
     }
 
+    public void auth(String apiKey) {
+        if (apiKey.isEmpty()) throw new Error("search auth is configured but apiKey is empty");
+        search.apiKey = apiKey;
+    }
+
     void configureLogger() {
         System.setProperty(LogManager.FACTORY_PROPERTY_NAME, ESLoggerContextFactory.class.getName());
     }

@@ -30,13 +30,14 @@ class KibanaServiceTest {
 
     @BeforeEach
     void createKibanaService() {
-        service = new KibanaService("http://kibana:5601", "banner", httpClient);
+        service = new KibanaService("http://kibana:5601", "test", "banner", httpClient);
     }
 
     @Test
     void importObjects() {
         when(httpClient.execute(argThat(request -> {
             assertThat(request.headers).containsEntry("kbn-xsrf", "true");
+            assertThat(request.headers).containsEntry("Authorization", "ApiKey test");
             assertThat(new String(request.body, StandardCharsets.UTF_8)).doesNotContain("${NOTIFICATION_BANNER}");
             return true;
         }))).thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes("acknowledged")));
