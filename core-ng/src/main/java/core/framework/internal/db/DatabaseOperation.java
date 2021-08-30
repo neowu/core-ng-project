@@ -120,6 +120,33 @@ public class DatabaseOperation {
         }
     }
 
+    Optional<List<Long>> batchInsert(String sql, List<Object[]> params, String generatedColumn) {
+        int size = params.size();
+        List<Long> results = Lists.newArrayList();
+        PoolItem<Connection> connection = transactionManager.getConnection();
+        try (PreparedStatement statement = insertStatement(connection.resource, sql, generatedColumn)) {
+            statement.setQueryTimeout(queryTimeoutInSeconds);
+            int index = 1;
+            for (Object[] batchParams : params) {
+                setParams(statement, batchParams);
+                statement.addBatch();
+                if (index % batchSize == 0 || index == size) {
+                    statement.executeBatch();
+                    if (generatedColumn != null) {
+                        results.addAll(fetchGeneratedKeys(statement));
+                    }
+                }
+                index++;
+            }
+            return generatedColumn != null ? Optional.of(results) : Optional.empty();
+        } catch (SQLException e) {
+            Connections.checkConnectionState(connection, e);
+            throw new UncheckedSQLException(e);
+        } finally {
+            transactionManager.returnConnection(connection);
+        }
+    }
+
     private PreparedStatement insertStatement(Connection connection, String sql, String generatedColumn) throws SQLException {
         if (generatedColumn == null) return connection.prepareStatement(sql);
         return connection.prepareStatement(sql, new String[]{generatedColumn});
@@ -158,6 +185,18 @@ public class DatabaseOperation {
             }
         }
         return OptionalLong.empty();
+    }
+
+    private List<Long> fetchGeneratedKeys(PreparedStatement statement) throws SQLException {
+        List<Long> allKeys = Lists.newArrayList();
+        try (ResultSet keys = statement.getGeneratedKeys()) {
+            if (keys != null) {
+                while (keys.next()) {
+                    allKeys.add(keys.getLong(1));
+                }
+            }
+        }
+        return allKeys;
     }
 
     private void setParams(PreparedStatement statement, Object... params) throws SQLException {

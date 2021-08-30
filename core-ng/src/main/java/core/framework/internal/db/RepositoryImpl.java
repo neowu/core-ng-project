@@ -135,7 +135,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
-    public void batchInsert(List<T> entities) {
+    public Optional<List<Long>> batchInsert(List<T> entities) {
         var watch = new StopWatch();
         if (entities.isEmpty()) throw new Error("entities must not be empty");
         String sql = insertQuery.sql;
@@ -145,7 +145,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             params.add(insertQuery.params(entity));
         }
         try {
-            database.operation.batchUpdate(sql, params);
+            return database.operation.batchInsert(sql, params, insertQuery.generatedColumn);
         } finally {
             long elapsed = watch.elapsed();
             int size = entities.size();
