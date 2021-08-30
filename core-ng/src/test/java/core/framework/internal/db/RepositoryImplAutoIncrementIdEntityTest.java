@@ -17,7 +17,6 @@ import java.time.chrono.ChronoZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
-import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,26 +62,25 @@ class RepositoryImplAutoIncrementIdEntityTest {
 
         AutoIncrementIdEntity result = repository.get(id.orElseThrow()).orElseThrow();
         assertThat(result).usingRecursiveComparison()
-                          .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
-                          .ignoringFields("id")
-                          .isEqualTo(entity);
+            .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
+            .ignoringFields("id")
+            .isEqualTo(entity);
         assertThat(result.id).isEqualTo(id.orElseThrow());
     }
 
     @Test
     void batchInsert() {
         List<AutoIncrementIdEntity> entities = Lists.newArrayList();
-        for (int i = 1; i < 100; i++) {
+        for (int i = 0; i < 100; i++) {
             AutoIncrementIdEntity entity = entity("string-" + i, 10 + i);
             entities.add(entity);
         }
-        Optional<List<Long>> ids = repository.batchInsert(entities);
+        Optional<long[]> ids = repository.batchInsert(entities);
 
-        assertThat(repository.get("1")).get().usingRecursiveComparison().ignoringFields("id").isEqualTo(entities.get(0));
-        assertThat(repository.get("2")).get().usingRecursiveComparison().ignoringFields("id").isEqualTo(entities.get(1));
-
-        Optional<List<Long>> expectedIds = Optional.of(LongStream.range(1, 100).boxed().collect(Collectors.toList()));
-        assertThat(ids).usingRecursiveComparison().isEqualTo(expectedIds);
+        assertThat(ids).isPresent().hasValue(LongStream.range(1, 101).toArray());   // db auto incremental pk starts from 1
+        assertThat(repository.get(ids.orElseThrow()[0])).get().usingRecursiveComparison().ignoringFields("id").isEqualTo(entities.get(0));
+        assertThat(repository.get(ids.orElseThrow()[1])).get().usingRecursiveComparison().ignoringFields("id").isEqualTo(entities.get(1));
+        assertThat(repository.get(ids.orElseThrow()[99])).get().usingRecursiveComparison().ignoringFields("id").isEqualTo(entities.get(99));
     }
 
     @Test
@@ -141,7 +139,7 @@ class RepositoryImplAutoIncrementIdEntityTest {
 
         List<AutoIncrementIdEntity> entities = repository.select("enum_field = ?", TestEnum.V1);
         assertThat(entities).hasSize(1)
-                            .first().usingRecursiveComparison().ignoringFields("id").isEqualTo(entity1);
+            .first().usingRecursiveComparison().ignoringFields("id").isEqualTo(entity1);
 
         long count = repository.count("enum_field = ?", TestEnum.V2);
         assertThat(count).isEqualTo(1);

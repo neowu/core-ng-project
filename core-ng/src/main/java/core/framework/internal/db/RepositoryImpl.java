@@ -135,7 +135,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
-    public Optional<List<Long>> batchInsert(List<T> entities) {
+    public Optional<long[]> batchInsert(List<T> entities) {
         var watch = new StopWatch();
         if (entities.isEmpty()) throw new Error("entities must not be empty");
         String sql = insertQuery.sql;

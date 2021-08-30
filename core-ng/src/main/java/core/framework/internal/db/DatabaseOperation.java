@@ -120,20 +120,22 @@ public class DatabaseOperation {
         }
     }
 
-    Optional<List<Long>> batchInsert(String sql, List<Object[]> params, String generatedColumn) {
+    Optional<long[]> batchInsert(String sql, List<Object[]> params, String generatedColumn) {
         int size = params.size();
-        List<Long> results = Lists.newArrayList();
+        long[] results = generatedColumn == null ? null : new long[size];
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = insertStatement(connection.resource, sql, generatedColumn)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
             int index = 1;
+            int resultIndex = 0;
             for (Object[] batchParams : params) {
                 setParams(statement, batchParams);
                 statement.addBatch();
                 if (index % batchSize == 0 || index == size) {
                     statement.executeBatch();
                     if (generatedColumn != null) {
-                        results.addAll(fetchGeneratedKeys(statement));
+                        fetchGeneratedKeys(statement, results, resultIndex);
+                        resultIndex = index - 1;
                     }
                 }
                 index++;
@@ -187,16 +189,15 @@ public class DatabaseOperation {
         return OptionalLong.empty();
     }
 
-    private List<Long> fetchGeneratedKeys(PreparedStatement statement) throws SQLException {
-        List<Long> allKeys = Lists.newArrayList();
+    private void fetchGeneratedKeys(PreparedStatement statement, long[] results, int resultIndex) throws SQLException {
+        int index = resultIndex;
         try (ResultSet keys = statement.getGeneratedKeys()) {
             if (keys != null) {
                 while (keys.next()) {
-                    allKeys.add(keys.getLong(1));
+                    results[index++] = keys.getLong(1);
                 }
             }
         }
-        return allKeys;
     }
 
     private void setParams(PreparedStatement statement, Object... params) throws SQLException {

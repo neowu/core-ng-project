@@ -135,11 +135,11 @@ class RepositoryImplAssignedIdEntityTest {
             AssignedIdEntity entity = entity(String.valueOf(i), "value" + i, 10 + i);
             entities.add(entity);
         }
-        Optional<List<Long>> ids = repository.batchInsert(entities);
+        Optional<long[]> ids = repository.batchInsert(entities);
 
         assertThat(repository.get("1")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
         assertThat(repository.get("2")).get().usingRecursiveComparison().isEqualTo(entities.get(1));
-        assertThat(ids).usingRecursiveComparison().isEqualTo(Optional.empty());
+        assertThat(ids).isEmpty();
     }
 
     @Test

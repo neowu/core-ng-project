@@ -42,7 +42,7 @@ public interface Repository<T> {
 
     void delete(Object... primaryKeys);
 
-    Optional<List<Long>> batchInsert(List<T> entities);
+    Optional<long[]> batchInsert(List<T> entities);
 
     // return how many rows inserted
     int batchInsertIgnore(List<T> entities);

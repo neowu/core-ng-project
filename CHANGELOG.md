@@ -1,6 +1,7 @@
 ## Change log
 
 ### 7.8.1 (08/19/2021 - )
+* db: batchInsert returns Optional<long[]> for auto incremental PK
 
 ### 7.8.0 (08/04/2021 - 08/17/2021)   !!! breaking changes, pls read details
 
