@@ -122,7 +122,7 @@ public class DatabaseOperation {
 
     Optional<long[]> batchInsert(String sql, List<Object[]> params, String generatedColumn) {
         int size = params.size();
-        long[] results = generatedColumn == null ? null : new long[size];
+        long[] results = generatedColumn != null ? new long[size] : null;
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = insertStatement(connection.resource, sql, generatedColumn)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
