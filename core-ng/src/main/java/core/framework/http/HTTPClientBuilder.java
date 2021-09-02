@@ -16,21 +16,28 @@ import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.KeyFactory;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.Security;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -72,6 +79,7 @@ public final class HTTPClientBuilder {
     private String userAgent = "HTTPClient";
     private boolean trustAll = false;
     private KeyStore trustStore;
+    private KeyManager[] keyManagers;   // for client auth
     private Integer maxRetries;
     private Duration retryWaitTime = Duration.ofMillis(500);
 
@@ -108,20 +116,20 @@ public final class HTTPClientBuilder {
     }
 
     private void configureHTTPS(OkHttpClient.Builder builder) {
-        if (!trustAll && trustStore == null) return;
+        if (!trustAll && trustStore == null && keyManagers == null) return;
         try {
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            X509TrustManager trustManager;
+            TrustManager[] trustManagers;
             if (trustAll) {
-                trustManager = new DefaultTrustManager();
+                trustManagers = new TrustManager[]{new DefaultTrustManager()};
             } else {
                 var trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init(trustStore);
-                trustManager = (X509TrustManager) trustManagerFactory.getTrustManagers()[0];
+                trustManagers = trustManagerFactory.getTrustManagers();
             }
-            sslContext.init(null, new TrustManager[]{trustManager}, null);
+            sslContext.init(keyManagers, trustManagers, null);
             builder.hostnameVerifier((hostname, sslSession) -> true)
-                .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
+                .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustManagers[0]);
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new Error(e);
         }
@@ -199,10 +207,28 @@ public final class HTTPClientBuilder {
             CertificateFactory factory = CertificateFactory.getInstance("X.509");
             Certificate certificate = factory.generateCertificate(new ByteArrayInputStream(PEM.decode(cert)));
             trustStore.setCertificateEntry(String.valueOf(trustStore.size() + 1), certificate);
+            return this;
         } catch (CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
             throw new Error(e);
         }
-        return this;
+    }
+
+    public HTTPClientBuilder clientAuth(String privateKey, String cert) {
+        try {
+            PrivateKey clientPrivateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(PEM.decode(privateKey)));
+            Certificate clientCertificate = CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(PEM.decode(cert)));
+
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(null, null);
+            keyStore.setKeyEntry("default", clientPrivateKey, new char[0], new Certificate[]{clientCertificate});
+
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            keyManagerFactory.init(keyStore, new char[0]);
+            keyManagers = keyManagerFactory.getKeyManagers();
+            return this;
+        } catch (UnrecoverableKeyException | CertificateException | InvalidKeySpecException | NoSuchAlgorithmException | KeyStoreException | IOException e) {
+            throw new Error(e);
+        }
     }
 
     // this is rough estimate, like read timeout doesn't mean fetching full response will complete within duration of timeout
