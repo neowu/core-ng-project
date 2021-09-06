@@ -104,6 +104,8 @@ final class Protocol {
         static final byte[] ZRANGE = Strings.bytes("ZRANGE");
         static final byte[] ZRANGEBYSCORE = Strings.bytes("ZRANGEBYSCORE");
         static final byte[] ZREM = Strings.bytes("ZREM");
+
+        static final byte[] AUTH = Strings.bytes("AUTH");
     }
 
     static class Keyword {
