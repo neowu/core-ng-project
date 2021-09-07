@@ -60,7 +60,10 @@ apply from: file("${rootDir}/gradle/check.gradle")
 
 allprojects {
     apply plugin: 'idea'
-    idea.module.inheritOutputDirs = true
+    idea.module {
+        outputDir = file("${rootDir}/build/${rootDir.relativePath(projectDir)}/classes/java/main")
+        testOutputDir = file("${rootDir}/build/${rootDir.relativePath(projectDir)}/classes/java/test")
+    }
 }
 
 tasks.named('wrapper') {
