@@ -48,9 +48,9 @@ subprojects {
 
             manifest {
                 attributes 'Implementation-Title': project.name,
-                        'Implementation-Version': project.version,
-                        'Created-By': "${System.getProperty('java.version')} (${System.getProperty('java.vendor')})",
-                        'Built-With': "gradle ${project.gradle.gradleVersion}"
+                    'Implementation-Version': project.version,
+                    'Created-By': "${System.getProperty('java.version')} (${System.getProperty('java.vendor')})",
+                    'Built-With': "gradle ${project.gradle.gradleVersion}"
             }
         }
     }
@@ -61,8 +61,8 @@ apply from: file("${rootDir}/gradle/check.gradle")
 allprojects {
     apply plugin: 'idea'
     idea.module {
-        outputDir = file("${rootDir}/build/${rootDir.relativePath(projectDir)}/classes/java/main")
-        testOutputDir = file("${rootDir}/build/${rootDir.relativePath(projectDir)}/classes/java/test")
+        outputDir = file("${rootDir}/build/${rootDir.relativePath(projectDir)}/idea/production")
+        testOutputDir = file("${rootDir}/build/${rootDir.relativePath(projectDir)}/idea/test")
     }
 }
 
