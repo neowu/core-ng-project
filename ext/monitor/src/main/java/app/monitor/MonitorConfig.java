@@ -28,7 +28,6 @@ public class MonitorConfig {
     @Property(name = "kube")
     public KubeConfig kube;
 
-    @NotNull
     @Property(name = "api")
     public APIConfig api;
 
