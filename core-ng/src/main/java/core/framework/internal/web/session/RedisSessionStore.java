@@ -29,12 +29,11 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public Map<String, String> getAndRefresh(String sessionId, String domain, Duration defaultTimeout) {
+    public Map<String, String> getAndRefresh(String sessionId, String domain, Duration timeout) {
         String key = sessionKey(sessionId, domain);
         try {
             Map<String, String> sessionValues = redis.hash().getAll(key);
             if (sessionValues.isEmpty()) return null;
-            Duration timeout = SessionStoreHelper.timeout(sessionValues, defaultTimeout);
             redis.expire(key, timeout);
             return sessionValues;
         } catch (RedisException e) {
@@ -45,7 +44,7 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration defaultTimeout) {
+    public void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration timeout) {
         String key = sessionKey(sessionId, domain);
 
         List<String> deletedFields = Lists.newArrayList();
@@ -57,7 +56,6 @@ public class RedisSessionStore implements SessionStore {
         }
         if (!deletedFields.isEmpty()) redis.hash().del(key, deletedFields.toArray(new String[0]));
         if (!updatedValues.isEmpty()) redis.hash().multiSet(key, updatedValues);
-        Duration timeout = SessionStoreHelper.timeout(values, defaultTimeout);
         redis.expire(key, timeout);
     }
 

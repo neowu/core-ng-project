@@ -4,7 +4,6 @@ import core.framework.crypto.Hash;
 import core.framework.util.Strings;
 import core.framework.web.Session;
 
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,8 +14,6 @@ import java.util.Set;
  * @author neo
  */
 public class SessionImpl implements Session {
-    static final String TIMEOUT_FIELD = "_timeout";     // reserved field for custom timeout
-
     final Map<String, String> values = new HashMap<>();
     final Set<String> changedFields = new HashSet<>();
     final String domain;
@@ -38,26 +35,15 @@ public class SessionImpl implements Session {
 
     @Override
     public void set(String key, String value) {
-        if (Strings.startsWith(key, '_')) throw new Error("key must not start with '_', key=" + key);
-        internalSet(key, value);
+        String previousValue = values.put(key, value);
+        if (!Strings.equals(previousValue, value)) {
+            changedFields.add(key);
+        }
     }
 
     @Override
     public void invalidate() {
         invalidated = true;
-    }
-
-    @Override
-    public void timeout(Duration timeout) {
-        // timeout.toSeconds can be zero or negative, which is allowed by local/redis store
-        internalSet(TIMEOUT_FIELD, String.valueOf(timeout.toSeconds()));
-    }
-
-    private void internalSet(String key, String value) {
-        String previousValue = values.put(key, value);
-        if (!Strings.equals(previousValue, value)) {
-            changedFields.add(key);
-        }
     }
 
     void id(String id) {
