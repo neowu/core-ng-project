@@ -88,6 +88,7 @@ public class RedisImpl implements Redis {
             connection.connect(host.host, host.port, timeoutInMs);
             if (!Strings.isBlank(password)) {
                 connection.writeKeyCommand(AUTH, password);
+                connection.readSimpleString();
             }
             return connection;
         } catch (IOException e) {

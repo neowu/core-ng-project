@@ -5,7 +5,7 @@ package core.framework.module;
  */
 public class TestCacheConfig extends CacheConfig {
     @Override
-    void configureRedis(String host) {
+    void configureRedis(String host, String password) {
         local();
     }
 }
