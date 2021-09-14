@@ -107,6 +107,8 @@ public class HTTPHandler implements HttpHandler {
             request.session = sessionManager.load(request, actionLog);  // load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
 
             Response response = new InvocationImpl(controller, interceptors, request, webContext).proceed();
+            webContext.handleResponse(response);
+
             responseHandler.render(request, (ResponseImpl) response, exchange, actionLog);
         } catch (Throwable e) {
             logManager.logError(e);
