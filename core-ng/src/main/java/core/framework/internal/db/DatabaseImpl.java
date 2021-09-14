@@ -87,11 +87,13 @@ public final class DatabaseImpl implements Database {
             driverProperties = driverProperties(url, user, password);
             this.driverProperties = driverProperties;
         }
+        Connection connection = null;
         try {
-            Connection connection = driver.connect(url, driverProperties);
+            connection = driver.connect(url, driverProperties);
             if (isolationLevel != null) connection.setTransactionIsolation(isolationLevel.level);
             return connection;
         } catch (SQLException e) {
+            Pool.closeQuietly(connection);
             throw new UncheckedSQLException(e);
         }
     }

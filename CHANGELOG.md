@@ -6,6 +6,7 @@
 * db: update mysql driver to 8.0.26
 * httpClient: support client ssl auth
 * site: removed Session.timeout(Duration), it proved not useful, for app level remember me, it's better handle in app level with custom token handling
+* redis: support password auth for redis/cache
 
 ### 7.8.0 (08/04/2021 - 08/17/2021)   !!! breaking changes, pls read details
 
