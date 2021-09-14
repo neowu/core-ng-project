@@ -17,6 +17,7 @@ import core.framework.redis.RedisSet;
 import core.framework.redis.RedisSortedSet;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static core.framework.internal.redis.Protocol.Command.AUTH;
 import static core.framework.internal.redis.Protocol.Command.DEL;
 import static core.framework.internal.redis.Protocol.Command.GET;
 import static core.framework.internal.redis.Protocol.Command.INCRBY;
@@ -58,6 +60,7 @@ public class RedisImpl implements Redis {
     private final String name;
     public Pool<RedisConnection> pool;
     public RedisHost host;
+    public String password;
     long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
     int timeoutInMs = (int) Duration.ofSeconds(5).toMillis();
 
@@ -83,6 +86,10 @@ public class RedisImpl implements Redis {
         try {
             var connection = new RedisConnection();
             connection.connect(host.host, host.port, timeoutInMs);
+            if (!Strings.isBlank(password)) {
+                connection.writeKeyCommand(AUTH, password);
+                connection.readSimpleString();
+            }
             return connection;
         } catch (IOException e) {
             throw new UncheckedIOException(e);

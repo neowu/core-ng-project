@@ -54,6 +54,11 @@ public class RedisConfig extends Config {
         redis.host = new RedisHost(host);
     }
 
+    public void password(String password) {
+        RedisImpl redis = (RedisImpl) this.redis;
+        redis.password = password;
+    }
+
     public void poolSize(int minSize, int maxSize) {
         ((RedisImpl) redis).pool.size(minSize, maxSize);
     }
