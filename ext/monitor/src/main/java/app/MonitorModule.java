@@ -69,9 +69,7 @@ public class MonitorModule extends Module {
             String app = entry.getKey();
             MonitorConfig.ElasticSearchConfig esConfig = entry.getValue();
 
-            var job = new ElasticSearchMonitorJob(elasticSearchClient, app, esConfig.host, publisher);
-            job.highHeapUsageThreshold = esConfig.highHeapUsageThreshold;
-            job.highDiskUsageThreshold = esConfig.highDiskUsageThreshold;
+            var job = new ElasticSearchMonitorJob(elasticSearchClient, app, esConfig, publisher);
             schedule().fixedRate("monitor:es:" + app, job, Duration.ofSeconds(10));
         }
     }

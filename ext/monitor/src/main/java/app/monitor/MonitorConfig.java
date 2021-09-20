@@ -49,6 +49,9 @@ public class MonitorConfig {
         @Property(name = "host")
         public String host;                             // only need to put one host per cluster
 
+        @Property(name = "apiKey")
+        public String apiKey;
+
         @NotNull
         @Min(0)
         @Max(1)
