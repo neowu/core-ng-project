@@ -64,11 +64,11 @@ public class MonitorModule extends Module {
     }
 
     private void configureESJob(MessagePublisher<StatMessage> publisher, Map<String, MonitorConfig.ElasticSearchConfig> config) {
-        var elasticSearchClient = new ElasticSearchClient();
         for (Map.Entry<String, MonitorConfig.ElasticSearchConfig> entry : config.entrySet()) {
             String app = entry.getKey();
             MonitorConfig.ElasticSearchConfig esConfig = entry.getValue();
 
+            var elasticSearchClient = new ElasticSearchClient(esConfig.host, esConfig.apiKey);
             var job = new ElasticSearchMonitorJob(elasticSearchClient, app, esConfig, publisher);
             schedule().fixedRate("monitor:es:" + app, job, Duration.ofSeconds(10));
         }

@@ -21,7 +21,6 @@ public class ElasticSearchMonitorJob implements Job {
     private final MessagePublisher<StatMessage> publisher;
     private final String app;
     private final String host;
-    private final String apiKey;
     private final double highHeapUsageThreshold;
     public final double highDiskUsageThreshold;
     private final Map<String, GCStat> gcStats = Maps.newHashMapWithExpectedSize(2);
@@ -30,7 +29,6 @@ public class ElasticSearchMonitorJob implements Job {
         this.elasticSearchClient = elasticSearchClient;
         this.app = app;
         this.host = config.host;
-        this.apiKey = config.apiKey;
         this.highHeapUsageThreshold = config.highHeapUsageThreshold;
         this.highDiskUsageThreshold = config.highDiskUsageThreshold;
         this.publisher = publisher;
@@ -39,7 +37,7 @@ public class ElasticSearchMonitorJob implements Job {
     @Override
     public void execute(JobContext context) {
         try {
-            ElasticSearchNodeStats nodeStats = elasticSearchClient.stats(host, apiKey);
+            ElasticSearchNodeStats nodeStats = elasticSearchClient.stats();
             for (ElasticSearchNodeStats.Node node : nodeStats.nodes.values()) {
                 Stats stats = collect(node);
                 var message = StatMessageFactory.stats(app, node.name, stats);

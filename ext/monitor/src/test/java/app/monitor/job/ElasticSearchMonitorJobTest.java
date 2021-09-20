@@ -42,7 +42,7 @@ class ElasticSearchMonitorJobTest {
 
     @Test
     void execute() throws IOException {
-        when(elasticSearchClient.stats("localhost", "test"))
+        when(elasticSearchClient.stats())
                 .thenReturn(JSON.fromJSON(ElasticSearchNodeStats.class, ClasspathResources.text("es-job-test/stats.json")));
         job.execute(null);
 
@@ -60,7 +60,7 @@ class ElasticSearchMonitorJobTest {
 
     @Test
     void publishError() throws IOException {
-        when(elasticSearchClient.stats("localhost")).thenThrow(new HTTPClientException("mock", "MOCK_ERROR_CODE", null));
+        when(elasticSearchClient.stats()).thenThrow(new HTTPClientException("mock", "MOCK_ERROR_CODE", null));
         job.execute(null);
         verify(publisher).publish(argThat(message -> "es".equals(message.app)
                 && "ERROR".equals(message.result)
