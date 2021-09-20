@@ -1,5 +1,6 @@
 package app.monitor.job;
 
+import app.monitor.MonitorConfig;
 import core.framework.http.HTTPClientException;
 import core.framework.internal.stat.Stats;
 import core.framework.json.JSON;
@@ -33,12 +34,15 @@ class ElasticSearchMonitorJobTest {
 
     @BeforeEach
     void createElasticSearchMonitorJob() {
-        job = new ElasticSearchMonitorJob(elasticSearchClient, "es", "localhost", publisher);
+        var config = new MonitorConfig.ElasticSearchConfig();
+        config.host = "localhost";
+        config.apiKey = "test";
+        job = new ElasticSearchMonitorJob(elasticSearchClient, "es", config, publisher);
     }
 
     @Test
     void execute() throws IOException {
-        when(elasticSearchClient.stats("localhost"))
+        when(elasticSearchClient.stats("localhost", "test"))
                 .thenReturn(JSON.fromJSON(ElasticSearchNodeStats.class, ClasspathResources.text("es-job-test/stats.json")));
         job.execute(null);
 

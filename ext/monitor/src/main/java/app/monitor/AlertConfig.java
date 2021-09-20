@@ -64,5 +64,3 @@ public class AlertConfig {
         public Matcher matcher;
     }
 }
-
-

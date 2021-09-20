@@ -1,5 +1,6 @@
 package app.monitor.job;
 
+import app.monitor.MonitorConfig;
 import core.framework.internal.stat.Stats;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
@@ -20,21 +21,25 @@ public class ElasticSearchMonitorJob implements Job {
     private final MessagePublisher<StatMessage> publisher;
     private final String app;
     private final String host;
+    private final String apiKey;
+    private final double highHeapUsageThreshold;
+    public final double highDiskUsageThreshold;
     private final Map<String, GCStat> gcStats = Maps.newHashMapWithExpectedSize(2);
-    public double highHeapUsageThreshold;
-    public double highDiskUsageThreshold;
 
-    public ElasticSearchMonitorJob(ElasticSearchClient elasticSearchClient, String app, String host, MessagePublisher<StatMessage> publisher) {
+    public ElasticSearchMonitorJob(ElasticSearchClient elasticSearchClient, String app, MonitorConfig.ElasticSearchConfig config, MessagePublisher<StatMessage> publisher) {
         this.elasticSearchClient = elasticSearchClient;
         this.app = app;
-        this.host = host;
+        this.host = config.host;
+        this.apiKey = config.apiKey;
+        this.highHeapUsageThreshold = config.highHeapUsageThreshold;
+        this.highDiskUsageThreshold = config.highDiskUsageThreshold;
         this.publisher = publisher;
     }
 
     @Override
     public void execute(JobContext context) {
         try {
-            ElasticSearchNodeStats nodeStats = elasticSearchClient.stats(host);
+            ElasticSearchNodeStats nodeStats = elasticSearchClient.stats(host, apiKey);
             for (ElasticSearchNodeStats.Node node : nodeStats.nodes.values()) {
                 Stats stats = collect(node);
                 var message = StatMessageFactory.stats(app, node.name, stats);
