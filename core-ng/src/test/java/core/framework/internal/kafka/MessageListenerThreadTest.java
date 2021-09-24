@@ -10,7 +10,6 @@ import core.framework.kafka.MessageHandler;
 import core.framework.util.Strings;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.internals.RecordHeaders;
-import org.apache.kafka.common.record.TimestampType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -92,10 +91,10 @@ class MessageListenerThreadTest {
     @Test
     void key() {
         assertThat(thread.key(new ConsumerRecord<>("topic", 0, 0, null, null)))
-                .isNull();
+            .isNull();
 
         assertThat(thread.key(new ConsumerRecord<>("topic", 0, 0, Strings.bytes("key"), null)))
-                .isEqualTo("key");
+            .isEqualTo("key");
     }
 
     @Test
@@ -103,8 +102,7 @@ class MessageListenerThreadTest {
         var key = "key";
         var message = new TestMessage();
         message.stringField = "value";
-        var record = new ConsumerRecord<>("topic", 0, 0, System.currentTimeMillis(), TimestampType.CREATE_TIME,
-                -1, -1, -1, Strings.bytes(key), Strings.bytes(JSON.toJSON(message)));
+        var record = new ConsumerRecord<>("topic", 0, 0, Strings.bytes(key), Strings.bytes(JSON.toJSON(message)));
         record.headers().add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));
         record.headers().add(MessageHeaders.HEADER_CLIENT, Strings.bytes("client"));
         thread.handle("topic", new MessageProcess<>(messageHandler, null, TestMessage.class), List.of(record), Duration.ofHours(1).toNanos());
@@ -117,14 +115,13 @@ class MessageListenerThreadTest {
         var key = "key";
         var message = new TestMessage();
         message.stringField = "value";
-        var record = new ConsumerRecord<>("topic", 0, 0, System.currentTimeMillis(), TimestampType.CREATE_TIME,
-                -1, -1, -1, Strings.bytes(key), Strings.bytes(JSON.toJSON(message)));
+        var record = new ConsumerRecord<>("topic", 0, 0, Strings.bytes(key), Strings.bytes(JSON.toJSON(message)));
         record.headers().add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes("correlationId"));
         record.headers().add(MessageHeaders.HEADER_REF_ID, Strings.bytes("refId"));
         thread.handleBulk("topic", new MessageProcess<>(null, bulkMessageHandler, TestMessage.class), List.of(record), Duration.ofHours(1).toNanos());
 
         verify(bulkMessageHandler).handle(argThat(value -> value.size() == 1
-                && key.equals(value.get(0).key)
-                && "value".equals(value.get(0).value.stringField)));
+                                                           && key.equals(value.get(0).key)
+                                                           && "value".equals(value.get(0).value.stringField)));
     }
 }

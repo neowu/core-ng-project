@@ -106,6 +106,7 @@ public class SessionManager implements SessionContext {
 
     public void cookie(String name, String domain) {
         if (name == null) throw new Error("name must not be null");
+        // path must be /, refer to https://datatracker.ietf.org/doc/html/rfc6265#section-4.1.2.4
         cookieSpec = new CookieSpec(name).domain(domain).path("/").sessionScope().httpOnly().secure().sameSite();
     }
 
