@@ -43,7 +43,7 @@ class UpdateQueryBuilder<T> {
     private String updateMethod(Class<T> entityClass, List<Field> primaryKeyFields, List<Field> columnFields) {
         var builder = new CodeBuilder();
         String entityClassLiteral = type(entityClass);
-        builder.append("public {} update(Object value, boolean partial) {\n", type(UpdateQuery.Statement.class))
+        builder.append("public {} update(Object value, boolean partial, String where, Object[] whereParams) {\n", type(UpdateQuery.Statement.class))
             .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral);
 
         for (Field primaryKeyField : primaryKeyFields) {
@@ -74,10 +74,14 @@ class UpdateQueryBuilder<T> {
             index++;
         }
         builder.append("\");\n");
-
         for (Field primaryKeyField : primaryKeyFields) {
             builder.indent(1).append("params.add(entity.{});\n", primaryKeyField.getName());
         }
+
+        builder.indent(1).append("if (where != null) {\n")
+            .indent(2).append("sql.append(\" AND (\").append(where).append(')');\n")
+            .indent(2).append("for (int i = 0; i< whereParams.length; i++) params.add(whereParams[i]);\n")
+            .indent(1).append("}\n");
 
         builder.indent(1).append("return new {}(sql.toString(), params.toArray());\n", type(UpdateQuery.Statement.class))
             .append("}");

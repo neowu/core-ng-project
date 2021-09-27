@@ -106,7 +106,7 @@ class RepositoryImplAssignedIdEntityTest {
         AssignedIdEntity entity = entity(UUID.randomUUID().toString(), "string", 11);
         repository.insert(entity);
 
-        AssignedIdEntity updatedEntity = new AssignedIdEntity();
+        var updatedEntity = new AssignedIdEntity();
         updatedEntity.id = entity.id;
         updatedEntity.stringField = "updated";
         updatedEntity.dateField = LocalDate.of(2016, Month.JULY, 5);
@@ -115,6 +115,25 @@ class RepositoryImplAssignedIdEntityTest {
         AssignedIdEntity result = repository.get(entity.id).orElseThrow();
         assertThat(result.stringField).isEqualTo(updatedEntity.stringField);
         assertThat(result.dateField).isEqualTo(updatedEntity.dateField);
+        assertThat(result.intField).isEqualTo(11);
+    }
+
+    @Test
+    void partialUpdateWithCondition() {
+        AssignedIdEntity entity = entity(UUID.randomUUID().toString(), "string", 11);
+        repository.insert(entity);
+
+        var updatedEntity = new AssignedIdEntity();
+        updatedEntity.id = entity.id;
+        updatedEntity.stringField = "updated";
+        boolean updated = repository.partialUpdate(updatedEntity, "int_field = ?", 12);
+        assertThat(updated).isFalse();
+
+        updated = repository.partialUpdate(updatedEntity, "int_field = ?", 11);
+        assertThat(updated).isTrue();
+
+        AssignedIdEntity result = repository.get(entity.id).orElseThrow();
+        assertThat(result.stringField).isEqualTo(updatedEntity.stringField);
         assertThat(result.intField).isEqualTo(11);
     }
 

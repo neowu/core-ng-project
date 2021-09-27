@@ -90,18 +90,19 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public void update(T entity) {
-        update(entity, false);
+        int updatedRows = update(entity, false, null, null);
+        if (updatedRows != 1)
+            logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
     }
 
-    private void update(T entity, boolean partial) {
+    private int update(T entity, boolean partial, String where, Object[] params) {
         var watch = new StopWatch();
         validator.validate(entity, partial);
-        UpdateQuery.Statement query = updateQuery.update(entity, partial);
+        UpdateQuery.Statement query = updateQuery.update(entity, partial, where, params);
         int updatedRows = 0;
         try {
             updatedRows = database.operation.update(query.sql, query.params);
-            if (updatedRows != 1)
-                logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
+            return updatedRows;
         } finally {
             long elapsed = watch.elapsed();
             int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
@@ -112,7 +113,17 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public void partialUpdate(T entity) {
-        update(entity, true);
+        int updatedRows = update(entity, true, null, null);
+        if (updatedRows != 1)
+            logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
+    }
+
+    @Override
+    public boolean partialUpdate(T entity, String where, Object... params) {
+        int updatedRows = update(entity, true, where, params);
+        if (updatedRows > 1)
+            logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 0 or 1, rows={}", updatedRows);
+        return updatedRows == 1;
     }
 
     @Override
