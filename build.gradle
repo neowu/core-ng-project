@@ -14,7 +14,7 @@ subprojects {
     }
 }
 
-def elasticVersion = '7.14.0'
+def elasticVersion = '7.15.0'
 def kafkaVersion = '3.0.0'
 def jacksonVersion = '2.12.3'
 def junitVersion = '5.7.2'
