@@ -19,8 +19,14 @@ class RepositoryImplTest {
     }
 
     @Test
-    void insertedRows() {
-        assertThat(repository.insertedRows(new int[]{Statement.SUCCESS_NO_INFO, 0, Statement.SUCCESS_NO_INFO})).isEqualTo(2);
-        assertThat(repository.insertedRows(new int[]{1, 1})).isEqualTo(2);
+    void insertedResults() {
+        boolean[] results = new boolean[3];
+        assertThat(repository.insertedResults(new int[]{Statement.SUCCESS_NO_INFO, 0, Statement.SUCCESS_NO_INFO}, results))
+            .isEqualTo(2);
+        assertThat(results).contains(true, false, true);
+
+        results = new boolean[2];
+        assertThat(repository.insertedResults(new int[]{1, 1}, results)).isEqualTo(2);
+        assertThat(results).contains(true, true);
     }
 }

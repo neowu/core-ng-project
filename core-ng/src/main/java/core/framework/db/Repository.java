@@ -33,7 +33,7 @@ public interface Repository<T> {
     OptionalLong insert(T entity);
 
     // refer to https://dev.mysql.com/doc/refman/8.0/en/insert.html
-    // ignore if there is duplicated row, return true if insert successfully
+    // ignore if there is duplicated row, return true if inserted successfully
     boolean insertIgnore(T entity);
 
     // use update carefully, it will update all the columns according to the entity fields, includes null fields
@@ -50,8 +50,8 @@ public interface Repository<T> {
 
     Optional<long[]> batchInsert(List<T> entities);
 
-    // return how many rows inserted
-    int batchInsertIgnore(List<T> entities);
+    // return whether each inserted successfully
+    boolean[] batchInsertIgnore(List<T> entities);
 
     void batchDelete(List<?> primaryKeys);
 }

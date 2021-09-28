@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.9.0 (09/20/2021 - )
+### 7.8.2 (09/20/2021 - )
 
 * kafka: update client to 3.0.0
 * es: update to 7.15.0
@@ -8,6 +8,7 @@
   > to clarify, Repository.update() must be used carefully, since it's update all columns to bean fields, regardless it's null
   > in actual project, common use cases generally are like to update few columns with id or optimistic lock, so always prefer partialUpdate over update
   > for accumulated update (like set amount = amount + ?), it's still better use Database.execute() + plain sql
+* db: updated Repository.batchInsertIgnore to return boolean[], to tell exactly whether each entity was inserted successfully
 
 ### 7.8.1 (08/19/2021 - 09/14/2021)
 

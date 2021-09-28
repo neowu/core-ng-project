@@ -167,7 +167,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
-    public int batchInsertIgnore(List<T> entities) {
+    public boolean[] batchInsertIgnore(List<T> entities) {
         var watch = new StopWatch();
         if (entities.isEmpty()) throw new Error("entities must not be empty");
         String sql = insertQuery.insertIgnoreSQL();
@@ -179,8 +179,9 @@ public final class RepositoryImpl<T> implements Repository<T> {
         int insertedRows = 0;
         try {
             int[] results = database.operation.batchUpdate(sql, params);
-            insertedRows = insertedRows(results);
-            return insertedRows;
+            boolean[] insertedResults = new boolean[results.length];
+            insertedRows = insertedResults(results, insertedResults);
+            return insertedResults;
         } finally {
             long elapsed = watch.elapsed();
             int operations = ActionLogContext.track("db", elapsed, 0, insertedRows);
@@ -189,11 +190,18 @@ public final class RepositoryImpl<T> implements Repository<T> {
         }
     }
 
-    int insertedRows(int[] results) {
+    // use procedurally way to produce results to insertedRows and insertedResults in one method, to balance both performance and ease of unit test
+    // not recommended applying in application level code
+    int insertedResults(int[] results, boolean[] insertedResults) {
         int insertedRows = 0;
-        for (int result : results) {
-            if (result == Statement.SUCCESS_NO_INFO) insertedRows++;    // with insertIgnore, mysql returns -2 if insert succeeds
-            else if (result > 0) insertedRows += result;
+        for (int i = 0; i < results.length; i++) {
+            int result = results[i];
+            // with insertIgnore, mysql returns -2 if insert succeeds, for batch only
+            // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts
+            if (result == Statement.SUCCESS_NO_INFO || result > 0) {
+                insertedResults[i] = true;
+                insertedRows++;
+            }
         }
         return insertedRows;
     }
