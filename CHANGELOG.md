@@ -1,7 +1,9 @@
 ## Change log
 
-### 7.8.2 (09/20/2021 - )
+### 7.8.2 (09/20/2021 - 09/28/2021)
 
+* java: target to Java 16,
+  > since all projects are on java 16 for long time, this should not be issue, will update to java 17 LTS, once adoptopenjdk released java 17 build
 * kafka: update client to 3.0.0
 * es: update to 7.15.0
 * db: added "boolean partialUpdate(T entity, String where, Object... params)" on Repository, to support updating with optimistic lock
