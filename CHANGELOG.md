@@ -1,11 +1,23 @@
 ## Change log
 
+### 7.8.2 (09/20/2021 - 09/28/2021)
+
+* java: target to Java 16,
+  > since all projects are on java 16 for long time, this should not be issue, will update to java 17 LTS, once adoptopenjdk released java 17 build
+* kafka: update client to 3.0.0
+* es: update to 7.15.0
+* db: added "boolean partialUpdate(T entity, String where, Object... params)" on Repository, to support updating with optimistic lock
+  > to clarify, Repository.update() must be used carefully, since it's update all columns to bean fields, regardless it's null
+  > in actual project, common use cases generally are like to update few columns with id or optimistic lock, so always prefer partialUpdate over update
+  > for accumulated update (like set amount = amount + ?), it's still better use Database.execute() + plain sql
+* db: updated Repository.batchInsertIgnore to return boolean[], to tell exactly whether each entity was inserted successfully
+
 ### 7.8.1 (08/19/2021 - 09/14/2021)
 
 * db: batchInsert returns Optional<long[]> for auto incremental PK
 * db: update mysql driver to 8.0.26
 * httpClient: support client ssl auth
-* site: removed Session.timeout(Duration), it proved not useful, for app level remember me, it's better handle in app level with custom token handling
+* site: removed Session.timeout(Duration), it proved not useful, for app level remember me, it's better handle in app level with custom token
 * redis: support password auth for redis/cache
 * ws: added WebContext.responseCookie to allow WS to assign cookie to response
 

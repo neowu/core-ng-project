@@ -4,7 +4,7 @@ package core.framework.internal.db;
  * @author neo
  */
 public interface UpdateQuery<T> {
-    Statement update(T entity, boolean partial);
+    Statement update(T entity, boolean partial, String where, Object[] params);
 
     class Statement {
         final String sql;

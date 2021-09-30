@@ -33,19 +33,25 @@ public interface Repository<T> {
     OptionalLong insert(T entity);
 
     // refer to https://dev.mysql.com/doc/refman/8.0/en/insert.html
-    // ignore if there is duplicated row, return true if insert successfully
+    // ignore if there is duplicated row, return true if inserted successfully
     boolean insertIgnore(T entity);
 
+    // use update carefully, it will update all the columns according to the entity fields, includes null fields
+    // generally it's recommended to use partialUpdate if only few columns need to be updated and with optimistic lock
     void update(T entity);
 
-    void partialUpdate(T entity); // only update non-null fields
+    // only update non-null fields
+    void partialUpdate(T entity);
+
+    // partial update with additional condition, usually applied as optimistic lock pattern, return true if updated successfully
+    boolean partialUpdate(T entity, String where, Object... params);
 
     void delete(Object... primaryKeys);
 
     Optional<long[]> batchInsert(List<T> entities);
 
-    // return how many rows inserted
-    int batchInsertIgnore(List<T> entities);
+    // return whether each inserted successfully
+    boolean[] batchInsertIgnore(List<T> entities);
 
     void batchDelete(List<?> primaryKeys);
 }

@@ -90,18 +90,19 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public void update(T entity) {
-        update(entity, false);
+        int updatedRows = update(entity, false, null, null);
+        if (updatedRows != 1)
+            logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
     }
 
-    private void update(T entity, boolean partial) {
+    private int update(T entity, boolean partial, String where, Object[] params) {
         var watch = new StopWatch();
         validator.validate(entity, partial);
-        UpdateQuery.Statement query = updateQuery.update(entity, partial);
+        UpdateQuery.Statement query = updateQuery.update(entity, partial, where, params);
         int updatedRows = 0;
         try {
             updatedRows = database.operation.update(query.sql, query.params);
-            if (updatedRows != 1)
-                logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
+            return updatedRows;
         } finally {
             long elapsed = watch.elapsed();
             int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
@@ -112,7 +113,17 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public void partialUpdate(T entity) {
-        update(entity, true);
+        int updatedRows = update(entity, true, null, null);
+        if (updatedRows != 1)
+            logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
+    }
+
+    @Override
+    public boolean partialUpdate(T entity, String where, Object... params) {
+        int updatedRows = update(entity, true, where, params);
+        if (updatedRows > 1)
+            logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 0 or 1, rows={}", updatedRows);
+        return updatedRows == 1;
     }
 
     @Override
@@ -156,7 +167,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
-    public int batchInsertIgnore(List<T> entities) {
+    public boolean[] batchInsertIgnore(List<T> entities) {
         var watch = new StopWatch();
         if (entities.isEmpty()) throw new Error("entities must not be empty");
         String sql = insertQuery.insertIgnoreSQL();
@@ -168,8 +179,9 @@ public final class RepositoryImpl<T> implements Repository<T> {
         int insertedRows = 0;
         try {
             int[] results = database.operation.batchUpdate(sql, params);
-            insertedRows = insertedRows(results);
-            return insertedRows;
+            boolean[] insertedResults = new boolean[results.length];
+            insertedRows = insertedResults(results, insertedResults);
+            return insertedResults;
         } finally {
             long elapsed = watch.elapsed();
             int operations = ActionLogContext.track("db", elapsed, 0, insertedRows);
@@ -178,11 +190,18 @@ public final class RepositoryImpl<T> implements Repository<T> {
         }
     }
 
-    int insertedRows(int[] results) {
+    // use procedurally way to produce results to insertedRows and insertedResults in one method, to balance both performance and ease of unit test
+    // not recommended applying in application level code
+    int insertedResults(int[] results, boolean[] insertedResults) {
         int insertedRows = 0;
-        for (int result : results) {
-            if (result == Statement.SUCCESS_NO_INFO) insertedRows++;    // with insertIgnore, mysql returns -2 if insert succeeds
-            else if (result > 0) insertedRows += result;
+        for (int i = 0; i < results.length; i++) {
+            int result = results[i];
+            // with insertIgnore, mysql returns -2 if insert succeeds, for batch only
+            // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts
+            if (result == Statement.SUCCESS_NO_INFO || result > 0) {
+                insertedResults[i] = true;
+                insertedRows++;
+            }
         }
         return insertedRows;
     }

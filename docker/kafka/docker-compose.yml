@@ -1,12 +1,35 @@
 version: "3"
 services:
   kafka:
-    build: .
+    image: neowu/kafka:3.0.0-kraft
     ports:
     - 9092:9092
     - 1099:1099
     environment:
-    - KAFKA_CLUSTER_ID=j35hUF5uQdWNNd0ouSUXGg
+    - KAFKA_NODE_ID=1
+    - KAFKA_CLUSTER_ID=lK_g8qooQNOD9klGoxLojA
     - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.rmi.port=1099 -Djava.rmi.server.hostname=kafka
     - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
     - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://localhost:9092 --override num.partitions=3
+#  example of kafka with zookeeper
+#  zookeeper:
+#    image: zookeeper:3.6.3
+#    ports:
+#    - 2181
+#    environment:
+#    - JMXDISABLE=true
+#    - SERVER_JVMFLAGS=-Dzookeeper.jmx.log4j.disable=true
+#    - ZOO_DATA_DIR=/data
+#    - ZOO_DATA_LOG_DIR=/datalog
+#    - ZOO_ADMINSERVER_ENABLED=false
+#  kafka:
+#    image: neowu/kafka:3.0.0
+#    ports:
+#    - 9092:9092
+#    - 1099:1099
+#    environment:
+#    - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.rmi.port=1099 -Djava.rmi.server.hostname=kafka
+#    - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
+#    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://localhost:9092 --override num.partitions=3
+#    depends_on:
+#    - zookeeper
