@@ -90,10 +90,10 @@ subprojects {
             executionData.setFrom(fileTree(rootDir).include('build/**/jacoco/test.exec'))
 
             reports {
-                xml.enabled = true
+                xml.required = true
                 xml.destination rootProject.file("${buildDir}/reports/jacoco/report.xml")
-                html.enabled = true
-                csv.enabled = false
+                html.required = true
+                csv.required = false
             }
         }
     }

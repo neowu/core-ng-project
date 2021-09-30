@@ -20,7 +20,7 @@ public class LocalSessionStore implements SessionStore {
     private final Logger logger = LoggerFactory.getLogger(LocalSessionStore.class);
 
     @Override
-    public Map<String, String> getAndRefresh(String sessionId, String domain, Duration defaultTimeout) {
+    public Map<String, String> getAndRefresh(String sessionId, String domain, Duration timeout) {
         SessionValue sessionValue = values.get(sessionId);
         if (sessionValue == null) return null;
 
@@ -30,18 +30,16 @@ public class LocalSessionStore implements SessionStore {
         }
 
         Map<String, String> sessionValues = sessionValue.values;
-        Duration timeout = SessionStoreHelper.timeout(sessionValues, defaultTimeout);
         values.put(sessionId, new SessionValue(expirationTime(timeout), sessionValues));
         return sessionValues;
     }
 
     @Override
-    public void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration defaultTimeout) {
+    public void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration timeout) {
         Map<String, String> updatedValues = Maps.newHashMapWithExpectedSize(values.size());
         values.forEach((field, value) -> {
             if (value != null) updatedValues.put(field, value);
         });
-        Duration timeout = SessionStoreHelper.timeout(values, defaultTimeout);
         this.values.put(sessionId, new SessionValue(expirationTime(timeout), updatedValues));
     }
 

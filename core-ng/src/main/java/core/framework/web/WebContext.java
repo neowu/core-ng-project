@@ -1,5 +1,7 @@
 package core.framework.web;
 
+import javax.annotation.Nullable;
+
 /**
  * @author neo
  */
@@ -9,4 +11,7 @@ public interface WebContext {
     void put(String key, Object value);
 
     Request request();
+
+    // to let ws assign cookie to response
+    void responseCookie(CookieSpec spec, @Nullable String value);
 }

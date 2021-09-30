@@ -3,7 +3,7 @@ apply from: file("${rootDir}/gradle/publish.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '7.8.0'
+    version = '7.8.1'
 
     repositories {
         maven {
@@ -19,9 +19,9 @@ def elasticVersion = '7.14.0'
 def kafkaVersion = '2.8.0'
 def jacksonVersion = '2.12.3'
 def junitVersion = '5.7.2'
-def mockitoVersion = '3.11.1'
-def assertjVersion = '3.19.0'
-def mysqlVersion = '8.0.25'
+def mockitoVersion = '3.12.4'
+def assertjVersion = '3.20.2'
+def mysqlVersion = '8.0.26'
 
 project('core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -38,7 +38,7 @@ project('core-ng') {
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'com.squareup.okhttp3:okhttp:4.9.1'
-        implementation 'io.undertow:undertow-core:2.2.9.Final'
+        implementation 'io.undertow:undertow-core:2.2.10.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.8.4'      // used by kafka message compression
         compileOnly "mysql:mysql-connector-java:${mysqlVersion}"

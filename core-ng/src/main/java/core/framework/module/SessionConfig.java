@@ -3,7 +3,6 @@ package core.framework.module;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
-import core.framework.internal.redis.RedisHost;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.resource.PoolMetrics;
 import core.framework.internal.web.session.LocalSessionStore;
@@ -51,7 +50,7 @@ public class SessionConfig extends Config {
         logger.info("create redis session store, host={}", host);
 
         var redis = new RedisImpl("redis-session");
-        redis.host = new RedisHost(host);
+        redis.host(host);
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
         context.collector.metrics.add(new PoolMetrics(redis.pool));
 

@@ -81,8 +81,8 @@ class RepositoryImplAssignedIdEntityTest {
         AssignedIdEntity entity = entity(null, "string", 1);
 
         assertThatThrownBy(() -> repository.insert(entity))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("primary key must not be null");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("primary key must not be null");
     }
 
     @Test
@@ -135,17 +135,18 @@ class RepositoryImplAssignedIdEntityTest {
             AssignedIdEntity entity = entity(String.valueOf(i), "value" + i, 10 + i);
             entities.add(entity);
         }
-        repository.batchInsert(entities);
+        Optional<long[]> ids = repository.batchInsert(entities);
 
         assertThat(repository.get("1")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
         assertThat(repository.get("2")).get().usingRecursiveComparison().isEqualTo(entities.get(1));
+        assertThat(ids).isEmpty();
     }
 
     @Test
     void batchInsertWithEmptyEntities() {
         assertThatThrownBy(() -> repository.batchInsert(List.of()))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("entities must not be empty");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("entities must not be empty");
     }
 
     @Test
@@ -182,8 +183,8 @@ class RepositoryImplAssignedIdEntityTest {
     @Test
     void batchDeleteWithEmptyPrimaryKeys() {
         assertThatThrownBy(() -> repository.batchDelete(List.of()))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("primaryKeys must not be empty");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("primaryKeys must not be empty");
     }
 
     @Test
@@ -203,8 +204,8 @@ class RepositoryImplAssignedIdEntityTest {
         assertThat(sum).hasValue(50);
 
         assertThatThrownBy(query::fetch)
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("fetch must not be used with groupBy");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("fetch must not be used with groupBy");
     }
 
     @Test

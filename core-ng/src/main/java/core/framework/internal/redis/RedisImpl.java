@@ -47,6 +47,8 @@ import static core.framework.internal.redis.RedisEncodings.validate;
  * @author neo
  */
 public class RedisImpl implements Redis {
+    final RedisConnectionFactory connectionFactory = new RedisConnectionFactory();
+
     private final Logger logger = LoggerFactory.getLogger(RedisImpl.class);
     private final RedisSet redisSet = new RedisSetImpl(this);
     private final RedisHash redisHash = new RedisHashImpl(this);
@@ -57,20 +59,26 @@ public class RedisImpl implements Redis {
     private final RedisAdmin redisAdmin = new RedisAdminImpl(this);
     private final String name;
     public Pool<RedisConnection> pool;
-    public RedisHost host;
     long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
-    int timeoutInMs = (int) Duration.ofSeconds(5).toMillis();
 
     public RedisImpl(String name) {
         this.name = name;
-        pool = new Pool<>(() -> createConnection(timeoutInMs), name);
+        pool = new Pool<>(connectionFactory, name);
         pool.size(5, 50);
         pool.maxIdleTime = Duration.ofMinutes(30);
         pool.checkoutTimeout(Duration.ofSeconds(5));
     }
 
+    public void host(String host) {
+        connectionFactory.host = new RedisHost(host);
+    }
+
+    public void password(String password) {
+        connectionFactory.password = password;
+    }
+
     public void timeout(Duration timeout) {
-        timeoutInMs = (int) timeout.toMillis();
+        connectionFactory.timeoutInMs = (int) timeout.toMillis();
         pool.checkoutTimeout(timeout);
     }
 
@@ -78,19 +86,8 @@ public class RedisImpl implements Redis {
         slowOperationThresholdInNanos = threshold.toNanos();
     }
 
-    RedisConnection createConnection(int timeoutInMs) {
-        if (host == null) throw new Error("redis.host must not be null");
-        try {
-            var connection = new RedisConnection();
-            connection.connect(host.host, host.port, timeoutInMs);
-            return connection;
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
     public void close() {
-        logger.info("close redis client, name={}, host={}", name, host);
+        logger.info("close redis client, name={}, host={}", name, connectionFactory.host);
         pool.close();
     }
 

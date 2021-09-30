@@ -2,6 +2,7 @@ package core.framework.internal.db;
 
 import core.framework.db.Query;
 import core.framework.db.Repository;
+import core.framework.util.Lists;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +15,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalLong;
+import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,6 +46,7 @@ class RepositoryImplAutoIncrementIdEntityTest {
     @BeforeEach
     void truncateTable() {
         database.execute("TRUNCATE TABLE auto_increment_id_entity");
+        database.execute("ALTER TABLE auto_increment_id_entity ALTER COLUMN id RESTART WITH 1");
     }
 
     @Test
@@ -58,18 +62,33 @@ class RepositoryImplAutoIncrementIdEntityTest {
 
         AutoIncrementIdEntity result = repository.get(id.orElseThrow()).orElseThrow();
         assertThat(result).usingRecursiveComparison()
-                .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
-                .ignoringFields("id")
-                .isEqualTo(entity);
+            .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
+            .ignoringFields("id")
+            .isEqualTo(entity);
         assertThat(result.id).isEqualTo(id.orElseThrow());
+    }
+
+    @Test
+    void batchInsert() {
+        List<AutoIncrementIdEntity> entities = Lists.newArrayList();
+        for (int i = 0; i < 100; i++) {
+            AutoIncrementIdEntity entity = entity("string-" + i, 10 + i);
+            entities.add(entity);
+        }
+        Optional<long[]> ids = repository.batchInsert(entities);
+
+        assertThat(ids).isPresent().hasValue(LongStream.range(1, 101).toArray());   // db auto incremental pk starts from 1
+        assertThat(repository.get(ids.orElseThrow()[0])).get().usingRecursiveComparison().ignoringFields("id").isEqualTo(entities.get(0));
+        assertThat(repository.get(ids.orElseThrow()[1])).get().usingRecursiveComparison().ignoringFields("id").isEqualTo(entities.get(1));
+        assertThat(repository.get(ids.orElseThrow()[99])).get().usingRecursiveComparison().ignoringFields("id").isEqualTo(entities.get(99));
     }
 
     @Test
     void insertIgnore() {
         var entity = new AutoIncrementIdEntity();
         assertThatThrownBy(() -> repository.insertIgnore(entity))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("entity must not have auto increment primary key");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("entity must not have auto increment primary key");
     }
 
     @Test
@@ -120,9 +139,16 @@ class RepositoryImplAutoIncrementIdEntityTest {
 
         List<AutoIncrementIdEntity> entities = repository.select("enum_field = ?", TestEnum.V1);
         assertThat(entities).hasSize(1)
-                .first().usingRecursiveComparison().ignoringFields("id").isEqualTo(entity1);
+            .first().usingRecursiveComparison().ignoringFields("id").isEqualTo(entity1);
 
         long count = repository.count("enum_field = ?", TestEnum.V2);
         assertThat(count).isEqualTo(1);
+    }
+
+    private AutoIncrementIdEntity entity(String stringField, double doubleFiled) {
+        var entity = new AutoIncrementIdEntity();
+        entity.stringField = stringField;
+        entity.doubleField = doubleFiled;
+        return entity;
     }
 }

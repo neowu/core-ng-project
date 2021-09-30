@@ -61,12 +61,13 @@ public class TestModule extends AbstractTestModule {
 
     private void configureRedis() {
         redis().host("localhost");
+        redis().password("password");
 
         redis("redis2").host("localhost");
     }
 
     private void configureCache() {
-        cache().redis("localhost");
+        cache().redis("localhost", "password");
         cache().maxLocalSize(5000);
         cache().add(TestDBEntity.class, Duration.ofHours(6));
     }
