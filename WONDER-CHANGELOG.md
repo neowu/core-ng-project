@@ -1,5 +1,8 @@
 ## Change Log In Wonder
 
+#### 0.0.4 (09/30/2021) - (09/30/2021)
+* merge changes include version 7.8.1 from origin.
+
 #### 0.0.3 (08/25/2021) - (09/30/2021)
 * merge changes include version 7.8.0 from origin.
 
