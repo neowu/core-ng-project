@@ -22,7 +22,12 @@ repositories {
 [https://github.com/neowu/core-ng-project/wiki](https://github.com/neowu/core-ng-project/wiki)
 
 ## Change log
-please check [CHANGELOG.md](CHANGELOG.md)
+please check [WONDER-CHANGELOG.md](WONDER-CHANGELOG.md) & [CHANGELOG.md](CHANGELOG.md)
+
+## Version update principle
+We will update the version in these cases:
+1. original repo updates its version —— we will update our version according its change. No matter the original repo updates its major, minor or patch version, we will update related version position. 
+2. once we have our own changes.
 
 ## Keep it up-to-date with the upstream repo
 ```

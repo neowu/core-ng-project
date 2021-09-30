@@ -1,6 +1,8 @@
 ## Change Log In Wonder
 
-#### 0.0.2 (08/18/2021) - 
+#### 0.0.3 (08/25/2021) - 
+
+#### 0.0.2 (08/18/2021) - (08/24/2021)
 
 * es: support ElasticSearch API keys
 > refer to https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/_other_authentication_methods.html#_elasticsearch_api_keys
