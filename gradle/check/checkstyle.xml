@@ -140,6 +140,7 @@
         <module name="NoWhitespaceBefore">          <!--Checks that there is no whitespace before a token.-->
             <property name="allowLineBreaks" value="true"/>
         </module>
+        <module name="NoWhitespaceBeforeCaseDefaultColon"/> <!--Checks that there is no whitespace before the colon in a switch block.-->
         <module name="OperatorWrap"/>               <!--Checks line wrapping for operators.-->
         <module name="ParenPad"/>
         <module name="SeparatorWrap">               <!--check dot should in new line-->

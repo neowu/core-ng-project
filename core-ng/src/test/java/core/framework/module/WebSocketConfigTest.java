@@ -27,23 +27,23 @@ class WebSocketConfigTest {
     @Test
     void withReservedPath() {
         assertThatThrownBy(() -> config.listen(HTTPIOHandler.HEALTH_CHECK_PATH, TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener()))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("/health-check is reserved path");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("/health-check is reserved path");
     }
 
     @Test
     void listen() {
         assertThatThrownBy(() -> config.listen("/ws/:name", null, null, null))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("listener path must be static");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("listener path must be static");
 
         assertThatThrownBy(() -> config.listen("/ws", TestWebSocketMessage.class, TestWebSocketMessage.class, (channel, message) -> {
         })).isInstanceOf(Error.class)
-                .hasMessageContaining("listener class must not be anonymous class or lambda");
+            .hasMessageContaining("listener class must not be anonymous class or lambda");
 
         config.listen("/ws2", TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener());
         var webSocketContext = (WebSocketContext) config.context.beanFactory.bean(WebSocketContext.class, null);
         assertThat(webSocketContext).isNotNull();
-        assertThat(config.context.serviceRegistry.beanClasses).contains(TestWebSocketMessage.class);
+        assertThat(config.context.apiController.beanClasses).contains(TestWebSocketMessage.class);
     }
 }

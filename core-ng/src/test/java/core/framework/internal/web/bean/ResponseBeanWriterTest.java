@@ -4,7 +4,7 @@ import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.bean.TestBean;
 import core.framework.internal.validate.ValidationException;
 import core.framework.internal.web.service.ErrorResponse;
-import core.framework.internal.web.site.AJAXErrorResponse;
+import core.framework.internal.web.service.InternalErrorResponse;
 import core.framework.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,8 +38,8 @@ class ResponseBeanWriterTest {
     @Test
     void builtinClasses() {
         // controller may return error responses
-        assertThat(writer.contains(AJAXErrorResponse.class)).isTrue();
         assertThat(writer.contains(ErrorResponse.class)).isTrue();
+        assertThat(writer.contains(InternalErrorResponse.class)).isTrue();
     }
 
     @Test

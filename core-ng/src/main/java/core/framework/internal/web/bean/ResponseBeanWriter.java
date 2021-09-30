@@ -5,7 +5,7 @@ import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
 import core.framework.internal.web.service.ErrorResponse;
-import core.framework.internal.web.site.AJAXErrorResponse;
+import core.framework.internal.web.service.InternalErrorResponse;
 import core.framework.util.Maps;
 import core.framework.util.Strings;
 
@@ -20,8 +20,8 @@ public class ResponseBeanWriter {   // used by controller and web service
     private final Map<Class<?>, Context<?>> context = Maps.newHashMap();
 
     public ResponseBeanWriter() {
+        context.put(InternalErrorResponse.class, new Context<>(InternalErrorResponse.class));
         context.put(ErrorResponse.class, new Context<>(ErrorResponse.class));
-        context.put(AJAXErrorResponse.class, new Context<>(AJAXErrorResponse.class));
     }
 
     public void register(Type responseType, BeanClassValidator validator) {

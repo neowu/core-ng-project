@@ -2,8 +2,8 @@ package core.framework.internal.web;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.internal.web.service.ErrorResponse;
+import core.framework.internal.web.service.InternalErrorResponse;
 import core.framework.internal.web.service.WebServiceClient;
-import core.framework.internal.web.site.AJAXErrorResponse;
 import core.framework.log.Severity;
 import core.framework.web.exception.NotFoundException;
 import core.framework.web.service.RemoteServiceException;
@@ -37,41 +37,41 @@ class HTTPErrorHandlerTest {
 
     @Test
     void errorResponseWithErrorCodeException() {
-        var expected = new ErrorResponse();
+        var expected = new InternalErrorResponse();
         expected.id = "actionId";
         expected.message = "test message";
         expected.errorCode = "TEST_ERROR_CODE";
         expected.severity = "WARN";
 
         var response = handler.errorResponse(new NotFoundException("test message", "TEST_ERROR_CODE"), WebServiceClient.USER_AGENT, "actionId");
-        assertThat(response).isInstanceOf(ErrorResponse.class)
+        assertThat(response).isInstanceOf(InternalErrorResponse.class)
                 .usingRecursiveComparison().ignoringFields("stackTrace")
                 .isEqualTo(expected);
     }
 
     @Test
     void errorResponse() {
-        var expected = new ErrorResponse();
+        var expected = new InternalErrorResponse();
         expected.id = "actionId";
         expected.message = "test message";
         expected.errorCode = "INTERNAL_ERROR";
         expected.severity = "ERROR";
 
         var response = handler.errorResponse(new Error("test message"), WebServiceClient.USER_AGENT, "actionId");
-        assertThat(response).isInstanceOf(ErrorResponse.class)
+        assertThat(response).isInstanceOf(InternalErrorResponse.class)
                 .usingRecursiveComparison().ignoringFields("stackTrace")
                 .isEqualTo(expected);
     }
 
     @Test
     void ajaxErrorResponse() {
-        var expected = new AJAXErrorResponse();
+        var expected = new ErrorResponse();
         expected.id = "actionId";
         expected.message = "test message";
         expected.errorCode = "INTERNAL_ERROR";
 
         var response = handler.errorResponse(new Error("test message"), "Mozilla/5.0", "actionId");
-        assertThat(response).isInstanceOf(AJAXErrorResponse.class)
+        assertThat(response).isInstanceOf(ErrorResponse.class)
                 .usingRecursiveComparison().ignoringFields("stackTrace")
                 .isEqualTo(expected);
     }

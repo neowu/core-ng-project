@@ -30,7 +30,7 @@ public final class WebSocketConfig {
         new InjectValidator(listener).validate();
 
         logger.info("ws, path={}, clientMessageClass={}, serverMessageClass={}, listener={}",
-                path, clientMessageClass.getCanonicalName(), serverMessageClass.getCanonicalName(), listener.getClass().getCanonicalName());
+            path, clientMessageClass.getCanonicalName(), serverMessageClass.getCanonicalName(), listener.getClass().getCanonicalName());
 
         if (context.httpServer.handler.webSocketHandler == null) {
             context.httpServer.handler.webSocketHandler = new WebSocketHandler(context.logManager, context.httpServer.siteManager.sessionManager, context.httpServer.handler.rateControl);
@@ -39,8 +39,8 @@ public final class WebSocketConfig {
 
         context.beanClassValidator.validate(clientMessageClass);
         context.beanClassValidator.validate(serverMessageClass);
-        context.serviceRegistry.beanClasses.add(clientMessageClass);
-        context.serviceRegistry.beanClasses.add(serverMessageClass);
+        context.apiController.beanClasses.add(clientMessageClass);
+        context.apiController.beanClasses.add(serverMessageClass);
 
         var handler = new ChannelHandler<>(clientMessageClass, serverMessageClass, listener);
         context.httpServer.handler.webSocketHandler.add(path, handler);

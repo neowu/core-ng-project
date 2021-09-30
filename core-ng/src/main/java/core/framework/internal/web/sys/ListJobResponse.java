@@ -14,7 +14,7 @@ public class ListJobResponse {
     public static class JobView {
         @Property(name = "name")
         public String name;
-        @Property(name = "job_class")
+        @Property(name = "jobClass")
         public String jobClass;
         @Property(name = "trigger")
         public String trigger;

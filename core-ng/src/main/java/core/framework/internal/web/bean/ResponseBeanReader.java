@@ -5,7 +5,7 @@ import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.reflect.GenericTypes;
 import core.framework.internal.validate.Validator;
-import core.framework.internal.web.service.ErrorResponse;
+import core.framework.internal.web.service.InternalErrorResponse;
 import core.framework.util.Maps;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class ResponseBeanReader {   // used by webservice client
     final Map<Class<?>, Context<?>> context = Maps.newHashMap();
 
     public ResponseBeanReader() {
-        context.put(ErrorResponse.class, new Context<>(ErrorResponse.class));   // webservice client doesn't need AJAXErrorResponse
+        context.put(InternalErrorResponse.class, new Context<>(InternalErrorResponse.class));   // webservice client doesn't need ErrorResponse
     }
 
     public void register(Type responseType, BeanClassValidator validator) {

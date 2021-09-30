@@ -235,7 +235,6 @@ public class RedisImpl implements Redis {
 
     @Override
     public Map<String, String> multiGet(String... keys) {
-        validate("keys", keys);
         Map<String, byte[]> values = multiGetBytes(keys);
         Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(values.size());
         for (Map.Entry<String, byte[]> entry : values.entrySet()) {
@@ -246,6 +245,7 @@ public class RedisImpl implements Redis {
 
     public Map<String, byte[]> multiGetBytes(String... keys) {
         var watch = new StopWatch();
+        validate("keys", keys);
         Map<String, byte[]> values = Maps.newLinkedHashMapWithExpectedSize(keys.length);
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {

@@ -26,7 +26,9 @@ class APIDefinitionBuilderTest {
     void build() {
         APIDefinitionResponse response = builder.build();
         APIDefinitionResponse expectedResponse = JSON.fromJSON(APIDefinitionResponse.class, ClasspathResources.text("api-test/test-webservice.json"));
-        assertThat(response).usingRecursiveComparison().isEqualTo(expectedResponse);
+        assertThat(response).usingRecursiveComparison()
+            .ignoringFields("version")
+            .isEqualTo(expectedResponse);
     }
 
     public enum ErrorCode {
