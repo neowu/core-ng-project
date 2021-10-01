@@ -84,6 +84,7 @@ public class TestModule extends AbstractTestModule {
         site().cdn().host("//cdn");
         site().security().contentSecurityPolicy("default-src 'self' https://cdn; img-src 'self' https://cdn data:; object-src 'none'; frame-src 'none';");
         site().allowAPI(List.of("0.0.0.0/0"));
+        site().message(List.of("messages/messages.properties"));
     }
 
     private void configureHTTP() {

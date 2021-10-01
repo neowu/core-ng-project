@@ -3,8 +3,9 @@
 ### 7.8.3 (09/29/2021 - )
 
 * message: make Message.get() more tolerable, won't fail but log as error if key is missing or language is null
-  > use first language defined in site().message() if language is null,
-  > return key and log error if message key is missing
+  > use first language defined in site().message() if language is null
+  > return key and log error if message key is missing,
+  > with integration test context, still throw error if key is missing, to make message unit test easier to write
 
 ### 7.8.2 (09/20/2021 - 09/28/2021)
 

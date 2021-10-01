@@ -8,6 +8,7 @@ import core.framework.module.KafkaConfig;
 import core.framework.module.LogConfig;
 import core.framework.module.RedisConfig;
 import core.framework.module.SessionConfig;
+import core.framework.module.SiteConfig;
 import core.framework.module.TestAPIConfig;
 import core.framework.module.TestCacheConfig;
 import core.framework.module.TestDBConfig;
@@ -16,6 +17,7 @@ import core.framework.module.TestKafkaConfig;
 import core.framework.module.TestLogConfig;
 import core.framework.module.TestRedisConfig;
 import core.framework.module.TestSessionConfig;
+import core.framework.module.TestSiteConfig;
 import core.framework.util.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +46,7 @@ class TestModuleContextTest {
         assertThat(context.configClass(LogConfig.class)).isEqualTo(TestLogConfig.class);
         assertThat(context.configClass(RedisConfig.class)).isEqualTo(TestRedisConfig.class);
         assertThat(context.configClass(SessionConfig.class)).isEqualTo(TestSessionConfig.class);
+        assertThat(context.configClass(SiteConfig.class)).isEqualTo(TestSiteConfig.class);
     }
 
     @Test
