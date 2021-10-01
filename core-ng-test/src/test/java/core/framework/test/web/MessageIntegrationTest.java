@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author neo
  */
-public class MessageIntegrationTest extends IntegrationTest {
+class MessageIntegrationTest extends IntegrationTest {
     @Inject
     Message message;
 
