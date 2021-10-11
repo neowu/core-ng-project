@@ -7,8 +7,6 @@ import core.framework.util.Network;
 
 import java.util.Map;
 
-import static core.framework.internal.log.LogLevel.WARN;
-
 /**
  * @author neo
  */
@@ -34,7 +32,7 @@ public class ActionLogMessageFactory {
         message.stats = log.stats;
         message.performanceStats = performanceStats(log.performanceStats);
         if (log.flushTraceLog()) {
-            message.traceLog = trace(log, SOFT_TRACE_LIMIT, HARD_TRACE_LIMIT);
+            message.traceLog = log.trace(SOFT_TRACE_LIMIT, HARD_TRACE_LIMIT);
         }
         return message;
     }
@@ -51,26 +49,5 @@ public class ActionLogMessageFactory {
             messages.put(entry.getKey(), message);
         }
         return messages;
-    }
-
-    String trace(ActionLog log, int softLimit, int hardLimit) {
-        var builder = new StringBuilder(log.events.size() << 7);  // length * 128 as rough initial capacity
-        boolean softLimitReached = false;
-        for (LogEvent event : log.events) {
-            if (!softLimitReached || event.level.value >= WARN.value) { // after soft limit, only write warn+ event
-                event.appendTrace(builder, log.startTime);
-            }
-
-            if (!softLimitReached && builder.length() >= softLimit) {
-                softLimitReached = true;
-                if (event.level.value < LogLevel.WARN.value) builder.setLength(softLimit);  // do not truncate if current is warn
-                builder.append("...(soft trace limit reached)\n");
-            } else if (builder.length() >= hardLimit) {
-                builder.setLength(hardLimit);
-                builder.append("...(hard trace limit reached)");
-                break;
-            }
-        }
-        return builder.toString();
     }
 }

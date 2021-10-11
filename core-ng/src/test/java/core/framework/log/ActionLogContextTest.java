@@ -50,4 +50,14 @@ class ActionLogContextTest {
         assertThat(ActionLogContext.remainingProcessTime()).isGreaterThanOrEqualTo(Duration.ZERO);
         logManager.end("end");
     }
+
+    @Test
+    void trace() {
+        assertThat(ActionLogContext.trace()).isNull();
+
+        var logManager = new LogManager();
+        logManager.begin("begin", null);
+        assertThat(ActionLogContext.trace()).isNotEmpty();
+        logManager.end("end");
+    }
 }

@@ -31,8 +31,8 @@ public final class ActionLog {
     public final Map<String, List<String>> context;
     public final Map<String, Double> stats;
     final Map<String, PerformanceStat> performanceStats;
-    final List<LogEvent> events;
-    final long startTime;
+    private final List<LogEvent> events;
+    private final long startTime;
     private final long startCPUTime;
 
     public boolean trace;  // whether flush trace log for all subsequent actions
@@ -172,5 +172,26 @@ public final class ActionLog {
         long remainingTime = maxProcessTimeInNano - elapsed();
         if (remainingTime < 0) return 0;
         return remainingTime;
+    }
+
+    public String trace(int softLimit, int hardLimit) {
+        var builder = new StringBuilder(events.size() << 7);  // length * 128 as rough initial capacity
+        boolean softLimitReached = false;
+        for (LogEvent event : events) {
+            if (!softLimitReached || event.level.value >= WARN.value) { // after soft limit, only write warn+ event
+                event.appendTrace(builder, startTime);
+            }
+
+            if (!softLimitReached && builder.length() >= softLimit) {
+                softLimitReached = true;
+                if (event.level.value < LogLevel.WARN.value) builder.setLength(softLimit);  // do not truncate if current is warn
+                builder.append("...(soft trace limit reached)\n");
+            } else if (builder.length() >= hardLimit) {
+                builder.setLength(hardLimit);
+                builder.append("...(hard trace limit reached)");
+                break;
+            }
+        }
+        return builder.toString();
     }
 }

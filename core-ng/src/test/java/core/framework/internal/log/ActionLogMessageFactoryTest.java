@@ -47,27 +47,4 @@ class ActionLogMessageFactoryTest {
         assertThat(stats.readEntries).isNull();
         assertThat(stats.writeEntries).isNull();
     }
-
-    @Test
-    void trace() {
-        String suffix = "...(soft trace limit reached)\n";
-        var log = new ActionLog("begin", null);
-        String trace = factory.trace(log, 200, 500);
-        assertThat(trace).hasSize(200 + suffix.length())
-                .contains("ActionLog - begin")
-                .endsWith(suffix);
-
-        log.process(new LogEvent("logger", null, LogLevel.WARN, "warning", null, null));
-
-        trace = factory.trace(log, 200, 500);
-        assertThat(trace).endsWith("warning\n");
-
-        trace = factory.trace(log, 250, 500);   // the max debug length will hit warning event
-        assertThat(trace).contains("warning")
-                .endsWith(suffix);
-
-        log.process(new LogEvent("logger", null, LogLevel.WARN, "warning2", null, null));
-        trace = factory.trace(log, 250, 320);   // truncate with hard limit
-        assertThat(trace).endsWith("...(hard trace limit reached)");
-    }
 }

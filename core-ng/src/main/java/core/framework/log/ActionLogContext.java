@@ -58,4 +58,12 @@ public final class ActionLogContext {
         if (actionLog == null) return null;
         return Duration.ofNanos(actionLog.remainingProcessTimeInNano());
     }
+
+    // return complete trace at this point, be aware of when you call this within action, action hasn't ended yet
+    @Nullable
+    public static String trace() {
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        if (actionLog == null) return null;
+        return actionLog.trace(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    }
 }

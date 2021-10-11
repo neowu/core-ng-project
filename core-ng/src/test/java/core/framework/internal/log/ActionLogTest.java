@@ -107,4 +107,26 @@ class ActionLogTest {
         assertThat(stat.readEntries).isZero();
         assertThat(stat.writeEntries).isZero();
     }
+
+    @Test
+    void trace() {
+        String suffix = "...(soft trace limit reached)\n";
+        String trace = log.trace(200, 500);
+        assertThat(trace).hasSize(200 + suffix.length())
+            .contains("ActionLog - begin")
+            .endsWith(suffix);
+
+        log.process(new LogEvent("logger", null, LogLevel.WARN, "warning", null, null));
+
+        trace = log.trace(200, 500);
+        assertThat(trace).endsWith("warning\n");
+
+        trace = log.trace(250, 500);   // the max debug length will hit warning event
+        assertThat(trace).contains("warning")
+            .endsWith(suffix);
+
+        log.process(new LogEvent("logger", null, LogLevel.WARN, "warning2", null, null));
+        trace = log.trace(250, 320);   // truncate with hard limit
+        assertThat(trace).endsWith("...(hard trace limit reached)");
+    }
 }
