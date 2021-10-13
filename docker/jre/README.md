@@ -1,7 +1,6 @@
-for core-ng env jre
+this is slim jre image targeted for core-ng web application w/ cloud env
 
 included following modules
-
 ```
 java.base@17
 java.compiler@17
