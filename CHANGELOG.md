@@ -1,7 +1,11 @@
 ## Change log
 
-### 7.8.3 (09/29/2021 - )
+### 7.9.0 (09/29/2021 - )  !!! will be released for jdk 17
 
+* jdk: updated to JDK 17
+  > for local env, it's easier to use intellij builtin way to download SDK, or go to https://adoptium.net/
+  > adoptium (renamed from adoptopenjdk) doesn't provide JRE docker image anymore, you should build for yourself (or use JDK one if you don't mind image size)
+  > refer to docker/jre folder, here it has slimmed jre image for generic core-ng app
 * message: make Message.get() more tolerable, won't fail but log as error if key is missing or language is null
   > use first language defined in site().message() if language is null
   > return key and log error if message key is missing,
