@@ -1,6 +1,13 @@
 this is slim jre image targeted for core-ng web application w/ cloud env
 
+analyze dependencies by
+
+```bash
+jdeps --class-path './*' -recursive -summary --multi-release 17 *.jar
+```
+
 included following modules
+
 ```
 java.base@17
 java.compiler@17
@@ -11,6 +18,7 @@ java.logging@17
 java.management@17
 java.naming@17
 java.prefs@17
+java.rmi@17
 java.security.jgss@17
 java.security.sasl@17
 java.sql@17
@@ -20,7 +28,6 @@ jdk.attach@17
 jdk.charsets@17
 jdk.crypto.cryptoki@17
 jdk.crypto.ec@17
-jdk.dynalink@17
 jdk.internal.jvmstat@17
 jdk.jdi@17
 jdk.jdwp.agent@17
