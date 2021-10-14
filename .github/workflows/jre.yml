@@ -4,13 +4,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - uses: docker/login-action@v1
       with:
         username: neowu
         password: ${{ secrets.DOCKER_HUB_TOKEN }}
-    - run: ls -l .
     - uses: docker/build-push-action@v2
       with:
-        context: "./docker/jre"
+        context: "docker/jre"
         tags: "neowu/jre:17"
         push: true
