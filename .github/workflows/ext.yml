@@ -1,4 +1,4 @@
-name: docker
+name: ext
 on:
   push:
     tags: [ "*.*.*" ]
