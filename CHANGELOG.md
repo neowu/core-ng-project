@@ -13,6 +13,11 @@
 * http: update undertow to 2.2.12
 * actionLog: added ActionLogContext.trace() to return current trace
   > e.g. to integrate with external services, we want to track all the request/response, with built-in trace, it's easier to collect all info with proper masking
+* action: removed ActionLogContext.remainingProcessTime(), and httpClient retryInterceptor won't consider actionLog.remainingProcessTimeInNano
+  > it's not feasible to adapt time left before making external call (most likely http call with timeout),
+  > due to http call is out of control (e.g. take long to create connection with external site), or external sdk/client not managed by framework
+  > so it's better to careful plan in advance for sync chained http calls
+  > maxProcessTime mechanism will be mainly used for measurement/visibility purpose (alert if one action took too long, close to maxProcessTime)
 
 ### 7.8.2 (09/20/2021 - 09/28/2021)
 

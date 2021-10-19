@@ -66,17 +66,6 @@ public class RetryInterceptor implements Interceptor {
         }
     }
 
-    boolean withinMaxProcessTime(int attempts) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
-        if (actionLog == null || actionLog.maxProcessTimeInNano == -1) return true;
-        long remainingTime = actionLog.remainingProcessTimeInNano();
-        if (remainingTime < waitTime(attempts).toNanos()) {
-            logger.debug("not retry due to max process time limit, maxProcessTime={}, timeLeft={}", Duration.ofNanos(actionLog.maxProcessTimeInNano), Duration.ofNanos(remainingTime));
-            return false;
-        }
-        return true;
-    }
-
     // remove query params, to keep it simple by skipping masking
     String uri(Request request) {
         return request.url().newBuilder().query(null).build().toString();
@@ -90,7 +79,6 @@ public class RetryInterceptor implements Interceptor {
     boolean shouldRetry(boolean canceled, int attempts, int statusCode) {
         if (canceled) return false;    // AsyncTimout cancels call if callTimeout, refer to RealCall.kt/timout field
         if (attempts >= maxRetries) return false;
-        if (!withinMaxProcessTime(attempts)) return false;
 
         return statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code;
     }
@@ -99,7 +87,6 @@ public class RetryInterceptor implements Interceptor {
     boolean shouldRetry(boolean canceled, String method, int attempts, Exception e) {
         if (canceled) return false;    // AsyncTimout cancels call if callTimeout, refer to RealCall.kt/timout field
         if (attempts >= maxRetries) return false;
-        if (!withinMaxProcessTime(attempts)) return false;
 
         if (e instanceof RouteException) return true;   // if it's route failure, then request is not sent yet
 
