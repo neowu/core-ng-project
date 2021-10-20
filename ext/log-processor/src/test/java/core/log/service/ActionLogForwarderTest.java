@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -33,7 +32,6 @@ class ActionLogForwarderTest {
         message.app = "website";
         message.traceLog = "trace";
         forwarder.forward(List.of(message));
-        assertThat(message.traceLog).isNull();
         verify(publisher).publish("action", null, message);
     }
 }
