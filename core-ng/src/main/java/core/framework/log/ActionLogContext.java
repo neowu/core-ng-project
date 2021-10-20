@@ -51,11 +51,10 @@ public final class ActionLogContext {
         return actionLog.track(operation, elapsed, readEntries, writeEntries);
     }
 
-    // return complete trace at this point, be aware of when you call this within action, action hasn't ended yet
-    @Nullable
-    public static String trace() {
+    public static void trace() {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
-        if (actionLog == null) return null;
-        return actionLog.trace(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        if (actionLog != null) {
+            actionLog.trace = true;
+        }
     }
 }

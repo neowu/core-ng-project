@@ -41,11 +41,12 @@ class ActionLogContextTest {
 
     @Test
     void trace() {
-        assertThat(ActionLogContext.trace()).isNull();
+        ActionLogContext.trace();
 
         var logManager = new LogManager();
         logManager.begin("begin", null);
-        assertThat(ActionLogContext.trace()).isNotEmpty();
+        ActionLogContext.trace();
+        assertThat(LogManager.CURRENT_ACTION_LOG.get().trace).isTrue();
         logManager.end("end");
     }
 }

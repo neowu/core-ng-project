@@ -11,7 +11,7 @@
   > return key and log error if message key is missing,
   > with integration test context, still throw error if key is missing, to make message unit test easier to write
 * http: update undertow to 2.2.12
-* actionLog: added ActionLogContext.trace() to return current trace
+* actionLog: added ActionLogContext.trace() to trigger trace log, use Custom LogAppender to process
   > e.g. to integrate with external services, we want to track all the request/response, with built-in trace, it's easier to collect all info with proper masking
 * action: removed ActionLogContext.remainingProcessTime(), and httpClient retryInterceptor won't consider actionLog.remainingProcessTimeInNano
   > it's not feasible to adapt time left before making external call (most likely http call with timeout),

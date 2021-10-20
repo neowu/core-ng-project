@@ -1,7 +1,6 @@
 package core.framework.internal.log;
 
 import core.framework.log.ErrorCode;
-import core.framework.log.LogAppender;
 import core.framework.log.Severity;
 import core.framework.log.message.ActionLogMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.Serial;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.doThrow;
 class LogManagerTest {
     LogManager logManager;
     @Mock
-    LogAppender appender;
+    CompositeLogAppender appender;
 
     @BeforeEach
     void createLogManager() {
@@ -68,6 +68,7 @@ class LogManagerTest {
     }
 
     private static class TestException extends Exception implements ErrorCode {
+        @Serial
         private static final long serialVersionUID = 4243205974337190882L;
 
         @Override
