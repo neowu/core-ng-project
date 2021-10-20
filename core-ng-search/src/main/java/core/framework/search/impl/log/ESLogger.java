@@ -8,7 +8,10 @@ import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.spi.AbstractLogger;
 
+import java.io.Serial;
+
 public class ESLogger extends AbstractLogger {
+    @Serial
     private static final long serialVersionUID = -4341238245729493821L;
     private final LoggerImpl logger;
 

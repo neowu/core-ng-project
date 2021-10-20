@@ -1,6 +1,7 @@
 package core.framework.internal.log;
 
 import core.framework.log.ErrorCode;
+import core.framework.log.LogAppender;
 import core.framework.log.Severity;
 import core.framework.log.message.ActionLogMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.doThrow;
 class LogManagerTest {
     LogManager logManager;
     @Mock
-    CompositeLogAppender appender;
+    LogAppender appender;
 
     @BeforeEach
     void createLogManager() {

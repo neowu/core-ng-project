@@ -113,8 +113,7 @@ public final class ActionLog {
     }
 
     String result() {
-        if (result == LogLevel.INFO)
-            return trace ? "TRACE" : "OK";
+        if (result == LogLevel.INFO) return "OK";
         return result.name();
     }
 

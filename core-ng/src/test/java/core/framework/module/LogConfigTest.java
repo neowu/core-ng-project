@@ -23,19 +23,9 @@ class LogConfigTest {
 
     @Test
     void appender() {
-        LogAppender appender = mock(LogAppender.class);
-        config.appender(appender);
-
-        assertThatThrownBy(() -> config.appender(appender))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("log appender is already set");
-    }
-
-    @Test
-    void appendToKafka() {
         config.appendToConsole();
 
-        assertThatThrownBy(() -> config.appendToKafka("kafka:9092"))
+        assertThatThrownBy(() -> config.appender(mock(LogAppender.class)))
             .isInstanceOf(Error.class)
             .hasMessageContaining("log appender is already set");
     }

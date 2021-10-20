@@ -2,6 +2,7 @@ package core.framework.internal.log;
 
 import core.framework.internal.log.filter.LogFilter;
 import core.framework.log.ErrorCode;
+import core.framework.log.LogAppender;
 import core.framework.log.Markers;
 import core.framework.log.Severity;
 import org.slf4j.Logger;
@@ -44,7 +45,7 @@ public class LogManager {
     }
 
     private final ActionLogMessageFactory actionLogMessageFactory = new ActionLogMessageFactory();
-    public CompositeLogAppender appender;
+    public LogAppender appender;
 
     public ActionLog begin(String message, String id) {
         var actionLog = new ActionLog(message, id);
