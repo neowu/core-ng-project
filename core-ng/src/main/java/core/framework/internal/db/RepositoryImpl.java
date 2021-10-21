@@ -74,16 +74,16 @@ public final class RepositoryImpl<T> implements Repository<T> {
         var watch = new StopWatch();
         if (insertQuery.generatedColumn != null) throw new Error("entity must not have auto increment primary key, entityClass=" + entityClass.getCanonicalName());
         validator.validate(entity, false);
-        int updatedRows = 0;
+        int insertedRows = 0;
         String sql = insertQuery.insertIgnoreSQL();
         Object[] params = insertQuery.params(entity);
         try {
-            updatedRows = database.operation.update(sql, params);
-            return updatedRows == 1;
+            insertedRows = database.operation.update(sql, params);
+            return insertedRows == 1;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
-            logger.debug("insertIgnore, sql={}, params={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), elapsed);
+            int operations = ActionLogContext.track("db", elapsed, 0, insertedRows);
+            logger.debug("insertIgnore, sql={}, params={}, insertedRows={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), insertedRows, elapsed);
             database.checkOperation(elapsed, operations);
         }
     }
@@ -106,7 +106,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         } finally {
             long elapsed = watch.elapsed();
             int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
-            logger.debug("update, sql={}, params={}, elapsed={}", query.sql, new SQLParams(database.operation.enumMapper, query.params), elapsed);
+            logger.debug("update, sql={}, params={}, updatedRows={}, elapsed={}", query.sql, new SQLParams(database.operation.enumMapper, query.params), updatedRows, elapsed);
             database.checkOperation(elapsed, operations);
         }
     }
@@ -185,7 +185,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         } finally {
             long elapsed = watch.elapsed();
             int operations = ActionLogContext.track("db", elapsed, 0, insertedRows);
-            logger.debug("batchInsertIgnore, sql={}, params={}, size={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), entities.size(), elapsed);
+            logger.debug("batchInsertIgnore, sql={}, params={}, size={}, insertedRows={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), entities.size(), insertedRows, elapsed);
             database.checkOperation(elapsed, operations);
         }
     }

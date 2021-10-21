@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.9.0 (09/29/2021 - )  !!! only support java 17
+### 7.9.0 (09/29/2021 - 10/21/2021)  !!! only support java 17
 
 * jdk: updated to JDK 17
   > for local env, it's easier to use intellij builtin way to download SDK, or go to https://adoptium.net/

@@ -42,4 +42,10 @@ public class ActionLogMessage {
     public Map<String, PerformanceStatMessage> performanceStats;
     @Property(name = "trace_log")
     public String traceLog;
+
+    public String firstContextValue(String key) {
+        List<String> values = context.get(key);
+        if (values == null) return null;
+        return values.get(0);
+    }
 }

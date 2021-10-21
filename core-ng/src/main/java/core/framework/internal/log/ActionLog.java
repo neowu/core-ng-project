@@ -136,9 +136,9 @@ public final class ActionLog {
                 process(new LogEvent(LOGGER, Markers.errorCode("CONTEXT_TOO_LONG"), WARN, "context value is too long, key={}, value={}", new Object[]{key, contextValue}, new Error("context value is too long")));
             } else {
                 contextValues.add(contextValue);
-                add(event("[context] {}={}", key, contextValue));
             }
         }
+        add(event("[context] {}={}", key, values.length == 1 ? values[0] : values));
     }
 
     public void stat(String key, double value) {

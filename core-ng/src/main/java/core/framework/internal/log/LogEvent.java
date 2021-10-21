@@ -31,7 +31,7 @@ final class LogEvent {
     }
 
     String message() {  // only be called for error message
-        if (arguments == null || arguments.length == 0) return message;     // most of case, message is from exception, and without no arguments
+        if (arguments == null || arguments.length == 0) return message;     // most case, message is from exception, and without no arguments
 
         var builder = new StringBuilder(256);
         LogManager.FILTER.append(builder, message, arguments);
