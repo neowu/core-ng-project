@@ -8,6 +8,12 @@ def yarn(String dir, List<String> params) {
     }
 }
 
+tasks.named('mkdir') {
+    doLast {
+        mkdir("${projectDir}/src/main/dist/web")
+    }
+}
+
 def env = hasProperty('env') ? env : null
 
 afterEvaluate {
