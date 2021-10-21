@@ -16,6 +16,7 @@ java.desktop@17
 java.instrument@17
 java.logging@17
 java.management@17
+java.management.rmi@17
 java.naming@17
 java.prefs@17
 java.rmi@17
@@ -35,6 +36,7 @@ jdk.jfr@17
 jdk.localedata@17
 jdk.management@17
 jdk.management.jfr@17
+jdk.naming.rmi@17
 jdk.net@17
 jdk.unsupported@17
 ```
