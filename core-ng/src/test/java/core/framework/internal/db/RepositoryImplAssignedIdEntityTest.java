@@ -94,7 +94,8 @@ class RepositoryImplAssignedIdEntityTest {
         updatedEntity.id = entity.id;
         updatedEntity.dateField = LocalDate.of(2016, Month.JULY, 5);
         updatedEntity.intField = 12;
-        repository.update(updatedEntity);
+        boolean updated = repository.update(updatedEntity);
+        assertThat(updated).isTrue();
 
         AssignedIdEntity result = repository.get(entity.id).orElseThrow();
         assertThat(result).usingRecursiveComparison().isEqualTo(updatedEntity);
@@ -110,7 +111,8 @@ class RepositoryImplAssignedIdEntityTest {
         updatedEntity.id = entity.id;
         updatedEntity.stringField = "updated";
         updatedEntity.dateField = LocalDate.of(2016, Month.JULY, 5);
-        repository.partialUpdate(updatedEntity);
+        boolean updated = repository.partialUpdate(updatedEntity);
+        assertThat(updated).isTrue();
 
         AssignedIdEntity result = repository.get(entity.id).orElseThrow();
         assertThat(result.stringField).isEqualTo(updatedEntity.stringField);
@@ -192,7 +194,8 @@ class RepositoryImplAssignedIdEntityTest {
         }
         repository.batchInsert(entities);
 
-        repository.batchDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
+        boolean[] results = repository.batchDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
+        assertThat(results).hasSize(100).doesNotContain(false);
 
         assertThat(repository.get(entities.get(0).id)).isNotPresent();
         assertThat(repository.get(entities.get(1).id)).isNotPresent();

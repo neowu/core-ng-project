@@ -42,12 +42,12 @@ class RepositoryImplCompositeKeyEntityTest {
     @Test
     void get() {
         assertThatThrownBy(() -> repository.get())
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("the length of primary keys does not match columns");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("the length of primary keys does not match columns");
 
         assertThatThrownBy(() -> repository.get("id1"))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("the length of primary keys does not match columns");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("the length of primary keys does not match columns");
     }
 
     @Test
@@ -75,7 +75,8 @@ class RepositoryImplCompositeKeyEntityTest {
         repository.insert(entity);
 
         entity.longField = 2L;
-        repository.partialUpdate(entity);
+        boolean result = repository.partialUpdate(entity);
+        assertThat(result).isTrue();
 
         CompositeKeyEntity selectedEntity = repository.get(entity.id1, entity.id2).orElseThrow();
         assertThat(selectedEntity).usingRecursiveComparison().isEqualTo(entity);
@@ -93,13 +94,15 @@ class RepositoryImplCompositeKeyEntityTest {
 
         repository.delete(entity.id1, entity.id2);
         assertThat(repository.get(entity.id1, entity.id2)).isNotPresent();
+
+        assertThat(repository.delete("notExistedId1", "notExistedId2")).isFalse();
     }
 
     @Test
     void deleteWithInvalidPrimaryKeys() {
         assertThatThrownBy(() -> repository.delete("id1"))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("the length of primary keys does not match columns");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("the length of primary keys must match columns");
     }
 
     @Test

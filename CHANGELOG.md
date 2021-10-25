@@ -5,6 +5,9 @@
 * site: StaticDirectoryController will normalize path before serving the requested file, to prevent controller serving files outside content directory
   > it's not recommended serving static directory or file directly through java webapp,
   > better use CDN + static bucket or put Nginx in front of java process to server /static
+* db: Repository update and delete operations return boolean to indicate whether updated
+  > normally we expect a valid PK when updating by PK, if there is no row updated, framework will log warning,
+  > and the boolean result is used by app code to determine whether break by throwing error
 
 ### 7.9.0 (09/29/2021 - 10/21/2021)  !!! only support java 17
 

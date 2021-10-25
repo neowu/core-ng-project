@@ -85,8 +85,14 @@ class RepositoryImplAutoIncrementIdEntityTest {
 
     @Test
     void insertIgnore() {
-        var entity = new AutoIncrementIdEntity();
-        assertThatThrownBy(() -> repository.insertIgnore(entity))
+        assertThatThrownBy(() -> repository.insertIgnore(new AutoIncrementIdEntity()))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("entity must not have auto increment primary key");
+    }
+
+    @Test
+    void batchInsertIgnore() {
+        assertThatThrownBy(() -> repository.batchInsertIgnore(List.of(new AutoIncrementIdEntity())))
             .isInstanceOf(Error.class)
             .hasMessageContaining("entity must not have auto increment primary key");
     }

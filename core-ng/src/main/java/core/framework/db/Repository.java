@@ -38,20 +38,20 @@ public interface Repository<T> {
 
     // use update carefully, it will update all the columns according to the entity fields, includes null fields
     // generally it's recommended to use partialUpdate if only few columns need to be updated and with optimistic lock
-    void update(T entity);
+    boolean update(T entity);
 
     // only update non-null fields
-    void partialUpdate(T entity);
+    boolean partialUpdate(T entity);
 
     // partial update with additional condition, usually applied as optimistic lock pattern, return true if updated successfully
     boolean partialUpdate(T entity, String where, Object... params);
 
-    void delete(Object... primaryKeys);
+    boolean delete(Object... primaryKeys);
 
     Optional<long[]> batchInsert(List<T> entities);
 
     // return whether each inserted successfully
     boolean[] batchInsertIgnore(List<T> entities);
 
-    void batchDelete(List<?> primaryKeys);
+    boolean[] batchDelete(List<?> primaryKeys);
 }
