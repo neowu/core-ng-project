@@ -5,11 +5,13 @@ package core.framework.internal.db;
  */
 final class InsertQuery<T> {
     final String sql;
+    final String upsertClause;
     final String generatedColumn;
     private final InsertQueryParamBuilder<T> paramBuilder;
 
-    InsertQuery(String sql, String generatedColumn, InsertQueryParamBuilder<T> paramBuilder) {
+    InsertQuery(String sql, String upsertClause, String generatedColumn, InsertQueryParamBuilder<T> paramBuilder) {
         this.sql = sql;
+        this.upsertClause = upsertClause;
         this.generatedColumn = generatedColumn;
         this.paramBuilder = paramBuilder;
     }
@@ -23,5 +25,9 @@ final class InsertQuery<T> {
         // replace first INSERT with INSERT IGNORE
         // new StringBuilder(str) will reserve str.length+16 as capacity, so insert will not trigger expansion
         return new StringBuilder(sql).insert(6, " IGNORE").toString();
+    }
+
+    String upsertSQL() {
+        return sql + upsertClause;
     }
 }

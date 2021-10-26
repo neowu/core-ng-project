@@ -89,6 +89,27 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
+    public void upsert(T entity) {
+        var watch = new StopWatch();
+        if (insertQuery.generatedColumn != null) throw new Error("entity must not have auto increment primary key, entityClass=" + entityClass.getCanonicalName());
+        validator.validate(entity, false);
+        int updatedRows = 0;
+        String sql = insertQuery.upsertSQL();
+        Object[] params = insertQuery.params(entity);
+        try {
+            int result = database.operation.update(sql, params);
+            // refer to https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html
+            // With ON DUPLICATE KEY UPDATE, the affected-rows value per row is 1 if the row is inserted as a new row, 2 if an existing row is updated, and 0 if an existing row is set to its current values.
+            if (result > 0) updatedRows = 1;
+        } finally {
+            long elapsed = watch.elapsed();
+            int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
+            logger.debug("upsert, sql={}, params={}, updatedRows={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), updatedRows, elapsed);
+            database.checkOperation(elapsed, operations);
+        }
+    }
+
+    @Override
     public boolean update(T entity) {
         int updatedRows = update(entity, false, null, null);
         if (updatedRows != 1) logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
@@ -190,6 +211,29 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
+    public void batchUpsert(List<T> entities) {
+        var watch = new StopWatch();
+        if (entities.isEmpty()) throw new Error("entities must not be empty");
+        if (insertQuery.generatedColumn != null) throw new Error("entity must not have auto increment primary key, entityClass=" + entityClass.getCanonicalName());
+        String sql = insertQuery.upsertSQL();
+        List<Object[]> params = new ArrayList<>(entities.size());
+        for (T entity : entities) {
+            validator.validate(entity, false);
+            params.add(insertQuery.params(entity));
+        }
+        int updatedRows = 0;
+        try {
+            int[] results = database.operation.batchUpdate(sql, params);
+            updatedRows = database.batchUpdatedRows(results);
+        } finally {
+            long elapsed = watch.elapsed();
+            int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
+            logger.debug("batchUpsert, sql={}, params={}, size={}, updatedRows={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), entities.size(), updatedRows, elapsed);
+            database.checkOperation(elapsed, operations);
+        }
+    }
+
+    @Override
     public boolean[] batchDelete(List<?> primaryKeys) {
         var watch = new StopWatch();
         if (primaryKeys.isEmpty()) throw new Error("primaryKeys must not be empty");
@@ -206,7 +250,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             int[] results = database.operation.batchUpdate(deleteSQL, params);
             boolean[] deletedResults = new boolean[results.length];
             deletedRows = updatedResults(results, deletedResults);
-            if (deletedRows != primaryKeys.size()) logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows do not match size of primary keys, rows={}", Arrays.toString(results));
+            if (deletedRows != primaryKeys.size()) logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows do not match size of primary keys, results={}", Arrays.toString(results));
             return deletedResults;
         } finally {
             long elapsed = watch.elapsed();
@@ -222,7 +266,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         int updatedRows = 0;
         for (int i = 0; i < results.length; i++) {
             int result = results[i];
-            // with insertIgnore, mysql returns -2 if insert succeeds, for batch only
+            // with batchInsert, mysql returns -2 if insert succeeds, for batch only
             // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts
             if (result == Statement.SUCCESS_NO_INFO || result > 0) {
                 updatedResults[i] = true;

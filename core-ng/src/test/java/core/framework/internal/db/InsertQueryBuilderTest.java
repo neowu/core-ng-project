@@ -17,6 +17,7 @@ class InsertQueryBuilderTest {
         assertThat(builder.builder.sourceCode()).isEqualTo(ClasspathResources.text("db-test/insert-query-param-builder-assigned-id.java"));
 
         assertThat(query.sql).isEqualTo("INSERT INTO assigned_id_entity (id, string_field, int_field, big_decimal_field, date_field) VALUES (?, ?, ?, ?, ?)");
+        assertThat(query.upsertSQL()).isEqualTo("INSERT INTO assigned_id_entity (id, string_field, int_field, big_decimal_field, date_field) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE string_field = VALUES(string_field), int_field = VALUES(int_field), big_decimal_field = VALUES(big_decimal_field), date_field = VALUES(date_field)");
         assertThat(query.generatedColumn).isNull();
     }
 

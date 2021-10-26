@@ -93,10 +93,6 @@ public class DBConfig extends Config {
         database.timeout(timeout);
     }
 
-    public void batchSize(int size) {
-        database.operation.batchSize = size;
-    }
-
     public void view(Class<?> viewClass) {
         if (url == null) throw new Error("db url must be configured first, name=" + name);
         database.view(viewClass);

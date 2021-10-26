@@ -8,6 +8,11 @@
 * db: Repository update and delete operations return boolean to indicate whether updated
   > normally we expect a valid PK when updating by PK, if there is no row updated, framework will log warning,
   > and the boolean result is used by app code to determine whether break by throwing error
+* db: removed DBConfig.batchSize() configuration
+  > with recent MySQL server and jdbc driver, it is already auto split batch according to max_allowed_packet
+  > refer to com.mysql.cj.AbstractPreparedQuery.computeBatchSize
+  > and MySQL prefers large batch as the default max_allowed_packet value is getting larger
+* db: added Repository.upsert() and Repository.batchUpsert()
 
 ### 7.9.0 (09/29/2021 - 10/21/2021)  !!! only support java 17
 

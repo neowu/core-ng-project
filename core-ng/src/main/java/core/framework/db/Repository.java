@@ -36,6 +36,11 @@ public interface Repository<T> {
     // ignore if there is duplicated row, return true if inserted successfully
     boolean insertIgnore(T entity);
 
+    // refer to https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html
+    // use insert on duplicate key sql, generally used by data sync
+    // BE CAUTION, it uses PK or unique index to determine duplication !!! read mysql doc carefully to avoid unexpected side effect
+    void upsert(T entity);
+
     // use update carefully, it will update all the columns according to the entity fields, includes null fields
     // generally it's recommended to use partialUpdate if only few columns need to be updated and with optimistic lock
     boolean update(T entity);
@@ -52,6 +57,9 @@ public interface Repository<T> {
 
     // return whether each inserted successfully
     boolean[] batchInsertIgnore(List<T> entities);
+
+    // batch performance is significantly better than single call, try to do batch if possible on data sync
+    void batchUpsert(List<T> entities);
 
     boolean[] batchDelete(List<?> primaryKeys);
 }

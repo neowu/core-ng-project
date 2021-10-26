@@ -18,11 +18,11 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -242,7 +242,7 @@ public final class DatabaseImpl implements Database {
         int updatedRows = 0;
         try {
             int[] results = operation.batchUpdate(sql, params);
-            updatedRows = Arrays.stream(results).sum();
+            updatedRows = batchUpdatedRows(results);
             return results;
         } finally {
             long elapsed = watch.elapsed();
@@ -272,6 +272,16 @@ public final class DatabaseImpl implements Database {
         if (size > tooManyRowsReturnedThreshold) {
             logger.warn(errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
         }
+    }
+
+    int batchUpdatedRows(int[] results) {
+        int updatedRows = 0;
+        for (int result : results) {
+            // with batchInsert, mysql returns -2 if insert succeeds, for batch only
+            // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts
+            if (result == Statement.SUCCESS_NO_INFO || result > 0) updatedRows++;
+        }
+        return updatedRows;
     }
 
     void checkOperation(long elapsed, int operations) {

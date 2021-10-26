@@ -28,7 +28,6 @@ import static core.framework.util.Strings.format;
 public class DatabaseOperation {
     public final TransactionManager transactionManager;
     final EnumDBMapper enumMapper = new EnumDBMapper();
-    public int batchSize = 1000;   // use 1000 as default batch size by considering actual use cases
     int queryTimeoutInSeconds;
 
     DatabaseOperation(Pool<Connection> pool) {
@@ -51,23 +50,17 @@ public class DatabaseOperation {
         }
     }
 
+    // mysql jdbc driver will adjust batch size according to max_allowed_packet param, check this value by "SHOW VARIABLES LIKE '%max_allowed_packet'"
+    // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts, com.mysql.cj.AbstractPreparedQuery.computeBatchSize
     int[] batchUpdate(String sql, List<Object[]> params) {
-        int size = params.size();
-        int[] results = new int[size];
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
-            int index = 1;
             for (Object[] batchParams : params) {
                 setParams(statement, batchParams);
                 statement.addBatch();
-                if (index % batchSize == 0 || index == size) {
-                    int[] batchResults = statement.executeBatch();
-                    System.arraycopy(batchResults, 0, results, index - batchResults.length, batchResults.length);
-                }
-                index++;
             }
-            return results;
+            return statement.executeBatch();
         } catch (SQLException e) {
             Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
@@ -121,26 +114,19 @@ public class DatabaseOperation {
     }
 
     Optional<long[]> batchInsert(String sql, List<Object[]> params, String generatedColumn) {
-        int size = params.size();
-        long[] results = generatedColumn != null ? new long[size] : null;
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = insertStatement(connection.resource, sql, generatedColumn)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
-            int index = 1;
-            int resultIndex = 0;
             for (Object[] batchParams : params) {
                 setParams(statement, batchParams);
                 statement.addBatch();
-                if (index % batchSize == 0 || index == size) {
-                    statement.executeBatch();
-                    if (generatedColumn != null) {
-                        fetchGeneratedKeys(statement, results, resultIndex);
-                        resultIndex = index - 1;
-                    }
-                }
-                index++;
             }
-            return generatedColumn != null ? Optional.of(results) : Optional.empty();
+            statement.executeBatch();
+            if (generatedColumn != null) {
+                long[] results = fetchGeneratedKeys(statement, params.size());
+                return Optional.of(results);
+            }
+            return Optional.empty();
         } catch (SQLException e) {
             Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
@@ -189,8 +175,9 @@ public class DatabaseOperation {
         return OptionalLong.empty();
     }
 
-    private void fetchGeneratedKeys(PreparedStatement statement, long[] results, int resultIndex) throws SQLException {
-        int index = resultIndex;
+    private long[] fetchGeneratedKeys(PreparedStatement statement, int size) throws SQLException {
+        long[] results = new long[size];
+        int index = 0;
         try (ResultSet keys = statement.getGeneratedKeys()) {
             if (keys != null) {
                 while (keys.next()) {
@@ -198,6 +185,7 @@ public class DatabaseOperation {
                 }
             }
         }
+        return results;
     }
 
     private void setParams(PreparedStatement statement, Object... params) throws SQLException {

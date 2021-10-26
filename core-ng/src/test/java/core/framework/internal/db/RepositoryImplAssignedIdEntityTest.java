@@ -36,7 +36,6 @@ class RepositoryImplAssignedIdEntityTest {
         database = new DatabaseImpl("db");
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
         database.isolationLevel = IsolationLevel.READ_UNCOMMITTED;
-        database.operation.batchSize = 7;
         database.execute("CREATE TABLE assigned_id_entity (id VARCHAR(36) PRIMARY KEY, string_field VARCHAR(20), int_field INT, big_decimal_field DECIMAL(10,2), date_field DATE)");
 
         repository = database.repository(AssignedIdEntity.class);
@@ -74,6 +73,19 @@ class RepositoryImplAssignedIdEntityTest {
 
         inserted = repository.insertIgnore(entity);
         assertThat(inserted).isFalse();
+    }
+
+    @Test
+    void upsert() {
+        String id = UUID.randomUUID().toString();
+        AssignedIdEntity entity = entity(id, "string", 12);
+
+        repository.upsert(entity);
+        assertThat(repository.get(id)).get().usingRecursiveComparison().isEqualTo(entity);
+
+        entity.stringField = "updated";
+        repository.upsert(entity);
+        assertThat(repository.get(id)).get().usingRecursiveComparison().isEqualTo(entity);
     }
 
     @Test
@@ -183,6 +195,24 @@ class RepositoryImplAssignedIdEntityTest {
         assertThat(results).hasSize(10).contains(true, false, true, false, true, false, true, false, true, false);
         assertThat(repository.get("0")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
         assertThat(repository.get("1")).get().usingRecursiveComparison().isEqualTo(entities.get(2));
+    }
+
+    @Test
+    void batchUpsert() {
+        List<AssignedIdEntity> entities = Lists.newArrayList();
+        for (int i = 0; i < 5; i++) {
+            AssignedIdEntity entity = entity(String.valueOf(i), "value" + i, 10 + i);
+            entities.add(entity);
+        }
+        repository.batchUpsert(entities);
+        assertThat(repository.get("0")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
+        assertThat(repository.get("4")).get().usingRecursiveComparison().isEqualTo(entities.get(4));
+
+        entities.get(0).intField = 2;
+        entities.get(4).intField = 2;
+        repository.batchUpsert(entities);
+        assertThat(repository.get("0")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
+        assertThat(repository.get("4")).get().usingRecursiveComparison().isEqualTo(entities.get(4));
     }
 
     @Test

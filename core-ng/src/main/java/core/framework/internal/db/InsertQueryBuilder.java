@@ -7,10 +7,12 @@ import core.framework.internal.asm.CodeBuilder;
 import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.reflect.Classes;
 import core.framework.util.Lists;
+import core.framework.util.Strings;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static core.framework.internal.asm.Literal.type;
 
@@ -20,11 +22,12 @@ import static core.framework.internal.asm.Literal.type;
 class InsertQueryBuilder<T> {
     final DynamicInstanceBuilder<InsertQueryParamBuilder<T>> builder;
     private final Class<T> entityClass;
-    private final List<Field> primaryKeyFields = Lists.newArrayList();
+    private final List<String> primaryKeyFieldNames = Lists.newArrayList();
 
     private String generatedColumn;
-    private List<Field> paramFields;
+    private List<String> paramFieldNames;
     private String sql;
+    private String upsertSQLClause;
 
     InsertQueryBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -33,46 +36,48 @@ class InsertQueryBuilder<T> {
 
     InsertQuery<T> build() {
         buildSQL();
-
-        builder.addMethod(applyMethod(entityClass, paramFields));
+        builder.addMethod(applyMethod());
         InsertQueryParamBuilder<T> paramBuilder = builder.build();
-
-        return new InsertQuery<>(sql, generatedColumn, paramBuilder);
+        return new InsertQuery<>(sql, upsertSQLClause, generatedColumn, paramBuilder);
     }
 
     private void buildSQL() {
-        var builder = new StringBuilder(256).append("INSERT INTO ");
-
-        Table table = entityClass.getDeclaredAnnotation(Table.class);
-        builder.append(table.name()).append(" (");
-
         List<Field> fields = Classes.instanceFields(entityClass);
-        paramFields = new ArrayList<>(fields.size());
+        paramFieldNames = new ArrayList<>(fields.size());
+        List<String> paramColumns = new ArrayList<>(fields.size());
+        List<String> upsertUpdates = new ArrayList<>(fields.size());
         for (Field field : fields) {
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
-            Column column = field.getDeclaredAnnotation(Column.class);
+            String column = field.getDeclaredAnnotation(Column.class).name();
             if (primaryKey != null) {
                 if (primaryKey.autoIncrement()) {
-                    generatedColumn = column.name();
+                    generatedColumn = column;
                     continue;
                 }
-                primaryKeyFields.add(field);    // pk fields is only needed for assigned id
+                primaryKeyFieldNames.add(field.getName());    // pk fields is only needed for assigned id
+            } else {
+                // since MySQL 8.0.20, VALUES(column) syntax is deprecated, currently gcloud MySQL is still on 8.0.18
+                upsertUpdates.add(Strings.format("{} = VALUES({})", column, column));
             }
-            if (!paramFields.isEmpty()) builder.append(", ");
-            builder.append(column.name());
-            paramFields.add(field);
+            paramFieldNames.add(field.getName());
+            paramColumns.add(column);
         }
-        builder.append(") VALUES (");
-        for (int i = 0; i < paramFields.size(); i++) {
-            if (i > 0) builder.append(", ");
-            builder.append('?');
-        }
-        builder.append(')');
 
-        sql = builder.toString();
+        var builder = new CodeBuilder()
+            .append("INSERT INTO {} (", entityClass.getDeclaredAnnotation(Table.class).name())
+            .appendCommaSeparatedValues(paramColumns)
+            .append(") VALUES (")
+            .appendCommaSeparatedValues(paramColumns.stream().map(name -> "?").collect(Collectors.toList()))
+            .append(')');
+        sql = builder.build();
+
+        var upsertBuilder = new CodeBuilder()
+            .append(" ON DUPLICATE KEY UPDATE ")
+            .appendCommaSeparatedValues(upsertUpdates);
+        upsertSQLClause = upsertBuilder.build();
     }
 
-    private String applyMethod(Class<T> entityClass, List<Field> paramFields) {
+    private String applyMethod() {
         var builder = new CodeBuilder();
 
         String entityClassLiteral = type(entityClass);
@@ -80,15 +85,15 @@ class InsertQueryBuilder<T> {
             .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral);
 
         if (generatedColumn == null) {
-            for (Field primaryKeyField : primaryKeyFields) {
-                builder.indent(1).append("if (entity.{} == null) throw new Error(\"primary key must not be null, field={}\");\n", primaryKeyField.getName(), primaryKeyField.getName());
+            for (String name : primaryKeyFieldNames) {
+                builder.indent(1).append("if (entity.{} == null) throw new Error(\"primary key must not be null, field={}\");\n", name, name);
             }
         }
 
-        builder.indent(1).append("Object[] params = new Object[{}];\n", paramFields.size());
+        builder.indent(1).append("Object[] params = new Object[{}];\n", paramFieldNames.size());
         int index = 0;
-        for (Field paramField : paramFields) {
-            builder.indent(1).append("params[{}] = entity.{};\n", index, paramField.getName());
+        for (String name : paramFieldNames) {
+            builder.indent(1).append("params[{}] = entity.{};\n", index, name);
             index++;
         }
 
