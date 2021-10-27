@@ -15,6 +15,7 @@ public interface RedisList {
 
     List<String> pop(String key, int size);
 
+    // return the length of the list after the push operation
     long push(String key, String... values);
 
     default List<String> range(String key) {
@@ -22,4 +23,7 @@ public interface RedisList {
     }
 
     List<String> range(String key, long start, long stop);
+
+    // trim the list, only keep most recent items
+    void trim(String key, int maxSize);
 }

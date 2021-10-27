@@ -33,7 +33,7 @@ public interface Repository<T> {
     OptionalLong insert(T entity);
 
     // refer to https://dev.mysql.com/doc/refman/8.0/en/insert.html
-    // ignore if there is duplicated row, return true if inserted successfully
+    // ignore if there is duplicate row, return true if inserted successfully
     boolean insertIgnore(T entity);
 
     // refer to https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html

@@ -46,4 +46,18 @@ class MockRedisListTest {
         assertThat(redis.list().range("key2", -1, 5)).containsExactly("v1", "v2", "v3");
         assertThat(redis.list().range("key2", 9, 10)).isEmpty();
     }
+
+    @Test
+    void trim() {
+        redis.list().push("key3", "v1", "v2", "v3", "v4");
+        redis.list().trim("key3", 3);
+        assertThat(redis.list().range("key3")).containsExactly("v2", "v3", "v4");
+
+        redis.list().trim("key3", 4);
+        assertThat(redis.list().range("key3")).containsExactly("v2", "v3", "v4");
+
+        redis.list().push("key3", "v5");
+        redis.list().trim("key3", 2);
+        assertThat(redis.list().range("key3")).containsExactly("v4", "v5");
+    }
 }

@@ -95,6 +95,7 @@ final class Protocol {
         static final byte[] LRANGE = Strings.bytes("LRANGE");
         static final byte[] RPUSH = Strings.bytes("RPUSH");
         static final byte[] LPOP = Strings.bytes("LPOP");
+        static final byte[] LTRIM = Strings.bytes("LTRIM");
 
         static final byte[] SUBSCRIBE = Strings.bytes("SUBSCRIBE");
         static final byte[] PUBLISH = Strings.bytes("PUBLISH");

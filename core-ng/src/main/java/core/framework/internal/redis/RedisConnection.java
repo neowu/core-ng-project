@@ -56,6 +56,15 @@ class RedisConnection implements AutoCloseable {
         flush();
     }
 
+    void writeKeyArgumentsCommand(byte[] command, String key, byte[] argument1, byte[] argument2) throws IOException {
+        writeArray(4);
+        writeBlobString(command);
+        writeBlobString(encode(key));
+        writeBlobString(argument1);
+        writeBlobString(argument2);
+        flush();
+    }
+
     void writeKeyArgumentsCommand(byte[] command, String key, String... arguments) throws IOException {
         writeArray(2 + arguments.length);
         writeBlobString(command);

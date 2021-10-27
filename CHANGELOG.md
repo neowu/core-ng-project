@@ -13,6 +13,10 @@
   > refer to com.mysql.cj.AbstractPreparedQuery.computeBatchSize
   > and MySQL prefers large batch as the default max_allowed_packet value is getting larger
 * db: added Repository.upsert() and Repository.batchUpsert()
+  > upsert is using "insert on duplicate key update", a common use case is data sync
+* db: mysql jdbc driver updated to 8.0.27
+* redis: added Redis.list().trim(key, maxSize)
+  > to make it easier to manage fixed length list in redis
 
 ### 7.9.0 (09/29/2021 - 10/21/2021)  !!! only support java 17
 
@@ -275,7 +279,7 @@
 
 * http: httpClient does not read response body if status code is 204
 * executor: improve warning for task rejection/cancellation during shutdown
-* db: added Repository.insertIgnore(entity) to handle duplicated key / constraint violation cases without catching UncheckedSQLException
+* db: added Repository.insertIgnore(entity) to handle duplicate key / constraint violation cases without catching UncheckedSQLException
 * redis: added initial zset support
 
 ### 7.6.0 (09/30/2020 - 10/13/2020) !!! only support java 15
