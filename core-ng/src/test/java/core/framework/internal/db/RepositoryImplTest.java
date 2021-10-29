@@ -21,12 +21,17 @@ class RepositoryImplTest {
     @Test
     void updatedResults() {
         boolean[] results = new boolean[3];
-        assertThat(repository.updatedResults(new int[]{Statement.SUCCESS_NO_INFO, 0, Statement.SUCCESS_NO_INFO}, results))
+        assertThat(repository.batchResults(new int[]{Statement.SUCCESS_NO_INFO, 0, Statement.SUCCESS_NO_INFO}, results))
             .isEqualTo(2);
         assertThat(results).contains(true, false, true);
 
         results = new boolean[2];
-        assertThat(repository.updatedResults(new int[]{1, 1}, results)).isEqualTo(2);
+        assertThat(repository.batchResults(new int[]{1, 1}, results)).isEqualTo(2);
         assertThat(results).contains(true, true);
+
+        // for upsert, affected rows = 2 if updated
+        results = new boolean[2];
+        assertThat(repository.batchResults(new int[]{2, 1}, results)).isEqualTo(2);
+        assertThat(results).contains(false, true);
     }
 }

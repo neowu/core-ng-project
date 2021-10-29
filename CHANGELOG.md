@@ -5,6 +5,15 @@
 * site: StaticDirectoryController will normalize path before serving the requested file, to prevent controller serving files outside content directory
   > it's not recommended serving static directory or file directly through java webapp,
   > better use CDN + static bucket or put Nginx in front of java process to server /static
+* db: use useAffectedRows=true on mysql connection, return boolean for update/delete/upsert !!! pls read this carefully
+  > refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-connp-props-connection.html#cj-conn-prop_useAffectedRows
+  > the MySQL affected rows means the row actually changed,
+  > e.g. sql like update table set column = 'value' where id = 'id', the affected row = 0 means either id not found or column value is set to its current values (no row affected)
+  > so if you want to use update with optimistic lock or determine whether id exists, you can make one column always be changed, like set updatedTime = now()
+* db: added Repository.upsert() and Repository.batchUpsert()
+  > upsert is using "insert on duplicate key update", a common use case is data sync
+  > !!! due to HSQL doesn't support MySQL useAffectedRows=true behavior, so upsert always return true
+  > we may create HSQL upsert impl to support unit test if there is need in future (get by id then create or update approach)
 * db: Repository update and delete operations return boolean to indicate whether updated
   > normally we expect a valid PK when updating by PK, if there is no row updated, framework will log warning,
   > and the boolean result is used by app code to determine whether break by throwing error
@@ -12,8 +21,6 @@
   > with recent MySQL server and jdbc driver, it is already auto split batch according to max_allowed_packet
   > refer to com.mysql.cj.AbstractPreparedQuery.computeBatchSize
   > and MySQL prefers large batch as the default max_allowed_packet value is getting larger
-* db: added Repository.upsert() and Repository.batchUpsert()
-  > upsert is using "insert on duplicate key update", a common use case is data sync
 * db: mysql jdbc driver updated to 8.0.27
 * redis: added Redis.list().trim(key, maxSize)
   > to make it easier to manage fixed length list in redis

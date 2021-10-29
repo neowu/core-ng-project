@@ -39,18 +39,21 @@ public interface Repository<T> {
     // refer to https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html
     // use insert on duplicate key sql, generally used by data sync
     // BE CAUTION, it uses PK or unique index to determine duplication !!! read mysql doc carefully to avoid unexpected side effect
-    void upsert(T entity);
+    // return true if the new row inserted
+    boolean upsert(T entity);
 
     // use update carefully, it will update all the columns according to the entity fields, includes null fields
     // generally it's recommended to use partialUpdate if only few columns need to be updated and with optimistic lock
     boolean update(T entity);
 
-    // only update non-null fields
+    // only update non-null fields, return true if the row actually changed
+    // if returned false, it CAN NOT distinguish if id not found, or all columns updated to its current values
     boolean partialUpdate(T entity);
 
-    // partial update with additional condition, usually applied as optimistic lock pattern, return true if updated successfully
+    // partial update with additional condition, usually applied as optimistic lock pattern, return true if the row actually changed
     boolean partialUpdate(T entity, String where, Object... params);
 
+    // return true if the row actually deleted
     boolean delete(Object... primaryKeys);
 
     Optional<long[]> batchInsert(List<T> entities);
@@ -59,7 +62,8 @@ public interface Repository<T> {
     boolean[] batchInsertIgnore(List<T> entities);
 
     // batch performance is significantly better than single call, try to do batch if possible on data sync
-    void batchUpsert(List<T> entities);
+    // return true if the new row inserted
+    boolean[] batchUpsert(List<T> entities);
 
     boolean[] batchDelete(List<?> primaryKeys);
 }

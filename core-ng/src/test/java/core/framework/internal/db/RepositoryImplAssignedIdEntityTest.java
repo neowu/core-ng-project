@@ -80,11 +80,13 @@ class RepositoryImplAssignedIdEntityTest {
         String id = UUID.randomUUID().toString();
         AssignedIdEntity entity = entity(id, "string", 12);
 
-        repository.upsert(entity);
+        boolean inserted = repository.upsert(entity);
+        assertThat(inserted).isTrue();
         assertThat(repository.get(id)).get().usingRecursiveComparison().isEqualTo(entity);
 
         entity.stringField = "updated";
         repository.upsert(entity);
+        // due to HSQL doesn't support MySQL's useAffectedRows behavior, upsert always return true
         assertThat(repository.get(id)).get().usingRecursiveComparison().isEqualTo(entity);
     }
 
@@ -204,13 +206,15 @@ class RepositoryImplAssignedIdEntityTest {
             AssignedIdEntity entity = entity(String.valueOf(i), "value" + i, 10 + i);
             entities.add(entity);
         }
-        repository.batchUpsert(entities);
+        boolean[] inserts = repository.batchUpsert(entities);
         assertThat(repository.get("0")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
         assertThat(repository.get("4")).get().usingRecursiveComparison().isEqualTo(entities.get(4));
+        assertThat(inserts).containsExactly(true, true, true, true, true);
 
         entities.get(0).intField = 2;
         entities.get(4).intField = 2;
         repository.batchUpsert(entities);
+        // due to HSQL doesn't support MySQL's useAffectedRows behavior, upsert always return true
         assertThat(repository.get("0")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
         assertThat(repository.get("4")).get().usingRecursiveComparison().isEqualTo(entities.get(4));
     }

@@ -107,6 +107,10 @@ public final class DatabaseImpl implements Database {
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
             properties.setProperty(PropertyKey.connectTimeout.getKeyName(), timeoutValue);
             properties.setProperty(PropertyKey.socketTimeout.getKeyName(), timeoutValue);
+            // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-connp-props-connection.html#cj-conn-prop_useAffectedRows
+            // Don't set the CLIENT_FOUND_ROWS flag when connecting to the server (not JDBC-compliant, will break most applications that rely on "found" rows vs. "affected rows" for DML statements),
+            // but does cause "correct" update counts from "INSERT ... ON DUPLICATE KEY UPDATE" statements to be returned by the server.
+            properties.setProperty(PropertyKey.useAffectedRows.getKeyName(), "true");
             properties.setProperty(PropertyKey.rewriteBatchedStatements.getKeyName(), "true");
             properties.setProperty(PropertyKey.queryInterceptors.getKeyName(), MySQLQueryInterceptor.class.getName());
             properties.setProperty(PropertyKey.logger.getKeyName(), "Slf4JLogger");
@@ -222,14 +226,14 @@ public final class DatabaseImpl implements Database {
     public int execute(String sql, Object... params) {
         var watch = new StopWatch();
         validateStringValue(sql);
-        int updatedRows = 0;
+        int affectedRows = 0;
         try {
-            updatedRows = operation.update(sql, params);
-            return updatedRows;
+            affectedRows = operation.update(sql, params);
+            return affectedRows;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
-            logger.debug("execute, sql={}, params={}, updatedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), updatedRows, elapsed);
+            int operations = ActionLogContext.track("db", elapsed, 0, affectedRows);
+            logger.debug("execute, sql={}, params={}, affectedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), affectedRows, elapsed);
             checkOperation(elapsed, operations);
         }
     }
@@ -239,15 +243,20 @@ public final class DatabaseImpl implements Database {
         var watch = new StopWatch();
         validateStringValue(sql);
         if (params.isEmpty()) throw new Error("params must not be empty");
-        int updatedRows = 0;
+        int affectedRows = 0;
         try {
             int[] results = operation.batchUpdate(sql, params);
-            updatedRows = batchUpdatedRows(results);
+            for (int result : results) {
+                // with batchInsert, mysql returns -2 if insert succeeds, for batch only
+                // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts
+                if (result == Statement.SUCCESS_NO_INFO) affectedRows++;
+                if (result > 0) affectedRows += result;
+            }
             return results;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
-            logger.debug("batchExecute, sql={}, params={}, size={}, updatedRows={}, elapsed={}", sql, new SQLBatchParams(operation.enumMapper, params), params.size(), updatedRows, elapsed);
+            int operations = ActionLogContext.track("db", elapsed, 0, affectedRows);
+            logger.debug("batchExecute, sql={}, params={}, size={}, affectedRows={}, elapsed={}", sql, new SQLBatchParams(operation.enumMapper, params), params.size(), affectedRows, elapsed);
             checkOperation(elapsed, operations);
         }
     }
@@ -274,16 +283,6 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    int batchUpdatedRows(int[] results) {
-        int updatedRows = 0;
-        for (int result : results) {
-            // with batchInsert, mysql returns -2 if insert succeeds, for batch only
-            // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts
-            if (result == Statement.SUCCESS_NO_INFO || result > 0) updatedRows++;
-        }
-        return updatedRows;
-    }
-
     void checkOperation(long elapsed, int operations) {
         if (operations > maxOperations) {
             throw new Error("too many db operations, operations=" + operations);
@@ -304,8 +303,8 @@ public final class DatabaseImpl implements Database {
                 if (ch != ' ') break;   // seek to next non-whitespace
             }
             if (ch == ','
-                    || index == length  // sql ends with *
-                    || index + 4 <= length && ASCII.toUpperCase(ch) == 'F' && "FROM".equals(ASCII.toUpperCase(sql.substring(index, index + 4))))
+                || index == length  // sql ends with *
+                || index + 4 <= length && ASCII.toUpperCase(ch) == 'F' && "FROM".equals(ASCII.toUpperCase(sql.substring(index, index + 4))))
                 throw new Error("sql must not contain wildcard(*), please only select columns needed, sql=" + sql);
             index = sql.indexOf('*', index + 1);
         }
