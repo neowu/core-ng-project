@@ -17,7 +17,7 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:9.0'
+            checkstyle 'com.puppycrawl.tools:checkstyle:9.1'
             checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.40.0'
         }
 
@@ -45,7 +45,7 @@ subprojects {
     pmd {
         ruleSets = []
         ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
-        toolVersion = '6.39.0'
+        toolVersion = '6.40.0'
         consoleOutput = true
 
         tasks.withType(Pmd).configureEach {
@@ -60,7 +60,7 @@ subprojects {
 
         reportLevel = 'low'
         includeFilter = rootProject.file('gradle/check/spotbugs.xml')
-        toolVersion = '4.4.1'
+        toolVersion = '4.4.2'
 
         def spotbugsReport = tasks.register('spotbugsReport') {
             group = 'verification'
