@@ -1,5 +1,5 @@
 [
-  {"attributes": {"buildNum": 42747, "defaultIndex": "action-pattern", "notifications:banner": "${NOTIFICATION_BANNER}"}, "id": "7.14.0", "type": "config"},
+  {"attributes": {"buildNum": 44185, "defaultIndex": "action-pattern", "notifications:banner": "${NOTIFICATION_BANNER}", "defaultRoute": "/app/discover#/"}, "id": "7.15.1", "type": "config"},
   {
     "id": "action-pattern", "type": "index-pattern",
     "attributes": {
