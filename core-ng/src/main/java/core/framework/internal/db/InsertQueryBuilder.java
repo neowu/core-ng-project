@@ -12,7 +12,6 @@ import core.framework.util.Strings;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static core.framework.internal.asm.Literal.type;
 
@@ -27,7 +26,7 @@ class InsertQueryBuilder<T> {
     private String generatedColumn;
     private List<String> paramFieldNames;
     private String sql;
-    private String upsertSQLClause;
+    private String upsertClause;
 
     InsertQueryBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -38,14 +37,16 @@ class InsertQueryBuilder<T> {
         buildSQL();
         builder.addMethod(applyMethod());
         InsertQueryParamBuilder<T> paramBuilder = builder.build();
-        return new InsertQuery<>(sql, upsertSQLClause, generatedColumn, paramBuilder);
+        return new InsertQuery<>(sql, upsertClause, generatedColumn, paramBuilder);
     }
 
     private void buildSQL() {
         List<Field> fields = Classes.instanceFields(entityClass);
-        paramFieldNames = new ArrayList<>(fields.size());
-        List<String> paramColumns = new ArrayList<>(fields.size());
-        List<String> upsertUpdates = new ArrayList<>(fields.size());
+        int size = fields.size();
+        paramFieldNames = new ArrayList<>(size);
+        List<String> columns = new ArrayList<>(size);
+        List<String> params = new ArrayList<>(size);
+        List<String> updates = new ArrayList<>(size);
         for (Field field : fields) {
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
             String column = field.getDeclaredAnnotation(Column.class).name();
@@ -57,24 +58,25 @@ class InsertQueryBuilder<T> {
                 primaryKeyFieldNames.add(field.getName());    // pk fields is only needed for assigned id
             } else {
                 // since MySQL 8.0.20, VALUES(column) syntax is deprecated, currently gcloud MySQL is still on 8.0.18
-                upsertUpdates.add(Strings.format("{} = VALUES({})", column, column));
+                updates.add(Strings.format("{} = VALUES({})", column, column));
             }
             paramFieldNames.add(field.getName());
-            paramColumns.add(column);
+            columns.add(column);
+            params.add("?");
         }
 
         var builder = new CodeBuilder()
             .append("INSERT INTO {} (", entityClass.getDeclaredAnnotation(Table.class).name())
-            .appendCommaSeparatedValues(paramColumns)
+            .appendCommaSeparatedValues(columns)
             .append(") VALUES (")
-            .appendCommaSeparatedValues(paramColumns.stream().map(name -> "?").collect(Collectors.toList()))
+            .appendCommaSeparatedValues(params)
             .append(')');
         sql = builder.build();
 
         var upsertBuilder = new CodeBuilder()
             .append(" ON DUPLICATE KEY UPDATE ")
-            .appendCommaSeparatedValues(upsertUpdates);
-        upsertSQLClause = upsertBuilder.build();
+            .appendCommaSeparatedValues(updates);
+        upsertClause = upsertBuilder.build();
     }
 
     private String applyMethod() {
