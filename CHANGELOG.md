@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.9.1 (10/22/2021 - )
+### 7.9.1 (10/22/2021 - 11/03/2021)
 
 * site: StaticDirectoryController will normalize path before serving the requested file, to prevent controller serving files outside content directory
   > it's not recommended serving static directory or file directly through java webapp,
