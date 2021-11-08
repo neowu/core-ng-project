@@ -82,10 +82,10 @@ class RepositoryImplAssignedIdEntityTest {
     @Test
     void insertIgnoreWithInvalidTimestamp() {
         AssignedIdEntity entity = entity(UUID.randomUUID().toString(), "string", 12);
-        entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(1970, 1, 1, 0, 0, 1), ZoneId.of("UTC"));
+        entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(1970, 1, 1, 0, 0, 0), ZoneId.of("UTC"));
         assertThatThrownBy(() -> repository.insertIgnore(entity))
             .isInstanceOf(Error.class)
-            .hasMessageContaining("timestamp must after 1970-01-01 00:00:01");
+            .hasMessageContaining("timestamp must be after 1970-01-01 00:00:00");
     }
 
     @Test
