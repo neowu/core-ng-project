@@ -111,6 +111,9 @@ public final class DatabaseImpl implements Database {
             // Don't set the CLIENT_FOUND_ROWS flag when connecting to the server (not JDBC-compliant, will break most applications that rely on "found" rows vs. "affected rows" for DML statements),
             // but does cause "correct" update counts from "INSERT ... ON DUPLICATE KEY UPDATE" statements to be returned by the server.
             properties.setProperty(PropertyKey.useAffectedRows.getKeyName(), "true");
+            // refer to com.mysql.cj.protocol.a.NativeProtocol.configureTimeZone,
+            // force to UTC, generally on cloud it defaults to UTC, this setting is to make local match cloud
+            properties.setProperty(PropertyKey.connectionTimeZone.getKeyName(), "UTC");
             properties.setProperty(PropertyKey.rewriteBatchedStatements.getKeyName(), "true");
             properties.setProperty(PropertyKey.queryInterceptors.getKeyName(), MySQLQueryInterceptor.class.getName());
             properties.setProperty(PropertyKey.logger.getKeyName(), "Slf4JLogger");

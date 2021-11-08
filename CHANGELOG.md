@@ -2,6 +2,15 @@
 
 ### 7.9.2 (11/03/2021 - not released)
 
+* db: validate timestamp param must be after 1970-01-01 00:00:01
+  > with insert ignore, out of range timestamp param will be converted to "0000-00-00 00:00:00" into db, and will trigger "Zero date value prohibited" error on read
+  > refer to https://dev.mysql.com/doc/refman/8.0/en/insert.html
+  > Data conversions that would trigger errors abort the statement if IGNORE is not specified. With IGNORE, invalid values are adjusted to the closest values and inserted; warnings are produced but the statement does not abort.
+  > current we only check > 0, make trade off between validating TIMESTAMP column type and keeping compatible with DATETIME column type
+  > most likely the values we deal with from external systems are lesser (e.g. nodejs default year is 1900, it converts 0 into 1900/01/01 00:00:00)
+  > if it passes timestamp after 2038-01-19 03:14:07 (Instant.ofEpochSecond(Integer.MAX_VALUE)), it will still trigger this issue on MySQL
+  > so on application level, if you can not ensure the range of input value, write your own utils to check before assigning
+
 ### 7.9.1 (10/22/2021 - 11/03/2021)
 
 * site: StaticDirectoryController will normalize path before serving the requested file, to prevent controller serving files outside content directory

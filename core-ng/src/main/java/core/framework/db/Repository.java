@@ -34,6 +34,7 @@ public interface Repository<T> {
 
     // refer to https://dev.mysql.com/doc/refman/8.0/en/insert.html
     // ignore if there is duplicate row, return true if inserted successfully
+    // BE CAUTION, it uses PK or unique index to determine duplication !!! read mysql doc carefully to avoid unexpected side effect
     boolean insertIgnore(T entity);
 
     // refer to https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html

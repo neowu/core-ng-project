@@ -12,7 +12,10 @@ import org.junit.jupiter.api.TestInstance;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -36,7 +39,7 @@ class RepositoryImplAssignedIdEntityTest {
         database = new DatabaseImpl("db");
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
         database.isolationLevel = IsolationLevel.READ_UNCOMMITTED;
-        database.execute("CREATE TABLE assigned_id_entity (id VARCHAR(36) PRIMARY KEY, string_field VARCHAR(20), int_field INT, big_decimal_field DECIMAL(10,2), date_field DATE)");
+        database.execute("CREATE TABLE assigned_id_entity (id VARCHAR(36) PRIMARY KEY, string_field VARCHAR(20), int_field INT, big_decimal_field DECIMAL(10,2), date_field DATE, zoned_date_time_field TIMESTAMP(6))");
 
         repository = database.repository(AssignedIdEntity.class);
     }
@@ -73,6 +76,16 @@ class RepositoryImplAssignedIdEntityTest {
 
         inserted = repository.insertIgnore(entity);
         assertThat(inserted).isFalse();
+    }
+
+
+    @Test
+    void insertIgnoreWithInvalidTimestamp() {
+        AssignedIdEntity entity = entity(UUID.randomUUID().toString(), "string", 12);
+        entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(1970, 1, 1, 0, 0, 1), ZoneId.of("UTC"));
+        assertThatThrownBy(() -> repository.insertIgnore(entity))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("timestamp must after 1970-01-01 00:00:01");
     }
 
     @Test
