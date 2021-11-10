@@ -10,6 +10,7 @@
   > most likely the values we deal with from external systems are lesser (e.g. nodejs default year is 1900, it converts 0 into 1900/01/01 00:00:00)
   > if it passes timestamp after 2038-01-19 03:14:07 (Instant.ofEpochSecond(Integer.MAX_VALUE)), it will still trigger this issue on MySQL
   > so on application level, if you can not ensure the range of input value, write your own utils to check before assigning
+* jre: 17.0.1 released, published "neowu/jre:17.0.1"
 
 ### 7.9.1 (10/22/2021 - 11/03/2021)
 
