@@ -35,7 +35,7 @@ public final class RequestImpl implements Request {
     HTTPMethod method;
     String clientIP;
     String scheme;
-    String hostName;
+    String hostname;
     int port;
     String requestURL;
     ContentType contentType;
@@ -58,8 +58,8 @@ public final class RequestImpl implements Request {
     }
 
     @Override
-    public String hostName() {
-        return hostName;
+    public String hostname() {
+        return hostname;
     }
 
     @Override

@@ -39,6 +39,7 @@ public class ModuleContext {
     public final LogManager logManager;
     public final List<Task> startupHook = Lists.newArrayList();
     public final ShutdownHook shutdownHook;
+    public final ReadinessProbe probe = new ReadinessProbe();
     public final BeanFactory beanFactory = new BeanFactory();
     public final PropertyManager propertyManager = new PropertyManager();
     public final StatCollector collector = new StatCollector();
@@ -51,6 +52,7 @@ public class ModuleContext {
 
     public ModuleContext(LogManager logManager) {
         this.logManager = logManager;
+        startupHook.add(probe); // make readiness probe first to run on startup
         shutdownHook = new ShutdownHook(logManager);
         httpServer = createHTTPServer(logManager);
 

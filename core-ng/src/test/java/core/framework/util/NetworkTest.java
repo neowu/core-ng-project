@@ -9,12 +9,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class NetworkTest {
     @Test
-    void localHostAddress() {
+    void localhostAddress() {
         assertThat(Network.LOCAL_HOST_ADDRESS).isNotNull();
     }
 
     @Test
-    void localHostName() {
+    void localhostName() {
         assertThat(Network.LOCAL_HOST_NAME).isNotNull();
     }
 }

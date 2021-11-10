@@ -83,7 +83,7 @@ public class SessionManager implements SessionContext {
         // share sessionId requires multiple webapps decode session key/values consistently, which adds extra complexity for dev/deployment
         if (header == null && cookieSpec.domain != null)
             return cookieSpec.domain;
-        return request.hostName();
+        return request.hostname();
     }
 
     void putSessionId(Response response, String sessionId) {

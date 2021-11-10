@@ -158,13 +158,13 @@ class SessionManagerTest {
         sessionManager.header("SessionId");
         sessionManager.cookie("SessionId", "example.com");
 
-        when(request.hostName()).thenReturn("api.example.com");
+        when(request.hostname()).thenReturn("api.example.com");
         assertThat(sessionManager.domain(request)).isEqualTo("api.example.com");
     }
 
     @Test
     void domainWithCookie() {
-        when(request.hostName()).thenReturn("www.example.com");
+        when(request.hostname()).thenReturn("www.example.com");
 
         sessionManager.cookie("SessionId", "example.com");
         assertThat(sessionManager.domain(request)).isEqualTo("example.com");

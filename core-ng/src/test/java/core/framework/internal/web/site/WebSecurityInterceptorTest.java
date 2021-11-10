@@ -62,7 +62,7 @@ class WebSecurityInterceptorTest {
 
     @Test
     void redirectURL() {
-        when(request.hostName()).thenReturn("host");
+        when(request.hostname()).thenReturn("host");
         when(request.path()).thenReturn("/path");
         Map<String, String> queryParams = new LinkedHashMap<>();
         queryParams.put("key1", "value1");

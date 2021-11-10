@@ -51,6 +51,7 @@ public class RedisConfig extends Config {
     void setHost(String host) {
         RedisImpl redis = (RedisImpl) this.redis;
         redis.host(host);
+        context.probe.hostURIs.add(host);
     }
 
     public void password(String password) {

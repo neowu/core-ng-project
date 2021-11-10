@@ -35,6 +35,8 @@ public interface Repository<T> {
     // refer to https://dev.mysql.com/doc/refman/8.0/en/insert.html
     // ignore if there is duplicate row, return true if inserted successfully
     // BE CAUTION, it uses PK or unique index to determine duplication !!! read mysql doc carefully to avoid unexpected side effect
+    // BE CAUTION, With IGNORE, invalid values are adjusted to the closest values and inserted; warnings are produced but the statement does not abort.
+    // e.g. if you pass to out of range timestamp value, insert ignore will save it as 0 in db, which is terrible design of MySQL
     boolean insertIgnore(T entity);
 
     // refer to https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html

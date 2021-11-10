@@ -8,6 +8,7 @@ import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.Message;
 import core.framework.kafka.MessageHandler;
 import core.framework.util.Strings;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,8 @@ class MessageListenerThreadTest {
     @Mock
     MessageHandler<TestMessage> messageHandler;
     @Mock
+    Consumer<byte[], byte[]> consumer;
+    @Mock
     BulkMessageHandler<TestMessage> bulkMessageHandler;
     private MessageListenerThread thread;
     private LogManager logManager;
@@ -40,7 +43,7 @@ class MessageListenerThreadTest {
     @BeforeEach
     void createKafkaMessageListenerThread() {
         logManager = new LogManager();
-        thread = new MessageListenerThread("listener-thread-1", new MessageListener(null, null, logManager));
+        thread = new MessageListenerThread("listener-thread-1", consumer, new MessageListener(null, null, logManager));
     }
 
     @Test
@@ -123,5 +126,11 @@ class MessageListenerThreadTest {
         verify(bulkMessageHandler).handle(argThat(value -> value.size() == 1
                                                            && key.equals(value.get(0).key)
                                                            && "value".equals(value.get(0).value.stringField)));
+    }
+
+    @Test
+    void shutdown() {
+        thread.shutdown();
+        verify(consumer).wakeup();
     }
 }

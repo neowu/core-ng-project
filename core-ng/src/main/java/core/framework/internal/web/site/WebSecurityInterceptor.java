@@ -47,7 +47,7 @@ public final class WebSecurityInterceptor implements Interceptor {  // refer to 
     }
 
     String redirectURL(Request request) {   // always assume https site is published on 443 port
-        var builder = new StringBuilder("https://").append(request.hostName()).append(request.path());
+        var builder = new StringBuilder("https://").append(request.hostname()).append(request.path());
 
         Map<String, String> params = request.queryParams();
         if (!params.isEmpty()) {

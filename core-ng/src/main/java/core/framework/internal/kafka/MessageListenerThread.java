@@ -39,12 +39,13 @@ class MessageListenerThread extends Thread {
     private final long longConsumerDelayThresholdInNano;
 
     private final Object lock = new Object();
-    private Consumer<byte[], byte[]> consumer;
+    private final Consumer<byte[], byte[]> consumer;
 
     private volatile boolean processing;
 
-    MessageListenerThread(String name, MessageListener listener) {
+    MessageListenerThread(String name, Consumer<byte[], byte[]> consumer, MessageListener listener) {
         super(name);
+        this.consumer = consumer;
         this.listener = listener;
         logManager = listener.logManager;
         maxProcessTimeInNano = listener.maxProcessTime.toNanos();
@@ -55,10 +56,7 @@ class MessageListenerThread extends Thread {
     public void run() {
         try {
             processing = true;
-            consumer = listener.createConsumer();
-            if (consumer != null) { // consumer can be null if host is not resolved before shutdown
-                process();
-            }
+            process();
         } finally {
             processing = false;
             synchronized (lock) {
@@ -86,13 +84,9 @@ class MessageListenerThread extends Thread {
     }
 
     void shutdown() {
-        if (consumer == null) {
-            interrupt();    // interrupt listener.createConsumer() if needed
-        } else {
-            // if consumer != null, interrupt() will interrupt consumer coordinator,
-            // the only downside of not calling interrupt() is if thread is at process->exception->sleepRoughly, shutdown will have to wait until sleep ends
-            consumer.wakeup();
-        }
+        // interrupt() will interrupt consumer coordinator,
+        // the only downside of not calling interrupt() is if thread is at process->exception->sleepRoughly, shutdown will have to wait until sleep ends
+        consumer.wakeup();
     }
 
     void awaitTermination(long timeoutInMs) throws InterruptedException {
@@ -223,7 +217,7 @@ class MessageListenerThread extends Thread {
             byte[] value = record.value();
             long timestamp = record.timestamp();
             logger.debug("[message] key={}, value={}, timestamp={}, refId={}, client={}, correlationId={}",
-                    key, new BytesLogParam(value), timestamp, refId, client, correlationId);
+                key, new BytesLogParam(value), timestamp, refId, client, correlationId);
 
             if (minTimestamp > timestamp) minTimestamp = timestamp;
 

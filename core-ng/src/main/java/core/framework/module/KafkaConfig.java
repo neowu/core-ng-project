@@ -51,6 +51,8 @@ public class KafkaConfig extends Config {
         if (this.uri != null)
             throw new Error(format("kafka uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri));
         this.uri = new KafkaURI(uri);
+        // only add first kafka uri to probe, as in kube env, generally kafka-0.kafka is created first
+        context.probe.hostURIs.add(this.uri.bootstrapURIs.get(0));
     }
 
     // for use case as replying message back to publisher, so the topic can be dynamic (different services (consumer group) expect to receive reply in their own topic)
@@ -72,8 +74,8 @@ public class KafkaConfig extends Config {
     <T> MessagePublisher<T> createMessagePublisher(String topic, Class<T> messageClass) {
         if (producer == null) {
             var producer = new MessageProducer(uri, name, maxRequestSize);
-            producer.tryCreateProducer();  // try to init kafka during startup
             context.collector.metrics.add(producer.producerMetrics);
+            context.startupHook.add(producer::initialize);
             context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
             var controller = new KafkaController(producer);
             context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/message/:key"), (LambdaController) controller::publish, true);

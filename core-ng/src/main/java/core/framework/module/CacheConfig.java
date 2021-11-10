@@ -110,6 +110,7 @@ public class CacheConfig extends Config {
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
         context.collector.metrics.add(new PoolMetrics(redis.pool));
         redisCacheStore = new RedisCacheStore(redis);
+        context.probe.hostURIs.add(host);
         this.redis = redis;
     }
 

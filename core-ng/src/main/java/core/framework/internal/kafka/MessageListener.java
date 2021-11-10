@@ -6,7 +6,6 @@ import core.framework.kafka.MessageHandler;
 import core.framework.util.Maps;
 import core.framework.util.Network;
 import core.framework.util.StopWatch;
-import core.framework.util.Threads;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -64,7 +63,8 @@ public class MessageListener {
         threads = new MessageListenerThread[poolSize];
         for (int i = 0; i < poolSize; i++) {
             String name = listenerThreadName(this.name, i);
-            threads[i] = new MessageListenerThread(name, this);
+            Consumer<byte[], byte[]> consumer = createConsumer();
+            threads[i] = new MessageListenerThread(name, consumer, this);
         }
         for (var thread : threads) {
             thread.start();
@@ -78,10 +78,12 @@ public class MessageListener {
 
     public void shutdown() {
         shutdown = true;
-        if (threads != null) {  // in case of shutdown before startup finish
+        if (threads != null) {  // in case of shutdown in middle of start
             logger.info("shutting down kafka listener, uri={}, name={}", uri, name);
             for (MessageListenerThread thread : threads) {
-                thread.shutdown();
+                if (thread != null) {   // in case of shutdown in middle of start
+                    thread.shutdown();
+                }
             }
         }
     }
@@ -101,19 +103,6 @@ public class MessageListener {
     }
 
     Consumer<byte[], byte[]> createConsumer() {
-        synchronized (this) {
-            while (!shutdown) {
-                if (uri.resolveURI()) {
-                    return consumer();
-                }
-                logger.warn("failed to resolve kafka uri, retry in 10 seconds, uri={}", uri);
-                Threads.sleepRoughly(Duration.ofSeconds(10));
-            }
-            return null;
-        }
-    }
-
-    private Consumer<byte[], byte[]> consumer() {
         var watch = new StopWatch();
         try {
             Map<String, Object> config = Maps.newHashMapWithExpectedSize(12);
