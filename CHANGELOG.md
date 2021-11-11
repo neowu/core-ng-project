@@ -11,7 +11,8 @@
   > if it passes timestamp after 2038-01-19 03:14:07 (Instant.ofEpochSecond(Integer.MAX_VALUE)), it will still trigger this issue on MySQL
   > so on application level, if you can not ensure the range of input value, write your own utils to check before assigning
 * jre: 17.0.1 released, published "neowu/jre:17.0.1"
-* app: added external dependency checking before start, currently only check kafka and redis/cache to be ready
+* app: added external dependency checking before startup
+  > it currently checks kafka, redis/cache, mongo, es to be ready (not db, generally we use managed db service created before kube cluster)
   > in kube env, during node upgrading or provision, app pods usually start faster than kafka/redis/other stateful set (e.g. one common issue we see is that scheduler job failed to send kafka message)
   > by this way, app pods will wait until kafka is ready, it will fail to start if dependency is not resolved in 30s
   > log kafka appender still treat log-kafka as optional

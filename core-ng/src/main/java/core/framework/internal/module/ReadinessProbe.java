@@ -14,7 +14,7 @@ import java.util.List;
  * @author neo
  */
 public class ReadinessProbe implements Task {
-    // hosts are in host:port format
+    // hostURI are in host:[port] format
     public final List<String> hostURIs = new ArrayList<>();
     private final Logger logger = LoggerFactory.getLogger(ReadinessProbe.class);
 

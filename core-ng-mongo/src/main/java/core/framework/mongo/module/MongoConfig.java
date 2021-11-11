@@ -47,6 +47,7 @@ public class MongoConfig extends Config {
         var connectionString = new ConnectionString(uri);
         if (connectionString.getDatabase() == null) throw new Error("uri must have database, uri=" + uri);
         mongo.uri = connectionString(connectionString);
+        context.probe.hostURIs.add(connectionString.getHosts().get(0));
         this.uri = uri;
     }
 

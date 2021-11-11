@@ -46,6 +46,7 @@ public class SearchConfig extends Config {
     // comma separated hosts
     public void host(String host) {
         search.hosts = ElasticSearchHost.parse(host);
+        context.probe.hostURIs.add(search.hosts[0].getHostName());      // in kube env, it's ok to just check first pod dns of stateful set
     }
 
     void configureLogger() {
