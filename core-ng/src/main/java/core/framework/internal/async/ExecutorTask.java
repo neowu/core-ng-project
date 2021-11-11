@@ -2,6 +2,7 @@ package core.framework.internal.async;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ public class ExecutorTask<T> implements Callable<T> {
     private String rootAction;
     private String refId;
     private String correlationId;
-    private boolean trace;
+    private Trace trace;
 
     ExecutorTask(String actionId, String action, Instant startTime, ActionLog parentActionLog, LogManager logManager, Callable<T> task) {
         this.action = action;

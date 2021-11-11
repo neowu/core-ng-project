@@ -2,6 +2,7 @@ package core.framework.internal.async;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import core.framework.util.Threads;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,13 +41,13 @@ class ExecutorImplTest {
     void submit() throws ExecutionException, InterruptedException {
         ActionLog parentAction = logManager.begin("begin", null);
         parentAction.action("parentAction");
-        parentAction.trace = true;
+        parentAction.trace = Trace.CASCADE;
         parentAction.correlationIds = List.of("correlationId");
 
         Future<Boolean> future = executor.submit("action", () -> {
             ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
             assertThat(actionLog.action).isEqualTo("parentAction:task:action");
-            assertThat(actionLog.trace).isTrue();
+            assertThat(actionLog.trace).isEqualTo(Trace.CASCADE);
             assertThat(actionLog.correlationIds).containsExactly("correlationId");
             return Boolean.TRUE;
         });
@@ -61,7 +62,7 @@ class ExecutorImplTest {
             ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
             assertThat(actionLog.action).isEqualTo("task:action");
             assertThat(actionLog.context).doesNotContainKey("root_action");
-            assertThat(actionLog.trace).isFalse();
+            assertThat(actionLog.trace).isEqualTo(Trace.NONE);
         });
         assertThat(future.get()).isNull();
     }

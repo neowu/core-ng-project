@@ -35,8 +35,10 @@ class ActionLogTest {
 
     @Test
     void flushTraceLogWithTrace() {
-        log.trace = true;
+        log.trace = Trace.CURRENT;
+        assertThat(log.flushTraceLog()).isTrue();
 
+        log.trace = Trace.CASCADE;
         assertThat(log.flushTraceLog()).isTrue();
     }
 

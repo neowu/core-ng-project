@@ -17,6 +17,8 @@
   > by this way, app pods will wait until kafka is ready, it will fail to start if dependency is not resolved in 30s
   > log kafka appender still treat log-kafka as optional
 * http: Request.hostName() renamed to Request.hostname() to keep consistent with other places  !!! breaking change but easy to fix
+* action: replaced ActionLogContext.trace() to ActionLogContext.triggerTrace(boolean cascade)
+  > for audit context, we may not want to trace all correlated actions, with this way we can tweak the scope of tracing
 
 ### 7.9.1 (10/22/2021 - 11/03/2021)
 

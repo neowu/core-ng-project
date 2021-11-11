@@ -35,9 +35,9 @@ public final class ActionLog {
     private final long startTime;
     private final long startCPUTime;
 
-    public boolean trace;  // whether flush trace log for all subsequent actions
+    public Trace trace = Trace.NONE;        // whether flush trace log for all subsequent actions
     public String action = "unassigned";
-    public List<String> correlationIds;    // with bulk message handler, there will be multiple correlationIds handled by one batch
+    public List<String> correlationIds;     // with bulk message handler, there will be multiple correlationIds handled by one batch
     public List<String> clients;
     public List<String> refIds;
     public boolean suppressSlowSQLWarning;
@@ -118,7 +118,7 @@ public final class ActionLog {
     }
 
     boolean flushTraceLog() {
-        return trace || result.value >= WARN.value;
+        return trace != Trace.NONE || result.value >= WARN.value;
     }
 
     public String errorCode() {

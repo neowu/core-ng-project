@@ -3,6 +3,7 @@ package core.framework.internal.kafka;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.kafka.Message;
 import core.framework.util.Sets;
@@ -141,24 +142,24 @@ class MessageListenerThread extends Thread {
                 actionLog.maxProcessTime(maxProcessTimeInNano);
 
                 Headers headers = record.headers();
-                if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) actionLog.trace = true;
+                String trace = header(headers, MessageHeaders.HEADER_TRACE);
+                if (trace != null) actionLog.trace = Trace.parse(trace);
                 String correlationId = header(headers, MessageHeaders.HEADER_CORRELATION_ID);
                 if (correlationId != null) actionLog.correlationIds = List.of(correlationId);
                 String client = header(headers, MessageHeaders.HEADER_CLIENT);
                 if (client != null) actionLog.clients = List.of(client);
                 String refId = header(headers, MessageHeaders.HEADER_REF_ID);
                 if (refId != null) actionLog.refIds = List.of(refId);
-                logger.debug("[header] refId={}, client={}, correlationId={}", refId, client, correlationId);
+                logger.debug("[header] refId={}, client={}, correlationId={}, trace={}", refId, client, correlationId, trace);
 
                 String key = key(record);
-                actionLog.context("key", key);
+                actionLog.context.put("key", List.of(key));
 
                 long timestamp = record.timestamp();
-                logger.debug("[message] timestamp={}", timestamp);
                 checkConsumerDelay(actionLog, timestamp, longConsumerDelayThresholdInNano);
 
                 byte[] value = record.value();
-                logger.debug("[message] value={}", new BytesLogParam(value));
+                logger.debug("[message] key={}, value={}, timestamp={}", key, new BytesLogParam(value), timestamp);
                 T message = process.reader.fromJSON(value);
                 process.validator.validate(message, false);
                 process.handler.handle(key, message);
@@ -203,7 +204,8 @@ class MessageListenerThread extends Thread {
 
         for (ConsumerRecord<byte[], byte[]> record : records) {
             Headers headers = record.headers();
-            if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) actionLog.trace = true;    // trigger trace if any message is trace
+            String trace = header(headers, MessageHeaders.HEADER_TRACE);
+            if (trace != null) actionLog.trace = Trace.parse(trace);   // trigger trace if any message is trace
             String correlationId = header(headers, MessageHeaders.HEADER_CORRELATION_ID);
             if (correlationId != null) correlationIds.add(correlationId);
             String client = header(headers, MessageHeaders.HEADER_CLIENT);
@@ -216,15 +218,15 @@ class MessageListenerThread extends Thread {
 
             byte[] value = record.value();
             long timestamp = record.timestamp();
-            logger.debug("[message] key={}, value={}, timestamp={}, refId={}, client={}, correlationId={}",
-                key, new BytesLogParam(value), timestamp, refId, client, correlationId);
+            logger.debug("[message] key={}, value={}, timestamp={}, refId={}, client={}, correlationId={}, trace={}",
+                key, new BytesLogParam(value), timestamp, refId, client, correlationId, trace);
 
             if (minTimestamp > timestamp) minTimestamp = timestamp;
 
             T message = reader.fromJSON(value);
             messages.add(new Message<>(key, message));
         }
-        actionLog.context("key", keys.toArray());
+        actionLog.context.put("key", List.copyOf(keys));
 
         if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);  // action log kafka appender doesn't send headers
         if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);

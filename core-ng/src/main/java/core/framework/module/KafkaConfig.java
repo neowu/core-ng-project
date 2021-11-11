@@ -51,7 +51,7 @@ public class KafkaConfig extends Config {
         if (this.uri != null)
             throw new Error(format("kafka uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri));
         this.uri = new KafkaURI(uri);
-        // only add first kafka uri to probe, as in kube env, generally kafka-0.kafka is created first
+        // in kube env, it's ok to just check first pod dns of stateful set
         context.probe.hostURIs.add(this.uri.bootstrapURIs.get(0));
     }
 

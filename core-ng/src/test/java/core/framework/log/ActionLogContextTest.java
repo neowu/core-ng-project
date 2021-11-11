@@ -1,6 +1,7 @@
 package core.framework.log;
 
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,12 +42,12 @@ class ActionLogContextTest {
 
     @Test
     void trace() {
-        ActionLogContext.trace();
+        ActionLogContext.triggerTrace(true);
 
         var logManager = new LogManager();
         logManager.begin("begin", null);
-        ActionLogContext.trace();
-        assertThat(LogManager.CURRENT_ACTION_LOG.get().trace).isTrue();
+        ActionLogContext.triggerTrace(false);
+        assertThat(LogManager.CURRENT_ACTION_LOG.get().trace).isEqualTo(Trace.CURRENT);
         logManager.end("end");
     }
 }

@@ -2,6 +2,9 @@ package core.framework.log;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -10,6 +13,8 @@ import java.util.List;
  * @author neo
  */
 public final class ActionLogContext {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActionLogContext.class);
+
     @Nullable
     public static String id() {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
@@ -51,10 +56,12 @@ public final class ActionLogContext {
         return actionLog.track(operation, elapsed, readEntries, writeEntries);
     }
 
-    public static void trace() {
+    public static void triggerTrace(boolean cascade) {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {
-            actionLog.trace = true;
+            Trace trace = cascade ? Trace.CASCADE : Trace.CURRENT;
+            LOGGER.debug("trigger trace, trace={}", trace);
+            actionLog.trace = trace;
         }
     }
 }

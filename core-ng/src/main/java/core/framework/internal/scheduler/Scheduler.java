@@ -3,6 +3,7 @@ package core.framework.internal.scheduler;
 import core.framework.internal.async.ThreadPools;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
 import core.framework.scheduler.Trigger;
@@ -117,7 +118,7 @@ public final class Scheduler {
             ZonedDateTime scheduledTime = task.scheduledTime;
             ZonedDateTime next = task.scheduleNext();
             logger.info("execute scheduled job, job={}, rate={}, scheduled={}, next={}", task.name(), task.rate, scheduledTime, next);
-            submitJob(task, scheduledTime, false);
+            submitJob(task, scheduledTime, Trace.NONE);
         }, delay.toNanos(), task.rate.toNanos(), TimeUnit.NANOSECONDS);
     }
 
@@ -126,7 +127,7 @@ public final class Scheduler {
             ZonedDateTime next = next(task.trigger, scheduledTime);
             schedule(task, next);
             logger.info("execute scheduled job, job={}, trigger={}, scheduled={}, next={}", task.name(), task.trigger(), scheduledTime, next);
-            submitJob(task, scheduledTime, false);
+            submitJob(task, scheduledTime, Trace.NONE);
         } catch (Throwable e) {
             logger.error("failed to execute scheduled job, job is terminated, job={}, error={}", task.name(), e.getMessage(), e);
         }
@@ -135,10 +136,10 @@ public final class Scheduler {
     public void triggerNow(String name) {
         Task task = tasks.get(name);
         if (task == null) throw new NotFoundException("job not found, name=" + name);
-        submitJob(task, ZonedDateTime.now(clock), true);
+        submitJob(task, ZonedDateTime.now(clock), Trace.CASCADE);
     }
 
-    private void submitJob(Task task, ZonedDateTime scheduledTime, boolean trace) {
+    private void submitJob(Task task, ZonedDateTime scheduledTime, Trace trace) {
         jobExecutor.submit(() -> {
             try {
                 ActionLog actionLog = logManager.begin("=== job execution begin ===", null);

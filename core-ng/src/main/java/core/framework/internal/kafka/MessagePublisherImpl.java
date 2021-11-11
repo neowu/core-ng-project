@@ -4,6 +4,7 @@ import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.internal.validate.Validator;
 import core.framework.kafka.MessagePublisher;
@@ -64,7 +65,7 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
         if (actionLog == null) return;      // publisher may be used without action log context
 
         headers.add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes(actionLog.correlationId()));
-        if (actionLog.trace) headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));
+        if (actionLog.trace != Trace.NONE) headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes(actionLog.trace.name()));
         headers.add(MessageHeaders.HEADER_REF_ID, Strings.bytes(actionLog.id));
     }
 }

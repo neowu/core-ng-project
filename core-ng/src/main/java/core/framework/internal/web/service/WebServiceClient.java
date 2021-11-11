@@ -9,6 +9,7 @@ import core.framework.http.HTTPResponse;
 import core.framework.internal.http.HTTPClientImpl;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import core.framework.internal.web.HTTPHandler;
 import core.framework.internal.web.bean.RequestBeanWriter;
 import core.framework.internal.web.bean.ResponseBeanReader;
@@ -120,7 +121,7 @@ public class WebServiceClient {
         if (actionLog == null) return;  // web service client may be used without action log context
 
         headers.put(HTTPHandler.HEADER_CORRELATION_ID.toString(), actionLog.correlationId());
-        if (actionLog.trace) headers.put(HTTPHandler.HEADER_TRACE.toString(), "true");
+        if (actionLog.trace != Trace.NONE) headers.put(HTTPHandler.HEADER_TRACE.toString(), actionLog.trace.name());
         headers.put(HTTPHandler.HEADER_REF_ID.toString(), actionLog.id);
 
         long timeout = ((HTTPClientImpl) httpClient).timeoutInNano; // not count connect timeout, as action starts after connecting
