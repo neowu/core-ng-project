@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -135,11 +136,9 @@ class MessageListenerThread extends Thread {
         for (ConsumerRecord<byte[], byte[]> record : records) {
             ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
             try {
-                actionLog.action("topic:" + topic);
-                actionLog.context("topic", topic);
-                actionLog.context("handler", process.handler.getClass().getCanonicalName());
+                initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), maxProcessTimeInNano);
+
                 actionLog.track("kafka", 0, 1, 0);
-                actionLog.maxProcessTime(maxProcessTimeInNano);
 
                 Headers headers = record.headers();
                 String trace = header(headers, MessageHeaders.HEADER_TRACE);
@@ -153,7 +152,7 @@ class MessageListenerThread extends Thread {
                 logger.debug("[header] refId={}, client={}, correlationId={}, trace={}", refId, client, correlationId, trace);
 
                 String key = key(record);
-                actionLog.context.put("key", List.of(key));
+                actionLog.context.put("key", Collections.singletonList(key)); // key can be null
 
                 long timestamp = record.timestamp();
                 checkConsumerDelay(actionLog, timestamp, longConsumerDelayThresholdInNano);
@@ -174,10 +173,7 @@ class MessageListenerThread extends Thread {
     <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, long maxProcessTimeInNano) {
         ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
         try {
-            actionLog.action("topic:" + topic);
-            actionLog.context("topic", topic);
-            actionLog.context("handler", process.bulkHandler.getClass().getCanonicalName());
-            actionLog.maxProcessTime(maxProcessTimeInNano);
+            initAction(actionLog, topic, process.bulkHandler.getClass().getCanonicalName(), maxProcessTimeInNano);
 
             List<Message<T>> messages = messages(records, actionLog, process.reader);
             for (Message<T> message : messages) {   // validate after fromJSON, so it can track refId/correlationId
@@ -190,6 +186,14 @@ class MessageListenerThread extends Thread {
         } finally {
             logManager.end("=== message handling end ===");
         }
+    }
+
+    private void initAction(ActionLog actionLog, String topic, String handler, long maxProcessTimeInNano) {
+        actionLog.action("topic:" + topic);
+        actionLog.context.put("topic", List.of(topic));
+        actionLog.context.put("handler", List.of(handler));
+        logger.debug("topic={}, handler={}", topic, handler);
+        actionLog.maxProcessTime(maxProcessTimeInNano);
     }
 
     <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONReader<T> reader) throws IOException {
@@ -226,7 +230,7 @@ class MessageListenerThread extends Thread {
             T message = reader.fromJSON(value);
             messages.add(new Message<>(key, message));
         }
-        actionLog.context.put("key", List.copyOf(keys));
+        actionLog.context.put("key", new ArrayList<>(keys));    // keys could contain null
 
         if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);  // action log kafka appender doesn't send headers
         if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);

@@ -9,6 +9,7 @@ import core.framework.web.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,7 +39,8 @@ public final class Route {
         if (handler == null) {
             throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
         }
-        actionLog.context("path_pattern", handler.pathPattern);
+        actionLog.context.put("path_pattern", List.of(handler.pathPattern));
+        logger.debug("pathPattern={}", handler.pathPattern);
         return handler.get(method);
     }
 }
