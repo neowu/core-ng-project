@@ -9,7 +9,7 @@ import java.util.Set;
  * @author neo
  */
 class PropertyValidator {
-    final Set<String> usedProperties = new HashSet<>();
+    Set<String> usedProperties = new HashSet<>();
 
     void validate(Set<String> keys) {
         List<String> notUsedKeys = new ArrayList<>();
@@ -19,5 +19,6 @@ class PropertyValidator {
         if (!notUsedKeys.isEmpty()) {
             throw new Error("found not used properties, please remove unnecessary config, keys=" + notUsedKeys);
         }
+        usedProperties = null;  // release memory
     }
 }
