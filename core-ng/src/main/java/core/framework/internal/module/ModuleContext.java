@@ -1,6 +1,5 @@
 package core.framework.internal.module;
 
-import core.framework.async.Task;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.inject.BeanFactory;
@@ -17,7 +16,6 @@ import core.framework.internal.web.sys.DiagnosticController;
 import core.framework.internal.web.sys.PropertyController;
 import core.framework.module.LambdaController;
 import core.framework.util.ASCII;
-import core.framework.util.Lists;
 import core.framework.util.Maps;
 import core.framework.web.Controller;
 import core.framework.web.SessionContext;
@@ -27,7 +25,6 @@ import core.framework.web.site.WebDirectory;
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -37,7 +34,7 @@ import java.util.Set;
  */
 public class ModuleContext {
     public final LogManager logManager;
-    public final List<Task> startupHook = Lists.newArrayList();
+    public final StartupHook startupHook = new StartupHook();
     public final ShutdownHook shutdownHook;
     public final ReadinessProbe probe = new ReadinessProbe();
     public final BeanFactory beanFactory = new BeanFactory();
@@ -52,7 +49,7 @@ public class ModuleContext {
 
     public ModuleContext(LogManager logManager) {
         this.logManager = logManager;
-        startupHook.add(probe); // make readiness probe first to run on startup
+        startupHook.initialize.add(probe); // make readiness probe first to run on initialize
         shutdownHook = new ShutdownHook(logManager);
         httpServer = createHTTPServer(logManager);
 
@@ -72,7 +69,7 @@ public class ModuleContext {
         beanFactory.bind(SessionContext.class, null, httpServer.siteManager.sessionManager);
         beanFactory.bind(WebDirectory.class, null, httpServer.siteManager.webDirectory);
 
-        startupHook.add(httpServer::start);
+        startupHook.start.add(httpServer::start);
         shutdownHook.add(ShutdownHook.STAGE_0, timeout -> httpServer.shutdown());
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitRequestCompletion);
         shutdownHook.add(ShutdownHook.STAGE_9, timeout -> httpServer.awaitTermination());
@@ -84,7 +81,7 @@ public class ModuleContext {
     public BackgroundTaskExecutor backgroundTask() {
         if (backgroundTask == null) {
             var backgroundTask = new BackgroundTaskExecutor();
-            startupHook.add(backgroundTask::start);
+            startupHook.start.add(backgroundTask::start);
             shutdownHook.add(ShutdownHook.STAGE_2, timeoutInMs -> backgroundTask.shutdown());
             shutdownHook.add(ShutdownHook.STAGE_3, backgroundTask::awaitTermination);
             this.backgroundTask = backgroundTask;

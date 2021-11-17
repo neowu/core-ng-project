@@ -30,7 +30,8 @@ public abstract class Module {
     }
 
     public void onStartup(Task task) {
-        context.startupHook.add(task);
+        // put all custom startup task on start stage
+        context.startupHook.start.add(task);
     }
 
     public <T> T bind(Class<T> instanceClass) {

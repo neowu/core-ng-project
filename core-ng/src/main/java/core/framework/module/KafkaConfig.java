@@ -75,7 +75,7 @@ public class KafkaConfig extends Config {
         if (producer == null) {
             var producer = new MessageProducer(uri, name, maxRequestSize);
             context.collector.metrics.add(producer.producerMetrics);
-            context.startupHook.add(producer::initialize);
+            context.startupHook.initialize.add(producer::initialize);
             context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
             var controller = new KafkaController(producer);
             context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/message/:key"), (LambdaController) controller::publish, true);
@@ -112,7 +112,7 @@ public class KafkaConfig extends Config {
         if (listener == null) {
             if (uri == null) throw new Error("kafka uri must be configured first, name=" + name);
             var listener = new MessageListener(uri, name, context.logManager);
-            context.startupHook.add(listener::start);
+            context.startupHook.start.add(listener::start);
             context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> listener.shutdown());
             context.shutdownHook.add(ShutdownHook.STAGE_1, listener::awaitTermination);
             context.collector.metrics.add(listener.consumerMetrics);

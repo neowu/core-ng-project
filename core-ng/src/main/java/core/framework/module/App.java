@@ -1,7 +1,6 @@
 package core.framework.module;
 
 import com.sun.management.OperatingSystemMXBean;
-import core.framework.async.Task;
 import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.log.ActionLog;
@@ -28,9 +27,8 @@ public abstract class App extends Module {
             logContext(actionLog);
             configure();
             logger.info("execute startup tasks");
-            for (Task task : context.startupHook) {
-                task.execute();
-            }
+            context.startupHook.initialize();
+            context.startupHook.start();
             cleanup();
             logger.info("startup completed, elapsed={}", actionLog.elapsed());
         } catch (Throwable e) {

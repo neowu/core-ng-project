@@ -27,7 +27,7 @@ public final class IntegrationExtension implements TestInstancePostProcessor {
             AbstractTestModule module = context.module().getConstructor().newInstance();
             module.configure();
             return module;
-        } catch (ReflectiveOperationException e) {
+        } catch (Exception e) {
             throw new Error("failed to create test context", e);
         }
     }

@@ -29,7 +29,7 @@ public class LogConfig extends Config {
     public void appendToKafka(String uri) {
         var appender = new KafkaAppender(new KafkaURI(uri));
         appender(appender);
-        context.startupHook.add(appender::start);
+        context.startupHook.start.add(appender::start);
         context.shutdownHook.add(ShutdownHook.STAGE_8, appender::stop);
         context.collector.metrics.add(appender.producerMetrics);
     }

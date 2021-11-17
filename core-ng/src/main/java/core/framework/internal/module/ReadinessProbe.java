@@ -14,9 +14,10 @@ import java.util.List;
  * @author neo
  */
 public class ReadinessProbe implements Task {
-    // hostURI are in host:[port] format
-    public final List<String> hostURIs = new ArrayList<>();
     private final Logger logger = LoggerFactory.getLogger(ReadinessProbe.class);
+
+    // hostURI are in host:[port] format
+    public List<String> hostURIs = new ArrayList<>();
 
     @Override
     public void execute() throws Exception {
@@ -25,6 +26,7 @@ public class ReadinessProbe implements Task {
             String hostname = hostname(hostURI);
             resolveHost(hostname, watch);
         }
+        hostURIs = null;    // release memory
     }
 
     void resolveHost(String hostname, StopWatch watch) throws UnknownHostException, InterruptedException {

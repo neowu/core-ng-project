@@ -29,7 +29,7 @@ public final class ShutdownHook implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
     private final LogManager logManager;
-    private final ShutdownStage[] stages = new ShutdownStage[STAGE_9 + 1];
+    private final Stage[] stages = new Stage[STAGE_9 + 1];
     private final long shutdownDelayInSec;
     private final long shutdownTimeoutInMs;
 
@@ -66,7 +66,7 @@ public final class ShutdownHook implements Runnable {
     }
 
     public void add(int stage, Shutdown shutdown) {
-        if (stages[stage] == null) stages[stage] = new ShutdownStage();
+        if (stages[stage] == null) stages[stage] = new Stage();
         stages[stage].shutdowns.add(shutdown);
     }
 
@@ -101,7 +101,7 @@ public final class ShutdownHook implements Runnable {
 
     void shutdown(long endTime, int fromStage, int toStage) {
         for (int i = fromStage; i <= toStage; i++) {
-            ShutdownStage stage = stages[i];
+            Stage stage = stages[i];
             if (stage == null) continue;
             logger.info("shutdown stage: {}", i);
             for (Shutdown shutdown : stage.shutdowns) {
@@ -120,7 +120,7 @@ public final class ShutdownHook implements Runnable {
         void execute(long timeoutInMs) throws Exception;
     }
 
-    static class ShutdownStage {
+    static class Stage {
         final List<Shutdown> shutdowns = new ArrayList<>();
     }
 }

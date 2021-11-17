@@ -19,6 +19,9 @@
 * http: Request.hostName() renamed to Request.hostname() to keep consistent with other places  !!! breaking change but easy to fix
 * action: replaced ActionLogContext.trace() to ActionLogContext.triggerTrace(boolean cascade)
   > for audit context, we may not want to trace all correlated actions, with this way we can tweak the scope of tracing
+* app: startupHooks introduced 2 stages (initialize and start), removed lazy init for kafka producer / elasticsearch / mongo
+  > since client initialize() will be called during startup, it removes lazy init to simplify
+  > if you want to call Mongo/ElasticSearch directly (e.g. local arbitrary main method), call initialize() before using
 
 ### 7.9.1 (10/22/2021 - 11/03/2021)
 

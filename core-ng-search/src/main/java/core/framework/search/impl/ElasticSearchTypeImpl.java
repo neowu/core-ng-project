@@ -119,7 +119,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     private org.elasticsearch.action.search.SearchResponse search(org.elasticsearch.action.search.SearchRequest searchRequest) throws IOException {
         logger.debug("search, request={}", searchRequest);
-        org.elasticsearch.action.search.SearchResponse response = elasticSearch.client().search(searchRequest, RequestOptions.DEFAULT);
+        org.elasticsearch.action.search.SearchResponse response = elasticSearch.client.search(searchRequest, RequestOptions.DEFAULT);
         if (response.getFailedShards() > 0) logger.warn("elasticsearch shards failed, response={}", response);
         return response;
     }
@@ -180,7 +180,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         int hits = 0;
         try {
             var getRequest = new org.elasticsearch.action.get.GetRequest(index, request.id);
-            GetResponse response = elasticSearch.client().get(getRequest, RequestOptions.DEFAULT);
+            GetResponse response = elasticSearch.client.get(getRequest, RequestOptions.DEFAULT);
             if (!response.isExists()) return Optional.empty();
             hits = 1;
             return Optional.of(reader.fromJSON(response.getSourceAsBytes()));
@@ -202,7 +202,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         byte[] document = writer.toJSON(request.source);
         try {
             var indexRequest = new org.elasticsearch.action.index.IndexRequest(index).id(request.id).source(document, XContentType.JSON);
-            elasticSearch.client().index(indexRequest, RequestOptions.DEFAULT);
+            elasticSearch.client.index(indexRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
@@ -228,7 +228,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         }
         long esTook = 0;
         try {
-            BulkResponse response = elasticSearch.client().bulk(bulkRequest, RequestOptions.DEFAULT);
+            BulkResponse response = elasticSearch.client.bulk(bulkRequest, RequestOptions.DEFAULT);
             esTook = response.getTook().nanos();
             if (response.hasFailures()) throw new SearchException(response.buildFailureMessage());
         } catch (IOException e) {
@@ -250,7 +250,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             Map<String, Object> params = request.params == null ? Map.of() : request.params;
             var script = new Script(DEFAULT_SCRIPT_TYPE, DEFAULT_SCRIPT_LANG, request.script, params);
             var updateRequest = new org.elasticsearch.action.update.UpdateRequest(index, request.id).script(script);
-            elasticSearch.client().update(updateRequest, RequestOptions.DEFAULT);
+            elasticSearch.client.update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
@@ -268,7 +268,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         boolean deleted = false;
         try {
             var deleteRequest = new org.elasticsearch.action.delete.DeleteRequest(index, request.id);
-            DeleteResponse response = elasticSearch.client().delete(deleteRequest, RequestOptions.DEFAULT);
+            DeleteResponse response = elasticSearch.client.delete(deleteRequest, RequestOptions.DEFAULT);
             deleted = response.getResult() == DocWriteResponse.Result.DELETED;
             return deleted;
         } catch (IOException e) {
@@ -293,7 +293,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         }
         long esTook = 0;
         try {
-            BulkResponse response = elasticSearch.client().bulk(bulkRequest, RequestOptions.DEFAULT);
+            BulkResponse response = elasticSearch.client.bulk(bulkRequest, RequestOptions.DEFAULT);
             esTook = response.getTook().nanos();
             if (response.hasFailures()) throw new SearchException(response.buildFailureMessage());
         } catch (IOException e) {
@@ -313,7 +313,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         String index = request.index == null ? this.index : request.index;
         try {
             var analyzeRequest = org.elasticsearch.client.indices.AnalyzeRequest.withIndexAnalyzer(index, request.analyzer, request.text);
-            AnalyzeResponse response = elasticSearch.client().indices().analyze(analyzeRequest, RequestOptions.DEFAULT);
+            AnalyzeResponse response = elasticSearch.client.indices().analyze(analyzeRequest, RequestOptions.DEFAULT);
             return response.getTokens().stream().map(AnalyzeResponse.AnalyzeToken::getTerm).collect(Collectors.toList());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -339,7 +339,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             var searchRequest = searchRequest(index).scroll(keepAlive);
             searchRequest.source().query(forEach.query).sort(SortBuilders.fieldSort("_doc")).size(forEach.limit);
             logger.debug("forEach, index={}, request={}", index, searchRequest);
-            org.elasticsearch.action.search.SearchResponse response = elasticSearch.client().search(searchRequest, RequestOptions.DEFAULT);
+            org.elasticsearch.action.search.SearchResponse response = elasticSearch.client.search(searchRequest, RequestOptions.DEFAULT);
 
             while (true) {
                 esServerTook += response.getTook().nanos();
@@ -355,7 +355,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
                 }
 
                 start = System.nanoTime();
-                response = elasticSearch.client().scroll(Requests.searchScrollRequest(response.getScrollId()).scroll(keepAlive), RequestOptions.DEFAULT);
+                response = elasticSearch.client.scroll(Requests.searchScrollRequest(response.getScrollId()).scroll(keepAlive), RequestOptions.DEFAULT);
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
