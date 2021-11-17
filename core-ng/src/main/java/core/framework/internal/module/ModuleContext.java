@@ -49,7 +49,6 @@ public class ModuleContext {
 
     public ModuleContext(LogManager logManager) {
         this.logManager = logManager;
-        startupHook.initialize.add(probe); // make readiness probe first to run on initialize
         shutdownHook = new ShutdownHook(logManager);
         httpServer = createHTTPServer(logManager);
 
