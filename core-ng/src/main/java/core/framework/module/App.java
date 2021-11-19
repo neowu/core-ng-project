@@ -26,8 +26,8 @@ public abstract class App extends Module {
         try {
             logContext(actionLog);
             configure();
+            context.probe.check();    // readiness probe only needs to run on actual startup, not on test
             logger.info("execute startup tasks");
-            context.probe.execute();    // readiness probe only needs to run on actual startup, not on test
             context.startupHook.initialize();
             context.startupHook.start();
             cleanup();

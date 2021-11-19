@@ -8,6 +8,7 @@ import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.log.message.StatMessage;
 import core.framework.module.App;
+import core.framework.module.SystemModule;
 import core.framework.search.module.SearchConfig;
 import core.log.LogForwardConfig;
 import core.log.domain.ActionDocument;
@@ -20,7 +21,6 @@ import core.log.kafka.EventMessageHandler;
 import core.log.kafka.StatMessageHandler;
 import core.log.service.ActionLogForwarder;
 import core.log.service.ActionService;
-import core.log.service.ElasticSearchAppender;
 import core.log.service.EventForwarder;
 import core.log.service.EventService;
 import core.log.service.IndexOption;
@@ -39,7 +39,7 @@ import java.util.Optional;
 public class LogProcessorApp extends App {
     @Override
     protected void initialize() {
-        loadProperties("sys.properties");
+        load(new SystemModule("sys.properties"));
         loadProperties("app.properties");
 
         configureSearch();
@@ -50,8 +50,7 @@ public class LogProcessorApp extends App {
         bind(StatService.class);
         bind(EventService.class);
 
-        configureLogAppender();
-        onStartup(indexService::createIndexTemplatesUntilSuccess);
+        onStartup(indexService::createIndexTemplates);
 
         configureKibanaService();
         Forwarders forwarders = configureLogForwarders();
@@ -71,16 +70,6 @@ public class LogProcessorApp extends App {
         });
     }
 
-    private void configureLogAppender() {
-        property("sys.log.appender").ifPresent(appender -> {
-            if ("console".equals(appender)) {
-                log().appendToConsole();
-            } else if ("elasticsearch".equals(appender)) {
-                log().appender(bind(ElasticSearchAppender.class));  // ElasticSearchAppender doesn't need to stop, es will be stopped at stage 7
-            }
-        });
-    }
-
     private void configureIndexOption() {
         var option = new IndexOption();
         option.numberOfShards = Integer.parseInt(property("app.index.shards").orElse("1"));   // with small cluster one shard has best performance, for larger cluster use kube env to customize
@@ -89,7 +78,6 @@ public class LogProcessorApp extends App {
     }
 
     private void configureKafka(Forwarders forwarders) {
-        kafka().uri(requiredProperty("sys.kafka.uri"));
         kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get at least 1M message
         kafka().maxPoll(2000, 3 * 1024 * 1024);     // get 3M message at max

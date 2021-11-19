@@ -26,7 +26,7 @@ class RetryInterceptorTest {
 
     @BeforeEach
     void createRetryInterceptor() {
-        interceptor = new RetryInterceptor(3, Duration.ofMillis(500), null);
+        interceptor = new RetryInterceptor(3, Duration.ofMillis(500));
     }
 
     /*

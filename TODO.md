@@ -18,5 +18,3 @@
 
 * monitor: alert on kafka message api_changed? always publish api, not only for frontend?
 * action visualization to show service flow/dependency diagram?
-
-* readiness: check es actually ready, to simplify log-processor createIndexUntilSuccess?

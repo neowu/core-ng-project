@@ -3,6 +3,7 @@ package core.framework.internal.http;
 import core.framework.api.http.HTTPStatus;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.util.Threads;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -28,11 +29,9 @@ public class RetryInterceptor implements Interceptor {
     private final Logger logger = LoggerFactory.getLogger(RetryInterceptor.class);
     private final int maxRetries;
     private final long waitTimeInMs;
-    private final ThreadSleep sleep;
 
-    public RetryInterceptor(int maxRetries, Duration retryWaitTime, ThreadSleep sleep) {
+    public RetryInterceptor(int maxRetries, Duration retryWaitTime) {
         this.maxRetries = maxRetries;
-        this.sleep = sleep;
         waitTimeInMs = retryWaitTime.toMillis();
     }
 
@@ -57,7 +56,7 @@ public class RetryInterceptor implements Interceptor {
                     throw e;
                 }
             }
-            sleep.sleep(waitTime(attempts));
+            sleep(waitTime(attempts));
             attempts++;
 
             // set to actionLog directly to keep trace log concise
@@ -106,7 +105,7 @@ public class RetryInterceptor implements Interceptor {
         return Duration.ofMillis(waitTimeInMs << attempts - 1);
     }
 
-    public interface ThreadSleep {
-        void sleep(Duration time);
+    void sleep(Duration duration) {
+        Threads.sleepRoughly(duration);
     }
 }

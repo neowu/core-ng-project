@@ -4,9 +4,6 @@ import core.framework.util.StopWatch;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.net.UnknownHostException;
-import java.time.Duration;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -30,16 +27,17 @@ class ReadinessProbeTest {
     }
 
     @Test
-    void execute() throws Exception {
+    void check() throws Exception {
         probe.hostURIs.add("localhost");
-        probe.execute();
+        probe.check();
     }
 
     @Test
     void resolveHost() {
         StopWatch watch = mock(StopWatch.class);
-        when(watch.elapsed()).thenReturn(Duration.ofSeconds(30).toNanos());
+        when(watch.elapsed()).thenReturn(ReadinessProbe.MAX_WAIT_TIME_IN_NANO);
         assertThatThrownBy(() -> probe.resolveHost("notExistedHost", watch))
-            .isInstanceOf(UnknownHostException.class);
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("readiness check failed");
     }
 }

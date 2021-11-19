@@ -15,7 +15,7 @@ public class TestModule extends AbstractTestModule {
         System.setProperty("app.log.forward.config", ClasspathResources.text("forward.json"));
         load(new LogProcessorApp());
 
-        // TODO: think about best way to do this
+        // TODO: think about best way to do this, and usually we need to keep index json on both unit test and es migration?
         config(InitSearchConfig.class);
         bean(IndexService.class).createIndexTemplates();
     }

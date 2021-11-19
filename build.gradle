@@ -17,7 +17,7 @@ subprojects {
 def elasticVersion = '7.15.0'
 def kafkaVersion = '3.0.0'
 def jacksonVersion = '2.12.5'
-def junitVersion = '5.7.2'
+def junitVersion = '5.8.1'
 def mockitoVersion = '3.12.4'
 def assertjVersion = '3.20.2'
 def mysqlVersion = '8.0.27'
