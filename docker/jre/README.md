@@ -36,7 +36,8 @@ jdk.jfr@17
 jdk.localedata@17
 jdk.management@17
 jdk.management.jfr@17
-jdk.naming.rmi@17
+jdk.naming.dns@17           // for "mongodb+srv://" connection protocol
+jdk.naming.rmi@17           // for kafka jmx connector, used by monitor 
 jdk.net@17
 jdk.unsupported@17
 ```
