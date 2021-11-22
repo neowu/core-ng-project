@@ -11,18 +11,13 @@ class KafkaURITest {
     @Test
     void parse() {
         assertThat(new KafkaURI("kafka-0.kafka").bootstrapURIs)
-                .containsExactly("kafka-0.kafka:9092");
+            .containsExactly("kafka-0.kafka:9092");
 
         assertThat(new KafkaURI("kafka-0.kafka:9092").bootstrapURIs)
-                .containsExactly("kafka-0.kafka:9092");
+            .containsExactly("kafka-0.kafka:9092");
 
         assertThat(new KafkaURI("kafka-0.kafka, kafka-1.kafka:9092").bootstrapURIs)
-                .containsExactly("kafka-0.kafka:9092", "kafka-1.kafka:9092");
-    }
-
-    @Test
-    void resolveURI() {
-        assertThat(new KafkaURI("localhost").resolveURI()).isTrue();
+            .containsExactly("kafka-0.kafka:9092", "kafka-1.kafka:9092");
     }
 
     @Test

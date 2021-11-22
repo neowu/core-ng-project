@@ -20,6 +20,7 @@ import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -53,7 +54,7 @@ public final class KafkaAppender implements LogAppender {
 
     void initialize() {
         while (!stop) {
-            if (uri.resolveURI()) {
+            if (resolveURI(uri)) {
                 producer = createProducer(uri);
                 break;
             }
@@ -82,14 +83,14 @@ public final class KafkaAppender implements LogAppender {
         var watch = new StopWatch();
         try {
             Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs,
-                    ProducerConfig.ACKS_CONFIG, "0",                                        // no acknowledge to maximize performance
-                    ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder",                       // if not specify, kafka uses producer-${seq} name, also impact jmx naming
-                    ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
-                    ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000,                      // 60s, type is INT
-                    ProducerConfig.LINGER_MS_CONFIG, 50L,
-                    ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                       // longer backoff to reduce cpu usage when kafka is not available
-                    ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L,                 // 5s
-                    ProducerConfig.MAX_BLOCK_MS_CONFIG, 30_000L);                           // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+                ProducerConfig.ACKS_CONFIG, "0",                                        // no acknowledge to maximize performance
+                ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder",                       // if not specify, kafka uses producer-${seq} name, also impact jmx naming
+                ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
+                ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000,                      // 60s, type is INT
+                ProducerConfig.LINGER_MS_CONFIG, 50L,
+                ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                       // longer backoff to reduce cpu usage when kafka is not available
+                ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L,                 // 5s
+                ProducerConfig.MAX_BLOCK_MS_CONFIG, 30_000L);                           // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
             var serializer = new ByteArraySerializer();
             var producer = new KafkaProducer<>(config, serializer, serializer);
             producerMetrics.set(producer.metrics());
@@ -122,13 +123,26 @@ public final class KafkaAppender implements LogAppender {
         stop = true;
         logForwarderThread.interrupt();
 
-        if (producer == null && uri.resolveURI()) producer = createProducer(uri);           // producer can be null if app failed to start (exception thrown by configure(), startup hook will not run)
+        if (producer == null && resolveURI(uri)) producer = createProducer(uri);           // producer can be null if app failed to start (exception thrown by configure(), startup hook will not run)
         if (producer != null) {                                         // producer can be null if uri is not resolved
             for (ProducerRecord<byte[], byte[]> record : records) {     // if log-kafka is not available, here will block MAX_BLOCK_MS, to simplify it's ok not handling timeout since kafka appender is at end of shutdown, no more critical resources left to handle
                 producer.send(record);
             }
             producer.close(Duration.ofMillis(timeoutInMs));
         }
+    }
+
+    boolean resolveURI(KafkaURI kafkaURI) {
+        for (String uri : kafkaURI.bootstrapURIs) {
+            int index = uri.indexOf(':');
+            if (index == -1) throw new Error("invalid kafka uri, uri=" + uri);
+            String host = uri.substring(0, index);
+            var address = new InetSocketAddress(host, 9092);
+            if (!address.isUnresolved()) {
+                return true;    // break if any uri is resolvable
+            }
+        }
+        return false;
     }
 
     // pmd has flaws to check slf4j log format with lambda, even with https://github.com/pmd/pmd/pull/2263, it fails to analyze logger in lambda+if condition block

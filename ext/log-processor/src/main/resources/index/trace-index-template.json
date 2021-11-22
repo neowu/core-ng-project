@@ -1,5 +1,5 @@
 {
-  "index_patterns": "trace-*",
+  "index_patterns": ["trace-*"],
   "priority": 1,
   "template": {
     "settings": {

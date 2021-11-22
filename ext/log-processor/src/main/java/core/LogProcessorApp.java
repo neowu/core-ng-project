@@ -72,8 +72,8 @@ public class LogProcessorApp extends App {
 
     private void configureIndexOption() {
         var option = new IndexOption();
-        option.numberOfShards = Integer.parseInt(property("app.index.shards").orElse("1"));   // with small cluster one shard has best performance, for larger cluster use kube env to customize
-        option.refreshInterval = property("app.index.refresh.interval").orElse("10s");  // use longer refresh to tune load on log es
+        option.numberOfShards = Integer.parseInt(property("app.index.shards").orElse("1"));     // with small cluster one shard has the best performance, for larger cluster use kube env to customize
+        option.refreshInterval = property("app.index.refresh.interval").orElse("10s");          // use longer refresh to tune load on log es
         bind(option);
     }
 

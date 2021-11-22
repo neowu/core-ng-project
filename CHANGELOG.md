@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.9.2 (11/03/2021 - not released)
+### 7.9.2 (11/03/2021 - 11/22/2021)
 
 * db: validate timestamp param must be after 1970-01-01 00:00:01
   > with insert ignore, out of range timestamp param will be converted to "0000-00-00 00:00:00" into db, and will trigger "Zero date value prohibited" error on read
@@ -24,7 +24,7 @@
   > since client initialize() will be called during startup, it removes lazy init to simplify
   > if you want to call Mongo/ElasticSearch directly (e.g. local arbitrary main method), call initialize() before using
 * log-processor: removed elasticsearch appender support
-  > generally in prod env, we use null log appender for log-processor, since log-processor is generally stable, and not necessary double the amount of action logs in log-es
+  > in prod env, we use null log appender for log-processor, since log-processor is stable, and not necessary to double the amount of action logs in log-es
   > if anything wrong happened, error output of log-processor is good enough for troubleshooting
 
 ### 7.9.1 (10/22/2021 - 11/03/2021)
