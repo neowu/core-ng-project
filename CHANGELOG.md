@@ -1,5 +1,9 @@
 ## Change log
 
+### 7.9.3 (11/23/2021 - )
+
+* monitor: improved kube pod monitor error message, for "Unschedulable" condition
+
 ### 7.9.2 (11/03/2021 - 11/22/2021)
 
 * db: validate timestamp param must be after 1970-01-01 00:00:01

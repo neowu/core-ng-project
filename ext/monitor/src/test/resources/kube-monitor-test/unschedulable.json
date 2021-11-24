@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "namespace": "platform",
+    "name": "backoffice-7b7655565f-9ptc7",
+    "generateName": "backoffice-7b7655565f-",
+    "creationTimestamp": "2021-11-23T14:47:34Z",
+    "deletionTimestamp": null,
+    "deletionGracePeriodSeconds": null,
+    "labels": {"app": "backoffice", "pod-template-hash": "7b7655565f"}
+  },
+  "status": {
+    "phase": "Pending",
+    "conditions": [
+      {
+        "type": "cloud.google.com/load-balancer-neg-ready",
+        "status": "True",
+        "lastProbeTime": null,
+        "lastTransitionTime": null,
+        "reason": "LoadBalancerNegTimeout",
+        "message": "Timeout waiting for pod to become healthy in at least one of the NEG(s): [k8s1-edb308b8-platform-backoffice-443-c2fa521e]. Marking condition \"cloud.google.com/load-balancer-neg-ready\" to True."
+      },
+      {
+        "type": "PodScheduled",
+        "status": "False",
+        "lastProbeTime": null,
+        "lastTransitionTime": "2021-11-23T14:47:34Z",
+        "reason": "Unschedulable",
+        "message": "0/4 nodes are available: 1 Insufficient cpu, 1 node(s) didn't match Pod's node affinity/selector, 1 node(s) had taint {dedicated: jenkins}, that the pod didn't tolerate, 1 node(s) had taint {dedicated: ops}, that the pod didn't tolerate."
+      }
+    ],
+    "initContainerStatuses": null,
+    "containerStatuses": [],
+    "startTime": null,
+    "hostIP": null,
+    "podIP": null,
+    "reason": null,
+    "message": null
+  }
+}
