@@ -84,9 +84,11 @@ public class MessageProducer {
         public void onCompletion(RecordMetadata metadata, Exception exception) {
             if (exception != null) {    // if failed to send message (kafka is down), fallback to error output
                 byte[] key = record.key();
-                LOGGER.error("failed to send kafka message, key={}, value={}",
+                LOGGER.error("failed to send kafka message, topic={}, key={}, value={}, error={}",
+                    record.topic(),
                     key == null ? null : new String(key, UTF_8),
                     new String(record.value(), UTF_8),
+                    exception.getMessage(),
                     exception);
             }
         }
