@@ -54,7 +54,7 @@ public class ExecutorTask<T> implements Callable<T> {
                 actionLog.correlationIds = List.of(correlationId);
                 LOGGER.debug("refId={}", refId);
                 actionLog.refIds = List.of(refId);
-                actionLog.trace = trace;
+                if (trace == Trace.CASCADE) actionLog.trace = Trace.CASCADE;
             }
             Duration delay = Duration.between(startTime, actionLog.date);
             LOGGER.debug("taskDelay={}", delay);
