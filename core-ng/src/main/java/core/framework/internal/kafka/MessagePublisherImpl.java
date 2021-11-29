@@ -65,7 +65,7 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
         if (actionLog == null) return;      // publisher may be used without action log context
 
         headers.add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes(actionLog.correlationId()));
-        if (actionLog.trace != Trace.NONE) headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes(actionLog.trace.name()));
+        if (actionLog.trace == Trace.CASCADE) headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes(actionLog.trace.name()));
         headers.add(MessageHeaders.HEADER_REF_ID, Strings.bytes(actionLog.id));
     }
 }

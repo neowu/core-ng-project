@@ -2,7 +2,8 @@
 
 ### 7.9.3 (11/23/2021 - )
 
-* monitor: improved kube pod monitor error message, for "Unschedulable" condition
+* monitor: improve kube pod monitor error message for "Unschedulable" condition
+* action: fixed webserviceClient/messagePublisher only pass trace header when trace = cascade
 
 ### 7.9.2 (11/03/2021 - 11/22/2021)
 

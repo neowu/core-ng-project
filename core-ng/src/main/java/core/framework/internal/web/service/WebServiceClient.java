@@ -121,7 +121,7 @@ public class WebServiceClient {
         if (actionLog == null) return;  // web service client may be used without action log context
 
         headers.put(HTTPHandler.HEADER_CORRELATION_ID.toString(), actionLog.correlationId());
-        if (actionLog.trace != Trace.NONE) headers.put(HTTPHandler.HEADER_TRACE.toString(), actionLog.trace.name());
+        if (actionLog.trace == Trace.CASCADE) headers.put(HTTPHandler.HEADER_TRACE.toString(), actionLog.trace.name());
         headers.put(HTTPHandler.HEADER_REF_ID.toString(), actionLog.id);
 
         long timeout = ((HTTPClientImpl) httpClient).timeoutInNano; // not count connect timeout, as action starts after connecting

@@ -165,7 +165,7 @@ class WebServiceClientTest {
 
     @Test
     void execute() {
-        HTTPResponse response = new HTTPResponse(200, Map.of(), new byte[0]);
+        var response = new HTTPResponse(200, Map.of(), new byte[0]);
         when(httpClient.execute(any())).thenReturn(response);
 
         var request = new TestWebService.TestRequest();
