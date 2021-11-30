@@ -8,7 +8,6 @@ import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.log.message.StatMessage;
 import core.framework.module.App;
-import core.framework.module.SystemModule;
 import core.framework.search.module.SearchConfig;
 import core.log.LogForwardConfig;
 import core.log.domain.ActionDocument;
@@ -39,7 +38,8 @@ import java.util.Optional;
 public class LogProcessorApp extends App {
     @Override
     protected void initialize() {
-        load(new SystemModule("sys.properties"));
+        // not using SystemModule, and not put sys.log.appender property, to prevent log processor from sending its own action log to same log-kafka it's pulling from
+        loadProperties("sys.properties");
         loadProperties("app.properties");
 
         configureSearch();
@@ -78,6 +78,7 @@ public class LogProcessorApp extends App {
     }
 
     private void configureKafka(Forwarders forwarders) {
+        kafka().uri(requiredProperty("sys.kafka.uri"));
         kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get at least 1M message
         kafka().maxPoll(2000, 3 * 1024 * 1024);     // get 3M message at max
