@@ -107,7 +107,7 @@ public class CacheConfig extends Config {
         redis.password(password);
         redis.timeout(Duration.ofSeconds(1));   // for cache, use shorter timeout than default redis config
         context.probe.hostURIs.add(host);
-        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
+        context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> redis.close());
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
         context.collector.metrics.add(new PoolMetrics(redis.pool));
         redisCacheStore = new RedisCacheStore(redis);
@@ -131,7 +131,7 @@ public class CacheConfig extends Config {
             LocalCacheStore localCache = localCacheStore();
             var thread = new RedisSubscribeThread("cache-invalidator", redis, new InvalidateLocalCacheMessageListener(localCache), RedisLocalCacheStore.CHANNEL_INVALIDATE_CACHE);
             context.startupHook.start.add(thread::start);
-            context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> thread.close());
+            context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> thread.close());
             redisLocalCacheStore = new RedisLocalCacheStore(localCache, redisCacheStore, redis);
         }
         return redisLocalCacheStore;

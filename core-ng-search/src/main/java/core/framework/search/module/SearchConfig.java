@@ -31,7 +31,7 @@ public class SearchConfig extends Config {
 
         var search = new ElasticSearchImpl();
         context.startupHook.initialize.add(search::initialize);
-        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> search.close());
+        context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> search.close());
         context.beanFactory.bind(ElasticSearch.class, name, search);
         this.search = search;
     }

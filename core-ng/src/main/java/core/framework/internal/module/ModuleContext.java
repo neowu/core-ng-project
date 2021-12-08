@@ -71,7 +71,7 @@ public class ModuleContext {
         startupHook.start.add(httpServer::start);
         shutdownHook.add(ShutdownHook.STAGE_0, timeout -> httpServer.shutdown());
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitRequestCompletion);
-        shutdownHook.add(ShutdownHook.STAGE_9, timeout -> httpServer.awaitTermination());
+        shutdownHook.add(ShutdownHook.STAGE_8, timeout -> httpServer.awaitTermination());
 
         collector.metrics.add(new HTTPServerMetrics(httpServer));
         return httpServer;

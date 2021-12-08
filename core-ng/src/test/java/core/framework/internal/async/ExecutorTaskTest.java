@@ -15,24 +15,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ExecutorTaskTest {
     @Test
     void action() {
-        assertThat(new ExecutorTask<Void>("actionId", "action", Instant.now(), null, null, () -> null).action())
-                .isEqualTo("task:action");
+        assertThat(new ExecutorTask<Void>(() -> null, null, context(null)).action())
+            .isEqualTo("task:action");
 
         var parentActionLog = new ActionLog(null, null);
         parentActionLog.action = "parentAction";
-        assertThat(new ExecutorTask<Void>("actionId", "action", Instant.now(), parentActionLog, null, () -> null).action())
-                .isEqualTo("parentAction:task:action");
+        assertThat(new ExecutorTask<Void>(() -> null, null, context(parentActionLog)).action())
+            .isEqualTo("parentAction:task:action");
 
         parentActionLog.context("root_action", "rootAction");
-        assertThat(new ExecutorTask<Void>("actionId", "action", Instant.now(), parentActionLog, null, () -> null).action())
-                .isEqualTo("rootAction:task:action");
+        assertThat(new ExecutorTask<Void>(() -> null, null, context(parentActionLog)).action())
+            .isEqualTo("rootAction:task:action");
     }
 
     @Test
     void callWithException() {
-        var task = new ExecutorTask<Void>("actionId", "action", Instant.now(), null, new LogManager(), () -> {
+        var task = new ExecutorTask<Void>(() -> {
             throw new Error("test");
-        });
+        }, new LogManager(), context(null));
         assertThatThrownBy(task::call)
             .isInstanceOf(TaskException.class)
             .hasMessageContaining("task failed")
@@ -42,7 +42,17 @@ class ExecutorTaskTest {
 
     @Test
     void convertToString() {
-        assertThat(new ExecutorTask<Void>("actionId", "action", Instant.now(), null, null, () -> null).toString())
+        assertThat(new ExecutorTask<Void>(() -> null, null, context(null)).toString())
             .isEqualTo("task:action:actionId");
+    }
+
+    private ExecutorTask.TaskContext context(ActionLog parentActionLog) {
+        var context = new ExecutorTask.TaskContext();
+        context.actionId = "actionId";
+        context.action = "action";
+        context.startTime = Instant.now();
+        context.parentActionLog = parentActionLog;
+        context.maxProcessTimeInNano = 25_000_000_000L;
+        return context;
     }
 }

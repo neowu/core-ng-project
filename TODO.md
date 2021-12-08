@@ -20,4 +20,5 @@
 * action visualization to show service flow/dependency diagram?
 
 * use adminClient to check kafka ready? or retry sending message?
-* executor, check long_process based on shutdown delay + shutdown timeout?
+* rethink maxProcessTime, check long_process based on shutdown delay + shutdown timeout?
+* rethink too many db operation, make it warning? or prevent infinite loop?

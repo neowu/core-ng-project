@@ -4,6 +4,8 @@
 
 * monitor: improve kube pod monitor error message for "Unschedulable" condition
 * action: fixed webserviceClient/messagePublisher/executor only pass trace header when trace = cascade
+* action: redesigned maxProcessTime behavior, use http client timeout and shutdown time out as benchmark
+  > for executor task actions, use SHUTDOWN_TIMEOUT as maxProcessTime
 
 ### 7.9.2 (11/03/2021 - 11/22/2021)
 

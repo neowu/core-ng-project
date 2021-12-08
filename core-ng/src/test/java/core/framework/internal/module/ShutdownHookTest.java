@@ -32,7 +32,7 @@ class ShutdownHookTest {
         doThrow(new Error("failed to shutdown")).when(shutdown1).execute(anyLong());
         var shutdown2 = mock(ShutdownHook.Shutdown.class);
         shutdownHook.add(ShutdownHook.STAGE_0, shutdown1);
-        shutdownHook.add(ShutdownHook.STAGE_7, shutdown2);
+        shutdownHook.add(ShutdownHook.STAGE_6, shutdown2);
 
         shutdownHook.run();
         verify(shutdown2).execute(anyLong());
@@ -49,15 +49,15 @@ class ShutdownHookTest {
     }
 
     @Test
-    void shutdownTimeoutInMs() {
-        assertThat(shutdownHook.shutdownTimeoutInMs(Map.of())).isEqualTo(Duration.ofSeconds(25).toMillis());    // default is 25s
+    void shutdownTimeoutInNano() {
+        assertThat(shutdownHook.shutdownTimeoutInNano(Map.of())).isEqualTo(Duration.ofSeconds(25).toNanos());    // default is 25s
 
-        assertThat(shutdownHook.shutdownTimeoutInMs(Map.of("SHUTDOWN_TIMEOUT_IN_SEC", "60")))
-                .isEqualTo(Duration.ofSeconds(60).toMillis());
+        assertThat(shutdownHook.shutdownTimeoutInNano(Map.of("SHUTDOWN_TIMEOUT_IN_SEC", "60")))
+            .isEqualTo(Duration.ofSeconds(60).toNanos());
 
-        assertThatThrownBy(() -> shutdownHook.shutdownTimeoutInMs(Map.of("SHUTDOWN_TIMEOUT_IN_SEC", "-1")))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("greater than 0");
+        assertThatThrownBy(() -> shutdownHook.shutdownTimeoutInNano(Map.of("SHUTDOWN_TIMEOUT_IN_SEC", "-1")))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("greater than 0");
     }
 
     @Test
@@ -75,8 +75,8 @@ class ShutdownHookTest {
     @Test
     void shutdown() throws Exception {
         var shutdown = mock(ShutdownHook.Shutdown.class);
-        shutdownHook.add(ShutdownHook.STAGE_7, shutdown);
-        shutdownHook.shutdown(System.currentTimeMillis(), ShutdownHook.STAGE_7, ShutdownHook.STAGE_9);
+        shutdownHook.add(ShutdownHook.STAGE_6, shutdown);
+        shutdownHook.shutdown(System.currentTimeMillis(), ShutdownHook.STAGE_6, ShutdownHook.STAGE_8);
 
         verify(shutdown).execute(1000); // give resource as least 1s to shutdown
     }

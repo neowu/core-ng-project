@@ -39,7 +39,7 @@ public class TestSearchConfig extends SearchConfig {
             if (localESHost == null) {
                 var server = new LocalElasticSearch();
                 localESHost = server.start();
-                context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> server.close());
+                context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> server.close());
             }
         }
     }

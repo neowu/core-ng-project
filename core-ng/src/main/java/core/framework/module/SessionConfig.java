@@ -55,7 +55,7 @@ public class SessionConfig extends Config {
         context.collector.metrics.add(new PoolMetrics(redis.pool));
 
         context.probe.hostURIs.add(host);
-        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
+        context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> redis.close());
         context.httpServer.siteManager.sessionManager.store(new RedisSessionStore(redis));
     }
 }

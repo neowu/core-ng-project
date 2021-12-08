@@ -22,17 +22,20 @@ public class ExecutorTask<T> implements Callable<T> {
     private final LogManager logManager;
     private final Callable<T> task;
     private final Instant startTime;
+    private final long maxProcessTimeInNano;
     private String rootAction;
     private String refId;
     private String correlationId;
     private Trace trace;
 
-    ExecutorTask(String actionId, String action, Instant startTime, ActionLog parentActionLog, LogManager logManager, Callable<T> task) {
-        this.action = action;
+    ExecutorTask(Callable<T> task, LogManager logManager, TaskContext context) {
         this.task = task;
         this.logManager = logManager;
-        this.startTime = startTime;
-        this.actionId = actionId;
+        actionId = context.actionId;
+        action = context.action;
+        startTime = context.startTime;
+        maxProcessTimeInNano = context.maxProcessTimeInNano;
+        ActionLog parentActionLog = context.parentActionLog;
         if (parentActionLog != null) {  // only keep info needed by call(), so parentActionLog can be GCed sooner
             List<String> parentActionContext = parentActionLog.context.get("root_action");
             rootAction = parentActionContext != null ? parentActionContext.get(0) : parentActionLog.action;
@@ -47,6 +50,7 @@ public class ExecutorTask<T> implements Callable<T> {
         try {
             ActionLog actionLog = logManager.begin("=== task execution begin ===", actionId);
             actionLog.action(action());
+            actionLog.maxProcessTime(maxProcessTimeInNano);
             // here it doesn't log task class, is due to task usually is lambda or method reference, it's expensive to inspect, refer to ControllerInspector
             if (rootAction != null) { // if rootAction != null, then all parent info are available
                 actionLog.context("root_action", rootAction);
@@ -76,5 +80,13 @@ public class ExecutorTask<T> implements Callable<T> {
     @Override
     public String toString() {
         return action() + ":" + actionId;
+    }
+
+    static class TaskContext {
+        String actionId;
+        String action;
+        Instant startTime;
+        ActionLog parentActionLog;
+        long maxProcessTimeInNano;
     }
 }
