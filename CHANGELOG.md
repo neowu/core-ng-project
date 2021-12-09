@@ -6,6 +6,8 @@
 * action: fixed webserviceClient/messagePublisher/executor only pass trace header when trace = cascade
 * action: redesigned maxProcessTime behavior, use http client timeout and shutdown time out as benchmark
   > for executor task actions, use SHUTDOWN_TIMEOUT as maxProcessTime
+  > for kafka listener, use SHUTDOWN_TIMEOUT as maxProcessTime for each message handling (just for warning purpose), ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG is still 30min
+  > for http handler, use request timeout header or HTTPConfig.maxProcessTime(), (default to 30s)
 
 ### 7.9.2 (11/03/2021 - 11/22/2021)
 

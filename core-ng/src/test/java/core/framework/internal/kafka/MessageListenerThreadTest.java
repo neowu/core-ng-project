@@ -44,14 +44,7 @@ class MessageListenerThreadTest {
     @BeforeEach
     void createKafkaMessageListenerThread() {
         logManager = new LogManager();
-        thread = new MessageListenerThread("listener-thread-1", consumer, new MessageListener(null, null, logManager));
-    }
-
-    @Test
-    void maxProcessTime() {
-        assertThat(thread.maxProcessTime(Duration.ofNanos(500).toNanos(), 1, 100)).isEqualTo(5);
-        assertThat(thread.maxProcessTime(Duration.ofNanos(500).toNanos(), 1, 1)).isEqualTo(500);
-        assertThat(thread.maxProcessTime(Duration.ofSeconds(1).toNanos(), 10, 100)).isEqualTo(Duration.ofMillis(100).toNanos());
+        thread = new MessageListenerThread("listener-thread-1", consumer, new MessageListener(null, null, logManager, 300_000L));
     }
 
     @Test
@@ -109,7 +102,7 @@ class MessageListenerThreadTest {
         var record = new ConsumerRecord<>("topic", 0, 0, Strings.bytes(key), Strings.bytes(JSON.toJSON(message)));
         record.headers().add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));
         record.headers().add(MessageHeaders.HEADER_CLIENT, Strings.bytes("client"));
-        thread.handle("topic", new MessageProcess<>(messageHandler, null, TestMessage.class), List.of(record), Duration.ofHours(1).toNanos());
+        thread.handle("topic", new MessageProcess<>(messageHandler, null, TestMessage.class), List.of(record));
 
         verify(messageHandler).handle(eq(key), argThat(value -> "value".equals(value.stringField)));
     }
@@ -122,7 +115,7 @@ class MessageListenerThreadTest {
         record.headers().add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));
         record.headers().add(MessageHeaders.HEADER_CLIENT, Strings.bytes("client"));
         record.headers().add(MessageHeaders.HEADER_TRACE, Strings.bytes("cascade"));
-        thread.handle("topic", new MessageProcess<>(messageHandler, null, TestMessage.class), List.of(record), Duration.ofHours(1).toNanos());
+        thread.handle("topic", new MessageProcess<>(messageHandler, null, TestMessage.class), List.of(record));
 
         verify(messageHandler).handle(isNull(), argThat(value -> "value".equals(value.stringField)));
     }
@@ -135,7 +128,7 @@ class MessageListenerThreadTest {
         var record = new ConsumerRecord<>("topic", 0, 0, Strings.bytes(key), Strings.bytes(JSON.toJSON(message)));
         record.headers().add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes("correlationId"));
         record.headers().add(MessageHeaders.HEADER_REF_ID, Strings.bytes("refId"));
-        thread.handleBulk("topic", new MessageProcess<>(null, bulkMessageHandler, TestMessage.class), List.of(record), Duration.ofHours(1).toNanos());
+        thread.handleBulk("topic", new MessageProcess<>(null, bulkMessageHandler, TestMessage.class), List.of(record));
 
         verify(bulkMessageHandler).handle(argThat(value -> value.size() == 1
                                                            && key.equals(value.get(0).key)

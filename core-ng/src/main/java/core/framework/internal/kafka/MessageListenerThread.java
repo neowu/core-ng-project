@@ -37,8 +37,6 @@ class MessageListenerThread extends Thread {
     private final Logger logger = LoggerFactory.getLogger(MessageListenerThread.class);
     private final MessageListener listener;
     private final LogManager logManager;
-    private final long maxProcessTimeInNano;
-    private final long longConsumerDelayThresholdInNano;
 
     private final Object lock = new Object();
     private final Consumer<byte[], byte[]> consumer;
@@ -50,8 +48,6 @@ class MessageListenerThread extends Thread {
         this.consumer = consumer;
         this.listener = listener;
         logManager = listener.logManager;
-        maxProcessTimeInNano = listener.maxProcessTime.toNanos();
-        longConsumerDelayThresholdInNano = listener.longConsumerDelayThreshold.toNanos();
     }
 
     @Override
@@ -121,9 +117,9 @@ class MessageListenerThread extends Thread {
                 List<ConsumerRecord<byte[], byte[]>> records = entry.getValue();
                 MessageProcess<?> process = listener.processes.get(topic);
                 if (process.bulkHandler != null) {
-                    handleBulk(topic, process, records, maxProcessTime(maxProcessTimeInNano, records.size(), count));
+                    handleBulk(topic, process, records);
                 } else {
-                    handle(topic, process, records, maxProcessTime(maxProcessTimeInNano, 1, count));
+                    handle(topic, process, records);
                 }
             }
         } finally {
@@ -132,11 +128,11 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    <T> void handle(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, long maxProcessTimeInNano) {
+    <T> void handle(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records) {
         for (ConsumerRecord<byte[], byte[]> record : records) {
             ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
             try {
-                initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), maxProcessTimeInNano);
+                initAction(actionLog, topic, process.handler.getClass().getCanonicalName());
 
                 actionLog.track("kafka", 0, 1, 0);
 
@@ -155,7 +151,7 @@ class MessageListenerThread extends Thread {
                 actionLog.context.put("key", Collections.singletonList(key)); // key can be null
 
                 long timestamp = record.timestamp();
-                checkConsumerDelay(actionLog, timestamp, longConsumerDelayThresholdInNano);
+                checkConsumerDelay(actionLog, timestamp, listener.longConsumerDelayThresholdInNano);
 
                 byte[] value = record.value();
                 logger.debug("[message] key={}, value={}, timestamp={}", key, new BytesLogParam(value), timestamp);
@@ -170,10 +166,10 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, long maxProcessTimeInNano) {
+    <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records) {
         ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
         try {
-            initAction(actionLog, topic, process.bulkHandler.getClass().getCanonicalName(), maxProcessTimeInNano);
+            initAction(actionLog, topic, process.bulkHandler.getClass().getCanonicalName());
 
             List<Message<T>> messages = messages(records, actionLog, process.reader);
             for (Message<T> message : messages) {   // validate after fromJSON, so it can track refId/correlationId
@@ -188,12 +184,12 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    private void initAction(ActionLog actionLog, String topic, String handler, long maxProcessTimeInNano) {
+    private void initAction(ActionLog actionLog, String topic, String handler) {
         actionLog.action("topic:" + topic);
+        actionLog.maxProcessTime(listener.maxProcessTimeInNano);
         actionLog.context.put("topic", List.of(topic));
         actionLog.context.put("handler", List.of(handler));
         logger.debug("topic={}, handler={}", topic, handler);
-        actionLog.maxProcessTime(maxProcessTimeInNano);
     }
 
     <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONReader<T> reader) throws IOException {
@@ -235,7 +231,7 @@ class MessageListenerThread extends Thread {
         if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);  // action log kafka appender doesn't send headers
         if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);
         if (!refIds.isEmpty()) actionLog.refIds = List.copyOf(refIds);
-        checkConsumerDelay(actionLog, minTimestamp, longConsumerDelayThresholdInNano);
+        checkConsumerDelay(actionLog, minTimestamp, listener.longConsumerDelayThresholdInNano);
         return messages;
     }
 
@@ -257,9 +253,5 @@ class MessageListenerThread extends Thread {
         if (delay > longConsumerDelayThresholdInNano) {
             logger.warn(errorCode("LONG_CONSUMER_DELAY"), "consumer delay is too long, delay={}", Duration.ofNanos(delay));
         }
-    }
-
-    long maxProcessTime(long maxProcessTimeInNano, int recordCount, int totalCount) {
-        return maxProcessTimeInNano * recordCount / totalCount;
     }
 }

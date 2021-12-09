@@ -111,7 +111,7 @@ public class KafkaConfig extends Config {
     private MessageListener listener() {
         if (listener == null) {
             if (uri == null) throw new Error("kafka uri must be configured first, name=" + name);
-            var listener = new MessageListener(uri, name, context.logManager);
+            var listener = new MessageListener(uri, name, context.logManager, context.shutdownHook.shutdownTimeoutInNano);
             context.startupHook.start.add(listener::start);
             context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> listener.shutdown());
             context.shutdownHook.add(ShutdownHook.STAGE_1, listener::awaitTermination);
@@ -132,10 +132,6 @@ public class KafkaConfig extends Config {
         listener().poolSize = poolSize;
     }
 
-    public void maxProcessTime(Duration maxProcessTime) {
-        listener().maxProcessTime = maxProcessTime;
-    }
-
     // to increase max message size, it must change on both producer and broker sides
     // on broker size use "--override message.max.bytes=size"
     // refer to https://kafka.apache.org/documentation/#message.max.bytes
@@ -146,7 +142,7 @@ public class KafkaConfig extends Config {
     }
 
     public void longConsumerDelayThreshold(Duration threshold) {
-        listener().longConsumerDelayThreshold = threshold;
+        listener().longConsumerDelayThresholdInNano = threshold.toNanos();
     }
 
     public void maxPoll(int maxRecords, int maxBytes) {
