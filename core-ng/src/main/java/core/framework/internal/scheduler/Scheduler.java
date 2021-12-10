@@ -33,6 +33,7 @@ public final class Scheduler {
     private final ScheduledExecutorService scheduler;
     private final ExecutorService jobExecutor;
     private final LogManager logManager;
+    private final long maxProcessTimeInNano = Duration.ofSeconds(10).toNanos(); // scheduler job should be fast, it may block other jobs, generally just sending kafka message
     public Clock clock = Clock.systemUTC();
 
     public Scheduler(LogManager logManager) {
@@ -146,6 +147,7 @@ public final class Scheduler {
                 String name = task.name();
                 actionLog.action("job:" + name);
                 actionLog.trace = trace;
+                actionLog.maxProcessTime(maxProcessTimeInNano);
                 actionLog.context("trigger", task.trigger());
                 Job job = task.job();
                 actionLog.context("job", name);

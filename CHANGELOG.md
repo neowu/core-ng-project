@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.9.3 (11/23/2021 - )
+### 7.9.3 (11/23/2021 - 12/10/2021)
 
 * monitor: improve kube pod monitor error message for "Unschedulable" condition
 * action: fixed webserviceClient/messagePublisher/executor only pass trace header when trace = cascade
@@ -8,6 +8,7 @@
   > for executor task actions, use SHUTDOWN_TIMEOUT as maxProcessTime
   > for kafka listener, use SHUTDOWN_TIMEOUT as maxProcessTime for each message handling (just for warning purpose), ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG is still 30min
   > for http handler, use request timeout header or HTTPConfig.maxProcessTime(), (default to 30s)
+  > for scheduler job, use 10s, scheduler job should be fast, generally just sending kafka message
 * db: updated "too many db operations" check
   > if within maxProcessTime, it logs warning with error code TOO_MANY_DB_OPERATIONS, otherwise throws error
   > not break if critical workload generates massive db operations, and still protect from infinite loop by mistake

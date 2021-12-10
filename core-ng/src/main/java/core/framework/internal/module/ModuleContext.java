@@ -81,7 +81,7 @@ public class ModuleContext {
         if (backgroundTask == null) {
             var backgroundTask = new BackgroundTaskExecutor();
             startupHook.start.add(backgroundTask::start);
-            shutdownHook.add(ShutdownHook.STAGE_2, timeoutInMs -> backgroundTask.shutdown());
+            shutdownHook.add(ShutdownHook.STAGE_2, timeout -> backgroundTask.shutdown());
             shutdownHook.add(ShutdownHook.STAGE_3, backgroundTask::awaitTermination);
             this.backgroundTask = backgroundTask;
         }
