@@ -159,7 +159,7 @@
     "references": [
       {"id": "perf-db", "name": "panel_1", "type": "visualization"},
       {"id": "perf-db_io", "name": "panel_2", "type": "visualization"},
-      {"id": "action-db_queries", "name": "panel_3", "type": "visualization"}
+      {"id": "action-db_queries", "name": "panel_3", "type": "visualization"},
       {"id": "stat-pool_db_count", "name": "panel_4", "type": "visualization"}
     ]
   },
