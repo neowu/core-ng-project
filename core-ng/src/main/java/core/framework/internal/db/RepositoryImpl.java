@@ -3,7 +3,6 @@ package core.framework.internal.db;
 import core.framework.db.Query;
 import core.framework.db.Repository;
 import core.framework.internal.validate.Validator;
-import core.framework.log.ActionLogContext;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
 import org.slf4j.Logger;
@@ -63,9 +62,8 @@ public final class RepositoryImpl<T> implements Repository<T> {
             return database.operation.insert(sql, params, insertQuery.generatedColumn);
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, 1);
             logger.debug("insert, sql={}, params={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), elapsed);
-            database.checkOperation(elapsed, operations);
+            database.track(elapsed, 0, 1, 1);
         }
     }
 
@@ -82,9 +80,8 @@ public final class RepositoryImpl<T> implements Repository<T> {
             return insertedRows == 1;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, insertedRows);
             logger.debug("insertIgnore, sql={}, params={}, inserted={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), insertedRows == 1, elapsed);
-            database.checkOperation(elapsed, operations);
+            database.track(elapsed, 0, insertedRows, 1);
         }
     }
 
@@ -103,9 +100,8 @@ public final class RepositoryImpl<T> implements Repository<T> {
             return affectedRows == 1;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, affectedRows == 0 ? 0 : 1);
             logger.debug("upsert, sql={}, params={}, inserted={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), affectedRows == 1, elapsed);
-            database.checkOperation(elapsed, operations);
+            database.track(elapsed, 0, affectedRows == 0 ? 0 : 1, 1);
         }
     }
 
@@ -124,9 +120,8 @@ public final class RepositoryImpl<T> implements Repository<T> {
             return updatedRows == 1;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
             logger.debug("update, sql={}, params={}, updatedRows={}, elapsed={}", query.sql, new SQLParams(database.operation.enumMapper, query.params), updatedRows, elapsed);
-            database.checkOperation(elapsed, operations);
+            database.track(elapsed, 0, updatedRows, 1);
         }
     }
 
@@ -153,9 +148,8 @@ public final class RepositoryImpl<T> implements Repository<T> {
             return affectedRows == 1;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, affectedRows);
             logger.debug("delete, sql={}, params={}, elapsed={}", deleteSQL, new SQLParams(database.operation.enumMapper, primaryKeys), elapsed);
-            database.checkOperation(elapsed, operations);
+            database.track(elapsed, 0, affectedRows, 1);
         }
     }
 
@@ -174,9 +168,8 @@ public final class RepositoryImpl<T> implements Repository<T> {
         } finally {
             long elapsed = watch.elapsed();
             int size = entities.size();
-            int operations = ActionLogContext.track("db", elapsed, 0, size);
             logger.debug("batchInsert, sql={}, params={}, size={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), size, elapsed);
-            database.checkOperation(elapsed, operations);
+            database.track(elapsed, 0, size, size);
         }
     }
 
@@ -199,9 +192,9 @@ public final class RepositoryImpl<T> implements Repository<T> {
             return results;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, insertedRows);
-            logger.debug("batchInsertIgnore, sql={}, params={}, size={}, insertedRows={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), entities.size(), insertedRows, elapsed);
-            database.checkOperation(elapsed, operations);
+            int size = entities.size();
+            logger.debug("batchInsertIgnore, sql={}, params={}, size={}, insertedRows={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), size, insertedRows, elapsed);
+            database.track(elapsed, 0, insertedRows, size);
         }
     }
 
@@ -224,9 +217,9 @@ public final class RepositoryImpl<T> implements Repository<T> {
             return results;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
-            logger.debug("batchUpsert, sql={}, params={}, size={}, updatedRows={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), entities.size(), updatedRows, elapsed);
-            database.checkOperation(elapsed, operations);
+            int size = entities.size();
+            logger.debug("batchUpsert, sql={}, params={}, size={}, updatedRows={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), size, updatedRows, elapsed);
+            database.track(elapsed, 0, updatedRows, size);
         }
     }
 
@@ -251,9 +244,9 @@ public final class RepositoryImpl<T> implements Repository<T> {
             return results;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, deletedRows);
-            logger.debug("batchDelete, sql={}, params={}, size={}, elapsed={}", deleteSQL, new SQLBatchParams(database.operation.enumMapper, params), primaryKeys.size(), elapsed);
-            database.checkOperation(elapsed, operations);
+            int size = primaryKeys.size();
+            logger.debug("batchDelete, sql={}, params={}, size={}, elapsed={}", deleteSQL, new SQLBatchParams(database.operation.enumMapper, params), size, elapsed);
+            database.track(elapsed, 0, deletedRows, size);
         }
     }
 

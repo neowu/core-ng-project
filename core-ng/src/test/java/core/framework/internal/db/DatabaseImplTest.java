@@ -2,6 +2,8 @@ package core.framework.internal.db;
 
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +33,7 @@ class DatabaseImplTest {
         database = new DatabaseImpl("db");
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
         database.view(EntityView.class);
+        database.maxOperations = 10;
 
         database.execute("CREATE TABLE database_test (id INT PRIMARY KEY, string_field VARCHAR(20), enum_field VARCHAR(10), date_field DATE, date_time_field TIMESTAMP)");
     }
@@ -229,6 +232,25 @@ class DatabaseImplTest {
         assertThat(properties)
                 .doesNotContainKeys("useSSL")
                 .containsEntry("characterEncoding", "utf-8");
+    }
+
+    @Test
+    void track() {
+        var logManager = new LogManager();
+        ActionLog actionLog = logManager.begin("begin", null);
+        actionLog.maxProcessTime(100);
+        database.track(100, 1, 0, 1);
+        assertThat(actionLog.stats).containsEntry("db_queries", 1.0);
+        database.track(100, 1, 0, 1);
+        assertThat(actionLog.stats).containsEntry("db_queries", 2.0);
+        assertThatThrownBy(() -> {
+            for (int i = 0; i < 10; i++) {
+                database.track(100, 0, 1, 20);
+            }
+        }).isInstanceOf(Error.class)
+                .hasMessageContaining("too many db operations");
+        assertThat(actionLog.stats).containsEntry("db_queries", 182.0);
+        logManager.end("end");
     }
 
     private void insertRow(int id, String stringField, TestEnum enumField) {

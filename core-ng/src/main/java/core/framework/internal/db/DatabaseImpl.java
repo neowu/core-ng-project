@@ -7,8 +7,9 @@ import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import core.framework.internal.resource.Pool;
-import core.framework.log.ActionLogContext;
 import core.framework.util.ASCII;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
@@ -47,7 +48,7 @@ public final class DatabaseImpl implements Database {
     private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
     public String user;
     public String password;
-    public int maxOperations = 5000;  // max db calls per action, if exceeds, it indicates either wrong impl (e.g. infinite loop with db calls) or bad practice (not CD friend), better split into multiple actions
+    public int maxOperations = 5000;  // max db calls per action, if exceeds, it indicates either wrong impl (e.g. infinite loop with db calls) or bad practice (not CD friendly), better split into multiple actions
     public int tooManyRowsReturnedThreshold = 1000;
     public long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     public IsolationLevel isolationLevel;
@@ -200,10 +201,9 @@ public final class DatabaseImpl implements Database {
             return results;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, returnedRows, 0);
             logger.debug("select, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
+            track(elapsed, returnedRows, 0, 1);
             checkTooManyRowsReturned(returnedRows); // check returnedRows after sql debug log, to make log easier to read
-            checkOperation(elapsed, operations);
         }
     }
 
@@ -219,9 +219,8 @@ public final class DatabaseImpl implements Database {
             return result;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, returnedRows, 0);
             logger.debug("selectOne, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
-            checkOperation(elapsed, operations);
+            track(elapsed, returnedRows, 0, 1);
         }
     }
 
@@ -235,9 +234,8 @@ public final class DatabaseImpl implements Database {
             return affectedRows;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, affectedRows);
             logger.debug("execute, sql={}, params={}, affectedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), affectedRows, elapsed);
-            checkOperation(elapsed, operations);
+            track(elapsed, 0, affectedRows, 1);
         }
     }
 
@@ -258,9 +256,9 @@ public final class DatabaseImpl implements Database {
             return results;
         } finally {
             long elapsed = watch.elapsed();
-            int operations = ActionLogContext.track("db", elapsed, 0, affectedRows);
-            logger.debug("batchExecute, sql={}, params={}, size={}, affectedRows={}, elapsed={}", sql, new SQLBatchParams(operation.enumMapper, params), params.size(), affectedRows, elapsed);
-            checkOperation(elapsed, operations);
+            int size = params.size();
+            logger.debug("batchExecute, sql={}, params={}, size={}, affectedRows={}, elapsed={}", sql, new SQLBatchParams(operation.enumMapper, params), size, affectedRows, elapsed);
+            track(elapsed, 0, affectedRows, size);
         }
     }
 
@@ -286,9 +284,23 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    void checkOperation(long elapsed, int operations) {
+    void track(long elapsed, int readRows, int writeRows, int queries) {
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        if (actionLog != null) {
+            actionLog.stats.compute("db_queries", (k, oldValue) -> (oldValue == null) ? queries : oldValue + queries);
+            int operations = actionLog.track("db", elapsed, readRows, writeRows);
+            checkOperations(actionLog, elapsed, operations);
+        }
+    }
+
+    private void checkOperations(ActionLog actionLog, long elapsed, int operations) {
         if (operations > maxOperations) {
-            throw new Error("too many db operations, operations=" + operations);
+            if (actionLog.remainingProcessTimeInNano() <= 0) {
+                // break if it took long and execute too many db queries
+                throw new Error("too many db operations, operations=" + operations);
+            } else {
+                logger.warn(errorCode("TOO_MANY_DB_OPERATIONS"), "too many db operations, operations={}", operations);
+            }
         }
         if (elapsed > slowOperationThresholdInNanos) {
             logger.warn(errorCode("SLOW_DB"), "slow db operation, elapsed={}", Duration.ofNanos(elapsed));
