@@ -74,7 +74,7 @@ public final class RequestParser {
             String contentType = headers.getFirst(Headers.CONTENT_TYPE);
             request.contentType = contentType == null ? null : ContentType.parse(contentType);
             parseBody(request, exchange);
-            actionLog.stats.put("http_content_length", (double) exchange.getRequestContentLength());
+            actionLog.stats.put("request_body_length", (double) exchange.getRequestContentLength());
         }
     }
 

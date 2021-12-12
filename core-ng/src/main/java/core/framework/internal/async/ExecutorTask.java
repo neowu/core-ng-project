@@ -56,7 +56,7 @@ public class ExecutorTask<T> implements Callable<T> {
                 actionLog.trace = trace;
             }
             Duration delay = Duration.between(startTime, actionLog.date);
-            LOGGER.debug("[stat] task_delay={}", delay);
+            LOGGER.debug("taskDelay={}", delay);
             actionLog.stats.put("task_delay", (double) delay.toNanos());
             return task.call();
         } catch (Throwable e) {

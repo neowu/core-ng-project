@@ -22,16 +22,17 @@ class HTTPClientBuilderTest {
     void callTimeout() {
         builder.connectTimeout(Duration.ofSeconds(1));
         builder.timeout(Duration.ofSeconds(2));
+        builder.retryWaitTime(Duration.ofMillis(500));
         assertThat(builder.callTimeout()).isEqualTo(Duration.ofMillis(1000 + 2000 + 2000));
 
         builder.maxRetries(1);
         assertThat(builder.callTimeout()).isEqualTo(Duration.ofMillis(1000 + 2000 + 2000));
 
         builder.maxRetries(2);
-        assertThat(builder.callTimeout()).isEqualTo(Duration.ofMillis(1000 + 2000 * 2 + 600 + 2000));
+        assertThat(builder.callTimeout()).isEqualTo(Duration.ofMillis(1000 + 2000 * 2 + 500 + 2000));
 
         builder.maxRetries(3);
-        assertThat(builder.callTimeout()).isEqualTo(Duration.ofMillis(1000 + 2000 * 3 + 600 + 1200 + 2000));
+        assertThat(builder.callTimeout()).isEqualTo(Duration.ofMillis(1000 + 2000 * 3 + 500 + 1000 + 2000));
     }
 
     @Test

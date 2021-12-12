@@ -9,6 +9,7 @@ import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -167,7 +168,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         int insertedRows = 0;
         try {
             int[] results = database.operation.batchUpdate(sql, params);
-            insertedRows = Arrays.stream(results).sum();
+            insertedRows = insertedRows(results);
             return insertedRows;
         } finally {
             long elapsed = watch.elapsed();
@@ -175,6 +176,15 @@ public final class RepositoryImpl<T> implements Repository<T> {
             logger.debug("batchInsertIgnore, sql={}, params={}, size={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), entities.size(), elapsed);
             database.checkOperation(elapsed, operations);
         }
+    }
+
+    int insertedRows(int[] results) {
+        int insertedRows = 0;
+        for (int result : results) {
+            if (result == Statement.SUCCESS_NO_INFO) insertedRows++;    // with insertIgnore, mysql returns -2 if insert succeeds
+            else if (result > 0) insertedRows += result;
+        }
+        return insertedRows;
     }
 
     @Override

@@ -3,13 +3,7 @@ package core.framework.internal.http;
 import core.framework.api.http.HTTPStatus;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
-import okhttp3.Interceptor;
-import okhttp3.MediaType;
-import okhttp3.Protocol;
 import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-import okio.BufferedSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,10 +18,6 @@ import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author neo
@@ -37,9 +27,7 @@ class RetryInterceptorTest {
 
     @BeforeEach
     void createRetryInterceptor() {
-        interceptor = new RetryInterceptor(3, Duration.ofMillis(500), time -> {
-            // skip sleep
-        });
+        interceptor = new RetryInterceptor(3, Duration.ofMillis(500), null);
     }
 
     @Test
@@ -187,63 +175,8 @@ class RetryInterceptorTest {
     }
 
     @Test
-    void closeResponseIfServiceUnavailable() throws IOException {
-        var request = new Request.Builder().url("http://localhost").build();
-        var source = mock(BufferedSource.class);
-        var serviceUnavailableResponse = new Response.Builder().request(request)
-                .protocol(Protocol.HTTP_2)
-                .code(HTTPStatus.SERVICE_UNAVAILABLE.code)
-                .message("service unavailable")
-                .body(ResponseBody.create(source, MediaType.get("application/json"), 0))
-                .build();
-        var okResponse = new Response.Builder().request(request)
-                .protocol(Protocol.HTTP_2)
-                .code(HTTPStatus.OK.code)
-                .message("ok")
-                .build();
-
-        var chain = mock(Interceptor.Chain.class);
-        when(chain.request()).thenReturn(request);
-        when(chain.proceed(request)).thenReturn(serviceUnavailableResponse).thenReturn(okResponse);
-
-        Response response = interceptor.intercept(chain);
-        assertThat(response).isSameAs(okResponse);
-
-        verify(source).close();
-    }
-
-    @Test
-    void retryWithConnectionFailure() throws IOException {
-        var request = new Request.Builder().url("http://localhost").build();
-        var okResponse = new Response.Builder().request(request)
-                .protocol(Protocol.HTTP_2)
-                .code(HTTPStatus.OK.code)
-                .message("ok")
-                .build();
-
-        var chain = mock(Interceptor.Chain.class);
-        when(chain.request()).thenReturn(request);
-        when(chain.proceed(request)).thenThrow(new ConnectException("connection refused")).thenReturn(okResponse);
-
-        Response response = interceptor.intercept(chain);
-        assertThat(response).isSameAs(okResponse);
-    }
-
-    @Test
-    void failedToRetry() throws IOException {
-        var request = new Request.Builder().url("http://localhost").build();
-        var chain = mock(Interceptor.Chain.class);
-        when(chain.request()).thenReturn(request);
-        when(chain.proceed(request)).thenThrow(new ConnectException("connection refused"));
-
-        assertThatThrownBy(() -> interceptor.intercept(chain))
-                .isInstanceOf(ConnectException.class)
-                .hasMessageContaining("connection refused");
-    }
-
-    @Test
     void uri() {
-        Request request = new Request.Builder().url("http://localhost/path?query=value").build();
+        var request = new Request.Builder().url("http://localhost/path?query=value").build();
         assertThat(interceptor.uri(request)).isEqualTo("http://localhost/path");
     }
 

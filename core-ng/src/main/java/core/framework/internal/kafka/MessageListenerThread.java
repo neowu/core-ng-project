@@ -252,6 +252,7 @@ class MessageListenerThread extends Thread {
 
     void checkConsumerDelay(ActionLog actionLog, long timestamp, long longConsumerDelayThresholdInNano) {
         long delay = (actionLog.date.toEpochMilli() - timestamp) * 1_000_000;     // convert to nanoseconds
+        logger.debug("consumerDelay={}", Duration.ofNanos(delay));
         actionLog.stats.put("consumer_delay", (double) delay);
         if (delay > longConsumerDelayThresholdInNano) {
             logger.warn(errorCode("LONG_CONSUMER_DELAY"), "consumer delay is too long, delay={}", Duration.ofNanos(delay));

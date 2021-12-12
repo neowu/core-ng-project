@@ -217,7 +217,7 @@ class RequestParserTest {
 
         assertThat(request.method).isEqualTo(HTTPMethod.POST);
         assertThat(request.body()).hasValue(body);
-        assertThat(actionLog.stats).containsKeys("http_content_length");
+        assertThat(actionLog.stats).containsKeys("request_body_length");
     }
 
     @Test

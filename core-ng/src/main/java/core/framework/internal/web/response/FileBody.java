@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.xnio.IoUtils;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.UncheckedIOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
@@ -68,6 +69,7 @@ public final class FileBody implements Body {
     }
 
     static class ClientAbortException extends UncheckedIOException implements ErrorCode {
+        @Serial
         private static final long serialVersionUID = 3981103270777664274L;
 
         ClientAbortException(IOException cause) {
@@ -76,7 +78,7 @@ public final class FileBody implements Body {
 
         @Override
         public String errorCode() {
-            return "CHANNEL_CLOSED";
+            return "CLIENT_ABORT";
         }
 
         @Override

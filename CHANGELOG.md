@@ -1,5 +1,13 @@
 ## Change log
 
+### 7.7.1 (05/25/2021 - 06/02/2021)
+
+* log-processor/kibana: added http server/client dashboard and visualizations (http / dns / conn / reties / delays)
+* http: added "action.stats.http_delay" to track time between http request start to action start (time spent on HTTPIOHandler)
+  added action.stats.request_body_length/action.stat.response_body_length to track
+* httpClient: track request/response body length thru perf_stats.http.write_entries/read_entries
+* db: fixed insertIgnore reports write_entries wrong, mysql 8.0 return SUCCESS_NO_INFO (-2) if insert succeeds
+
 ### 7.7.0 (04/26/2021 - 05/25/2021)
 
 * api: replaced /_sys/api, to expose more structured api info
