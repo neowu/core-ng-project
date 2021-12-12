@@ -3,6 +3,7 @@ package core.framework.module;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
+import core.framework.internal.web.http.IPv4Ranges;
 import core.framework.internal.web.site.StaticContentController;
 import core.framework.internal.web.site.StaticDirectoryController;
 import core.framework.internal.web.site.StaticFileController;
@@ -77,5 +78,10 @@ public class SiteConfig extends Config {
             context.httpServer.handler.interceptors.add(webSecurityInterceptor);
         }
         return new WebSecurityConfig(webSecurityInterceptor);
+    }
+
+    public void allowAPI(List<String> cidrs) {
+        logger.info("allow /_sys/api access, cidrs={}", cidrs);
+        context.apiController.accessControl.allow = new IPv4Ranges(cidrs);
     }
 }

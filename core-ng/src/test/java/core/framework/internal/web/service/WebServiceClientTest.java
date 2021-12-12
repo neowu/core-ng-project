@@ -82,7 +82,7 @@ class WebServiceClientTest {
 
     @Test
     void validateResponseWithErrorResponse() {
-        var response = new ErrorResponse();
+        var response = new InternalErrorResponse();
         response.id = "id";
         response.severity = "WARN";
         response.errorCode = "NOT_FOUND";

@@ -1,6 +1,7 @@
 package app.monitor.job;
 
 import core.framework.internal.web.api.APIDefinitionResponse;
+import core.framework.internal.web.api.APIType;
 import core.framework.log.Severity;
 import core.framework.util.Strings;
 
@@ -25,10 +26,10 @@ class APIValidator {
     final Set<String> errors = new LinkedHashSet<>();
 
     final Map<String, Operation> previousOperations;
-    final Map<String, APIDefinitionResponse.Type> previousTypes;
+    final Map<String, APIType> previousTypes;
 
     final Map<String, Operation> currentOperations;
-    final Map<String, APIDefinitionResponse.Type> currentTypes;
+    final Map<String, APIType> currentTypes;
 
     final Set<String> visitedPreviousTypes = new HashSet<>();
     final Set<String> visitedCurrentTypes = new HashSet<>();
@@ -85,7 +86,7 @@ class APIValidator {
                 validateType(previousType.name, currentType.name, false);
             }
         }
-        for (APIDefinitionResponse.Type currentType : leftCurrentTypes.values()) {
+        for (APIType currentType : leftCurrentTypes.values()) {
             warnings.add(Strings.format("added type {}", currentType.name));
         }
     }
@@ -139,8 +140,8 @@ class APIValidator {
         visitedPreviousTypes.add(previousType);
         visitedCurrentTypes.add(currentType);
 
-        APIDefinitionResponse.Type previous = previousTypes.get(previousType);
-        APIDefinitionResponse.Type current = currentTypes.get(currentType);
+        APIType previous = previousTypes.get(previousType);
+        APIType current = currentTypes.get(currentType);
         if ("enum".equals(previous.type)) {
             validateEnumType(previous, current, isRequest);
         } else {    // bean
@@ -148,9 +149,9 @@ class APIValidator {
         }
     }
 
-    private void validateBeanType(APIDefinitionResponse.Type current, APIDefinitionResponse.Type previous, boolean isRequest) {
+    private void validateBeanType(APIType current, APIType previous, boolean isRequest) {
         var currentFields = current.fields.stream().collect(Collectors.toMap(field -> field.name, Function.identity()));
-        for (APIDefinitionResponse.Field previousField : previous.fields) {
+        for (APIType.Field previousField : previous.fields) {
             String[] previousTypes = candidateTypes(previousField);
 
             var currentField = currentFields.remove(previousField.name);
@@ -195,7 +196,7 @@ class APIValidator {
         }
     }
 
-    private void validateEnumType(APIDefinitionResponse.Type previous, APIDefinitionResponse.Type current, boolean isRequest) {
+    private void validateEnumType(APIType previous, APIType current, boolean isRequest) {
         var previousEnums = previous.enumConstants.stream().collect(Collectors.toMap(constant -> constant.name, constant -> constant.value));
         var currentEnums = current.enumConstants.stream().collect(Collectors.toMap(constant -> constant.name, constant -> constant.value));
         for (var entry : previousEnums.entrySet()) {
@@ -226,7 +227,7 @@ class APIValidator {
         }
     }
 
-    private String[] candidateTypes(APIDefinitionResponse.Field field) {
+    private String[] candidateTypes(APIType.Field field) {
         List<String> types = new ArrayList<>();
         types.add(field.type);
         if (field.typeParams != null) types.addAll(field.typeParams);
@@ -234,7 +235,7 @@ class APIValidator {
     }
 
     private void removeReferenceType(String typeName, Severity severity) {
-        APIDefinitionResponse.Type type = previousTypes.get(typeName);
+        APIType type = previousTypes.get(typeName);
         if (type == null) return;   // not bean type, e.g. simple type, collection type, void, null
         Severity value = severity;
         if (value == Severity.WARN) value = removedReferenceTypes.getOrDefault(typeName, Severity.WARN);
@@ -268,7 +269,7 @@ class APIValidator {
         }
     }
 
-    String fieldType(APIDefinitionResponse.Field field) {
+    String fieldType(APIType.Field field) {
         if ("List".equals(field.type)) return "List<" + field.typeParams.get(0) + ">";
         if ("Map".equals(field.type)) {
             if ("List".equals(field.typeParams.get(1))) return "Map<" + field.typeParams.get(0) + ", List<" + field.typeParams.get(2) + ">";

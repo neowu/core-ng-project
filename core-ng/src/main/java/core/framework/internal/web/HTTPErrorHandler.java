@@ -8,8 +8,8 @@ import core.framework.internal.web.request.RequestImpl;
 import core.framework.internal.web.response.ResponseHandler;
 import core.framework.internal.web.response.ResponseImpl;
 import core.framework.internal.web.service.ErrorResponse;
+import core.framework.internal.web.service.InternalErrorResponse;
 import core.framework.internal.web.service.WebServiceClient;
-import core.framework.internal.web.site.AJAXErrorResponse;
 import core.framework.log.ErrorCode;
 import core.framework.log.Severity;
 import core.framework.util.Exceptions;
@@ -73,7 +73,7 @@ public class HTTPErrorHandler {
 
     Object errorResponse(Throwable e, String userAgent, String actionId) {
         if (WebServiceClient.USER_AGENT.equals(userAgent)) {
-            var response = new ErrorResponse();
+            var response = new InternalErrorResponse();
             response.id = actionId;
             response.message = e.getMessage();
             response.stackTrace = Exceptions.stackTrace(e);
@@ -89,7 +89,7 @@ public class HTTPErrorHandler {
             }
             return response;
         } else {
-            var response = new AJAXErrorResponse();
+            var response = new ErrorResponse();
             response.id = actionId;
             response.message = e.getMessage();
             if (e instanceof ErrorCode) {

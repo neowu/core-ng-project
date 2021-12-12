@@ -10,16 +10,12 @@ import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.bean.RequestBeanWriter;
 import core.framework.internal.web.bean.ResponseBeanReader;
 import core.framework.internal.web.controller.ControllerHolder;
-import core.framework.internal.web.http.IPv4AccessControl;
-import core.framework.internal.web.http.IPv4Ranges;
 import core.framework.internal.web.service.HTTPMethods;
 import core.framework.internal.web.service.WebServiceClient;
 import core.framework.internal.web.service.WebServiceClientBuilder;
 import core.framework.internal.web.service.WebServiceControllerBuilder;
 import core.framework.internal.web.service.WebServiceImplValidator;
 import core.framework.internal.web.service.WebServiceInterfaceValidator;
-import core.framework.internal.web.site.AJAXErrorResponse;
-import core.framework.internal.web.sys.APIController;
 import core.framework.util.ASCII;
 import core.framework.web.Controller;
 import core.framework.web.service.WebServiceClientProxy;
@@ -28,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.List;
 
 /**
  * @author neo
@@ -65,7 +60,7 @@ public class APIConfig extends Config {
         validator.validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
         new InjectValidator(service).validate();
-        context.serviceRegistry.serviceInterfaces.add(serviceInterface);    // doesn't need to check duplicate, duplication will failed to register route
+        context.apiController.serviceInterfaces.add(serviceInterface);    // doesn't need to check duplicate, duplication will failed to register route
 
         for (Method method : serviceInterface.getMethods()) {
             HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
@@ -108,14 +103,6 @@ public class APIConfig extends Config {
     public HTTPClientBuilder httpClient() {
         if (httpClient != null) throw new Error("api().httpClient() must be configured before adding client");
         return httpClientBuilder;
-    }
-
-    public void publishAPI(List<String> cidrs) {
-        logger.info("publish api definition, cidrs={}", cidrs);
-        var accessControl = new IPv4AccessControl();
-        accessControl.allow = new IPv4Ranges(cidrs);
-        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceRegistry, accessControl), true);
-        context.serviceRegistry.beanClasses.add(AJAXErrorResponse.class);   // publish default ajax error response
     }
 
     private HTTPClient getOrCreateHTTPClient() {
