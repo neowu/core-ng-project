@@ -1,5 +1,12 @@
 ## Change Log In Wonder
 
+### 1.0.5 (12/13/2021)
+
+* corresponds to upstream version 7.7.5.
+* mongo: updated driver to 4.3.0
+* action: added ActionLogContext.remainingProcessTime() for max time left for current action, to control external calling timeout or future get with timeout
+* http: update undertow to 2.2.9
+
 ### 1.0.4 (12/13/2021)
 
 * corresponds to upstream version 7.7.4.
