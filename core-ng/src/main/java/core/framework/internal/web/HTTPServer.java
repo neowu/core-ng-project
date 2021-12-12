@@ -35,7 +35,7 @@ public class HTTPServer {
     public Integer httpPort;
     public Integer httpsPort;
     public boolean gzip;
-    public long maxEntitySize = 10_000_000;    // limit max post body to 10M
+    public long maxEntitySize = 10_000_000;    // limit max post body to 10M, apply to multipart as well
     private Undertow server;
 
     public HTTPServer(LogManager logManager) {

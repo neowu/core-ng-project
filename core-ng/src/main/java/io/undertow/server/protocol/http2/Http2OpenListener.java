@@ -43,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Stuart Douglas
  */
 // due to pull request https://github.com/undertow-io/undertow/pull/1024 is not merged yet, overwrite the patched file for now, and removed all unnecessary logic to simplify
+// track change with https://github.com/undertow-io/undertow/blob/master/core/src/main/java/io/undertow/server/protocol/http2/Http2OpenListener.java
 public final class Http2OpenListener implements ChannelListener<StreamConnection>, DelegateOpenListener {
     public static final String HTTP2 = "h2";
     private final Set<Http2Channel> connections = Collections.newSetFromMap(new ConcurrentHashMap<>());

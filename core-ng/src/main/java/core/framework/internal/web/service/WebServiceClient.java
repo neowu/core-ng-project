@@ -125,8 +125,8 @@ public class WebServiceClient {
 
         long timeout = ((HTTPClientImpl) httpClient).timeoutInNano; // not count connect timeout, as action starts after connecting
         if (actionLog.maxProcessTimeInNano != -1) {                 // only action initiated by http/message has max process time
-            long remaining = actionLog.remainingProcessTimeInNano();
-            if (remaining < timeout) timeout = remaining;
+            long remainingTime = actionLog.remainingProcessTimeInNano();
+            if (remainingTime < timeout) timeout = remainingTime;
         }
         headers.put(HTTPHandler.HEADER_TIMEOUT.toString(), String.valueOf(timeout));
     }
