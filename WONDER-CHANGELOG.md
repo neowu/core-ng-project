@@ -1,5 +1,13 @@
 ## Change Log In Wonder
 
+### 1.0.3 (12/13/2021)
+
+* corresponds to upstream version 7.7.3.
+* log: fixed error when third-party lib calls slf4f logger with empty var args (Azure SDK)
+* executor: updated way to print canceled tasks during shutdown (with JDK16, it cannot access private field of internal JDK classes)
+* log-processor: add first version of action flow diagram, pass actionId to visualize entire action flow with all related _id and correlation_id
+  > e.g. https://localhost:8443/diagram/action?actionId=7A356AA3B1A5C6740794
+
 ### 1.0.2 (12/13/2021)
 
 * corresponds to upstream version 7.7.2.
