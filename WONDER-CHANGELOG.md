@@ -1,5 +1,12 @@
 ## Change Log In Wonder
 
+### 1.0.4 (12/13/2021)
+
+* corresponds to upstream version 7.7.4.
+* site: added Session.timeout(Duration), to allow application set different timeout
+  > e.g. use cases are like longer mobile app session expiration time, or "remember me" feature
+* http: disabled okHTTP builtin retryOnConnectionFailure, use RetryInterceptor to log all connection failures explicitly, more failure case handling
+
 ### 1.0.3 (12/13/2021)
 
 * corresponds to upstream version 7.7.3.
