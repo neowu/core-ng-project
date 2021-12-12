@@ -3,7 +3,7 @@ apply from: file("${rootDir}/gradle/publish.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '7.6.16'
+    version = '7.7.0'
 
     repositories {
         maven {
@@ -15,13 +15,13 @@ subprojects {
     }
 }
 
-def elasticVersion = '7.12.0'
+def elasticVersion = '7.13.0'
 def kafkaVersion = '2.8.0'
 def jacksonVersion = '2.12.0'
-def junitVersion = '5.7.1'
-def mockitoVersion = '3.7.0'
+def junitVersion = '5.7.2'
+def mockitoVersion = '3.10.0'
 def assertjVersion = '3.19.0'
-def mysqlVersion = '8.0.23'
+def mysqlVersion = '8.0.25'
 
 project('core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -34,7 +34,7 @@ project('core-ng') {
         api project(":core-ng-json")
         api project(":core-ng-common")
         api 'org.slf4j:slf4j-api:1.8.0-beta4'
-        implementation 'org.javassist:javassist:3.27.0-GA'
+        implementation 'org.javassist:javassist:3.28.0-GA'
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'com.squareup.okhttp3:okhttp:4.9.0'

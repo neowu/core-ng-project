@@ -1,0 +1,37 @@
+{
+  "services": [
+    {
+      "name": "CustomerAJAXService",
+      "operations": [
+        {"name": "get", "method": "GET", "path": "/ajax/customer/:id", "pathParams": [{"name": "id", "type": "String"}], "requestType": null, "responseType": "GetCustomerAJAXResponse", "optional": false, "deprecated": false},
+        {"name": "create", "method": "POST", "path": "/ajax/register", "pathParams": [], "requestType": "RegisterAJAXRequest", "responseType": "void", "optional": false, "deprecated": false}
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "GetCustomerAJAXResponse",
+      "type": "bean",
+      "fields": [
+        {"name": "id", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "name", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}}
+      ],
+      "enumConstants": null
+    },
+    {
+      "name": "RegisterAJAXRequest",
+      "type": "bean",
+      "fields": [
+        {"name": "customerName", "type": "String", "typeParams": null, "constraints": {"notNull": true, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}},
+        {"name": "email", "type": "String", "typeParams": null, "constraints": {"notNull": false, "notBlank": null, "min": null, "max": null, "size": null, "pattern": null}}
+      ],
+      "enumConstants": null
+    },
+    {
+      "name": "ErrorCode",
+      "type": "enum",
+      "fields": null,
+      "enumConstants": [{"name": "ERROR_1", "value": "ERROR_1"}]
+    }
+  ]
+}

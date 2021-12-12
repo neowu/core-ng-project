@@ -1,10 +1,33 @@
 ## Change log
 
-### 7.6.16-b0 (04/26/2021 - )
+### 7.7.0 (04/26/2021 - 05/25/2021)
 
-* api: created /_sys/api/v2, to expose more structured api info
+* api: replaced /_sys/api, to expose more structured api info
   > one purpose is to create api monitoring, to alert if api breaks backward compatibility
-  > will update example script to generate ts api, refer to frontend-demo-project
+  > !!! for ts client code generator, refer to https://github.com/neowu/frontend-demo-project/blob/master/website-frontend/webpack/api.js
+* redis: support pop with multiple items
+  > !!! only be supported since redis 6.2, use latest redis docker image if you use this feature
+  > pop without count still uses old protocol, so it's optional to upgrade redis
+* monitor: support to monitor api changes, alert config json schema changed !!!
+  > refer to ext/monitor/src/test/resources/monitor.json, ext/monitor/src/test/resources/alert.json for example config
+  > !!! alert config -> channels changed, to support one channel with multiple matchers, e.g.
+  ```json 
+    "notifications": [
+        {"channel": "backendWarnChannel", "matcher": {"severity": "WARN", "indices": ["trace", "stat"]}},
+        {"channel": "backendErrorChannel", "matcher": {"severity": "ERROR", "indices": ["trace", "stat"]}},
+        {"channel": "frontendWarnChannel", "matcher": {"severity": "WARN", "indices": ["event"]}},
+        {"channel": "frontendWarnChannel", "matcher": {"severity": "WARN", "errorCodes": ["API_CHANGED"], "indices": ["stat"]}},
+        {"channel": "frontendErrorChannel", "matcher": {"severity": "ERROR", "indices": ["event"]}},
+        {"channel": "frontendErrorChannel", "matcher": {"severity": "ERROR", "errorCodes": ["API_CHANGED"], "indices": ["stat"]}},
+        {"channel": "additionalErrorCodeChannel", "matcher": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}}
+    ]
+  ```
+* log-processor: updated kibana objects to be compatible with kibana 7.12.0, rebuild objects with kibana object builder
+  > refer to core-ng-demo-project/kibana-generator
+
+* es: update to 7.13.0, updated ElasticSearch.putIndexTemplate impl to use new PutComposableIndexTemplateRequest
+  > !!! refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html
+  > must update index template format to match new API, refer to ext/log-processor/src/main/resources/index/action-index-template.json as example
 
 ### 7.6.15 (04/13/2021 - 04/25/2021)
 

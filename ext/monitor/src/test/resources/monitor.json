@@ -21,5 +21,8 @@
   },
   "kube": {
     "namespaces": ["ops", "app"]
+  },
+  "api": {
+    "website": "https://website"
   }
 }

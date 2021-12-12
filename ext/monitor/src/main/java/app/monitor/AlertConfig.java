@@ -3,10 +3,10 @@ package app.monitor;
 import core.framework.api.json.Property;
 import core.framework.api.validate.Min;
 import core.framework.api.validate.NotNull;
+import core.framework.api.validate.Size;
 import core.framework.log.Severity;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author neo
@@ -29,8 +29,9 @@ public class AlertConfig {
     public String site;
 
     @NotNull
-    @Property(name = "channels")
-    public Map<String, Matcher> channels = Map.of();
+    @Size(min = 1)
+    @Property(name = "notifications")
+    public List<Notification> notifications = List.of();
 
     @NotNull
     @Property(name = "kibanaURL")
@@ -51,6 +52,16 @@ public class AlertConfig {
         @NotNull
         @Property(name = "errorCodes")
         public List<String> errorCodes = List.of();
+    }
+
+    public static class Notification {
+        @NotNull
+        @Property(name = "channel")
+        public String channel;
+
+        @NotNull
+        @Property(name = "matcher")
+        public Matcher matcher;
     }
 }
 

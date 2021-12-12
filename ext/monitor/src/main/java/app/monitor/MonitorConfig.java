@@ -28,6 +28,10 @@ public class MonitorConfig {
     @Property(name = "kube")
     public KubeConfig kube;
 
+    @NotNull
+    @Property(name = "api")
+    public Map<String, String> api = Map.of();
+
     public static class RedisConfig {
         @NotNull
         @Size(min = 1)
