@@ -10,6 +10,7 @@ import core.framework.api.validate.Size;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.api.web.service.QueryParam;
+import core.framework.internal.log.LogManager;
 import core.framework.internal.reflect.Classes;
 import core.framework.internal.reflect.GenericTypes;
 import core.framework.internal.reflect.Params;
@@ -51,6 +52,7 @@ public class APIDefinitionBuilder {
 
     public APIDefinitionResponse build() {
         var response = new APIDefinitionResponse();
+        response.app = LogManager.APP_NAME;
         response.services = services();
         for (Class<?> beanClass : beanClasses) {
             if (beanClass.isEnum()) {

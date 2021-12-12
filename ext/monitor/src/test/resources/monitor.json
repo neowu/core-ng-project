@@ -23,6 +23,6 @@
     "namespaces": ["ops", "app"]
   },
   "api": {
-    "website": "https://website"
+    "services": ["https://website"]
   }
 }

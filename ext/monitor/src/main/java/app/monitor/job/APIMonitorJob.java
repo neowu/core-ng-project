@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,11 +26,11 @@ import java.util.Map;
 public class APIMonitorJob implements Job {
     private final Logger logger = LoggerFactory.getLogger(APIMonitorJob.class);
     private final HTTPClient httpClient;
-    private final Map<String, String> serviceURLs;
+    private final List<String> serviceURLs;
     private final MessagePublisher<StatMessage> publisher;
     private final Map<String, APIDefinitionResponse> previousDefinitions = Maps.newConcurrentHashMap();
 
-    public APIMonitorJob(HTTPClient httpClient, Map<String, String> serviceURLs, MessagePublisher<StatMessage> publisher) {
+    public APIMonitorJob(HTTPClient httpClient, List<String> serviceURLs, MessagePublisher<StatMessage> publisher) {
         this.httpClient = httpClient;
         this.serviceURLs = serviceURLs;
         this.publisher = publisher;
@@ -37,36 +38,34 @@ public class APIMonitorJob implements Job {
 
     @Override
     public void execute(JobContext context) {
-        for (Map.Entry<String, String> entry : serviceURLs.entrySet()) {
-            String app = entry.getKey();
-            String serviceURL = entry.getValue();
+        for (String serviceURL : serviceURLs) {
             try {
-                checkAPI(app, serviceURL);
+                checkAPI(serviceURL);
             } catch (Throwable e) {
                 logger.error(e.getMessage(), e);
-                publisher.publish(StatMessageFactory.failedToCollect(app, null, e));
+                publisher.publish(StatMessageFactory.failedToCollect(LogManager.APP_NAME, null, e));
             }
         }
     }
 
-    private void checkAPI(String app, String serviceURL) {
+    private void checkAPI(String serviceURL) {
         HTTPResponse response = httpClient.execute(new HTTPRequest(HTTPMethod.GET, serviceURL + "/_sys/api"));
         if (response.statusCode != HTTPStatus.OK.code) {
             throw new Error("failed to call sys api, statusCode=" + response.statusCode + ", message=" + response.text());
         }
         APIDefinitionResponse currentDefinition = JSON.fromJSON(APIDefinitionResponse.class, response.text());
-        APIDefinitionResponse previousDefinition = previousDefinitions.get(app);
+        APIDefinitionResponse previousDefinition = previousDefinitions.get(currentDefinition.app);
         if (previousDefinition != null) {
-            checkAPI(app, previousDefinition, currentDefinition);
+            checkAPI(previousDefinition, currentDefinition);
         }
-        previousDefinitions.put(app, currentDefinition);
+        previousDefinitions.put(currentDefinition.app, currentDefinition);
     }
 
-    private void checkAPI(String app, APIDefinitionResponse previous, APIDefinitionResponse current) {
+    private void checkAPI(APIDefinitionResponse previous, APIDefinitionResponse current) {
         var validator = new APIValidator(previous, current);
         String result = validator.validate();
         if (result != null) {
-            publishAPIChanged(app, result, validator.errorMessage());
+            publishAPIChanged(current.app, result, validator.errorMessage());
         }
     }
 

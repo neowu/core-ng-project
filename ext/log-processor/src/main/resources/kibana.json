@@ -94,7 +94,7 @@
       {"id": "action-task_delay", "name": "panel_14", "type": "visualization"},
       {"id": "stat-cache_hit_rate", "name": "panel_15", "type": "visualization"},
       {"id": "stat-cache_size", "name": "panel_16", "type": "visualization"},
-      {"id": "perf-http", "name": "panel_17", "type": "visualization"},
+      {"id": "perf-http_client", "name": "panel_17", "type": "visualization"},
       {"id": "perf-redis", "name": "panel_18", "type": "visualization"},
       {"id": "perf-db", "name": "panel_19", "type": "visualization"},
       {"id": "perf-es", "name": "panel_20", "type": "visualization"},
@@ -126,11 +126,11 @@
       "panelsJSON": "[\n  {\"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"panelIndex\": \"1\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_1\"},\n  {\"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 15, \"i\": \"2\"}, \"panelIndex\": \"2\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_2\"},\n  {\"gridData\": {\"x\": 0, \"y\": 30, \"w\": 48, \"h\": 15, \"i\": \"3\"}, \"panelIndex\": \"3\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_3\"},\n  {\"gridData\": {\"x\": 0, \"y\": 45, \"w\": 48, \"h\": 15, \"i\": \"4\"}, \"panelIndex\": \"4\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_4\"},\n  {\"gridData\": {\"x\": 0, \"y\": 60, \"w\": 48, \"h\": 15, \"i\": \"5\"}, \"panelIndex\": \"5\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_5\"}\n]\n"
     },
     "references": [
-      {"id": "perf-http", "name": "panel_1", "type": "visualization"},
-      {"id": "perf-http_io", "name": "panel_2", "type": "visualization"},
-      {"id": "perf-http_conn", "name": "panel_3", "type": "visualization"},
-      {"id": "perf-http_dns", "name": "panel_4", "type": "visualization"},
-      {"id": "action-http_retries", "name": "panel_5", "type": "visualization"}
+      {"id": "perf-http_client", "name": "panel_1", "type": "visualization"},
+      {"id": "perf-http_client_io", "name": "panel_2", "type": "visualization"},
+      {"id": "perf-http_client_conn", "name": "panel_3", "type": "visualization"},
+      {"id": "perf-http_client_dns", "name": "panel_4", "type": "visualization"},
+      {"id": "action-http_client_retries", "name": "panel_5", "type": "visualization"}
     ]
   },
   {
@@ -357,48 +357,48 @@
     }
   },
   {
-    "id": "perf-http",
+    "id": "perf-http_client",
     "type": "visualization",
     "attributes": {
-      "title": "perf-http",
+      "title": "perf-http_client",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "visState": "{\"title\":\"perf-http\",\"type\":\"metrics\",\"params\":{\"id\":\"perf-http\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"action-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"percentile\",\"label\":\"total elapsed\",\"color\":\"#43AA8B\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"value_template\":\"{{value}} ns\",\"stacked\":\"none\",\"metrics\":[{\"id\":\"percentile\",\"type\":\"percentile\",\"field\":\"perf_stats.http.total_elapsed\",\"percentiles\":[{\"id\":\"99\",\"mode\":\"line\",\"value\":\"99\",\"shade\":0.2,\"percentile\":\"\"},{\"id\":\"90\",\"mode\":\"line\",\"value\":\"90\",\"shade\":0.2,\"percentile\":\"\"},{\"id\":\"50\",\"mode\":\"line\",\"value\":\"50\",\"shade\":0.2,\"percentile\":\"\"}]}]}]}}"
+      "visState": "{\"title\":\"perf-http_client\",\"type\":\"metrics\",\"params\":{\"id\":\"perf-http_client\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"action-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"percentile\",\"label\":\"total elapsed\",\"color\":\"#43AA8B\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"value_template\":\"{{value}} ns\",\"stacked\":\"none\",\"metrics\":[{\"id\":\"percentile\",\"type\":\"percentile\",\"field\":\"perf_stats.http.total_elapsed\",\"percentiles\":[{\"id\":\"99\",\"mode\":\"line\",\"value\":\"99\",\"shade\":0.2,\"percentile\":\"\"},{\"id\":\"90\",\"mode\":\"line\",\"value\":\"90\",\"shade\":0.2,\"percentile\":\"\"},{\"id\":\"50\",\"mode\":\"line\",\"value\":\"50\",\"shade\":0.2,\"percentile\":\"\"}]}]}]}}"
     }
   },
   {
-    "id": "perf-http_dns",
+    "id": "perf-http_client_dns",
     "type": "visualization",
     "attributes": {
-      "title": "perf-http_dns",
+      "title": "perf-http_client_dns",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "visState": "{\"title\":\"perf-http_dns\",\"type\":\"metrics\",\"params\":{\"id\":\"perf-http_dns\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"action-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"percentile\",\"label\":\"total elapsed\",\"color\":\"#4D908E\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"value_template\":\"{{value}} ns\",\"stacked\":\"none\",\"metrics\":[{\"id\":\"percentile\",\"type\":\"percentile\",\"field\":\"perf_stats.http_dns.total_elapsed\",\"percentiles\":[{\"id\":\"99\",\"mode\":\"line\",\"value\":\"99\",\"shade\":0.2,\"percentile\":\"\"},{\"id\":\"90\",\"mode\":\"line\",\"value\":\"90\",\"shade\":0.2,\"percentile\":\"\"},{\"id\":\"50\",\"mode\":\"line\",\"value\":\"50\",\"shade\":0.2,\"percentile\":\"\"}]}]}]}}"
+      "visState": "{\"title\":\"perf-http_client_dns\",\"type\":\"metrics\",\"params\":{\"id\":\"perf-http_client_dns\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"action-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"percentile\",\"label\":\"total elapsed\",\"color\":\"#4D908E\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"value_template\":\"{{value}} ns\",\"stacked\":\"none\",\"metrics\":[{\"id\":\"percentile\",\"type\":\"percentile\",\"field\":\"perf_stats.http_dns.total_elapsed\",\"percentiles\":[{\"id\":\"99\",\"mode\":\"line\",\"value\":\"99\",\"shade\":0.2,\"percentile\":\"\"},{\"id\":\"90\",\"mode\":\"line\",\"value\":\"90\",\"shade\":0.2,\"percentile\":\"\"},{\"id\":\"50\",\"mode\":\"line\",\"value\":\"50\",\"shade\":0.2,\"percentile\":\"\"}]}]}]}}"
     }
   },
   {
-    "id": "perf-http_conn",
+    "id": "perf-http_client_conn",
     "type": "visualization",
     "attributes": {
-      "title": "perf-http_conn",
+      "title": "perf-http_client_conn",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "visState": "{\"title\":\"perf-http_conn\",\"type\":\"metrics\",\"params\":{\"id\":\"perf-http_conn\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"action-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"percentile\",\"label\":\"total elapsed\",\"color\":\"#577590\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"value_template\":\"{{value}} ns\",\"stacked\":\"none\",\"metrics\":[{\"id\":\"percentile\",\"type\":\"percentile\",\"field\":\"perf_stats.http_conn.total_elapsed\",\"percentiles\":[{\"id\":\"99\",\"mode\":\"line\",\"value\":\"99\",\"shade\":0.2,\"percentile\":\"\"},{\"id\":\"90\",\"mode\":\"line\",\"value\":\"90\",\"shade\":0.2,\"percentile\":\"\"},{\"id\":\"50\",\"mode\":\"line\",\"value\":\"50\",\"shade\":0.2,\"percentile\":\"\"}]}]}]}}"
+      "visState": "{\"title\":\"perf-http_client_conn\",\"type\":\"metrics\",\"params\":{\"id\":\"perf-http_client_conn\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"action-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"percentile\",\"label\":\"total elapsed\",\"color\":\"#577590\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"value_template\":\"{{value}} ns\",\"stacked\":\"none\",\"metrics\":[{\"id\":\"percentile\",\"type\":\"percentile\",\"field\":\"perf_stats.http_conn.total_elapsed\",\"percentiles\":[{\"id\":\"99\",\"mode\":\"line\",\"value\":\"99\",\"shade\":0.2,\"percentile\":\"\"},{\"id\":\"90\",\"mode\":\"line\",\"value\":\"90\",\"shade\":0.2,\"percentile\":\"\"},{\"id\":\"50\",\"mode\":\"line\",\"value\":\"50\",\"shade\":0.2,\"percentile\":\"\"}]}]}]}}"
     }
   },
   {
-    "id": "perf-http_io",
+    "id": "perf-http_client_io",
     "type": "visualization",
     "attributes": {
-      "title": "perf-http_io",
+      "title": "perf-http_client_io",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "visState": "{\"title\":\"perf-http_io\",\"type\":\"metrics\",\"params\":{\"id\":\"perf-http_io\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"action-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":0,\"series\":[{\"id\":\"sum-perf_stats-http-read_entries\",\"label\":\"response body length\",\"color\":\"#277DA1\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"sum\",\"type\":\"sum\",\"field\":\"perf_stats.http.read_entries\"}]},{\"id\":\"sum-perf_stats-http-write_entries\",\"label\":\"request body length\",\"color\":\"#F94144\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"sum\",\"type\":\"sum\",\"field\":\"perf_stats.http.write_entries\"}]},{\"id\":\"sum-perf_stats-http-count\",\"label\":\"http\",\"color\":\"#F3722C\",\"split_mode\":\"everything\",\"separate_axis\":1,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.0,\"stacked\":\"none\",\"metrics\":[{\"id\":\"sum\",\"type\":\"sum\",\"field\":\"perf_stats.http.count\"}]}]}}"
+      "visState": "{\"title\":\"perf-http_client_io\",\"type\":\"metrics\",\"params\":{\"id\":\"perf-http_client_io\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"action-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":0,\"series\":[{\"id\":\"sum-perf_stats-http-read_entries\",\"label\":\"response body length\",\"color\":\"#277DA1\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"sum\",\"type\":\"sum\",\"field\":\"perf_stats.http.read_entries\"}]},{\"id\":\"sum-perf_stats-http-write_entries\",\"label\":\"request body length\",\"color\":\"#F94144\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"sum\",\"type\":\"sum\",\"field\":\"perf_stats.http.write_entries\"}]},{\"id\":\"sum-perf_stats-http-count\",\"label\":\"http\",\"color\":\"#F3722C\",\"split_mode\":\"everything\",\"separate_axis\":1,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.0,\"stacked\":\"none\",\"metrics\":[{\"id\":\"sum\",\"type\":\"sum\",\"field\":\"perf_stats.http.count\"}]}]}}"
     }
   },
   {
-    "id": "action-http_retries",
+    "id": "action-http_client_retries",
     "type": "visualization",
     "attributes": {
-      "title": "action-http_retries",
+      "title": "action-http_client_retries",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "visState": "{\"title\":\"action-http_retries\",\"type\":\"metrics\",\"params\":{\"id\":\"action-http_retries\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"action-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"sum-stats-http_retries\",\"label\":\"http retries\",\"color\":\"#F8961E\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"number\",\"chart_type\":\"bar\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"sum\",\"type\":\"sum\",\"field\":\"stats.http_retries\"}]}]}}"
+      "visState": "{\"title\":\"action-http_client_retries\",\"type\":\"metrics\",\"params\":{\"id\":\"action-http_client_retries\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"action-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"sum-stats-http_retries\",\"label\":\"http retries\",\"color\":\"#F8961E\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"number\",\"chart_type\":\"bar\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"sum\",\"type\":\"sum\",\"field\":\"stats.http_retries\"}]}]}}"
     }
   },
   {

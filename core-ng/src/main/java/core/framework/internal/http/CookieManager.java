@@ -20,6 +20,7 @@ public class CookieManager implements CookieJar {
     public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
         for (Cookie cookie : cookies) {
             String key = cookie.domain() + ":" + cookie.path() + ":" + cookie.name();
+            // refer to okhttp3.Cookie.parse(), with maxAge=0, it set expiresAt = Long.MIN_VALUE
             if (cookie.expiresAt() == Long.MIN_VALUE && "".equals(cookie.value())) {
                 store.remove(key);
             } else {
@@ -32,9 +33,10 @@ public class CookieManager implements CookieJar {
     public List<Cookie> loadForRequest(HttpUrl url) {
         List<Cookie> matchingCookies = new ArrayList<>();
         Iterator<Map.Entry<String, Cookie>> iterator = store.entrySet().iterator();
+        long now = System.currentTimeMillis();
         while (iterator.hasNext()) {
             Cookie cookie = iterator.next().getValue();
-            if (cookie.expiresAt() < System.currentTimeMillis()) {
+            if (cookie.expiresAt() < now) {
                 iterator.remove();
             } else if (cookie.matches(url)) {
                 matchingCookies.add(cookie);

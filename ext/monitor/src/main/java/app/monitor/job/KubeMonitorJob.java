@@ -45,7 +45,7 @@ public class KubeMonitorJob implements Job {
             }
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
-            publisher.publish(StatMessageFactory.failedToCollect("kubernetes", null, e));
+            publisher.publish(StatMessageFactory.failedToCollect(LogManager.APP_NAME, null, e));
         }
     }
 

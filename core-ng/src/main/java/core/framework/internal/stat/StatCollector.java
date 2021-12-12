@@ -50,10 +50,10 @@ public class StatCollector {
         collectHeapUsage(stats);
 
         for (GCStat gcStat : gcStats) {
-            long count = gcStat.count();
-            long elapsed = gcStat.elapsed();
-            stats.put("jvm_gc_" + gcStat.name + "_count", (double) count);
-            stats.put("jvm_gc_" + gcStat.name + "_elapsed", (double) elapsed);
+            double count = gcStat.count();
+            double elapsed = gcStat.elapsed();
+            stats.put("jvm_gc_" + gcStat.name + "_count", count);
+            stats.put("jvm_gc_" + gcStat.name + "_elapsed", elapsed);
         }
     }
 
@@ -76,10 +76,10 @@ public class StatCollector {
         }
     }
 
-    int parseVmRSS(String content) {
+    long parseVmRSS(String content) {
         int index1 = content.indexOf(' ');
         int index2 = content.indexOf(' ', index1 + 1);
-        return Integer.parseInt(content.substring(index1 + 1, index2)) * 4096;
+        return Long.parseLong(content.substring(index1 + 1, index2)) * 4096;
     }
 
     public void collectMetrics(Stats stats) {

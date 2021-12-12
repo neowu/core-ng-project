@@ -1,5 +1,19 @@
 ## Change log
 
+### 7.7.2 (06/03/2021 - 06/14/2021)
+
+* monitor: fixed overflowed vmRSS value, use long instead of int
+* api: added "app" in APIDefinitionResponse
+* monitor: api config json schema changed !!!
+  > changed from map to List<ServiceURL>, to simplify config. it requires the latest framework, refers to above
+    ```json
+        {
+          "api": {
+            "services": ["https://website", "https://backoffice"]
+          } 
+        }
+    ```
+
 ### 7.7.1 (05/25/2021 - 06/02/2021)
 
 * log-processor/kibana: added http server/client dashboard and visualizations (http / dns / conn / reties / delays)
@@ -242,20 +256,20 @@
 
 ```json
 {
-  "ignoreErrors": [
-    {"apps": ["website"], "errorCodes": ["PATH_NOT_FOUND"], "severity": "WARN"}
-  ],
-  "criticalErrors": [
-    {"errorCodes": ["FAILED_TO_START", "POD_FAILURE"]}
-  ],
-  "kibanaURL": "http://kibana:5601",
-  "channels": {
-    "actionWarnChannel": {"severity": "WARN", "indices": ["trace", "stat"]},
-    "actionErrorChannel": {"severity": "ERROR", "indices": ["trace", "stat"]},
-    "eventWarnChannel": {"severity": "WARN", "indices": ["event"]},
-    "eventErrorChannel": {"severity": "ERROR", "indices": ["event"]},
-    "additionalErrorCodeChannel": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}
-  }
+    "ignoreErrors": [
+        {"apps": ["website"], "errorCodes": ["PATH_NOT_FOUND"], "severity": "WARN"}
+    ],
+    "criticalErrors": [
+        {"errorCodes": ["FAILED_TO_START", "POD_FAILURE"]}
+    ],
+    "kibanaURL": "http://kibana:5601",
+    "channels": {
+        "actionWarnChannel": {"severity": "WARN", "indices": ["trace", "stat"]},
+        "actionErrorChannel": {"severity": "ERROR", "indices": ["trace", "stat"]},
+        "eventWarnChannel": {"severity": "WARN", "indices": ["event"]},
+        "eventErrorChannel": {"severity": "ERROR", "indices": ["event"]},
+        "additionalErrorCodeChannel": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}
+    }
 }
 ```    
 

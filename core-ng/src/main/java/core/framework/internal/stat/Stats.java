@@ -1,7 +1,6 @@
 package core.framework.internal.stat;
 
 import core.framework.util.ASCII;
-import core.framework.util.Maps;
 
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -11,7 +10,7 @@ import java.util.Map;
  * @author neo
  */
 public class Stats {
-    public final Map<String, Double> stats = Maps.newLinkedHashMap(); // to keep order in es
+    public final Map<String, Double> stats = new HashMap<>(); // no need to keep insertion order, kibana will sort all keys on display
     public String errorCode;
     public String errorMessage;
     public Map<String, String> info;

@@ -45,14 +45,14 @@ public class MonitorModule extends Module {
         if (config.kube != null) {
             configureKubeJob(publisher, config.kube);
         }
-        if (!config.api.isEmpty()) {
+        if (config.api != null) {
             configureAPIJob(publisher, config.api);
         }
     }
 
-    private void configureAPIJob(MessagePublisher<StatMessage> publisher, Map<String, String> serviceURLs) {
+    private void configureAPIJob(MessagePublisher<StatMessage> publisher, MonitorConfig.APIConfig config) {
         HTTPClient httpClient = HTTPClient.builder().userAgent("monitor").trustAll().build();
-        var job = new APIMonitorJob(httpClient, serviceURLs, publisher);
+        var job = new APIMonitorJob(httpClient, config.services, publisher);
         schedule().fixedRate("monitor:api", job, Duration.ofMinutes(10));  // not check api too often
     }
 

@@ -9,6 +9,9 @@ import java.util.List;
  * @author neo
  */
 public class APIDefinitionResponse {
+    @Property(name = "app")
+    public String app;
+
     @Property(name = "services")
     public List<Service> services;
 
