@@ -22,12 +22,6 @@ import java.util.TreeMap;
  * @author neo
  */
 public class ArchDiagram {
-    private static final List<String> COLOR_PALETTE = List.of(
-        "#F94144", "#F3722C", "#F8961E", "#F9844A", "#F9C74F",
-        "#90BE6D", "#43AA8B", "#4D908E", "#577590", "#277DA1"
-    );
-    // grey palette: "#E9ECEF", "#DEE2E6", "#CED4DA", "#ADB5BD", "#6C757D", "#495057"
-
     private final List<APIDependency> apiDependencies = new ArrayList<>();
     private final List<MessageSubscription> messageSubscriptions = new ArrayList<>();
     private final Map<String, Scheduler> schedulers = new HashMap<>();
@@ -59,7 +53,7 @@ public class ArchDiagram {
             }
             final long totalByClient = clients.stream().mapToLong(MultiBucketsAggregation.Bucket::getDocCount).sum();
             if (totalCount > totalByClient) {
-                loadAction(app, action, "_direct_" + id(app), totalCount - totalByClient);
+                loadAction(app, action, "_direct_" + app, totalCount - totalByClient);
             }
         }
     }
@@ -95,20 +89,20 @@ public class ArchDiagram {
         for (String app : apps()) {
             if (excludeApps.contains(app)) continue;
             if (app.startsWith("_direct_")) {
-                dot.append("{} [label=\"direct\", shape=point];\n", app);
+                dot.append("{} [label=direct, shape=point];\n", app);
                 continue;
             }
             String color = color(app);
             String tooltip = tooltip(app);
-            dot.append("{} [label=\"{}\", shape=circle, width=3, color=\"{}\", fillcolor=\"{}\", tooltip=\"{}\"];\n", id(app), app, color, color, tooltip);
+            dot.append("\"{}\" [label=\"{}\", shape=circle, width=3, color=\"{}\", fillcolor=\"{}\", tooltip=\"{}\"];\n", app, app, color, color, tooltip);
         }
         for (MessageSubscription subscription : messageSubscriptions) {
-            dot.append("{} [label=\"{}\", shape=box, color=\"#6C757D\", fillcolor=\"#6C757D\", tooltip=\"{}\"];\n", id(subscription.topic), subscription.topic, tooltip(subscription));
+            dot.append("\"{}\" [label=\"{}\", shape=box, color=\"#6C757D\", fillcolor=\"#6C757D\", tooltip=\"{}\"];\n", subscription.topic, subscription.topic, tooltip(subscription));
         }
         for (APIDependency dependency : apiDependencies) {
             if (!excludeApps.contains(dependency.client)) {     // excluded services are filtered on loading
                 String tooltip = tooltip(dependency);
-                dot.append("{} -> {} [color=\"{}\", weight=5, penwidth=2, tooltip=\"{}\"];\n", id(dependency.client), id(dependency.service), colors.get(dependency.client), tooltip);
+                dot.append("\"{}\" -> \"{}\" [color=\"{}\", weight=5, penwidth=2, tooltip=\"{}\"];\n", dependency.client, dependency.service, colors.get(dependency.client), tooltip);
             }
 
         }
@@ -116,11 +110,11 @@ public class ArchDiagram {
             for (Map.Entry<String, Long> entry : subscription.publishers.entrySet()) {
                 String publisher = entry.getKey();
                 if (!excludeApps.contains(publisher)) {
-                    dot.append("{} -> {} [color=\"#495057\", style=dashed];\n", id(publisher), id(subscription.topic));
+                    dot.append("\"{}\" -> \"{}\" [color=\"#495057\", style=dashed];\n", publisher, subscription.topic);
                 }
             }
             for (Map.Entry<String, Long> entry : subscription.consumers.entrySet()) {   // excluded consumers are filtered on loading
-                dot.append("{} -> {} [color=\"#ADB5BD\", style=dashed];\n", id(subscription.topic), id(entry.getKey()));
+                dot.append("\"{}\" -> \"{}\" [color=\"#ADB5BD\", style=dashed];\n", subscription.topic, entry.getKey());
             }
         }
         dot.append("}\n");
@@ -227,14 +221,10 @@ public class ArchDiagram {
         return apps;
     }
 
-    private String id(String name) {
-        return name.replace('-', '_').replace(':', '_');
-    }
-
     private String color(String app) {
         String color = colors.get(app);
         if (color == null) {
-            color = COLOR_PALETTE.get(colors.size() % COLOR_PALETTE.size());
+            color = Colors.COLOR_PALETTE[colors.size() % Colors.COLOR_PALETTE.length];
             colors.put(app, color);
         }
         return color;
