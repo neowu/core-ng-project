@@ -64,24 +64,26 @@ class RedisSessionStoreTest {
     }
 
     @Test
-    void getAndRefreshWithCustomTimeout() {
-        var values = Map.of(SessionImpl.TIMEOUT_FIELD, "100", "USER_ID", "1");
+    void getAndRefresh() {
+        var timeout = Duration.ofSeconds(30);
+        var values = Map.of("USER_ID", "1");
 
         when(redis.hash()).thenReturn(redisHash);
         when(redisHash.getAll(anyString())).thenReturn(values);
 
-        store.getAndRefresh("sessionId", "localhost", Duration.ofSeconds(30));
+        store.getAndRefresh("sessionId", "localhost", timeout);
 
-        verify(redis).expire(anyString(), eq(Duration.ofSeconds(100)));
+        verify(redis).expire(anyString(), eq(timeout));
     }
 
     @Test
-    void saveWithOverrideTimeout() {
+    void save() {
         when(redis.hash()).thenReturn(redisHash);
-        var values = Map.of(SessionImpl.TIMEOUT_FIELD, "100", "USER_ID", "1");
-        store.save("sessionId", "localhost", values, values.keySet(), Duration.ofSeconds(30));
+        var timeout = Duration.ofSeconds(30);
+        var values = Map.of("USER_ID", "1");
+        store.save("sessionId", "localhost", values, values.keySet(), timeout);
 
         verify(redisHash).multiSet(anyString(), eq(values));
-        verify(redis).expire(anyString(), eq(Duration.ofSeconds(100)));
+        verify(redis).expire(anyString(), eq(timeout));
     }
 }

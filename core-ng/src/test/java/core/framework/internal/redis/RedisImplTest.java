@@ -29,7 +29,7 @@ class RedisImplTest {
         var timeout = Duration.ofSeconds(5);
         redis.timeout(timeout);
 
-        assertThat(redis.timeoutInMs).isEqualTo(timeout.toMillis());
+        assertThat(redis.connectionFactory.timeoutInMs).isEqualTo(timeout.toMillis());
     }
 
     @Test
@@ -43,7 +43,7 @@ class RedisImplTest {
     @Test
     void set() {
         assertThatThrownBy(() -> redis.set("key", "value", Duration.ZERO, true))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("expiration time must be longer than 0ms");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("expiration time must be longer than 0ms");
     }
 }

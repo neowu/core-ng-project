@@ -31,7 +31,7 @@ public class RedisSubscribeThread extends Thread {
     @Override
     public void run() {
         while (!stop) {
-            try (RedisConnection connection = redis.createConnection(0)) {
+            try (RedisConnection connection = redis.connectionFactory.create(0)) {
                 this.connection = connection;
                 process(connection);
             } catch (Throwable e) {

@@ -3,7 +3,6 @@ package core.framework.module;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
-import core.framework.internal.redis.RedisHost;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.resource.PoolMetrics;
 import core.framework.redis.Redis;
@@ -51,7 +50,12 @@ public class RedisConfig extends Config {
 
     void setHost(String host) {
         RedisImpl redis = (RedisImpl) this.redis;
-        redis.host = new RedisHost(host);
+        redis.host(host);
+    }
+
+    public void password(String password) {
+        RedisImpl redis = (RedisImpl) this.redis;
+        redis.password(password);
     }
 
     public void poolSize(int minSize, int maxSize) {

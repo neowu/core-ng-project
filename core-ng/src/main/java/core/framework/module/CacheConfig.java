@@ -13,7 +13,6 @@ import core.framework.internal.cache.RedisLocalCacheStore;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
-import core.framework.internal.redis.RedisHost;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.redis.RedisSubscribeThread;
 import core.framework.internal.resource.PoolMetrics;
@@ -69,8 +68,12 @@ public class CacheConfig extends Config {
     }
 
     public void redis(String host) {
+        redis(host, null);
+    }
+
+    public void redis(String host, String password) {
         if (localCacheStore != null || redisCacheStore != null) throw new Error("cache store is already configured, please configure only once");
-        configureRedis(host);
+        configureRedis(host, password);
     }
 
     public <T> CacheStoreConfig add(Class<T> cacheClass, Duration duration) {
@@ -96,11 +99,12 @@ public class CacheConfig extends Config {
         return ASCII.toLowerCase(cacheClass.getSimpleName());
     }
 
-    void configureRedis(String host) {
+    void configureRedis(String host, String password) {
         logger.info("create redis cache store, host={}", host);
 
         var redis = new RedisImpl("redis-cache");
-        redis.host = new RedisHost(host);
+        redis.host(host);
+        redis.password(password);
         redis.timeout(Duration.ofSeconds(1));   // for cache, use shorter timeout than default redis config
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));

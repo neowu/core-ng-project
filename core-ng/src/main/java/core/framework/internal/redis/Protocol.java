@@ -63,6 +63,8 @@ final class Protocol {
     }
 
     static class Command {
+        static final byte[] AUTH = Strings.bytes("AUTH");
+
         static final byte[] GET = Strings.bytes("GET");
         static final byte[] SET = Strings.bytes("SET");
         static final byte[] PEXPIRE = Strings.bytes("PEXPIRE");

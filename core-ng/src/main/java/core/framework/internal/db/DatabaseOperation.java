@@ -120,6 +120,35 @@ public class DatabaseOperation {
         }
     }
 
+    Optional<long[]> batchInsert(String sql, List<Object[]> params, String generatedColumn) {
+        int size = params.size();
+        long[] results = generatedColumn != null ? new long[size] : null;
+        PoolItem<Connection> connection = transactionManager.getConnection();
+        try (PreparedStatement statement = insertStatement(connection.resource, sql, generatedColumn)) {
+            statement.setQueryTimeout(queryTimeoutInSeconds);
+            int index = 1;
+            int resultIndex = 0;
+            for (Object[] batchParams : params) {
+                setParams(statement, batchParams);
+                statement.addBatch();
+                if (index % batchSize == 0 || index == size) {
+                    statement.executeBatch();
+                    if (generatedColumn != null) {
+                        fetchGeneratedKeys(statement, results, resultIndex);
+                        resultIndex = index - 1;
+                    }
+                }
+                index++;
+            }
+            return generatedColumn != null ? Optional.of(results) : Optional.empty();
+        } catch (SQLException e) {
+            Connections.checkConnectionState(connection, e);
+            throw new UncheckedSQLException(e);
+        } finally {
+            transactionManager.returnConnection(connection);
+        }
+    }
+
     private PreparedStatement insertStatement(Connection connection, String sql, String generatedColumn) throws SQLException {
         if (generatedColumn == null) return connection.prepareStatement(sql);
         return connection.prepareStatement(sql, new String[]{generatedColumn});
@@ -158,6 +187,17 @@ public class DatabaseOperation {
             }
         }
         return OptionalLong.empty();
+    }
+
+    private void fetchGeneratedKeys(PreparedStatement statement, long[] results, int resultIndex) throws SQLException {
+        int index = resultIndex;
+        try (ResultSet keys = statement.getGeneratedKeys()) {
+            if (keys != null) {
+                while (keys.next()) {
+                    results[index++] = keys.getLong(1);
+                }
+            }
+        }
     }
 
     private void setParams(PreparedStatement statement, Object... params) throws SQLException {

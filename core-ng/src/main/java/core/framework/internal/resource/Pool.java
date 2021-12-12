@@ -25,10 +25,22 @@ import static core.framework.log.Markers.errorCode;
  * @author neo
  */
 public class Pool<T extends AutoCloseable> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Pool.class);
+
+    // helper for closing resource on creation failure
+    public static void closeQuietly(AutoCloseable resource) {
+        if (resource != null) {
+            try {
+                resource.close();
+            } catch (Exception e) {
+                LOGGER.warn("failed to close resource", e);
+            }
+        }
+    }
+
     final BlockingDeque<PoolItem<T>> idleItems = new LinkedBlockingDeque<>();
     final String name;
     final AtomicInteger size = new AtomicInteger(0);
-    private final Logger logger = LoggerFactory.getLogger(Pool.class);
     private final Supplier<T> factory;
     public Duration maxIdleTime = Duration.ofMinutes(30);
     private int minSize = 1;
@@ -78,11 +90,11 @@ public class Pool<T extends AutoCloseable> {
         try {
             valid = validator.validate(item.resource);
         } catch (Throwable e) {     // catch all exceptions to make sure item will be closed to avoid resource leak
-            logger.warn(e.getMessage(), e);
+            LOGGER.warn(e.getMessage(), e);
             valid = false;
         }
         if (!valid) {
-            logger.warn(errorCode("BROKEN_POOL_CONNECTION"), "connection is broken, try to reconnect immediately, pool=" + name);
+            LOGGER.warn(errorCode("BROKEN_POOL_CONNECTION"), "connection is broken, try to reconnect immediately, pool=" + name);
             closeItem(item);
         }
         return valid;
@@ -109,7 +121,7 @@ public class Pool<T extends AutoCloseable> {
         } catch (InterruptedException e) {
             throw new Error("interrupted during waiting for next available resource", e);
         } finally {
-            logger.debug("wait for next available resource, pool={}, elapsed={}", name, watch.elapsed());
+            LOGGER.debug("wait for next available resource, pool={}, elapsed={}", name, watch.elapsed());
         }
     }
 
@@ -122,12 +134,12 @@ public class Pool<T extends AutoCloseable> {
             size.getAndDecrement();
             throw e;
         } finally {
-            logger.debug("create new resource, pool={}, elapsed={}", name, watch.elapsed());
+            LOGGER.debug("create new resource, pool={}, elapsed={}", name, watch.elapsed());
         }
     }
 
     public void refresh() {
-        logger.info("refresh resource pool, pool={}", name);
+        LOGGER.info("refresh resource pool, pool={}", name);
         evictIdleItems();
         replenish();
     }
@@ -172,7 +184,7 @@ public class Pool<T extends AutoCloseable> {
         try {
             item.resource.close();
         } catch (Exception e) {
-            logger.warn("failed to close resource, pool={}", name, e);
+            LOGGER.warn("failed to close resource, pool={}", name, e);
         }
     }
 

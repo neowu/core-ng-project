@@ -87,11 +87,13 @@ public final class DatabaseImpl implements Database {
             driverProperties = driverProperties(url, user, password);
             this.driverProperties = driverProperties;
         }
+        Connection connection = null;
         try {
-            Connection connection = driver.connect(url, driverProperties);
+            connection = driver.connect(url, driverProperties);
             if (isolationLevel != null) connection.setTransactionIsolation(isolationLevel.level);
             return connection;
         } catch (SQLException e) {
+            Pool.closeQuietly(connection);
             throw new UncheckedSQLException(e);
         }
     }
@@ -112,9 +114,6 @@ public final class DatabaseImpl implements Database {
             // mysql with ssl has overhead, usually we ensure security on arch level, e.g. gcloud sql proxy or firewall rule
             if (index == -1 || url.indexOf("useSSL=", index + 1) == -1) properties.setProperty(PropertyKey.useSSL.getKeyName(), "false");
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-charsets.html
-            // without characterEncoding, mysql driver auto detects charset based on server side var character_set_server
-            // and only character_set_server=utf8mb4 will map characterEncoding to utf-8
-            // here use utf-8 as default value, and support to override by jdbc url param
             if (index == -1 || url.indexOf("characterEncoding=", index + 1) == -1) properties.setProperty(PropertyKey.characterEncoding.getKeyName(), "utf-8");
         }
         return properties;

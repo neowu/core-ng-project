@@ -26,7 +26,7 @@ tasks.named("startScripts").configure {
 
     doLast {
         windowsScript.text = windowsScript.text.replaceFirst('APP_HOME_VAR', '%APP_HOME%')
-        unixScript.text = unixScript.text.replaceFirst('APP_HOME_VAR', '\\$APP_HOME')
+        unixScript.text = unixScript.text.replaceFirst('APP_HOME_VAR/web', '\'\\$APP_HOME/web\'')
     }
 }
 
