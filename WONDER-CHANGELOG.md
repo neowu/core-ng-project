@@ -1,5 +1,15 @@
 ## Change Log In Wonder
 
+### 1.1.1 (12/13/2021)
+
+* corresponds to upstream version **7.8.1**.
+* db: batchInsert returns Optional<long[]> for auto incremental PK
+* db: update mysql driver to 8.0.26
+* httpClient: support client ssl auth
+* site: removed Session.timeout(Duration), it proved not useful, for app level remember me, it's better handle in app level with custom token handling
+* redis: support password auth for redis/cache
+* ws: added WebContext.responseCookie to allow WS to assign cookie to response
+
 ### 1.1.0 (12/13/2021)
 
 * corresponds to upstream version **7.8.0**.
