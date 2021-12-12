@@ -1,5 +1,20 @@
 ## Change Log In Wonder
 
+### 1.0.2 (12/13/2021)
+
+* corresponds to upstream version 7.7.2.
+* monitor: fixed overflowed vmRSS value, use long instead of int
+* api: added "app" in APIDefinitionResponse
+* monitor: api config json schema changed !!!
+  > changed from map to List<ServiceURL>, to simplify config. it requires the latest framework, refers to above
+    ```json
+        {
+          "api": {
+            "services": ["https://website", "https://backoffice"]
+          } 
+        }
+    ```
+
 ### 1.0.1 (12/13/2021)
 
 * corresponds to upstream version 7.7.1.
