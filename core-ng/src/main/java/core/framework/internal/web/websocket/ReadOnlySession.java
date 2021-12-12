@@ -2,6 +2,7 @@ package core.framework.internal.web.websocket;
 
 import core.framework.web.Session;
 
+import java.time.Duration;
 import java.util.Optional;
 
 /**
@@ -26,6 +27,11 @@ public class ReadOnlySession implements Session {
 
     @Override
     public void invalidate() {
+        throw new Error("session is readonly for websocket");
+    }
+
+    @Override
+    public void timeout(Duration timeout) {
         throw new Error("session is readonly for websocket");
     }
 }

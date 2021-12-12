@@ -107,7 +107,7 @@ public class ActionDiagram {
         return publishes;
     }
 
-    private String tooltip(String action, String app, List<ActionDocument> actions) {
+    String tooltip(String action, String app, List<ActionDocument> actions) {
         var builder = new CodeBuilder();
         builder.append("<table>\n")
             .append("<caption>{}</caption>\n", action)
@@ -118,10 +118,10 @@ public class ActionDiagram {
         builder.append("<tr><td colspan=2 class=section>action id</td></tr>\n");
         for (ActionDocument doc : actions) {
             if ("WARN".equals(doc.result) || "ERROR".equals(doc.result)) {
-                builder.append("<tr style='color:{}'><td>", "WARN".equals(doc.result) ? "OrangeRed" : "Red").append(doc.id).append("</td>");
-                builder.append("<td>").append(doc.errorCode).append("</td></tr>\n");
+                String color = "WARN".equals(doc.result) ? "OrangeRed" : "Red";
+                builder.append("<tr style='color:{}'><td>{}</td><td>{}</td></tr>\n", color, doc.id, doc.errorCode);
             } else {
-                builder.append("<tr><td colspan=2>").append(doc.id).append("</td></tr>\n");
+                builder.append("<tr><td colspan=2>{}</td></tr>\n", doc.id);
             }
         }
 

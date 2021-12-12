@@ -3,7 +3,7 @@ apply from: file("${rootDir}/gradle/publish.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '7.7.3'
+    version = '7.7.4'
 
     repositories {
         maven {

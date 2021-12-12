@@ -149,63 +149,69 @@ public class ArchDiagram {
         return result;
     }
 
-    private String tooltip(MessageSubscription subscription) {
-        var builder = new StringBuilder(512);
-        builder.append("<table>\n<caption>").append(subscription.topic).append("</caption>\n<tr><td colspan=2 class=section>publishers</td><tr>\n");
+    String tooltip(MessageSubscription subscription) {
+        var builder = new CodeBuilder();
+        builder.append("<table>\n")
+            .append("<caption>{}</caption>\n", subscription.topic)
+            .append("<tr><td colspan=2 class=section>publishers</td><tr>\n");
         for (Map.Entry<String, Long> entry : subscription.publishers.entrySet()) {
-            builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+            builder.append("<tr><td>{}</td><td>{}</td></tr>\n", entry.getKey(), entry.getValue());
         }
         builder.append("<tr><td colspan=2 class=section>consumers</td><tr>\n");
         for (Map.Entry<String, Long> entry : subscription.consumers.entrySet()) {
-            builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+            builder.append("<tr><td>{}</td><td>{}</td></tr>\n", entry.getKey(), entry.getValue());
         }
-        return builder.append("</table>").toString();
+        return builder.append("</table>").build();
     }
 
     private String tooltip(String app) {
-        var builder = new StringBuilder(512);
-        builder.append("<table>\n<caption>").append(app).append("</caption>\n");
+        var builder = new CodeBuilder();
+        builder.append("<table>\n")
+            .append("<caption>{}</caption>\n", app);
         Map<String, Long> calls = apiCalls(app);
         if (!calls.isEmpty()) {
             builder.append("<tr><td colspan=2 class=section>api calls</td><tr>\n");
             for (Map.Entry<String, Long> entry : calls.entrySet()) {
-                builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+                builder.append("<tr><td>{}</td><td>{}</td></tr>\n", entry.getKey(), entry.getValue());
             }
         }
         Scheduler scheduler = schedulers.get(app);
         if (scheduler != null) {
             builder.append("<tr><td colspan=2 class=section>jobs</td><tr>\n");
             for (Map.Entry<String, Long> entry : scheduler.jobs.entrySet()) {
-                builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+                builder.append("<tr><td>{}</td><td>{}</td></tr>\n", entry.getKey(), entry.getValue());
             }
         }
         Map<String, Long> published = messagePublished(app);
         if (!published.isEmpty()) {
             builder.append("<tr><td colspan=2 class=section>published messages</td><tr>\n");
             for (Map.Entry<String, Long> entry : published.entrySet()) {
-                builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+                builder.append("<tr><td>{}</td><td>{}</td></tr>\n", entry.getKey(), entry.getValue());
             }
         }
         Map<String, Long> consumed = messageConsumed(app);
         if (!consumed.isEmpty()) {
             builder.append("<tr><td colspan=2 class=section>consumed messages</td><tr>\n");
             for (Map.Entry<String, Long> entry : consumed.entrySet()) {
-                builder.append("<tr><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>\n");
+                builder.append("<tr><td>{}</td><td>{}</td></tr>\n", entry.getKey(), entry.getValue());
             }
         }
-        return builder.append("</table>").toString();
+        return builder.append("</table>").build();
     }
 
     private String tooltip(APIDependency dependency) {
         dependency.calls.sort(Comparator.comparing(call -> call.uri));
-        var builder = new StringBuilder(512);
-        builder.append("<table>\n<caption>").append(dependency.client.startsWith("_direct_") ? "direct" : dependency.client)
-            .append(" > ")
-            .append(dependency.service).append("</caption>\n<tr><td colspan=3 class=section>api calls</td><tr>\n");
+        var builder = new CodeBuilder();
+        builder.append("<table>\n");
+
+        String caption = dependency.client.startsWith("_direct_") ? "direct" : dependency.client + " > " + dependency.service;
+        builder.append("<caption>{}</caption>\n", caption);
+
+        builder.append("<tr><td colspan=3 class=section>api calls</td><tr>\n");
         for (APICall call : dependency.calls) {
-            builder.append("<tr><td>").append(call.method).append("</td><td>").append(call.uri).append("</td><td>").append(call.count).append("</td></tr>\n");
+            builder.append("<tr><td>{}</td><td>{}</td><td>{}</td></tr>\n", call.method, call.uri, call.count);
         }
-        return builder.append("</table>").toString();
+        return builder.append("</table>").build();
     }
 
     private Set<String> apps() {

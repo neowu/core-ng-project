@@ -88,7 +88,8 @@ public final class HTTPClientBuilder {
                 .writeTimeout(timeout)
                 .callTimeout(callTimeout()) // call timeout is only used as last defense, timeout for complete call includes connect/retry/etc
                 .connectionPool(new ConnectionPool(100, keepAlive.toSeconds(), TimeUnit.SECONDS))
-                .eventListenerFactory(new HTTPEventListenerFactory());
+                .eventListenerFactory(new HTTPEventListenerFactory())
+                .retryOnConnectionFailure(false);   // use RetryInterceptor to record all failures, RetryAndFollowUpInterceptor will always be added to chain by okHTTP, so it still supports followup
 
             configureHTTPS(builder);
 

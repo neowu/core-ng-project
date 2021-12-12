@@ -8,9 +8,9 @@ import java.util.Set;
  * @author neo
  */
 interface SessionStore {
-    Map<String, String> getAndRefresh(String sessionId, String domain, Duration sessionTimeout);
+    Map<String, String> getAndRefresh(String sessionId, String domain, Duration defaultTimeout);
 
-    void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration sessionTimeout);
+    void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration defaultTimeout);
 
     void invalidate(String sessionId, String domain);
 

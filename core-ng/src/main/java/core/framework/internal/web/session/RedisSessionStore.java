@@ -29,12 +29,13 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public Map<String, String> getAndRefresh(String sessionId, String domain, Duration sessionTimeout) {
+    public Map<String, String> getAndRefresh(String sessionId, String domain, Duration defaultTimeout) {
         String key = sessionKey(sessionId, domain);
         try {
             Map<String, String> sessionValues = redis.hash().getAll(key);
             if (sessionValues.isEmpty()) return null;
-            redis.expire(key, sessionTimeout);
+            Duration timeout = SessionStoreHelper.timeout(sessionValues, defaultTimeout);
+            redis.expire(key, timeout);
             return sessionValues;
         } catch (RedisException e) {
             // gracefully handle invalid data in redis, either legacy old format value, or invalid value/key type inserted manually,
@@ -44,7 +45,7 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration sessionTimeout) {
+    public void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration defaultTimeout) {
         String key = sessionKey(sessionId, domain);
 
         List<String> deletedFields = Lists.newArrayList();
@@ -56,7 +57,8 @@ public class RedisSessionStore implements SessionStore {
         }
         if (!deletedFields.isEmpty()) redis.hash().del(key, deletedFields.toArray(new String[0]));
         if (!updatedValues.isEmpty()) redis.hash().multiSet(key, updatedValues);
-        redis.expire(key, sessionTimeout);
+        Duration timeout = SessionStoreHelper.timeout(values, defaultTimeout);
+        redis.expire(key, timeout);
     }
 
     @Override
