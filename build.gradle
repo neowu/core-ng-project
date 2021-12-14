@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '7.9.3'
+    version = '7.10.0'
 
     repositories {
         maven {
@@ -14,7 +14,7 @@ subprojects {
     }
 }
 
-def elasticVersion = '7.15.0'
+def elasticVersion = '7.16.0'
 def kafkaVersion = '3.0.0'
 def jacksonVersion = '2.12.5'
 def junitVersion = '5.8.1'
@@ -35,7 +35,7 @@ project('core-ng') {
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'com.squareup.okhttp3:okhttp:4.9.3'
-        implementation 'io.undertow:undertow-core:2.2.12.Final'
+        implementation 'io.undertow:undertow-core:2.2.14.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.8.4'      // used by kafka message compression
         compileOnly "mysql:mysql-connector-java:${mysqlVersion}"
@@ -75,7 +75,7 @@ project('core-ng-mongo-test') {
     dependencies {
         implementation project(":core-ng-test")
         implementation project(":core-ng-mongo")
-        implementation 'de.bwaldvogel:mongo-java-server:1.38.0'
+        implementation 'de.bwaldvogel:mongo-java-server:1.39.0'
     }
 }
 
@@ -83,10 +83,8 @@ project('core-ng-search') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        api "org.elasticsearch:elasticsearch:${elasticVersion}@jar"
-        api "org.elasticsearch:elasticsearch-x-content:${elasticVersion}@jar"
-        implementation "org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticVersion}"
-        implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"              // override transitive jackson dependencies of elasticsearch
+        api "co.elastic.clients:elasticsearch-java:${elasticVersion}"
+        implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
         testImplementation project(":core-ng-test")
     }
 }

@@ -7,9 +7,7 @@ import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.impl.ElasticSearchHost;
 import core.framework.search.impl.ElasticSearchImpl;
-import core.framework.search.impl.log.ESLoggerContextFactory;
 import core.framework.util.Types;
-import org.apache.logging.log4j.LogManager;
 
 import java.time.Duration;
 
@@ -26,8 +24,6 @@ public class SearchConfig extends Config {
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-
-        configureLogger();
 
         var search = new ElasticSearchImpl();
         context.startupHook.initialize.add(search::initialize);
@@ -47,10 +43,6 @@ public class SearchConfig extends Config {
     public void host(String host) {
         search.hosts = ElasticSearchHost.parse(host);
         context.probe.urls.add(search.hosts[0].toURI() + "/_cluster/health?local=true");      // in kube env, it's ok to just check first pod of stateful set
-    }
-
-    void configureLogger() {
-        System.setProperty(LogManager.FACTORY_PROPERTY_NAME, ESLoggerContextFactory.class.getName());
     }
 
     public void slowOperationThreshold(Duration threshold) {

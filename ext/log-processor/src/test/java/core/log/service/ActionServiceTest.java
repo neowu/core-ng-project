@@ -1,5 +1,7 @@
 package core.log.service;
 
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import core.framework.inject.Inject;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.PerformanceStatMessage;
@@ -11,7 +13,6 @@ import core.framework.util.Lists;
 import core.log.IntegrationTest;
 import core.log.domain.ActionDocument;
 import core.log.domain.TraceDocument;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -112,7 +113,7 @@ class ActionServiceTest extends IntegrationTest {
 
     private List<ActionDocument> searchActionDocument(LocalDate now, String key, String value) {
         var request = new SearchRequest();
-        request.query = QueryBuilders.matchQuery(key, value);
+        request.query = new Query.Builder().match(m -> m.field(key).query(FieldValue.of(value))).build();
         request.index = indexService.indexName("action", now);
         return actionType.search(request).hits;
     }

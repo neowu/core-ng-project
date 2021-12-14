@@ -20,4 +20,3 @@
 * action visualization to show service flow/dependency diagram?
 
 * use adminClient to check kafka ready? or retry sending message?
-* update es to 7.16

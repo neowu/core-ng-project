@@ -30,6 +30,7 @@ public class TestSearchConfig extends SearchConfig {
     @Override
     protected void initialize(ModuleContext context, String name) {
         super.initialize(context, name);
+        configureLogger();
         startLocalElasticSearch(context);
     }
 
@@ -53,7 +54,6 @@ public class TestSearchConfig extends SearchConfig {
     // log4j-to-slf4j works only if client is used, but integration test uses Node.
     // refer to org.elasticsearch.common.logging.NodeAndClusterIdStateListener, NodeAndClusterIdConverter.setNodeIdAndClusterId(nodeId, clusterUUID);
     // ES keeps removing log4j-core dependency, now seems only above one left
-    @Override
     void configureLogger() {
         if (System.getProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY) != null) return;
         System.setProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY, ESLoggerConfigFactory.class.getName());

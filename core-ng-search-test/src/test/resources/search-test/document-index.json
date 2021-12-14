@@ -12,7 +12,7 @@
         },
         "english_stemmer": {
           "type": "stemmer",
-          "name": "english"
+          "language": "english"
         },
         "english_possessive_stemmer": {
           "type": "stemmer",

@@ -1,6 +1,6 @@
 package core.framework.search;
 
-import org.elasticsearch.search.aggregations.Aggregation;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 
 import java.util.List;
 import java.util.Map;
@@ -11,9 +11,9 @@ import java.util.Map;
 public class SearchResponse<T> {
     public final List<T> hits;
     public final long totalHits;
-    public final Map<String, Aggregation> aggregations;
+    public final Map<String, Aggregate> aggregations;
 
-    public SearchResponse(List<T> hits, long totalHits, Map<String, Aggregation> aggregations) {
+    public SearchResponse(List<T> hits, long totalHits, Map<String, Aggregate> aggregations) {
         this.hits = hits;
         this.totalHits = totalHits;
         this.aggregations = aggregations;
