@@ -29,7 +29,7 @@ public final class UncheckedSQLException extends RuntimeException {
         if (state == null) return null;
         // in batchExecute, driver throws BatchUpdateException and may not have SQLIntegrityConstraintViolationException as cause, so here use sql state as contract
         if (state.startsWith("23")) return ErrorType.INTEGRITY_CONSTRAINT_VIOLATION;
-        if (state.startsWith("08") && "S1009".equals(state)) return ErrorType.CONNECTION_ERROR;
+        if (state.startsWith("08") || "S1009".equals(state)) return ErrorType.CONNECTION_ERROR;
         return null;
     }
 
