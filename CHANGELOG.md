@@ -7,6 +7,7 @@
   > the new API in my opinion abused java lambda, which added lots accidentally complexity, and not jvm/gc friendly (of course usually the bottleneck of es call is not on java side),
   > especially java is not a language handles lambda elegantly, lambda is just syntax sugar of anonymous class  
   > in many cases it's actually much harder to use compare to old HLRC
+* TODO: elasticsearch java client still have bugs for completion, update soon
 
 ### 7.9.3 (11/23/2021 - 12/10/2021)
 

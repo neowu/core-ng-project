@@ -20,3 +20,4 @@
 * action visualization to show service flow/dependency diagram?
 
 * use adminClient to check kafka ready? or retry sending message?
+* retry on message handler? like when mysql is in maintenance 

@@ -50,10 +50,8 @@ public class TestSearchConfig extends SearchConfig {
         search.hosts = new HttpHost[]{localESHost};
     }
 
-    // es refers to log4j core directly in org.elasticsearch.common.logging.Loggers, this is to bridge es log to coreng logger
-    // log4j-to-slf4j works only if client is used, but integration test uses Node.
+    // ES Node refers to log4j core API directly in org.elasticsearch.common.logging.Loggers, this is to bridge es log to coreng logger
     // refer to org.elasticsearch.common.logging.NodeAndClusterIdStateListener, NodeAndClusterIdConverter.setNodeIdAndClusterId(nodeId, clusterUUID);
-    // ES keeps removing log4j-core dependency, now seems only above one left
     void configureLogger() {
         if (System.getProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY) != null) return;
         System.setProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY, ESLoggerConfigFactory.class.getName());

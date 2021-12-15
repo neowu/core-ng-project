@@ -1,11 +1,13 @@
 package core.framework.db;
 
+import java.io.Serial;
 import java.sql.SQLException;
 
 /**
  * @author neo
  */
 public final class UncheckedSQLException extends RuntimeException {
+    @Serial
     private static final long serialVersionUID = 5857178985477320780L;
 
     public final ErrorType errorType;
@@ -27,7 +29,7 @@ public final class UncheckedSQLException extends RuntimeException {
         if (state == null) return null;
         // in batchExecute, driver throws BatchUpdateException and may not have SQLIntegrityConstraintViolationException as cause, so here use sql state as contract
         if (state.startsWith("23")) return ErrorType.INTEGRITY_CONSTRAINT_VIOLATION;
-        if (state.startsWith("08")) return ErrorType.CONNECTION_ERROR;
+        if (state.startsWith("08") && "S1009".equals(state)) return ErrorType.CONNECTION_ERROR;
         return null;
     }
 
