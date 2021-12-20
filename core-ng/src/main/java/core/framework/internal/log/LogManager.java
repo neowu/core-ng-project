@@ -70,7 +70,7 @@ public class LogManager {
     }
 
     void checkSlowProcess(long elapsed, long maxProcessTimeInNano) {
-        if (maxProcessTimeInNano != -1 && elapsed > maxProcessTimeInNano) {
+        if (maxProcessTimeInNano > 0 && elapsed > maxProcessTimeInNano) {
             LOGGER.warn(Markers.errorCode("SLOW_PROCESS"), "action took longer than of max process time, maxProcessTime={}, elapsed={}", Duration.ofNanos(maxProcessTimeInNano), Duration.ofNanos(elapsed));
         }
     }

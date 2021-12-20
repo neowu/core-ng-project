@@ -10,6 +10,7 @@ services:
     - ES_JAVA_OPTS=-Xms512m -Xmx512m
     - xpack.security.enabled=false
     - xpack.ml.enabled=false
+    - ingest.geoip.downloader.enabled=false
   kibana:
     image: docker.elastic.co/kibana/kibana:7.16.0
     ports:

@@ -33,7 +33,7 @@ class WebServiceClientLinkContextTest {
     @Test
     void linkContext() {
         ActionLog actionLog = logManager.begin("begin", null);
-        actionLog.maxProcessTimeInNano = Duration.ofSeconds(60).toNanos();
+        actionLog.maxProcessTime(Duration.ofSeconds(60).toNanos());
 
         var request = new HTTPRequest(HTTPMethod.GET, "http://localhost");
         webServiceClient.linkContext(request);
@@ -62,7 +62,7 @@ class WebServiceClientLinkContextTest {
     @Test
     void linkContextWithShortProcessTime() {
         ActionLog actionLog = logManager.begin("begin", null);
-        actionLog.maxProcessTimeInNano = Duration.ofSeconds(1).toNanos();
+        actionLog.maxProcessTime(Duration.ofSeconds(1).toNanos());
 
         var request = new HTTPRequest(HTTPMethod.GET, "http://localhost");
         webServiceClient.linkContext(request);

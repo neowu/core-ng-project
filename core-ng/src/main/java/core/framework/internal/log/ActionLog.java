@@ -41,8 +41,8 @@ public final class ActionLog {
     public List<String> clients;
     public List<String> refIds;
     public boolean suppressSlowSQLWarning;
-    public long maxProcessTimeInNano = -1;
 
+    long maxProcessTimeInNano;
     String errorMessage;
     long elapsed;
 
