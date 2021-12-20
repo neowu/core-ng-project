@@ -75,6 +75,8 @@ public class WebSocketHandler {
         var webSocketExchange = new AsyncWebSocketHttpServerExchange(exchange, channels);
         exchange.upgradeChannel((connection, httpServerExchange) -> {
             WebSocketChannel channel = handshake.createChannel(webSocketExchange, connection, webSocketExchange.getBufferPool());
+            // not set idle timeout for channel, e.g. channel.setIdleTimeout(timeout);
+            // in cloud env, timeout is set on LB (azure AG, or gcloud LB), usually use 300s timeout
             try {
                 var wrapper = new ChannelImpl<>(channel, context, handler);
                 wrapper.action = action;

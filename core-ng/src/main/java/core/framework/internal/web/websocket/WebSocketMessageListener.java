@@ -14,6 +14,7 @@ import io.undertow.websockets.core.WebSockets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -21,6 +22,7 @@ import java.util.List;
  */
 final class WebSocketMessageListener extends AbstractReceiveListener {
     private static final long MAX_TEXT_MESSAGE_SIZE = 10_000_000;     // limit max text message sent by client to 10M
+    private final long maxProcessTimeInNano = Duration.ofSeconds(300).toNanos();    // generally we set 300s on LB for websocket timeout
     private final Logger logger = LoggerFactory.getLogger(WebSocketMessageListener.class);
     private final LogManager logManager;
     private final RateControl rateControl;
@@ -85,6 +87,7 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
     }
 
     private void linkContext(WebSocketChannel channel, ChannelImpl<?, ?> wrapper, ActionLog actionLog) {
+        actionLog.maxProcessTime(maxProcessTimeInNano);
         actionLog.context("channel", wrapper.id);
         logger.debug("refId={}", wrapper.refId);
         List<String> refIds = List.of(wrapper.refId);

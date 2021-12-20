@@ -114,7 +114,7 @@ public class CacheConfig extends Config {
         this.redis = redis;
     }
 
-    private LocalCacheStore localCacheStore() {
+    LocalCacheStore localCacheStore() {
         if (localCacheStore == null) {
             logger.info("create local cache store");
             var localCacheStore = new LocalCacheStore();

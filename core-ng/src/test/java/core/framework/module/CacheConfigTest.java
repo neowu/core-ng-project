@@ -32,7 +32,7 @@ class CacheConfigTest {
     @Test
     void validate() {
         assertThatThrownBy(() -> config.validate())
-                .hasMessageContaining("cache is configured but no cache added");
+            .hasMessageContaining("cache is configured but no cache added");
     }
 
     @Test
@@ -40,10 +40,10 @@ class CacheConfigTest {
         config.local();
 
         assertThatThrownBy(() -> config.local())
-                .hasMessageContaining("cache store is already configured");
+            .hasMessageContaining("cache store is already configured");
 
         assertThatThrownBy(() -> config.redis("localhost"))
-                .hasMessageContaining("cache store is already configured");
+            .hasMessageContaining("cache store is already configured");
     }
 
     @Test
@@ -55,6 +55,9 @@ class CacheConfigTest {
         assertThat(cache.cacheStore).isInstanceOf(LocalCacheStore.class);
 
         cacheStoreConfig.local();
+        assertThat(cache.cacheStore).isInstanceOf(LocalCacheStore.class);
+
+        cacheStoreConfig.localOnly();
         assertThat(cache.cacheStore).isInstanceOf(LocalCacheStore.class);
     }
 
@@ -68,12 +71,15 @@ class CacheConfigTest {
 
         cacheStoreConfig.local();
         assertThat(cache.cacheStore).isInstanceOf(RedisLocalCacheStore.class);
+
+        cacheStoreConfig.localOnly();
+        assertThat(cache.cacheStore).isInstanceOf(LocalCacheStore.class);
     }
 
     @Test
     void cacheName() {
         assertThat(config.cacheName(TestCache.class))
-                .isEqualTo("testcache");
+            .isEqualTo("testcache");
     }
 
     @Test
@@ -84,7 +90,7 @@ class CacheConfigTest {
         assertThat(config.caches.get("testcache")).isNotNull();
 
         assertThatThrownBy(() -> config.add(TestCache.class, Duration.ofHours(1)))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("found duplicate cache name");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("found duplicate cache name");
     }
 }

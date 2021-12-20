@@ -8,6 +8,8 @@
   > especially java is not a language handles lambda elegantly, lambda is just syntax sugar of anonymous class  
   > in many cases it's actually much harder to use compare to old HLRC
 * TODO: elasticsearch java client still have bugs for completion, update soon
+* cache: add cache().add(name).localOnly()
+  > to make certain cache only uses in memory store, for rarely changed or sensitive data (must not reside in redis as clear text)
 
 ### 7.9.3 (11/23/2021 - 12/10/2021)
 
