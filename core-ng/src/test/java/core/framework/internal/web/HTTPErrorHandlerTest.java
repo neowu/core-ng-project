@@ -1,6 +1,7 @@
 package core.framework.internal.web;
 
 import core.framework.api.http.HTTPStatus;
+import core.framework.internal.web.service.CompatibleInternalErrorResponse;
 import core.framework.internal.web.service.ErrorResponse;
 import core.framework.internal.web.service.InternalErrorResponse;
 import core.framework.internal.web.service.WebServiceClient;
@@ -44,8 +45,8 @@ class HTTPErrorHandlerTest {
         expected.severity = "WARN";
 
         var response = handler.errorResponse(new NotFoundException("test message", "TEST_ERROR_CODE"), WebServiceClient.USER_AGENT, "actionId");
-        assertThat(response).isInstanceOf(InternalErrorResponse.class)
-                .usingRecursiveComparison().ignoringFields("stackTrace")
+        assertThat(response).isInstanceOf(CompatibleInternalErrorResponse.class)
+                .usingRecursiveComparison().ignoringFields("stackTrace", "compatibleStackTrace", "compatibleErrorCode")
                 .isEqualTo(expected);
     }
 
@@ -58,8 +59,8 @@ class HTTPErrorHandlerTest {
         expected.severity = "ERROR";
 
         var response = handler.errorResponse(new Error("test message"), WebServiceClient.USER_AGENT, "actionId");
-        assertThat(response).isInstanceOf(InternalErrorResponse.class)
-                .usingRecursiveComparison().ignoringFields("stackTrace")
+        assertThat(response).isInstanceOf(CompatibleInternalErrorResponse.class)
+                .usingRecursiveComparison().ignoringFields("stackTrace", "compatibleStackTrace", "compatibleErrorCode")
                 .isEqualTo(expected);
     }
 

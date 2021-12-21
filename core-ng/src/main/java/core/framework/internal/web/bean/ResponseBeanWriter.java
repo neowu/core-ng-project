@@ -4,6 +4,7 @@ import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
+import core.framework.internal.web.service.CompatibleInternalErrorResponse;
 import core.framework.internal.web.service.ErrorResponse;
 import core.framework.internal.web.service.InternalErrorResponse;
 import core.framework.util.Maps;
@@ -21,6 +22,7 @@ public class ResponseBeanWriter {   // used by controller and web service
 
     public ResponseBeanWriter() {
         context.put(InternalErrorResponse.class, new Context<>(InternalErrorResponse.class));
+        context.put(CompatibleInternalErrorResponse.class, new Context<>(CompatibleInternalErrorResponse.class));
         context.put(ErrorResponse.class, new Context<>(ErrorResponse.class));
     }
 

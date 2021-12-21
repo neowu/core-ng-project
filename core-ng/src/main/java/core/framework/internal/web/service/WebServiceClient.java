@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -149,7 +150,14 @@ public class WebServiceClient {
 
     private InternalErrorResponse errorResponse(HTTPResponse response) {
         try {
-            return (InternalErrorResponse) reader.fromJSON(InternalErrorResponse.class, response.body);
+            var compatibleErrorResponse = (CompatibleInternalErrorResponse) reader.fromJSON(CompatibleInternalErrorResponse.class, response.body);
+            var errorResponse = new InternalErrorResponse();
+            errorResponse.id = compatibleErrorResponse.id;
+            errorResponse.severity = compatibleErrorResponse.severity;
+            errorResponse.message = compatibleErrorResponse.message;
+            errorResponse.errorCode = Optional.ofNullable(compatibleErrorResponse.errorCode).orElse(compatibleErrorResponse.compatibleErrorCode);
+            errorResponse.stackTrace = Optional.ofNullable(compatibleErrorResponse.stackTrace).orElse(compatibleErrorResponse.compatibleStackTrace);
+            return errorResponse;
         } catch (Throwable e) {
             int statusCode = response.statusCode;
             throw new RemoteServiceException("failed to deserialize remote service error response, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode), e);

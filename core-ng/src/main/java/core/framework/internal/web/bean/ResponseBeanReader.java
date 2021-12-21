@@ -5,6 +5,7 @@ import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.reflect.GenericTypes;
 import core.framework.internal.validate.Validator;
+import core.framework.internal.web.service.CompatibleInternalErrorResponse;
 import core.framework.internal.web.service.InternalErrorResponse;
 import core.framework.util.Maps;
 
@@ -25,6 +26,7 @@ public class ResponseBeanReader {   // used by webservice client
 
     public ResponseBeanReader() {
         context.put(InternalErrorResponse.class, new Context<>(InternalErrorResponse.class));   // webservice client doesn't need ErrorResponse
+        context.put(CompatibleInternalErrorResponse.class, new Context<>(CompatibleInternalErrorResponse.class));
     }
 
     public void register(Type responseType, BeanClassValidator validator) {

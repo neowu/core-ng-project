@@ -1,9 +1,16 @@
 package core.framework.module;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
+
 /**
  * @author neo
  */
 public final class SystemModule extends Module {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SystemModule.class);
+
     private final String propertyFileClasspath;
 
     public SystemModule(String propertyFileClasspath) {
@@ -43,7 +50,17 @@ public final class SystemModule extends Module {
         });
         property("sys.cdn.host").ifPresent(host -> site().cdn().host(host));
         property("sys.security.csp").ifPresent(policy -> site().security().contentSecurityPolicy(policy));
-        property("sys.api.allowCIDR").ifPresent(cidrs -> site().allowAPI(new IPv4RangePropertyValueParser(cidrs).parse()));
+        Optional.ofNullable(property("sys.api.allowCIDR")
+                .orElseGet(() -> {
+                    var cidrs = property("sys.publishAPI.allowCIDR");
+                    if (cidrs.isPresent()) {
+                        LOGGER.warn("'sys.publishAPI.allowCIDR' has been deprecated and will be removed in version 1.2. "
+                            + "please use 'sys.api.allowCIDR' as soon as possible.");
+                        return cidrs.get();
+                    }
+                    return null;
+                }))
+            .ifPresent(cidrs -> site().allowAPI(new IPv4RangePropertyValueParser(cidrs).parse()));
     }
 
     void configureHTTP() {
