@@ -2,7 +2,7 @@
 
 ### 7.10.0 (12/13/2021 - )
 
-* search: update to es 7.16.0, high level rest client is deprecated, migrated to elasticsearch java client !!! Query API broken
+* search: update to es 7.16.2, high level rest client is deprecated, migrated to elasticsearch java client !!! Query API broken
   > refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/introduction.html
   > the new API in my opinion abused java lambda, which added lots accidentally complexity, and not jvm/gc friendly (of course usually the bottleneck of es call is not on java side),
   > especially java is not a language handles lambda elegantly, lambda is just syntax sugar of anonymous class  
