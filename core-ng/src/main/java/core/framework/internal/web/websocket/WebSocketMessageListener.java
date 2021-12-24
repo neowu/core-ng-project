@@ -34,9 +34,9 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
     protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage textMessage) {
         @SuppressWarnings("unchecked")
         var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
-        //provide a convenient entry for open telemetry
         ActionLog actionLog = logManager.begin("=== ws message handling begin ===", null);
         try {
+            //provide a convenient entry for open telemetry
             onMessage(wrapper.action, channel, textMessage, wrapper, actionLog);
         } catch (Throwable e) {
             logManager.logError(e);
@@ -70,28 +70,28 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
     protected void onCloseMessage(CloseMessage message, WebSocketChannel channel) {
         @SuppressWarnings("unchecked")
         var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
-        //provide a convenient entry for open telemetry
-        onCloseMessage(wrapper.action, message, channel, wrapper);
-    }
-
-    private void onCloseMessage(String action, CloseMessage message, WebSocketChannel channel, ChannelImpl<Object, Object> wrapper) {
         ActionLog actionLog = logManager.begin("=== ws close message handling begin ===", null);
         try {
-            actionLog.action(action + ":close");
-            linkContext(channel, wrapper, actionLog);
-
-            int code = message.getCode();
-            String reason = message.getReason();
-            actionLog.context("code", code);
-            logger.debug("[channel] reason={}", reason);
-            actionLog.track("ws", 0, 1, 0);
-
-            wrapper.handler.listener.onClose(wrapper, code, reason);
+            //provide a convenient entry for open telemetry
+            onCloseMessage(wrapper.action, message, channel, wrapper, actionLog);
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {
             logManager.end("=== ws close message handling end ===");
         }
+    }
+
+    private void onCloseMessage(String action, CloseMessage message, WebSocketChannel channel, ChannelImpl<Object, Object> wrapper, ActionLog actionLog) {
+        actionLog.action(action + ":close");
+        linkContext(channel, wrapper, actionLog);
+
+        int code = message.getCode();
+        String reason = message.getReason();
+        actionLog.context("code", code);
+        logger.debug("[channel] reason={}", reason);
+        actionLog.track("ws", 0, 1, 0);
+
+        wrapper.handler.listener.onClose(wrapper, code, reason);
     }
 
     private void linkContext(WebSocketChannel channel, ChannelImpl<?, ?> wrapper, ActionLog actionLog) {
