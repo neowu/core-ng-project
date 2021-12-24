@@ -34,25 +34,30 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
     protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage textMessage) {
         @SuppressWarnings("unchecked")
         var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
+        //provide a convenient entry for open telemetry
         ActionLog actionLog = logManager.begin("=== ws message handling begin ===", null);
         try {
-            actionLog.action(wrapper.action);
-            linkContext(channel, wrapper, actionLog);
-
-            String data = textMessage.getData();
-            logger.debug("[channel] message={}", data);     // not mask, assume ws message not containing sensitive info, the data can be json or plain text
-            actionLog.track("ws", 0, 1, 0);
-
-            validateRate(wrapper);
-
-            Object message = wrapper.handler.fromClientMessage(data);
-            wrapper.handler.listener.onMessage(wrapper, message);
+            onMessage(wrapper.action, channel, textMessage, wrapper, actionLog);
         } catch (Throwable e) {
             logManager.logError(e);
             WebSockets.sendClose(closeCode(e), e.getMessage(), channel, ChannelCallback.INSTANCE);
         } finally {
             logManager.end("=== ws message handling end ===");
         }
+    }
+
+    private void onMessage(String action, WebSocketChannel channel, BufferedTextMessage textMessage, ChannelImpl<Object, Object> wrapper, ActionLog actionLog) {
+        actionLog.action(action);
+        linkContext(channel, wrapper, actionLog);
+
+        String data = textMessage.getData();
+        logger.debug("[channel] message={}", data);     // not mask, assume ws message not containing sensitive info, the data can be json or plain text
+        actionLog.track("ws", 0, 1, 0);
+
+        validateRate(wrapper);
+
+        Object message = wrapper.handler.fromClientMessage(data);
+        wrapper.handler.listener.onMessage(wrapper, message);
     }
 
     private void validateRate(ChannelImpl<?, ?> wrapper) {
@@ -65,9 +70,14 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
     protected void onCloseMessage(CloseMessage message, WebSocketChannel channel) {
         @SuppressWarnings("unchecked")
         var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
+        //provide a convenient entry for open telemetry
+        onCloseMessage(wrapper.action, message, channel, wrapper);
+    }
+
+    private void onCloseMessage(String action, CloseMessage message, WebSocketChannel channel, ChannelImpl<Object, Object> wrapper) {
         ActionLog actionLog = logManager.begin("=== ws close message handling begin ===", null);
         try {
-            actionLog.action(wrapper.action + ":close");
+            actionLog.action(action + ":close");
             linkContext(channel, wrapper, actionLog);
 
             int code = message.getCode();
