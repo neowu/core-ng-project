@@ -1,6 +1,8 @@
 package core.framework.search.impl;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch._types.ErrorCause;
 import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
@@ -8,6 +10,7 @@ import core.framework.internal.json.JSONMapper;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
+import core.framework.search.SearchException;
 import core.framework.util.StopWatch;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -40,10 +43,10 @@ public class ElasticSearchImpl implements ElasticSearch {
         if (client == null) {   // initialize can be called by initSearch explicitly during test,
             RestClientBuilder builder = RestClient.builder(hosts);
             builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
-                    .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
+                .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
             builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
-                    .setMaxConnPerRoute(100)
-                    .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis()));
+                .setMaxConnPerRoute(100)
+                .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis()));
             builder.setHttpClientConfigCallback(config -> config.addInterceptorFirst(new ElasticSearchLogInterceptor()));
             restClient = builder.build();
             client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper(JSONMapper.OBJECT_MAPPER)));
@@ -119,6 +122,8 @@ public class ElasticSearchImpl implements ElasticSearch {
             client.indices().refresh(builder -> builder.index(index));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw exception(e);
         } finally {
             logger.info("refresh index, index={}, elapsed={}", index, watch.elapsed());
         }
@@ -131,6 +136,8 @@ public class ElasticSearchImpl implements ElasticSearch {
             client.indices().close(builder -> builder.index(index).waitForActiveShards(w -> w.count(0)));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw exception(e);
         } finally {
             logger.info("close index, index={}, elapsed={}", index, watch.elapsed());
         }
@@ -143,6 +150,8 @@ public class ElasticSearchImpl implements ElasticSearch {
             client.indices().delete(builder -> builder.index(index));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw exception(e);
         } finally {
             logger.info("delete index, index={}, elapsed={}", index, watch.elapsed());
         }
@@ -155,8 +164,20 @@ public class ElasticSearchImpl implements ElasticSearch {
             return client.cluster().state(builder -> builder.metric("metadata")).valueBody().to(ClusterStateResponse.class);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw exception(e);
         } finally {
             logger.info("get cluster state, elapsed={}", watch.elapsed());
         }
+    }
+
+    // convert elasticsearch-java client exception, to append detailed error message
+    SearchException exception(ElasticsearchException e) {
+        ErrorCause causedBy = e.error().causedBy();
+        var builder = new StringBuilder(e.getMessage());
+        if (causedBy != null) {
+            builder.append("\nreason: ").append(causedBy.reason());
+        }
+        return new SearchException(builder.toString(), e);
     }
 }

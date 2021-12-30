@@ -1,6 +1,5 @@
 package core.log.service;
 
-import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import core.framework.inject.Inject;
 import core.framework.log.message.ActionLogMessage;
@@ -22,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
+import static core.framework.search.query.Queries.match;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -113,7 +113,7 @@ class ActionServiceTest extends IntegrationTest {
 
     private List<ActionDocument> searchActionDocument(LocalDate now, String key, String value) {
         var request = new SearchRequest();
-        request.query = new Query.Builder().match(m -> m.field(key).query(FieldValue.of(value))).build();
+        request.query = new Query.Builder().match(match(key, value)).build();
         request.index = indexService.indexName("action", now);
         return actionType.search(request).hits;
     }

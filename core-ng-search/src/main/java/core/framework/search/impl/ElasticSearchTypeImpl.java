@@ -1,5 +1,6 @@
 package core.framework.search.impl;
 
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.ErrorCause;
 import co.elastic.clients.elasticsearch._types.Result;
 import co.elastic.clients.elasticsearch._types.Time;
@@ -79,9 +80,9 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         try {
             var searchRequest = co.elastic.clients.elasticsearch.core.SearchRequest.of(builder -> {
                 builder.index(index).query(request.query).aggregations(request.aggregations).sort(request.sorts)
-                        .searchType(request.type)
-                        .from(request.skip)
-                        .size(request.limit);
+                    .searchType(request.type)
+                    .from(request.skip)
+                    .size(request.limit);
                 if (request.trackTotalHitsUpTo != null) builder.trackTotalHits(t -> t.count(request.trackTotalHitsUpTo));
                 return builder;
             });
@@ -94,6 +95,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             return new SearchResponse<>(items, total, response.aggregations());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw elasticSearch.exception(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, hits, 0);
@@ -117,17 +120,19 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
                 return builder;
             });
             var response = elasticSearch.client.search(builder ->
-                    builder.index(index).suggest(suggest).source(s -> s.fetch(Boolean.FALSE)), documentClass);
+                builder.index(index).suggest(suggest).source(s -> s.fetch(Boolean.FALSE)), documentClass);
 
             esTook = response.took() * 1_000_000;
             List<String> suggestions = response.suggest().values().stream()
-                    .flatMap(Collection::stream).flatMap(suggestion -> suggestion.options().stream()).map(option -> option.completion().text())
-                    .distinct()
-                    .collect(Collectors.toList());
+                .flatMap(Collection::stream).flatMap(suggestion -> suggestion.options().stream()).map(option -> option.completion().text())
+                .distinct()
+                .collect(Collectors.toList());
             options = suggestions.size();
             return suggestions;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw elasticSearch.exception(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, options, 0);
@@ -148,6 +153,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             return Optional.of(response.source());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw elasticSearch.exception(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, hits, 0);
@@ -165,6 +172,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             elasticSearch.client.index(builder -> builder.index(index).id(request.id).document(request.source));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw elasticSearch.exception(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, 0, 1);
@@ -188,11 +197,12 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         long esTook = 0;
         try {
             BulkResponse response = elasticSearch.client.bulk(builder -> builder.operations(operations));
-
             esTook = response.took() * 1_000_000; // mills to nano
-            if (response.errors()) throw new SearchException(failureMessage(response));
+            validate(response);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw elasticSearch.exception(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, 0, request.sources.size());
@@ -209,9 +219,11 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         try {
             Map<String, JsonData> params = request.params == null ? Map.of() : request.params.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, value -> JsonData.of(value.getValue())));
             elasticSearch.client.update(builder ->
-                    builder.index(index).id(request.id).script(s -> s.inline(i -> i.source(request.script).params(params))), documentClass);
+                builder.index(index).id(request.id).script(s -> s.inline(i -> i.source(request.script).params(params))), documentClass);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw elasticSearch.exception(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, 0, 1);
@@ -231,6 +243,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             return deleted;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw elasticSearch.exception(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, 0, deleted ? 1 : 0);
@@ -254,9 +268,11 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             BulkResponse response = elasticSearch.client.bulk(builder -> builder.operations(operations));
 
             esTook = response.took() * 1_000_000; // mills to nano
-            if (response.errors()) throw new SearchException(failureMessage(response));
+            validate(response);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw elasticSearch.exception(e);
         } finally {
             long elapsed = watch.elapsed();
             int size = request.ids.size();
@@ -275,6 +291,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             return response.tokens().stream().map(AnalyzeToken::token).toList();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw elasticSearch.exception(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed);
@@ -295,10 +313,10 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         int totalHits = 0;
         try {
             var response = elasticSearch.client.search(builder -> builder.index(index)
-                    .scroll(keepAlive)
-                    .query(forEach.query)
-                    .sort(s -> s.field(f -> f.field("_doc")))
-                    .size(forEach.limit), documentClass);
+                .scroll(keepAlive)
+                .query(forEach.query)
+                .sort(s -> s.field(f -> f.field("_doc")))
+                .size(forEach.limit), documentClass);
             var holder = new ScrollIdHolder();
             holder.scrollId = response.scrollId();
             while (true) {
@@ -319,6 +337,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw elasticSearch.exception(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, totalHits, 0);
@@ -340,23 +360,25 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         if (forEach.limit == null || forEach.limit <= 0) throw new Error("forEach.limit must not be null or less than one");
     }
 
-    private void checkSlowOperation(long elapsed) {
-        if (elapsed > slowOperationThresholdInNanos) {
-            logger.warn(errorCode("SLOW_ES"), "slow elasticsearch operation, elapsed={}", Duration.ofNanos(elapsed));
-        }
-    }
+    private void validate(BulkResponse response) {
+        if (!response.errors()) return;
 
-    private String failureMessage(BulkResponse responses) {
         var builder = new CodeBuilder();
         builder.append("bulk operation failed, errors=[\n");
-        for (BulkResponseItem item : responses.items()) {
+        for (BulkResponseItem item : response.items()) {
             ErrorCause error = item.error();
             if (error != null) {
                 builder.append("id={}, error={}, stackTrace={}\n", item.id(), error.reason(), error.stackTrace());
             }
         }
         builder.append("]");
-        return builder.build();
+        throw new SearchException(builder.build());
+    }
+
+    private void checkSlowOperation(long elapsed) {
+        if (elapsed > slowOperationThresholdInNanos) {
+            logger.warn(errorCode("SLOW_ES"), "slow elasticsearch operation, elapsed={}", Duration.ofNanos(elapsed));
+        }
     }
 
     private static class ScrollIdHolder {

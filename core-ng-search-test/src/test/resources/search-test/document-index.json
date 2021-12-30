@@ -56,6 +56,9 @@
       "completion2": {
         "type": "completion"
       },
+      "id": {
+        "type": "keyword"
+      },
       "string_field": {
         "type": "text",
         "analyzer": "english",

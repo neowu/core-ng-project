@@ -1,10 +1,9 @@
 package core.framework.search.impl;
 
-import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.ScriptSortType;
 import co.elastic.clients.elasticsearch._types.SearchType;
 import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.json.JsonData;
 import core.framework.inject.Inject;
@@ -16,6 +15,7 @@ import core.framework.search.ForEach;
 import core.framework.search.IntegrationTest;
 import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
+import core.framework.search.query.Sorts;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
@@ -33,6 +33,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static core.framework.search.query.Aggregations.sum;
+import static core.framework.search.query.Queries.match;
+import static core.framework.search.query.Queries.range;
+import static core.framework.search.query.Queries.term;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
@@ -64,21 +68,21 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     @Test
     void index() {
         TestDocument document = document("2", "value2", 2, 0,
-                ZonedDateTime.now(),
-                LocalTime.of(12, 1, 2, 200000000));
+            ZonedDateTime.now(),
+            LocalTime.of(12, 1, 2, 200000000));
         documentType.index(document.id, document);
 
         Optional<TestDocument> returnedDocument = documentType.get(document.id);
         assertThat(returnedDocument).get()
-                .usingRecursiveComparison()
-                .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
-                .isEqualTo(document);
+            .usingRecursiveComparison()
+            .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
+            .isEqualTo(document);
     }
 
     @Test
     void forEach() {
         documentType.bulkIndex(range(0, 30).mapToObj(i -> document(String.valueOf(i), String.valueOf(i), i, 0, null, null))
-                .collect(toMap(document -> document.id, identity())));
+            .collect(toMap(document -> document.id, identity())));
         elasticSearch.refreshIndex("document");
 
         List<TestDocument> results = Lists.newArrayList();
@@ -97,9 +101,9 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     @Test
     void complete() {
         documentType.bulkIndex(Map.of("1", document("1", "HashSet", 1, 0, null, null),
-                "2", document("2", "HashMap", 2, 0, null, null),
-                "3", document("3", "TreeSet", 3, 0, null, null),
-                "4", document("4", "TreeMap", 4, 0, null, null)));
+            "2", document("2", "HashMap", 2, 0, null, null),
+            "3", document("3", "TreeSet", 3, 0, null, null),
+            "4", document("4", "TreeMap", 4, 0, null, null)));
         elasticSearch.refreshIndex("document");
 
         List<String> options = documentType.complete("hash", "completion1", "completion2");
@@ -115,30 +119,30 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         // test synonyms
         var request = new SearchRequest();
         request.type = SearchType.QueryThenFetch;
-        request.query = new Query.Builder().bool(b -> b.must(m -> m.match(match -> match.field("string_field").query(FieldValue.of("first"))))
-                .filter(f -> f.term(t -> t.field("enum_field").value(FieldValue.of(JSON.toEnumValue(TestDocument.TestEnum.VALUE1)))))).build();
+        request.query = new Query.Builder().bool(b -> b.must(m -> m.match(match("string_field", "first")))
+            .filter(f -> f.term(term("enum_field", JSON.toEnumValue(TestDocument.TestEnum.VALUE1))))).build();
 
         request.sorts.add(SortOptions.of(builder -> builder.script(s ->
-                s.script(script -> script.inline(i -> i.source("doc['int_field'].value * 3"))).type(ScriptSortType.Number))));
+            s.script(script -> script.inline(i -> i.source("doc['int_field'].value * 3"))).type(ScriptSortType.Number))));
 
         SearchResponse<TestDocument> response = documentType.search(request);
 
         assertThat(response.totalHits).isEqualTo(1);
         assertThat(response.hits).hasSize(1)
-                .first().usingRecursiveComparison()
-                .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
-                .isEqualTo(document);
+            .first().usingRecursiveComparison()
+            .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
+            .isEqualTo(document);
 
         // test stemmer
         request = new SearchRequest();
-        request.query = new Query.Builder().match(builder -> builder.field("string_field").query(FieldValue.of("test"))).build();
+        request.query = new Query.Builder().match(match("string_field", "test")).build();
         response = documentType.search(request);
 
         assertThat(response.totalHits).isEqualTo(1);
         assertThat(response.hits).hasSize(1)
-                .first().usingRecursiveComparison()
-                .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
-                .isEqualTo(document);
+            .first().usingRecursiveComparison()
+            .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
+            .isEqualTo(document);
     }
 
     @Test
@@ -152,17 +156,18 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         elasticSearch.refreshIndex("document");
 
         var request = new SearchRequest();
-        request.query = new Query.Builder().range(r -> r.field("zoned_date_time_field").from(JsonData.of(from)).to(JsonData.of(to))).build();
+        request.query = new Query.Builder().range(range("zoned_date_time_field", from, to)).build();
+        request.sorts.add(Sorts.fieldSort("id", SortOrder.Asc));
         SearchResponse<TestDocument> response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(3);
         assertThat(response.hits.stream().map(document1 -> document1.stringField).collect(Collectors.toList()))
-                .containsOnly("value1", "value2", "value3");
+            .containsOnly("value1", "value2", "value3");
 
         request.query = new Query.Builder().range(r -> r.field("local_time_field").gt(JsonData.of(LocalTime.of(13, 0)))).build();
         response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(2);
         assertThat(response.hits.stream().map(document -> document.stringField).collect(Collectors.toList()))
-                .containsOnly("value3", "value4");
+            .containsOnly("value3", "value4");
     }
 
     @Test
@@ -217,8 +222,8 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         var request = new SearchRequest();
         request.skip = 0;
         request.limit = 1;
-        request.query = new Query.Builder().match(m -> m.field("string_field").query(FieldValue.of("value1"))).build();
-        request.aggregations.put("totalValue", Aggregation.of(a -> a.sum(s -> s.field("double_field"))));
+        request.query = new Query.Builder().match(match("string_field", "value1")).build();
+        request.aggregations.put("totalValue", sum("double_field"));
         SearchResponse<TestDocument> response = documentType.search(request);
 
         assertThat(response.totalHits).isEqualTo(2);
