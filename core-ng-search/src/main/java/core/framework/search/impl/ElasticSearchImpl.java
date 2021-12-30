@@ -123,7 +123,7 @@ public class ElasticSearchImpl implements ElasticSearch {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw exception(e);
+            throw searchException(e);
         } finally {
             logger.info("refresh index, index={}, elapsed={}", index, watch.elapsed());
         }
@@ -137,7 +137,7 @@ public class ElasticSearchImpl implements ElasticSearch {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw exception(e);
+            throw searchException(e);
         } finally {
             logger.info("close index, index={}, elapsed={}", index, watch.elapsed());
         }
@@ -151,7 +151,7 @@ public class ElasticSearchImpl implements ElasticSearch {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw exception(e);
+            throw searchException(e);
         } finally {
             logger.info("delete index, index={}, elapsed={}", index, watch.elapsed());
         }
@@ -165,14 +165,14 @@ public class ElasticSearchImpl implements ElasticSearch {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw exception(e);
+            throw searchException(e);
         } finally {
             logger.info("get cluster state, elapsed={}", watch.elapsed());
         }
     }
 
     // convert elasticsearch-java client exception, to append detailed error message
-    SearchException exception(ElasticsearchException e) {
+    SearchException searchException(ElasticsearchException e) {
         ErrorCause causedBy = e.error().causedBy();
         var builder = new StringBuilder(e.getMessage());
         if (causedBy != null) {

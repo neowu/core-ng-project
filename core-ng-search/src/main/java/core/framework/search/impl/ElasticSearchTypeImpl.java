@@ -96,7 +96,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw elasticSearch.exception(e);
+            throw elasticSearch.searchException(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, hits, 0);
@@ -132,7 +132,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw elasticSearch.exception(e);
+            throw elasticSearch.searchException(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, options, 0);
@@ -154,7 +154,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw elasticSearch.exception(e);
+            throw elasticSearch.searchException(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, hits, 0);
@@ -173,7 +173,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw elasticSearch.exception(e);
+            throw elasticSearch.searchException(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, 0, 1);
@@ -202,7 +202,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw elasticSearch.exception(e);
+            throw elasticSearch.searchException(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, 0, request.sources.size());
@@ -223,7 +223,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw elasticSearch.exception(e);
+            throw elasticSearch.searchException(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, 0, 1);
@@ -244,7 +244,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw elasticSearch.exception(e);
+            throw elasticSearch.searchException(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, 0, deleted ? 1 : 0);
@@ -272,7 +272,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw elasticSearch.exception(e);
+            throw elasticSearch.searchException(e);
         } finally {
             long elapsed = watch.elapsed();
             int size = request.ids.size();
@@ -292,7 +292,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw elasticSearch.exception(e);
+            throw elasticSearch.searchException(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed);
@@ -338,7 +338,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
-            throw elasticSearch.exception(e);
+            throw elasticSearch.searchException(e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, totalHits, 0);
