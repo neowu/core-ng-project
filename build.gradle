@@ -18,8 +18,8 @@ def elasticVersion = '7.16.2'
 def kafkaVersion = '3.0.0'
 def jacksonVersion = '2.12.5'
 def junitVersion = '5.8.1'
-def mockitoVersion = '3.12.4'
-def assertjVersion = '3.20.2'
+def mockitoVersion = '4.2.0'
+def assertjVersion = '3.22.0'
 def mysqlVersion = '8.0.27'
 
 project('core-ng-api') {

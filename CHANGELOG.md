@@ -11,6 +11,8 @@
   > refer to https://github.com/elastic/elasticsearch-java/issues/57
 * cache: add cache().add(name).localOnly()
   > to make certain cache only uses in memory store, for rarely changed or sensitive data (must not reside in redis as clear text)
+* maven-repo: deleted all 6.x version except 6.13.9
+  > recommend to upgrade to latest version
 
 ### 7.9.3 (11/23/2021 - 12/10/2021)
 
