@@ -1,4 +1,5 @@
 ### ideas
+
 * template, use ByteBuffer[] for performance?
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * mongo: update entity decoder to use switch(fieldName) to replace if statement? (optimization)
@@ -17,7 +18,6 @@
 * provide general support/framework for backend-test/regression-test/load-test?
 
 * monitor: alert on kafka message api_changed? always publish api, not only for frontend?
-* action visualization to show service flow/dependency diagram?
 
 * use adminClient to check kafka ready? or retry sending message?
-* retry on message handler? like when mysql is in maintenance 
+* retry on message handler? like when mysql is in maintenance

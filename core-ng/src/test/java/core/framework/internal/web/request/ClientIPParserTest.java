@@ -42,9 +42,11 @@ class ClientIPParserTest {
 
         parser.maxForwardedIPs = 2;
         assertThat(parser.parse("10.0.0.1", "192.168.0.1, 192.168.0.2, 192.168.0.3")).isEqualTo("192.168.0.2");
+        assertThat(parser.parse("10.0.0.1", "192.168.0.3")).isEqualTo("192.168.0.3");
 
         parser.maxForwardedIPs = 3;
         assertThat(parser.parse("10.0.0.1", "192.168.0.1, 192.168.0.2, 192.168.0.3, 192.168.0.4")).isEqualTo("192.168.0.2");
+        assertThat(parser.parse("10.0.0.1", "192.168.0.3, 192.168.0.4")).isEqualTo("192.168.0.3");
     }
 
     @Test
@@ -53,8 +55,8 @@ class ClientIPParserTest {
         assertThat(parser.parse("10.0.0.1", "text , 108.0.0.1, 10.0.0.1")).isEqualTo("108.0.0.1");
 
         assertThatThrownBy(() -> parser.parse("10.0.0.1", "text , 10.0.0.1"))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("invalid client ip address");
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("invalid client ip address");
     }
 
     @Test
@@ -71,7 +73,7 @@ class ClientIPParserTest {
 
     private void assertInvalidNode(String node) {
         assertThatThrownBy(() -> parser.extractIP(node))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("invalid client ip address");
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("invalid client ip address");
     }
 }
