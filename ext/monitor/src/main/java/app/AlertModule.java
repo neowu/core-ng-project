@@ -1,6 +1,7 @@
 package app;
 
 import app.monitor.AlertConfig;
+import app.monitor.PagerdutyConfig;
 import app.monitor.alert.AlertService;
 import app.monitor.channel.Channel;
 import app.monitor.channel.ChannelManager;
@@ -8,8 +9,10 @@ import app.monitor.channel.SlackClient;
 import app.monitor.kafka.ActionLogMessageHandler;
 import app.monitor.kafka.EventMessageHandler;
 import app.monitor.kafka.StatMessageHandler;
+import app.monitor.channel.PagerdutyClient;
 import core.framework.http.HTTPClient;
 import core.framework.json.Bean;
+import core.framework.json.JSON;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
@@ -33,14 +36,30 @@ public class AlertModule extends Module {
 
     private void configureChannels() {
         Map<String, Channel> channels = new HashMap<>();
+        configureSlackChannel(channels);
+        configurePagerdutyChannel(channels);
+        bind(new ChannelManager(channels, "slack"));
+    }
+
+    private void configureSlackChannel(Map<String, Channel> channels) {
         property("app.slack.token").ifPresent((String slackToken) -> {
             HTTPClient httpClient = HTTPClient.builder()
-                    .maxRetries(3)
-                    .retryWaitTime(Duration.ofSeconds(2))   // slack has rate limit with 1 message per second, here to slow down further when hit limit, refer to https://api.slack.com/docs/rate-limits
-                    .build();
+                .maxRetries(3)
+                .retryWaitTime(Duration.ofSeconds(2))   // slack has rate limit with 1 message per second, here to slow down further when hit limit, refer to https://api.slack.com/docs/rate-limits
+                .build();
             channels.put("slack", new SlackClient(httpClient, slackToken));
         });
-        bind(new ChannelManager(channels, "slack"));
+    }
+
+    private void configurePagerdutyChannel(Map<String, Channel> channels) {
+        property("app.pagerduty.config").ifPresent((String pagerdutyConfig) -> {
+            PagerdutyConfig pdConfig = JSON.fromJSON(PagerdutyConfig.class, pagerdutyConfig);
+            HTTPClient httpClient = HTTPClient.builder()
+                .maxRetries(3)
+                .retryWaitTime(Duration.ofSeconds(30))
+                .build();
+            channels.put("pagerduty", new PagerdutyClient(httpClient, pdConfig));
+        });
     }
 
     private void configureAlert(String alertConfig) {
