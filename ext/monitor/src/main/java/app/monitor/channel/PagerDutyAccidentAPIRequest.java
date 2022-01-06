@@ -6,7 +6,7 @@ import core.framework.api.validate.NotNull;
 /**
  * @author ajax
  */
-public class PDCreateAccidentAPIRequest {
+public class PagerDutyAccidentAPIRequest {
     @NotNull
     @Property(name = "incident")
     public Incident incident;
