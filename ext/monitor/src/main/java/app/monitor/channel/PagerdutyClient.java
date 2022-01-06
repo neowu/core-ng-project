@@ -13,12 +13,16 @@ import core.framework.json.JSON;
 import core.framework.util.ASCII;
 import core.framework.util.Strings;
 
+import java.util.Map;
+
 /**
  * @author ajax
  */
 public class PagerdutyClient implements Channel {
     private static final String ACCIDENT_API_URL = "https://api.pagerduty.com/incidents";
     private static final String FROM = "From";
+    private static final String PRIORITY_ID = "priorityId";
+    private static final String ESCALATION_POLICY_ID = "escalationPolicyId";
     private final PagerdutyConfig pagerDutyConfig;
     private final HTTPClient httpClient;
 
@@ -28,8 +32,8 @@ public class PagerdutyClient implements Channel {
     }
 
     @Override
-    public void notify(String serviceId, Alert alert, int alertCountSinceLastSent) {
-        PDCreateAccidentAPIRequest createRequest = createRequest(serviceId, alert);
+    public void notify(String serviceId, Map<String, String> params, Alert alert, int alertCountSinceLastSent) {
+        PDCreateAccidentAPIRequest createRequest = createRequest(serviceId, params, alert);
         HTTPRequest request = new HTTPRequest(HTTPMethod.POST, ACCIDENT_API_URL);
         request.headers.put(HTTPHeaders.AUTHORIZATION, "Token token=" + pagerDutyConfig.token);
         request.headers.put(FROM, pagerDutyConfig.from);
@@ -40,7 +44,7 @@ public class PagerdutyClient implements Channel {
         }
     }
 
-    private PDCreateAccidentAPIRequest createRequest(String serviceId, Alert alert) {
+    private PDCreateAccidentAPIRequest createRequest(String serviceId, Map<String, String> params, Alert alert) {
         PDCreateAccidentAPIRequest createRequest = new PDCreateAccidentAPIRequest();
         createRequest.incident = new PDCreateAccidentAPIRequest.Incident();
         createRequest.incident.type = "incident";
@@ -48,18 +52,20 @@ public class PagerdutyClient implements Channel {
         createRequest.incident.service = new PDCreateAccidentAPIRequest.Service();
         createRequest.incident.service.id = serviceId;
         createRequest.incident.service.type = "service_reference";
-        if (pagerDutyConfig.priorityId != null) {
+        String priorityId = params.get(PRIORITY_ID);
+        if (priorityId != null) {
             createRequest.incident.priority = new PDCreateAccidentAPIRequest.Priority();
-            createRequest.incident.priority.id = pagerDutyConfig.priorityId;
+            createRequest.incident.priority.id = priorityId;
             createRequest.incident.priority.type = "priority_reference";
         }
         createRequest.incident.urgency = "high";
         createRequest.incident.body = new PDCreateAccidentAPIRequest.Body();
         createRequest.incident.body.type = "incident_body";
         createRequest.incident.body.details = details(alert);
-        if (pagerDutyConfig.escalationPolicyId != null) {
+        String escalationPolicyId = params.get(ESCALATION_POLICY_ID);
+        if (escalationPolicyId != null) {
             createRequest.incident.escalationPolicy = new PDCreateAccidentAPIRequest.EscalationPolicy();
-            createRequest.incident.escalationPolicy.id = pagerDutyConfig.escalationPolicyId;
+            createRequest.incident.escalationPolicy.id = escalationPolicyId;
             createRequest.incident.escalationPolicy.type = "escalation_policy_reference";
         }
         return createRequest;

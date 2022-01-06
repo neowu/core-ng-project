@@ -14,6 +14,7 @@ import core.framework.util.Strings;
 import java.time.LocalDateTime;
 import java.time.temporal.IsoFields;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author ericchung
@@ -33,7 +34,7 @@ public class SlackClient implements Channel {
     }
 
     @Override
-    public void notify(String channel, Alert alert, int alertCountSinceLastSent) {
+    public void notify(String channel, Map<String, String> params, Alert alert, int alertCountSinceLastSent) {
         String message = message(alert, alertCountSinceLastSent);
         String color = color(alert.severity, alert.date);
         send(channel, message, color);
