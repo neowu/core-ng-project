@@ -12,7 +12,6 @@ import app.monitor.kafka.StatMessageHandler;
 import app.monitor.channel.PagerdutyClient;
 import core.framework.http.HTTPClient;
 import core.framework.json.Bean;
-import core.framework.json.JSON;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
@@ -22,6 +21,7 @@ import core.framework.module.Module;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -52,8 +52,11 @@ public class AlertModule extends Module {
     }
 
     private void configurePagerdutyChannel(Map<String, Channel> channels) {
-        property("app.pagerduty.config").ifPresent((String pagerdutyConfig) -> {
-            PagerdutyConfig pdConfig = JSON.fromJSON(PagerdutyConfig.class, pagerdutyConfig);
+        Optional<String> fromOpt = property("app.pagerduty.from");
+        property("app.pagerduty.token").ifPresent((String token) -> {
+            PagerdutyConfig pdConfig = new PagerdutyConfig();
+            pdConfig.token = token;
+            pdConfig.from = fromOpt.orElseThrow(() -> new IllegalArgumentException("app.pagerduty.from must not be null when app.pagerduty.token is not null"));
             HTTPClient httpClient = HTTPClient.builder()
                 .maxRetries(3)
                 .retryWaitTime(Duration.ofSeconds(30))

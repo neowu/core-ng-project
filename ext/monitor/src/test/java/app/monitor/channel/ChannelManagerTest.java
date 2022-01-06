@@ -1,6 +1,7 @@
 package app.monitor.channel;
 
 import app.monitor.alert.Alert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -30,8 +30,19 @@ class ChannelManagerTest {
 
     @Test
     void parseChannelURI() {
-        assertThat(channelManager.parseChannelURI("slack://channelId")).isEqualTo(new String[]{"slack", "channelId"});
-        assertThat(channelManager.parseChannelURI("channelId")).isEqualTo(new String[]{null, "channelId"});
+        ChannelURI uriWithType = channelManager.parseChannelURI("slack://channelId");
+        Assertions.assertEquals("slack", uriWithType.type);
+        Assertions.assertEquals("channelId", uriWithType.id);
+
+        ChannelURI uri = channelManager.parseChannelURI("channelId");
+        Assertions.assertNull(uri.type);
+        Assertions.assertEquals("channelId", uri.id);
+
+        ChannelURI uriWithTypeAndParams = channelManager.parseChannelURI("pagerduty://serviceId?priorityId=mockPriorityId&escalationPolicyId=mockEscalationPolicyId");
+        Assertions.assertEquals("pagerduty", uriWithTypeAndParams.type);
+        Assertions.assertEquals("serviceId", uriWithTypeAndParams.id);
+        Assertions.assertEquals("mockPriorityId", uriWithTypeAndParams.params.get("priorityId"));
+        Assertions.assertEquals("mockEscalationPolicyId", uriWithTypeAndParams.params.get("escalationPolicyId"));
     }
 
     @Test
@@ -39,7 +50,7 @@ class ChannelManagerTest {
         var alert = new Alert();
         channelManager.notify("pager://channelId", alert, 1);
 
-        verify(pagerChannel).notify("channelId", alert, 1);
+        verify(pagerChannel).notify("channelId", null, alert, 1);
     }
 
     @Test
@@ -47,6 +58,6 @@ class ChannelManagerTest {
         var alert = new Alert();
         channelManager.notify("channelId", alert, 1);
 
-        verify(slackChannel).notify("channelId", alert, 1);
+        verify(slackChannel).notify("channelId", null, alert, 1);
     }
 }
