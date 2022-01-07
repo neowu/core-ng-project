@@ -33,10 +33,10 @@ public class PagerDutyClient implements Channel {
 
     @Override
     public void notify(String serviceId, Map<String, String> params, Alert alert, int alertCountSinceLastSent) {
-        PagerDutyAccidentAPIRequest pagerDutyRequest = createRequest(serviceId, params, alert);
         var request = new HTTPRequest(HTTPMethod.POST, ACCIDENT_API_URL);
         request.headers.put(HTTPHeaders.AUTHORIZATION, "Token token=" + token);
         request.headers.put("From", from);
+        PagerDutyAccidentAPIRequest pagerDutyRequest = request(serviceId, params, alert);
         request.body(JSON.toJSON(pagerDutyRequest), ContentType.APPLICATION_JSON);
         HTTPResponse response = httpClient.execute(request);
         if (response.statusCode != HTTPStatus.CREATED.code) {
@@ -44,7 +44,7 @@ public class PagerDutyClient implements Channel {
         }
     }
 
-    private PagerDutyAccidentAPIRequest createRequest(String serviceId, Map<String, String> params, Alert alert) {
+    private PagerDutyAccidentAPIRequest request(String serviceId, Map<String, String> params, Alert alert) {
         PagerDutyAccidentAPIRequest request = new PagerDutyAccidentAPIRequest();
         request.incident = new PagerDutyAccidentAPIRequest.Incident();
         request.incident.type = "incident";
