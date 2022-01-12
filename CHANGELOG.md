@@ -14,6 +14,9 @@
 * maven-repo: deleted all 6.x version except 6.13.9
   > recommend to upgrade to latest version
 * monitor: support pagerduty (thanks Ajax's contribution !!!)
+* log: set kafka log appender "enable.idempotence" to false
+  > since kafka 3.0.0, enable.idempotence is default to true, and it overrides "acks" to "all"
+  > so this is set back to previous behavior, which means possible duplicate log messagees if there is connection error
 
 ### 7.9.3 (11/23/2021 - 12/10/2021)
 

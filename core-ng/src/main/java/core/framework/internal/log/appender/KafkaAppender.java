@@ -84,6 +84,7 @@ public final class KafkaAppender implements LogAppender {
         try {
             Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs,
                 ProducerConfig.ACKS_CONFIG, "0",                                        // no acknowledge to maximize performance
+                ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, false,                            // since kafka 3.0.0, "enable.idempotence" is true by default, and it overrides "acks" to all
                 ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder",                       // if not specify, kafka uses producer-${seq} name, also impact jmx naming
                 ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
                 ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000,                      // 60s, type is INT
