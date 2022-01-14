@@ -8,6 +8,7 @@ import core.framework.db.Repository;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
 import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogLevel;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.resource.Pool;
 import core.framework.util.ASCII;
@@ -298,7 +299,8 @@ public final class DatabaseImpl implements Database {
             if (actionLog.remainingProcessTimeInNano() <= 0) {
                 // break if it took long and execute too many db queries
                 throw new Error("too many db operations, operations=" + operations);
-            } else {
+            }
+            if (actionLog.result == LogLevel.INFO) {    // only warn once, action hits here typically will call db more times ongoing
                 logger.warn(errorCode("TOO_MANY_DB_OPERATIONS"), "too many db operations, operations={}", operations);
             }
         }

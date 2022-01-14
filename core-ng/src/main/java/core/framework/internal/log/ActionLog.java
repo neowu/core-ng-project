@@ -35,6 +35,7 @@ public final class ActionLog {
     private final long startTime;
     private final long startCPUTime;
 
+    public LogLevel result = LogLevel.INFO;
     public Trace trace = Trace.NONE;        // whether flush trace log for all subsequent actions
     public String action = "unassigned";
     public List<String> correlationIds;     // with bulk message handler, there will be multiple correlationIds handled by one batch
@@ -46,7 +47,6 @@ public final class ActionLog {
     String errorMessage;
     long elapsed;
 
-    private LogLevel result = LogLevel.INFO;
     private String errorCode;
 
     public ActionLog(String message, String id) {
