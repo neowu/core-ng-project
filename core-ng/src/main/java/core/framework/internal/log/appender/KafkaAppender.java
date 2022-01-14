@@ -84,14 +84,14 @@ public final class KafkaAppender implements LogAppender {
         try {
             Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs,
                 ProducerConfig.ACKS_CONFIG, "0",                                        // no acknowledge to maximize performance
-                ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, false,                            // since kafka 3.0.0, "enable.idempotence" is true by default, and it overrides "acks" to all
-                ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder",                       // if not specify, kafka uses producer-${seq} name, also impact jmx naming
+                ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, Boolean.FALSE,                    // since kafka 3.0.0, "enable.idempotence" is true by default, and it overrides "acks" to all
+                ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder",                           // if not specify, kafka uses producer-${seq} name, also impact jmx naming
                 ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
                 ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000,                      // 60s, type is INT
                 ProducerConfig.LINGER_MS_CONFIG, 50L,
                 ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                       // longer backoff to reduce cpu usage when kafka is not available
-                ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L,                 // 5s
-                ProducerConfig.MAX_BLOCK_MS_CONFIG, 30_000L);                           // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+                ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L,                     // 5s
+                ProducerConfig.MAX_BLOCK_MS_CONFIG, 30_000L);                               // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
             var serializer = new ByteArraySerializer();
             var producer = new KafkaProducer<>(config, serializer, serializer);
             producerMetrics.set(producer.metrics());
