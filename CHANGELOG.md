@@ -1,13 +1,12 @@
 ## Change log
 
-### 7.10.0 (12/13/2021 - )
+### 7.10.0-b2 (12/13/2021 - )
 
 * search: update to es 7.16.2, high level rest client is deprecated, migrated to elasticsearch java client !!! Query API broken
   > refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/introduction.html
-  > the new API in my opinion abused java lambda, which added lots accidentally complexity, and not jvm/gc friendly (of course usually the bottleneck of es call is not on java side),
-  > especially java is not a language handles lambda elegantly, lambda is just syntax sugar of anonymous class  
+  > the new API in my opinion abused java lambda, which added lots accidental complexity, and not jvm/gc friendly (of course usually the bottleneck of es call is not on java side),   
   > in many cases it's actually much harder to use compare to old HLRC
-* TODO: elasticsearch java client still have bugs for completion, update soon
+* TODO: elasticsearch java client still have bugs for completion api, from the activities of elasticsearch-java team, it seems to take long time to resolve this
   > refer to https://github.com/elastic/elasticsearch-java/issues/57
 * cache: add cache().add(name).localOnly()
   > to make certain cache only uses in memory store, for rarely changed or sensitive data (must not reside in redis as clear text)
@@ -17,6 +16,8 @@
 * log: set kafka log appender "enable.idempotence" to false
   > since kafka 3.0.0, enable.idempotence is default to true, and it overrides "acks" to "all"
   > so this is set back to previous behavior, which means possible duplicate log messagees if there is connection error
+* api: allow using custom-built httpClient into api().createClient()
+  > for regression ajax test use case, it can use stateful httpClient(enabled cookies)
 
 ### 7.9.3 (11/23/2021 - 12/10/2021)
 

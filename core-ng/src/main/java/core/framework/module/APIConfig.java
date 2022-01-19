@@ -79,19 +79,18 @@ public class APIConfig extends Config {
     }
 
     public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {
-        T client = createClient(serviceInterface, serviceURL);
+        T client = createClient(serviceInterface, serviceURL, getOrCreateHTTPClient());
         context.beanFactory.bind(serviceInterface, null, client);
         return new APIClientConfig((WebServiceClientProxy) client);
     }
 
-    public <T> T createClient(Class<T> serviceInterface, String serviceURL) {
+    public <T> T createClient(Class<T> serviceInterface, String serviceURL, HTTPClient httpClient) {
         logger.info("create web service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         var validator = new WebServiceInterfaceValidator(serviceInterface, context.beanClassValidator);
         validator.requestBeanWriter = writer;
         validator.responseBeanReader = reader;
         validator.validate();
 
-        HTTPClient httpClient = getOrCreateHTTPClient();
         var webServiceClient = new WebServiceClient(serviceURL, httpClient, writer, reader);
         return createWebServiceClient(serviceInterface, webServiceClient);
     }
