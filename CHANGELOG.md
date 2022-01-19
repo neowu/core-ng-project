@@ -18,6 +18,8 @@
   > so this is set back to previous behavior, which means possible duplicate log messagees if there is connection error
 * api: allow using custom-built httpClient into api().createClient()
   > for regression ajax test use case, it can use stateful httpClient(enabled cookies)
+* json: JSON.class won't allow null as json string or instance, to make sure always return non-null result
+  > generally we never use "null" as json text, and it was triggering Intellij's warning (dereference of JSON.from() may produce NullPointerException)
 
 ### 7.9.3 (11/23/2021 - 12/10/2021)
 
