@@ -4,6 +4,7 @@ import core.framework.internal.kafka.MessageHeaders;
 import core.framework.internal.kafka.MessageProducer;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.internal.web.http.IPv4AccessControl;
 import core.framework.log.Markers;
@@ -44,7 +45,7 @@ public class KafkaController {
         var record = new ProducerRecord<>(topic, Strings.bytes(key), body);
         Headers headers = record.headers();
         headers.add(MessageHeaders.HEADER_CLIENT, Strings.bytes(KafkaController.class.getSimpleName()));
-        headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));  // auto trace
+        headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes(Trace.CASCADE.name()));  // auto trace
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         headers.add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes(actionLog.correlationId()));
         headers.add(MessageHeaders.HEADER_REF_ID, Strings.bytes(actionLog.id));
