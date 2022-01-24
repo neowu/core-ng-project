@@ -18,13 +18,6 @@ public interface CacheStore {   // all keys here are direct cacheKey, not the ke
 
     boolean delete(String... keys);
 
-    class Entry<T> {
-        final String key;
-        final T value;
-
-        Entry(String key, T value) {
-            this.key = key;
-            this.value = value;
-        }
+    record Entry<T>(String key, T value) {
     }
 }

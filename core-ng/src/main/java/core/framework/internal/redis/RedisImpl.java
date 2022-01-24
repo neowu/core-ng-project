@@ -55,7 +55,6 @@ public class RedisImpl implements Redis {
     private final RedisList redisList = new RedisListImpl(this);
     private final RedisSortedSet redisSortedSet = new RedisSortedSetImpl(this);
     private final RedisHyperLogLog redisHyperLogLog = new RedisHyperLogLogImpl(this);
-    private final RedisPubSub pubSub = new RedisPubSub(this);
     private final RedisAdmin redisAdmin = new RedisAdminImpl(this);
     private final String name;
     public Pool<RedisConnection> pool;
@@ -421,10 +420,6 @@ public class RedisImpl implements Redis {
             logger.debug("pttl,  keys={}, size={}, returnedValues={}, elapsed={}", new ArrayLogParam(keys), size, expirationTimes, elapsed);
             checkSlowOperation(elapsed);
         }
-    }
-
-    public RedisPubSub pubSub() {
-        return pubSub;
     }
 
     void checkSlowOperation(long elapsed) {

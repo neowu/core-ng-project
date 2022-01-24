@@ -2,7 +2,6 @@ package core.framework.module;
 
 import core.framework.internal.cache.CacheImpl;
 import core.framework.internal.cache.RedisCacheStore;
-import core.framework.internal.cache.RedisLocalCacheStore;
 
 /**
  * @author neo
@@ -16,16 +15,11 @@ public class CacheStoreConfig {
         this.config = config;
     }
 
+    // for rarely changed data, or stale data is tolerated
+    // or use kafka with custom groupId to evict keys
+    // otherwise refresh can also be done by restarting service if there is emergence
     public void local() {
         if (cache.cacheStore instanceof RedisCacheStore) {
-            cache.cacheStore = config.redisLocalCacheStore();
-        }
-    }
-
-    // for rarely changed data, or tolerate stale data,
-    // in microservice env, only way to refresh is expiration or restart service
-    public void localOnly() {
-        if (cache.cacheStore instanceof RedisCacheStore || cache.cacheStore instanceof RedisLocalCacheStore) {
             cache.cacheStore = config.localCacheStore();
         }
     }

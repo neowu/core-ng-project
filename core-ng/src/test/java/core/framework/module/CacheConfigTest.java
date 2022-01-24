@@ -3,7 +3,6 @@ package core.framework.module;
 import core.framework.internal.cache.CacheImpl;
 import core.framework.internal.cache.LocalCacheStore;
 import core.framework.internal.cache.RedisCacheStore;
-import core.framework.internal.cache.RedisLocalCacheStore;
 import core.framework.internal.cache.TestCache;
 import core.framework.internal.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,9 +55,6 @@ class CacheConfigTest {
 
         cacheStoreConfig.local();
         assertThat(cache.cacheStore).isInstanceOf(LocalCacheStore.class);
-
-        cacheStoreConfig.localOnly();
-        assertThat(cache.cacheStore).isInstanceOf(LocalCacheStore.class);
     }
 
     @Test
@@ -70,9 +66,6 @@ class CacheConfigTest {
         assertThat(cache.cacheStore).isInstanceOf(RedisCacheStore.class);
 
         cacheStoreConfig.local();
-        assertThat(cache.cacheStore).isInstanceOf(RedisLocalCacheStore.class);
-
-        cacheStoreConfig.localOnly();
         assertThat(cache.cacheStore).isInstanceOf(LocalCacheStore.class);
     }
 

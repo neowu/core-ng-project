@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.0-b2 (12/13/2021 - )
+### 7.10.0-b3 (12/13/2021 - )
 
 * search: update to es 7.16.2, high level rest client is deprecated, migrated to elasticsearch java client !!! Query API broken
   > refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/introduction.html
@@ -20,6 +20,11 @@
   > for regression ajax test use case, it can use stateful httpClient(enabled cookies)
 * json: JSON.class won't allow null as json string or instance, to make sure always return non-null result
   > generally we never use "null" as json text, and it was triggering Intellij's warning (dereference of JSON.from() may produce NullPointerException)
+* cache: removed redisLocal support, now cache only supports local or redis store
+  > RedisLocalCacheStore (use pubsub to evict in memory keys) is not as useful as expected, and it also assumes cache redis is shared across services
+  > it violates "share nothing" design principle, based on our experience, only few places requires high performance of local/in-memory cache
+  > for those places, we can simply use local cache and kafka message to invalidate cache
+  > and performance of redis cache is fast enough, usually 100 redis calls per action took less than 10ms
 
 ### 7.9.3 (11/23/2021 - 12/10/2021)
 
