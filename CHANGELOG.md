@@ -8,8 +8,6 @@
   > in many cases it's actually much harder to use compare to old HLRC
 * !!! TODO: elasticsearch java client still have bugs for completion api, from the activities of elasticsearch-java team, it seems to take long time to resolve this
   > refer to https://github.com/elastic/elasticsearch-java/issues/57
-* cache: add cache().add(name).localOnly()
-  > to make certain cache only uses in memory store, for rarely changed or sensitive data (must not reside in redis as clear text)
 * maven-repo: deleted all 6.x version except 6.13.9
   > recommend to upgrade to latest version
 * monitor: support pagerduty (thanks Ajax for the contribution !!!)
@@ -25,6 +23,7 @@
   > it violates "share nothing" design principle, based on our experience, only few places requires high performance of local/in-memory cache
   > for those places, we can simply use local cache and kafka message to invalidate cache
   > and performance of redis cache is fast enough, usually 100 redis calls per action took less than 10ms
+  > cache().add(name).local() for local store, for sensitive data or performance reason
 * db: removed DBConfig.maxOperations() (default is 2000), added Database.maxOperations(threshold)
   > in real application, only very few actions do large number of db operations (e.g. replay, sync),
   > so added per action basis threshold
