@@ -28,6 +28,7 @@
 * db: removed DBConfig.maxOperations() (default is 2000), added Database.maxOperations(threshold)
   > in real application, only very few actions do large number of db operations (e.g. replay, sync),
   > so added per action basis threshold
+* log: tweak trace log truncation, and added defence logic to print actionLog/trace to console, if it's larger than kafka maxRequestSize
 
 ### 7.9.3 (11/23/2021 - 12/10/2021)
 

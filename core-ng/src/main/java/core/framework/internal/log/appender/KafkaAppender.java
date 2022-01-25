@@ -4,6 +4,7 @@ import core.framework.internal.json.JSONWriter;
 import core.framework.internal.kafka.KafkaURI;
 import core.framework.internal.kafka.ProducerMetrics;
 import core.framework.log.LogAppender;
+import core.framework.log.Markers;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.log.message.StatMessage;
@@ -103,9 +104,17 @@ public final class KafkaAppender implements LogAppender {
 
     @Override
     public void append(ActionLogMessage message) {
+        byte[] value = actionLogWriter.toJSON(message);
+
+        // refer to org.apache.kafka.common.record.DefaultRecordBatch.estimateBatchSizeUpperBound
+        if (value.length > 1_000_000) {
+            logger.warn(Markers.errorCode("LOG_TOO_LARGE"), "kafka log message size is too large, size={}", value.length);
+            new ConsoleAppender().append(message);  // fall back to console appender to print
+        }
+
         // not specify message key for sticky partition, StickyPartitionCache will be used if key is null
         // refer to org.apache.kafka.clients.producer.internals.DefaultPartitioner.partition
-        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, actionLogWriter.toJSON(message)));
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, value));
     }
 
     @Override
