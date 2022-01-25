@@ -62,7 +62,7 @@ public class MySQLQueryInterceptor implements QueryInterceptor {
     private boolean suppressSlowSQLWarning() {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {
-            return actionLog.suppressSlowSQLWarning;
+            return actionLog.internalContext().suppressSlowSQLWarning;
         }
         return false;
     }

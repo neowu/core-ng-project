@@ -1,5 +1,6 @@
 package core.framework.internal.db;
 
+import core.framework.db.Database;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
 import core.framework.internal.log.ActionLog;
@@ -113,14 +114,14 @@ class DatabaseImplTest {
     @Test
     void validateSQL() {
         assertThatThrownBy(() -> database.select("SELECT * FROM database_test", String.class))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("sql must not contain wildcard(*)");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("sql must not contain wildcard(*)");
         assertThatThrownBy(() -> database.selectOne("SELECT id FROM database_test WHERE string_field = 'value'", Integer.class))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("sql must not contain single quote(')");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("sql must not contain single quote(')");
         assertThatThrownBy(() -> database.execute("UPDATE database_test SET string_value = 'value' WHERE string_field = 'value'", Integer.class))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("sql must not contain single quote(')");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("sql must not contain single quote(')");
     }
 
     @Test
@@ -164,8 +165,8 @@ class DatabaseImplTest {
     @Test
     void batchExecuteWithEmptyParams() {
         assertThatThrownBy(() -> database.batchExecute("UPDATE database_test SET string_field = ? WHERE id = ?", List.of()))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("params must not be empty");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("params must not be empty");
     }
 
     @Test
@@ -174,22 +175,22 @@ class DatabaseImplTest {
 
         database.execute(sql, 1);
         assertThatThrownBy(() -> database.execute(sql, 1))
-                .isInstanceOf(UncheckedSQLException.class)
-                .satisfies(e -> {
-                    UncheckedSQLException exception = (UncheckedSQLException) e;
-                    assertThat(exception.sqlSate).startsWith("23");
-                    assertThat(exception.errorType).isEqualTo(UncheckedSQLException.ErrorType.INTEGRITY_CONSTRAINT_VIOLATION);
-                });
+            .isInstanceOf(UncheckedSQLException.class)
+            .satisfies(e -> {
+                UncheckedSQLException exception = (UncheckedSQLException) e;
+                assertThat(exception.sqlSate).startsWith("23");
+                assertThat(exception.errorType).isEqualTo(UncheckedSQLException.ErrorType.INTEGRITY_CONSTRAINT_VIOLATION);
+            });
 
         // the underlying db is hsql, hsql throws BatchUpdateException directly without SQLIntegrityConstraintViolationException as cause
         Object[] params = {1};
         assertThatThrownBy(() -> database.batchExecute(sql, List.of(params, params)))
-                .isInstanceOf(UncheckedSQLException.class)
-                .satisfies(e -> {
-                    UncheckedSQLException exception = (UncheckedSQLException) e;
-                    assertThat(exception.sqlSate).startsWith("23");
-                    assertThat(exception.errorType).isEqualTo(UncheckedSQLException.ErrorType.INTEGRITY_CONSTRAINT_VIOLATION);
-                });
+            .isInstanceOf(UncheckedSQLException.class)
+            .satisfies(e -> {
+                UncheckedSQLException exception = (UncheckedSQLException) e;
+                assertThat(exception.sqlSate).startsWith("23");
+                assertThat(exception.errorType).isEqualTo(UncheckedSQLException.ErrorType.INTEGRITY_CONSTRAINT_VIOLATION);
+            });
     }
 
     @Test
@@ -221,17 +222,17 @@ class DatabaseImplTest {
     void driverProperties() {
         Properties properties = database.driverProperties("jdbc:mysql://localhost/demo", null, null);
         assertThat(properties)
-                .doesNotContainKeys("user", "password")
-                .containsEntry("useSSL", "false")
-                .containsEntry("characterEncoding", "utf-8");
+            .doesNotContainKeys("user", "password")
+            .containsEntry("useSSL", "false")
+            .containsEntry("characterEncoding", "utf-8");
 
         properties = database.driverProperties("jdbc:mysql://localhost/demo?useSSL=true&characterEncoding=latin1", "user", "password");
         assertThat(properties).doesNotContainKeys("useSSL", "characterEncoding");
 
         properties = database.driverProperties("jdbc:mysql://localhost/demo?useSSL=true", null, null);
         assertThat(properties)
-                .doesNotContainKeys("useSSL")
-                .containsEntry("characterEncoding", "utf-8");
+            .doesNotContainKeys("useSSL")
+            .containsEntry("characterEncoding", "utf-8");
     }
 
     @Test
@@ -248,8 +249,11 @@ class DatabaseImplTest {
                 database.track(100, 0, 1, 20);
             }
         }).isInstanceOf(Error.class)
-                .hasMessageContaining("too many db operations");
+            .hasMessageContaining("too many db operations");
         assertThat(actionLog.stats).containsEntry("db_queries", 182.0);
+        Database.maxOperations(100);
+        database.track(100, 0, 1, 20);
+        assertThat(actionLog.stats).containsEntry("db_queries", 202.0);
         logManager.end("end");
     }
 

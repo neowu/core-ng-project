@@ -44,15 +44,16 @@ public final class DatabaseImpl implements Database {
 
     public final Pool<Connection> pool;
     public final DatabaseOperation operation;
-
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
     private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
     public String user;
     public String password;
-    public int maxOperations = 5000;  // max db calls per action, if exceeds, it indicates either wrong impl (e.g. infinite loop with db calls) or bad practice (not CD friendly), better split into multiple actions
     public int tooManyRowsReturnedThreshold = 1000;
     public long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     public IsolationLevel isolationLevel;
+
+    int maxOperations = 2000;  // max db calls per action, if exceeds, it indicates either wrong impl (e.g. infinite loop with db calls) or bad practice (not CD friendly), better split into multiple actions
+
     private String url;
     private Properties driverProperties;
     private Duration timeout;
@@ -295,7 +296,8 @@ public final class DatabaseImpl implements Database {
     }
 
     private void checkOperations(ActionLog actionLog, long elapsed, int operations) {
-        if (operations > maxOperations) {
+        // check default max operations first then check if specified action level max operations
+        if (operations > maxOperations && operations > actionLog.internalContext().maxDBOperations) {
             if (actionLog.remainingProcessTimeInNano() <= 0) {
                 // break if it took long and execute too many db queries
                 throw new Error("too many db operations, operations=" + operations);

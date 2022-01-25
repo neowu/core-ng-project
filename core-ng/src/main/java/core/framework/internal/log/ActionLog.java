@@ -41,12 +41,12 @@ public final class ActionLog {
     public List<String> correlationIds;     // with bulk message handler, there will be multiple correlationIds handled by one batch
     public List<String> clients;
     public List<String> refIds;
-    public boolean suppressSlowSQLWarning;
 
     long maxProcessTimeInNano;
     String errorMessage;
     long elapsed;
 
+    private InternalActionContext internalContext;
     private String errorCode;
 
     public ActionLog(String message, String id) {
@@ -192,5 +192,10 @@ public final class ActionLog {
             }
         }
         return builder.toString();
+    }
+
+    public InternalActionContext internalContext() {
+        if (internalContext == null) internalContext = new InternalActionContext();
+        return internalContext;
     }
 }

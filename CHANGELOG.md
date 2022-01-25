@@ -25,6 +25,9 @@
   > it violates "share nothing" design principle, based on our experience, only few places requires high performance of local/in-memory cache
   > for those places, we can simply use local cache and kafka message to invalidate cache
   > and performance of redis cache is fast enough, usually 100 redis calls per action took less than 10ms
+* db: removed DBConfig.maxOperations() (default is 2000), added Database.maxOperations(threshold)
+  > in real application, only very few actions do large number of db operations (e.g. replay, sync),
+  > so added per action basis threshold
 
 ### 7.9.3 (11/23/2021 - 12/10/2021)
 
