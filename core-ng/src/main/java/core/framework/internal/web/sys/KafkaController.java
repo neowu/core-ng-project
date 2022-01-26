@@ -5,7 +5,6 @@ import core.framework.internal.kafka.MessageProducer;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.Trace;
-import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.internal.web.http.IPv4AccessControl;
 import core.framework.log.Markers;
 import core.framework.util.Strings;
@@ -15,6 +14,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author neo
@@ -38,7 +39,7 @@ public class KafkaController {
         logger.warn(Markers.errorCode("MANUAL_OPERATION"), "publish message manually, topic={}", topic);   // log trace message, due to potential impact
         producer.send(record);
 
-        return Response.text(Strings.format("message published, topic={}, key={}, message={}", topic, key, new BytesLogParam(body)));
+        return Response.text(Strings.format("message published, topic={}, key={}, message={}", topic, key, new String(body, StandardCharsets.UTF_8)));
     }
 
     ProducerRecord<byte[], byte[]> record(String topic, String key, byte[] body) {
