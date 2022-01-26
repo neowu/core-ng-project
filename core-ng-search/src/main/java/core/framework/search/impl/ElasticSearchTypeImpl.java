@@ -8,6 +8,7 @@ import core.framework.log.ActionLogContext;
 import core.framework.search.AnalyzeRequest;
 import core.framework.search.BulkDeleteRequest;
 import core.framework.search.BulkIndexRequest;
+import core.framework.search.BulkIndexWithRoutingRequest;
 import core.framework.search.CompleteRequest;
 import core.framework.search.DeleteRequest;
 import core.framework.search.ElasticSearchType;
@@ -15,6 +16,7 @@ import core.framework.search.ForEach;
 import core.framework.search.GetRequest;
 import core.framework.search.Index;
 import core.framework.search.IndexRequest;
+import core.framework.search.IndexWithRoutingRequest;
 import core.framework.search.SearchException;
 import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
@@ -214,6 +216,25 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     }
 
     @Override
+    public void indexWithRouting(IndexWithRoutingRequest<T> request) {
+        var watch = new StopWatch();
+        String index = request.index == null ? this.index : request.index;
+        validator.validate(request.source, false);
+        byte[] document = writer.toJSON(request.source);
+        try {
+            var indexRequest = new org.elasticsearch.action.index.IndexRequest(index).routing(request.routing).id(request.id).source(document, XContentType.JSON);
+            elasticSearch.client().index(indexRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        } finally {
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, 0, 1);
+            logger.debug("index, index={}, id={}, routing={}, elapsed={}", index, request.id, request.routing, elapsed);
+            checkSlowOperation(elapsed);
+        }
+    }
+
+    @Override
     public void bulkIndex(BulkIndexRequest<T> request) {
         var watch = new StopWatch();
         if (request.sources == null || request.sources.isEmpty()) throw new Error("request.sources must not be empty");
@@ -237,6 +258,35 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, 0, request.sources.size());
             logger.debug("bulkIndex, index={}, size={}, esTook={}, elapsed={}", index, request.sources.size(), esTook, elapsed);
+            checkSlowOperation(elapsed);
+        }
+    }
+
+    @Override
+    public void bulkIndexWithRouting(BulkIndexWithRoutingRequest<T> request) {
+        var watch = new StopWatch();
+        if (request.requests == null || request.requests.isEmpty()) throw new Error("request.sources must not be empty");
+        String index = request.index == null ? this.index : request.index;
+        var bulkRequest = new BulkRequest();
+        for (Map.Entry<String, BulkIndexWithRoutingRequest.Request<T>> entry : request.requests.entrySet()) {
+            String id = entry.getKey();
+            T source = entry.getValue().source;
+            String routing = entry.getValue().routing;
+            validator.validate(source, false);
+            var indexRequest = new org.elasticsearch.action.index.IndexRequest(index).id(id).routing(routing).source(writer.toJSON(source), XContentType.JSON);
+            bulkRequest.add(indexRequest);
+        }
+        long esTook = 0;
+        try {
+            BulkResponse response = elasticSearch.client().bulk(bulkRequest, RequestOptions.DEFAULT);
+            esTook = response.getTook().nanos();
+            if (response.hasFailures()) throw new SearchException(response.buildFailureMessage());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        } finally {
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, 0, request.requests.size());
+            logger.debug("bulkIndex, index={}, size={}, esTook={}, elapsed={}", index, request.requests.size(), esTook, elapsed);
             checkSlowOperation(elapsed);
         }
     }
