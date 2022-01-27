@@ -30,11 +30,10 @@ abstract class AbstractLogger implements Logger {
     }
 
     private void logWithArguments(Marker marker, LogLevel level, String format, Object... arguments) {
-        if (arguments.length > 0 && arguments[arguments.length - 1] instanceof Throwable) {
-            Throwable lastArgument = (Throwable) arguments[arguments.length - 1];
+        if (arguments.length > 0 && arguments[arguments.length - 1] instanceof Throwable throwable) {
             Object[] messageArguments = new Object[arguments.length - 1];
             System.arraycopy(arguments, 0, messageArguments, 0, arguments.length - 1);
-            log(marker, level, format, messageArguments, lastArgument);
+            log(marker, level, format, messageArguments, throwable);
         } else {
             log(marker, level, format, arguments, null);
         }

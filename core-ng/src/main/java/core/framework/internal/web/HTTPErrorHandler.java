@@ -77,8 +77,7 @@ public class HTTPErrorHandler {
             response.id = actionId;
             response.message = e.getMessage();
             response.stackTrace = Exceptions.stackTrace(e);
-            if (e instanceof ErrorCode) {
-                ErrorCode errorCode = (ErrorCode) e;
+            if (e instanceof ErrorCode errorCode) {
                 response.errorCode = errorCode.errorCode();
                 response.severity = errorCode.severity().name();
             } else {
@@ -92,8 +91,8 @@ public class HTTPErrorHandler {
             var response = new ErrorResponse();
             response.id = actionId;
             response.message = e.getMessage();
-            if (e instanceof ErrorCode) {
-                response.errorCode = ((ErrorCode) e).errorCode();
+            if (e instanceof ErrorCode errorCode) {
+                response.errorCode = errorCode.errorCode();
             } else {
                 response.errorCode = "INTERNAL_ERROR";
             }
@@ -104,7 +103,7 @@ public class HTTPErrorHandler {
     HTTPStatus httpStatus(Throwable e) {
         ResponseStatus responseStatus = e.getClass().getDeclaredAnnotation(ResponseStatus.class);
         if (responseStatus != null) return responseStatus.value();
-        if (e instanceof RemoteServiceException) return ((RemoteServiceException) e).status;    // propagate underlying status code for REST convention
+        if (e instanceof RemoteServiceException remoteServiceException) return remoteServiceException.status;    // propagate underlying status code for REST convention
         return HTTPStatus.INTERNAL_SERVER_ERROR;
     }
 

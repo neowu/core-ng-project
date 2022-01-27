@@ -25,8 +25,8 @@ public class ElasticSearchLogInterceptor implements HttpRequestInterceptor {
     public void process(HttpRequest request, HttpContext context) {
         RequestLine requestLine = request.getRequestLine();
         logger.debug("[request] method={}, uri={}", requestLine.getMethod(), requestLine.getUri());
-        if (request instanceof HttpEntityEnclosingRequest) {
-            HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
+        if (request instanceof final HttpEntityEnclosingRequest entityRequest) {
+            HttpEntity entity = entityRequest.getEntity();
             if (entity != null) {
                 logger.debug("[request] body={}", new BodyParam(entity));
             }

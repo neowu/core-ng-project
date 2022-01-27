@@ -15,7 +15,7 @@ import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.StandardCharsets;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -39,7 +39,7 @@ public class KafkaController {
         logger.warn(Markers.errorCode("MANUAL_OPERATION"), "publish message manually, topic={}", topic);   // log trace message, due to potential impact
         producer.send(record);
 
-        return Response.text(Strings.format("message published, topic={}, key={}, message={}", topic, key, new String(body, StandardCharsets.UTF_8)));
+        return Response.text(Strings.format("message published, topic={}, key={}, message={}", topic, key, new String(body, UTF_8)));
     }
 
     ProducerRecord<byte[], byte[]> record(String topic, String key, byte[] body) {

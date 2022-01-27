@@ -65,12 +65,11 @@ public final class Types {
 
         @Override
         public boolean equals(Object other) {
-            if (!(other instanceof ParameterizedType)) return false;
+            if (!(other instanceof ParameterizedType that)) return false;
 
-            ParameterizedType that = (ParameterizedType) other;
             return Objects.equals(rawType, that.getRawType())
-                    && that.getOwnerType() == null
-                    && Arrays.equals(arguments, that.getActualTypeArguments());
+                   && that.getOwnerType() == null
+                   && Arrays.equals(arguments, that.getActualTypeArguments());
         }
 
         @Override
