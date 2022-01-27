@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.0-b3 (12/13/2021 - )
+### 7.10.0-b4 (12/13/2021 - )
 
 * search: update to es 7.16.2, high level rest client is deprecated, migrated to elasticsearch java client !!! Query API broken
   > refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/introduction.html
@@ -28,6 +28,7 @@
   > in real application, only very few actions do large number of db operations (e.g. replay, sync),
   > so added per action basis threshold
 * log: tweak trace log truncation, and added defensive logic to print actionLog/trace to console, if it's larger than kafka maxRequestSize
+* kafka: update kafka to 3.1.0
 
 ### 7.9.3 (11/23/2021 - 12/10/2021)
 

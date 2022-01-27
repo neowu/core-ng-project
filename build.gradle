@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '7.10.0-b3'
+    version = '7.10.0-b4'
 
     repositories {
         maven {
@@ -15,7 +15,7 @@ subprojects {
 }
 
 def elasticVersion = '7.16.2'
-def kafkaVersion = '3.0.0'
+def kafkaVersion = '3.1.0'
 def jacksonVersion = '2.12.5'
 def junitVersion = '5.8.2'
 def mockitoVersion = '4.2.0'
