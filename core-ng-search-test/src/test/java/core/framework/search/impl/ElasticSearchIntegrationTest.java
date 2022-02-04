@@ -20,7 +20,6 @@ import core.framework.util.ClasspathResources;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -97,7 +96,6 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         assertThat(results).hasSize(30);
     }
 
-    @Disabled("due to bug on elasticsearch java client, enable once it fixed")
     @Test
     void complete() {
         documentType.bulkIndex(Map.of("1", document("1", "HashSet", 1, 0, null, null),

@@ -9,6 +9,7 @@ import co.elastic.clients.elasticsearch.core.DeleteResponse;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.elasticsearch.core.search.CompletionSuggestOption;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.Suggester;
 import co.elastic.clients.elasticsearch.indices.AnalyzeResponse;
@@ -124,7 +125,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
             esTook = response.took() * 1_000_000;
             List<String> suggestions = response.suggest().values().stream()
-                .flatMap(Collection::stream).flatMap(suggestion -> suggestion.options().stream()).map(option -> option.completion().text())
+                .flatMap(Collection::stream).flatMap(suggestion -> suggestion.completion().options().stream()).map(CompletionSuggestOption::text)
                 .distinct()
                 .collect(Collectors.toList());
             options = suggestions.size();

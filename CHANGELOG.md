@@ -1,13 +1,11 @@
 ## Change log
 
-### 7.10.0-b4 (12/13/2021 - )
+### 7.10.0 (12/13/2021 - 02/04/2022)
 
-* search: update to es 7.16.2, high level rest client is deprecated, migrated to elasticsearch java client !!! Query API broken
+* search: update to es 7.17.0, high level rest client is deprecated, migrated to elasticsearch java client !!! Query API changed
   > refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/introduction.html
-  > the new API in my opinion abused java lambda, which added lots accidental complexity, and not jvm/gc friendly (of course usually the bottleneck of es call is not on java side),   
+  > the new API in my opinion abused java lambda, which added lots accidental complexity, and not jvm/gc friendly (although the bottleneck of es call usually is not on java side),   
   > in many cases it's actually much harder to use compare to old HLRC
-* !!! TODO: elasticsearch java client still have bugs for completion api, from the activities of elasticsearch-java team, it seems to take long time to resolve this
-  > refer to https://github.com/elastic/elasticsearch-java/issues/57
 * maven-repo: deleted all 6.x version except 6.13.9
   > recommend to upgrade to latest version
 * monitor: support pagerduty (thanks Ajax for the contribution !!!)
