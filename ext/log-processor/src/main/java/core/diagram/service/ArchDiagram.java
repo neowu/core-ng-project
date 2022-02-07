@@ -87,7 +87,7 @@ public class ArchDiagram {
         for (String app : apps()) {
             if (excludeApps.contains(app)) continue;
             if (app.startsWith("_direct_")) {
-                dot.append("{} [label=direct, shape=point];\n", app);
+                dot.append("\"{}\" [label=direct, shape=point];\n", app);
                 continue;
             }
             String color = color(app);

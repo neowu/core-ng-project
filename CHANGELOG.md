@@ -1,5 +1,7 @@
 ## Change log
 
+### 7.10.1 (02/07/2022 - )
+
 ### 7.10.0 (12/13/2021 - 02/04/2022)
 
 * search: update to es 7.17.0, high level rest client is deprecated, migrated to elasticsearch java client !!! Query API changed
@@ -11,7 +13,7 @@
 * monitor: support pagerduty (thanks Ajax for the contribution !!!)
 * log: set kafka log appender "enable.idempotence" to false
   > since kafka 3.0.0, enable.idempotence is default to true, and it overrides "acks" to "all"
-  > so this is set back to previous behavior, which means possible duplicate log messagees if there is connection error
+  > so this is set back to previous behavior, which means possible duplicate log messages if there is connection error
 * api: allow using custom-built httpClient into api().createClient()
   > for regression ajax test use case, it can use stateful httpClient(enabled cookies)
 * json: JSON.class won't allow null as json string or instance, to make sure always return non-null result
@@ -739,7 +741,7 @@
 
 ### 7.1.0 (10/1/2019 - 10/7/2019) !!! Action Log format changed, must update both core-ng and log-processor to same version !!!
 
-### action-log will be send to new topic (action-log-v2), to avoid error during transition, only impact could be some old action-log is not indexed which is minor
+### action-log will be sent to new topic (action-log-v2), to avoid error during transition, only impact could be some old action-log is not indexed which is minor
 
 * log: support put multiple values in same action log context, to make bulk handler / api easier to track, ActionLogContext.get(key) returns List<String> now
 * log-collector: add errorMessage field in event, to keep consistent with action log
