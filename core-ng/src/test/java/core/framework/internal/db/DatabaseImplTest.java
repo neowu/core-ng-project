@@ -125,16 +125,16 @@ class DatabaseImplTest {
     }
 
     @Test
-    void validateAsterisk() {
-        database.validateAsterisk("select column * 10 from table");
-        database.validateAsterisk("select 3*5, 4*2 from table");
-        database.validateAsterisk("select 3 * ? from table");
+    void validateSQLWithAsterisk() {
+        database.validateSQL("select column * 10 from table");
+        database.validateSQL("select 3*5, 4*2 from table");
+        database.validateSQL("select 3 * ? from table");
 
-        assertThatThrownBy(() -> database.validateAsterisk("select * from table")).isInstanceOf(Error.class);
-        assertThatThrownBy(() -> database.validateAsterisk("select * from")).isInstanceOf(Error.class);
-        assertThatThrownBy(() -> database.validateAsterisk("select t.* , t.column from table t")).isInstanceOf(Error.class);
-        assertThatThrownBy(() -> database.validateAsterisk("select 3*4, * from table")).isInstanceOf(Error.class);
-        assertThatThrownBy(() -> database.validateAsterisk("select *")).isInstanceOf(Error.class);
+        assertThatThrownBy(() -> database.validateSQL("select * from table")).isInstanceOf(Error.class);
+        assertThatThrownBy(() -> database.validateSQL("select * from")).isInstanceOf(Error.class);
+        assertThatThrownBy(() -> database.validateSQL("select t.* , t.column from table t")).isInstanceOf(Error.class);
+        assertThatThrownBy(() -> database.validateSQL("select 3*4, * from table")).isInstanceOf(Error.class);
+        assertThatThrownBy(() -> database.validateSQL("select *")).isInstanceOf(Error.class);
     }
 
     @Test

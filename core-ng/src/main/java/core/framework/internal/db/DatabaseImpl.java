@@ -194,8 +194,7 @@ public final class DatabaseImpl implements Database {
     @Override
     public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
         var watch = new StopWatch();
-        validateAsterisk(sql);
-        validateStringValue(sql);
+        validateSQL(sql);
         int returnedRows = 0;
         try {
             List<T> results = operation.select(sql, rowMapper(viewClass), params);
@@ -212,8 +211,7 @@ public final class DatabaseImpl implements Database {
     @Override
     public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
         var watch = new StopWatch();
-        validateAsterisk(sql);
-        validateStringValue(sql);
+        validateSQL(sql);
         int returnedRows = 0;
         try {
             Optional<T> result = operation.selectOne(sql, rowMapper(viewClass), params);
@@ -229,7 +227,7 @@ public final class DatabaseImpl implements Database {
     @Override
     public int execute(String sql, Object... params) {
         var watch = new StopWatch();
-        validateStringValue(sql);
+        validateSQL(sql);
         int affectedRows = 0;
         try {
             affectedRows = operation.update(sql, params);
@@ -244,7 +242,7 @@ public final class DatabaseImpl implements Database {
     @Override
     public int[] batchExecute(String sql, List<Object[]> params) {
         var watch = new StopWatch();
-        validateStringValue(sql);
+        validateSQL(sql);
         if (params.isEmpty()) throw new Error("params must not be empty");
         int affectedRows = 0;
         try {
@@ -311,7 +309,9 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    void validateAsterisk(String sql) {
+    void validateSQL(String sql) {
+        // validate asterisk
+        // execute() could have select part, e.g. insert into select
         int index = sql.indexOf('*');
         while (index > -1) {   // check whether it's wildcard or multiply operator
             int length = sql.length();
@@ -327,11 +327,10 @@ public final class DatabaseImpl implements Database {
                 throw new Error("sql must not contain wildcard(*), please only select columns needed, sql=" + sql);
             index = sql.indexOf('*', index + 1);
         }
-    }
 
-    // by this way, it also disallows functions with string values, e.g. IFNULL(column, 'value'), but it usually can be prevented by different design,
-    // and we prefer to simplify db usage if possible, and shift complexity to application layer
-    private void validateStringValue(String sql) {
+        // validate string value
+        // by this way, it also disallows functions with string values, e.g. IFNULL(column, 'value'), but it usually can be prevented by different design,
+        // and we prefer to simplify db usage if possible, and shift complexity to application layer
         if (sql.indexOf('\'') != -1)
             throw new Error("sql must not contain single quote('), please use prepared statement and question mark(?), sql=" + sql);
     }
