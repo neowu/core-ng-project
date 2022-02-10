@@ -43,12 +43,13 @@ public class ActionLogMessageFactory {
         return message;
     }
 
-    private int estimatedSize(Map<String, List<String>> context) {
+    int estimatedSize(Map<String, List<String>> context) {
         int size = 0;
         for (Map.Entry<String, List<String>> entry : context.entrySet()) {
             size += entry.getKey().length();
             for (String value : entry.getValue()) {
-                size += value.length();
+                // MessageListener may put null in context.key
+                if (value != null) size += value.length();
             }
         }
         return size;

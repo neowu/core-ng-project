@@ -1,6 +1,9 @@
 ## Change log
 
-### 7.10.1 (02/07/2022 - )
+### 7.10.1-b0 (02/07/2022 - )
+
+* db: check "*" for execute sql as well, for case like "insert into table select * from table"
+* bug: fixed ActionLogMessageFactory throws NPE if message key is null
 
 ### 7.10.0 (12/13/2021 - 02/04/2022)
 
