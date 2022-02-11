@@ -1,16 +1,17 @@
 package core.framework.module;
 
+import core.framework.internal.kafka.MockMessagePublisher;
 import core.framework.kafka.MessagePublisher;
-
-import static org.mockito.Mockito.mock;
+import org.mockito.Mockito;
 
 /**
  * @author neo
  */
 public class TestKafkaConfig extends KafkaConfig {
-    @SuppressWarnings("unchecked")
     @Override
     <T> MessagePublisher<T> createMessagePublisher(String topic, Class<T> messageClass) {
-        return (MessagePublisher<T>) mock(MessagePublisher.class);
+        // create custom mock message publisher to do validation check on integration test
+        // as well as leveraging mockito feature on test
+        return Mockito.spy(new MockMessagePublisher<>(topic, messageClass));
     }
 }

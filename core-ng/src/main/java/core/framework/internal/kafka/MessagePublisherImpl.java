@@ -16,6 +16,8 @@ import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+
 /**
  * @author neo
  */
@@ -35,12 +37,12 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
     }
 
     @Override
-    public void publish(String key, T value) {
+    public void publish(@Nullable String key, T value) {
         publish(topic, key, value);
     }
 
     @Override
-    public void publish(String topic, String key, T value) {
+    public void publish(String topic, @Nullable String key, T value) {
         if (topic == null) throw new Error("topic must not be null");
 
         var watch = new StopWatch();

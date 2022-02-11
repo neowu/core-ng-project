@@ -1,5 +1,7 @@
 ## Change log
 
+### 7.10.2 (02/11/2022 - )
+
 ### 7.10.1 (12/13/2021 - 02/11/2022)
 
 * search: update to es 7.17.0, high level rest client is deprecated, migrated to elasticsearch java client !!! Query API changed
