@@ -21,7 +21,7 @@ jobs:
         path: ~/.gradle/wrapper
         key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
     - run: ./gradlew check
-    - run: ./gradlew jacocoTestReport
-    - uses: codecov/codecov-action@v1
+    - run: ./gradlew testCodeCoverageReport
+    - uses: codecov/codecov-action@v2
       with:
         fail_ci_if_error: true

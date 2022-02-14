@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.2 (02/11/2022 - )
+### 7.10.2-b0 (02/11/2022 - )
 * scheduler: replaced jobExecutor with unlimited cached thread pool
   > no impact with regular cases, normally scheduler-service in one application should only send kafka message
   > this change is mainly to simplify test service or non-global jobs (e.g. no need to put real logic to Executors in Job)

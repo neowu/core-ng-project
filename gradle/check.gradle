@@ -13,7 +13,7 @@ subprojects {
     apply plugin: 'checkstyle'
     apply plugin: 'pmd'
     apply plugin: com.github.spotbugs.snom.SpotBugsPlugin
-    apply plugin: 'jacoco'
+    apply plugin: 'jacoco-report-aggregation'
 
     checkstyle {
         dependencies {
@@ -85,10 +85,7 @@ subprojects {
     jacoco {
         toolVersion = '0.8.7'
 
-        tasks.named('jacocoTestReport').configure {
-            // to generate cross sub project report, run: gradlew test && gradlew jacocoTestReport
-            executionData.setFrom(fileTree(rootDir).include('build/**/jacoco/test.exec'))
-
+        tasks.named('testCodeCoverageReport').configure {
             reports {
                 xml.required = true
                 xml.destination rootProject.file("${buildDir}/reports/jacoco/report.xml")
