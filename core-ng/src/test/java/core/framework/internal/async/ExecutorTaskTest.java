@@ -45,7 +45,7 @@ class ExecutorTaskTest {
     void call() throws Exception {
         var task = new ExecutorTask<>(() -> {
             assertThat(ActionLogContext.get("thread")).hasSize(1);
-            return true;
+            return Boolean.TRUE;
         }, new LogManager(), context(null));
         assertThat(task.call()).isTrue();
     }
