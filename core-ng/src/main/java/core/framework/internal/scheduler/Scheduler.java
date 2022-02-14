@@ -37,8 +37,7 @@ public final class Scheduler {
     public Clock clock = Clock.systemUTC();
 
     public Scheduler(LogManager logManager) {
-        this(logManager, ThreadPools.singleThreadScheduler("scheduler-"),
-                ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 4, "scheduler-job-"));
+        this(logManager, ThreadPools.singleThreadScheduler("scheduler-"), ThreadPools.cachedThreadPool("scheduler-job-"));
     }
 
     Scheduler(LogManager logManager, ScheduledExecutorService scheduler, ExecutorService jobExecutor) {
