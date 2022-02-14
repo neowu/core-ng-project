@@ -63,6 +63,7 @@ public class ExecutorTask<T> implements Callable<T> {
             Duration delay = Duration.between(startTime, actionLog.date);
             LOGGER.debug("taskDelay={}", delay);
             actionLog.stats.put("task_delay", (double) delay.toNanos());
+            actionLog.context.put("thread", List.of(Thread.currentThread().getName()));
             return task.call();
         } catch (Throwable e) {
             logManager.logError(e);
