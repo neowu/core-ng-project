@@ -1,4 +1,4 @@
-FROM        neowu/jre:17.0.1
+FROM        neowu/jre:17.0.2
 LABEL       app=log-processor
 RUN         addgroup --system app && adduser --system --no-create-home --ingroup app app
 USER        app
