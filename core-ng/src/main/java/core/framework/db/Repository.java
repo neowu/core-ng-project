@@ -68,5 +68,7 @@ public interface Repository<T> {
     // return true if the new row inserted
     boolean[] batchUpsert(List<T> entities);
 
+    // use Transaction if size of primaryKeys is too large, to avoid mysql create transaction for each statement
+    // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executePreparedBatchAsMultiStatement, mysql driver simply sends multiple queries with ';' as one statement
     boolean[] batchDelete(List<?> primaryKeys);
 }
