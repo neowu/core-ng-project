@@ -24,6 +24,7 @@ public class TestSearchConfig extends SearchConfig {
 
         // disable warning from org.elasticsearch.node.Node
         // refer to org.elasticsearch.node.Node deprecationLogger/no-jdk
+        // org.elasticsearch.monitor.jvm.JvmInfo Line 144
         System.setProperty("es.bundled_jdk", "true");
     }
 
@@ -50,7 +51,7 @@ public class TestSearchConfig extends SearchConfig {
         search.hosts = new HttpHost[]{localESHost};
     }
 
-    // ES use log4j2 core api directly, and cannot use log4j-to-slf4j to bridge, will cause following exception
+    // ES uses log4j2 core api directly, cannot use log4j-to-slf4j to bridge, refer to following exception
     // here is to bridge to core-ng logger
     /*
       java.lang.ClassCastException: class org.apache.logging.slf4j.SLF4JLoggerContext cannot be cast to class org.apache.logging.log4j.core.LoggerContext (org.apache.logging.slf4j.SLF4JLoggerContext and org.apache.logging.log4j.core.LoggerContext are in unnamed module of loader 'app')
