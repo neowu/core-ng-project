@@ -50,8 +50,16 @@ public class TestSearchConfig extends SearchConfig {
         search.hosts = new HttpHost[]{localESHost};
     }
 
-    // ES Node refers to log4j core API directly in org.elasticsearch.common.logging.Loggers, this is to bridge es log to coreng logger
-    // refer to org.elasticsearch.common.logging.NodeAndClusterIdStateListener, NodeAndClusterIdConverter.setNodeIdAndClusterId(nodeId, clusterUUID);
+    // ES use log4j2 core api directly, and cannot use log4j-to-slf4j to bridge, will cause following exception
+    // here is to bridge to core-ng logger
+    /*
+      java.lang.ClassCastException: class org.apache.logging.slf4j.SLF4JLoggerContext cannot be cast to class org.apache.logging.log4j.core.LoggerContext (org.apache.logging.slf4j.SLF4JLoggerContext and org.apache.logging.log4j.core.LoggerContext are in unnamed module of loader 'app')
+        at org.apache.logging.log4j.core.LoggerContext.getContext(LoggerContext.java:231)
+        at org.apache.logging.log4j.core.config.Configurator.setLevel(Configurator.java:366)
+        at org.elasticsearch.common.logging.Loggers.setLevel(Loggers.java:114)
+        at org.elasticsearch.index.SearchSlowLog.<init>(SearchSlowLog.java:111)
+        at org.elasticsearch.index.IndexModule.<init>(IndexModule.java:176)
+    * */
     void configureLogger() {
         if (System.getProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY) != null) return;
         System.setProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY, ESLoggerConfigFactory.class.getName());

@@ -1,10 +1,14 @@
 ## Change log
 
-### 7.10.2-b0 (02/11/2022 - )
+### 7.10.2-b1 (02/11/2022 - )
 * scheduler: replaced jobExecutor with unlimited cached thread pool
   > no impact with regular cases, normally scheduler-service in one application should only send kafka message
   > this change is mainly to simplify test service or non-global jobs (e.g. no need to put real logic to Executors in Job)
 * jre: published neowu/jre:17.0.2
+* search: update es to 8.0.0
+  > Elastic dropped more modules from this version, now we have to include transport-netty4, mapper-extras libs
+  > and it doesn't provide standard way of integration test, refer to https://github.com/elastic/elasticsearch/issues/55258
+  > opensearch is doing opposite, https://mvnrepository.com/artifact/org.opensearch.plugin
 
 ### 7.10.1 (12/13/2021 - 02/11/2022)
 

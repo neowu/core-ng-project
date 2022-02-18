@@ -52,7 +52,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @AfterEach
     void cleanup() {
-        documentType.bulkDelete(range(0, 100).mapToObj(String::valueOf).collect(Collectors.toList()));
+        documentType.bulkDelete(range(0, 100).mapToObj(String::valueOf).toList());
         elasticSearch.refreshIndex("document");
     }
 

@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '7.10.2-b0'
+    version = '7.10.2-b1'
 
     repositories {
         maven {
@@ -14,9 +14,9 @@ subprojects {
     }
 }
 
-def elasticVersion = '7.17.0'
+def elasticVersion = '8.0.0'
 def kafkaVersion = '3.1.0'
-def jacksonVersion = '2.12.5'
+def jacksonVersion = '2.13.1'
 def junitVersion = '5.8.2'
 def mockitoVersion = '4.2.0'
 def assertjVersion = '3.22.0'
@@ -35,7 +35,7 @@ project('core-ng') {
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'com.squareup.okhttp3:okhttp:4.9.3'
-        implementation 'io.undertow:undertow-core:2.2.14.Final'
+        implementation 'io.undertow:undertow-core:2.2.16.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.8.4'      // used by kafka message compression
         compileOnly "mysql:mysql-connector-java:${mysqlVersion}"
@@ -95,13 +95,11 @@ project('core-ng-search-test') {
         implementation project(":core-ng-test")
         implementation project(":core-ng-search")
         implementation "org.elasticsearch:elasticsearch:${elasticVersion}"
-        implementation "org.elasticsearch.plugin:transport-netty4-client:${elasticVersion}"
-        implementation "org.elasticsearch.plugin:reindex-client:${elasticVersion}"
-        implementation "org.elasticsearch.plugin:mapper-extras-client:${elasticVersion}"        // used by elasticsearch scaled_float
+        implementation "core.framework.elasticsearch.module:transport-netty4:${elasticVersion}"
+        implementation "core.framework.elasticsearch.module:mapper-extras:${elasticVersion}"    // used by elasticsearch scaled_float
         implementation "core.framework.elasticsearch.module:lang-painless:${elasticVersion}"
         implementation "core.framework.elasticsearch.module:analysis-common:${elasticVersion}"  // used by elasticsearch stemmer
-        implementation 'org.apache.logging.log4j:log4j-core:2.17.0'                             // used by elasticsearch local node, must match elasticsearch version
-        implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"              // override transitive jackson dependencies of elasticsearch
+        implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"              // override transitive jackson dependencies of elasticsearch, only for intellij, gradle woks fine
     }
 }
 
