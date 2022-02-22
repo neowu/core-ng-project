@@ -9,6 +9,11 @@
   > Elastic dropped more modules from this version, now we have to include transport-netty4, mapper-extras libs
   > and it doesn't provide standard way of integration test, refer to https://github.com/elastic/elasticsearch/issues/55258
   > opensearch is doing opposite, https://mvnrepository.com/artifact/org.opensearch.plugin
+* db: updated batchInsertIgnore, batchUpsert, batchDelete return value from boolean[] to boolean
+  > this is drawback of MySQL thin driver, though expected behavior
+  > with batch insert ignore (or insert on duplicate key), MySQL thin driver fills entire affectedRows array with same value, java.sql.Statement.SUCCESS_NO_INFO if updated count > 0
+  > refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts Line 758
+  > if you need to know result for each entity, you have to use single operation one by one (Transaction may help performance a bit)
 
 ### 7.10.1 (12/13/2021 - 02/11/2022)
 

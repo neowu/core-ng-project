@@ -107,7 +107,9 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public boolean update(T entity) {
-        return update(entity, false, null, null);
+        boolean updated = update(entity, false, null, null);
+        if (!updated) logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "row is not updated");
+        return updated;
     }
 
     private boolean update(T entity, boolean partial, String where, Object[] params) {
@@ -120,14 +122,16 @@ public final class RepositoryImpl<T> implements Repository<T> {
             return updatedRows == 1;
         } finally {
             long elapsed = watch.elapsed();
-            logger.debug("update, sql={}, params={}, updatedRows={}, elapsed={}", query.sql, new SQLParams(database.operation.enumMapper, query.params), updatedRows, elapsed);
+            logger.debug("update, sql={}, params={}, updated={}, elapsed={}", query.sql, new SQLParams(database.operation.enumMapper, query.params), updatedRows == 1, elapsed);
             database.track(elapsed, 0, updatedRows, 1);
         }
     }
 
     @Override
     public boolean partialUpdate(T entity) {
-        return update(entity, true, null, null);
+        boolean updated = update(entity, true, null, null);
+        if (!updated) logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "row is not updated");
+        return updated;
     }
 
     @Override
@@ -144,7 +148,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         int affectedRows = 0;
         try {
             affectedRows = database.operation.update(deleteSQL, primaryKeys);
-            if (affectedRows != 1) logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", affectedRows);
+            if (affectedRows != 1) logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "row is not deleted, result={}", affectedRows);
             return affectedRows == 1;
         } finally {
             long elapsed = watch.elapsed();
@@ -174,7 +178,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
-    public boolean[] batchInsertIgnore(List<T> entities) {
+    public boolean batchInsertIgnore(List<T> entities) {
         var watch = new StopWatch();
         if (entities.isEmpty()) throw new Error("entities must not be empty");
         if (insertQuery.generatedColumn != null) throw new Error("entity must not have auto increment primary key, entityClass=" + entityClass.getCanonicalName());
@@ -184,22 +188,21 @@ public final class RepositoryImpl<T> implements Repository<T> {
             validator.validate(entity, false);
             params.add(insertQuery.params(entity));
         }
-        int insertedRows = 0;
+        boolean inserted = false;   // any row inserted
         try {
             int[] affectedRows = database.operation.batchUpdate(sql, params);
-            boolean[] results = new boolean[affectedRows.length];
-            insertedRows = batchResults(affectedRows, results);
-            return results;
+            inserted = batchUpdated(affectedRows);
+            return inserted;
         } finally {
             long elapsed = watch.elapsed();
             int size = entities.size();
-            logger.debug("batchInsertIgnore, sql={}, params={}, size={}, insertedRows={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), size, insertedRows, elapsed);
-            database.track(elapsed, 0, insertedRows, size);
+            logger.debug("batchInsertIgnore, sql={}, params={}, size={}, inserted={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), size, inserted, elapsed);
+            database.track(elapsed, 0, inserted ? size : 0, size);
         }
     }
 
     @Override
-    public boolean[] batchUpsert(List<T> entities) {
+    public boolean batchUpsert(List<T> entities) {
         var watch = new StopWatch();
         if (entities.isEmpty()) throw new Error("entities must not be empty");
         if (insertQuery.generatedColumn != null) throw new Error("entity must not have auto increment primary key, entityClass=" + entityClass.getCanonicalName());
@@ -209,22 +212,32 @@ public final class RepositoryImpl<T> implements Repository<T> {
             validator.validate(entity, false);
             params.add(insertQuery.params(entity));
         }
-        int updatedRows = 0;
+        boolean updated = false;
         try {
             int[] affectedRows = database.operation.batchUpdate(sql, params);
-            boolean[] results = new boolean[affectedRows.length];
-            updatedRows = batchResults(affectedRows, results);
-            return results;
+            updated = batchUpdated(affectedRows);
+            return updated;
         } finally {
             long elapsed = watch.elapsed();
             int size = entities.size();
-            logger.debug("batchUpsert, sql={}, params={}, size={}, updatedRows={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), size, updatedRows, elapsed);
-            database.track(elapsed, 0, updatedRows, size);
+            logger.debug("batchUpsert, sql={}, params={}, size={}, updated={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), size, updated, elapsed);
+            database.track(elapsed, 0, updated ? size : 0, size);
         }
     }
 
+    private boolean batchUpdated(int[] affectedRows) {
+        // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts Line 758
+        // only need to check first value
+        // HSQL actually returns accurate affected rows for batch, so also check if > 0 to make unit test correct
+        for (int affectedRow : affectedRows) {
+            if (affectedRow == Statement.SUCCESS_NO_INFO) return true;
+            if (affectedRow > 0) return true;
+        }
+        return false;
+    }
+
     @Override
-    public boolean[] batchDelete(List<?> primaryKeys) {
+    public boolean batchDelete(List<?> primaryKeys) {
         var watch = new StopWatch();
         if (primaryKeys.isEmpty()) throw new Error("primaryKeys must not be empty");
         List<Object[]> params = new ArrayList<>(primaryKeys.size());
@@ -238,34 +251,14 @@ public final class RepositoryImpl<T> implements Repository<T> {
         int deletedRows = 0;
         try {
             int[] affectedRows = database.operation.batchUpdate(deleteSQL, params);
-            boolean[] results = new boolean[affectedRows.length];
-            deletedRows = batchResults(affectedRows, results);
-            if (deletedRows != primaryKeys.size()) logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows do not match size of primary keys, results={}", Arrays.toString(affectedRows));
-            return results;
+            deletedRows = Arrays.stream(affectedRows).sum();
+            if (deletedRows != primaryKeys.size()) logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "some rows are not deleted, results={}", Arrays.toString(affectedRows));
+            return deletedRows > 0;
         } finally {
             long elapsed = watch.elapsed();
             int size = primaryKeys.size();
             logger.debug("batchDelete, sql={}, params={}, size={}, elapsed={}", deleteSQL, new SQLBatchParams(database.operation.enumMapper, params), size, elapsed);
             database.track(elapsed, 0, deletedRows, size);
         }
-    }
-
-    // use procedurally way to produce results to insertedRows and insertedResults in one method, to balance both performance and ease of unit test
-    // not recommended applying in application level code
-    int batchResults(int[] affectedRows, boolean[] results) {
-        int updatedRows = 0;
-        for (int i = 0; i < affectedRows.length; i++) {
-            int affectedRow = affectedRows[i];
-            // with batchInsert, mysql returns -2 if insert succeeds, for batch only
-            // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts
-            // with upsert, returns 1 if inserted, 2 if updated
-            if (affectedRow == Statement.SUCCESS_NO_INFO || affectedRow == 1) {
-                results[i] = true;  // return true if row is inserted/deleted/updated
-                updatedRows++;
-            } else if (affectedRow > 0) {
-                updatedRows++;
-            }
-        }
-        return updatedRows;
     }
 }

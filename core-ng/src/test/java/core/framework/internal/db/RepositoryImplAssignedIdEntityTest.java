@@ -205,9 +205,9 @@ class RepositoryImplAssignedIdEntityTest {
             entities.add(entity);
             entities.add(entity);
         }
-        boolean[] results = repository.batchInsertIgnore(entities);
+        boolean result = repository.batchInsertIgnore(entities);
 
-        assertThat(results).hasSize(10).contains(true, false, true, false, true, false, true, false, true, false);
+        assertThat(result).isTrue();
         assertThat(repository.get("0")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
         assertThat(repository.get("1")).get().usingRecursiveComparison().isEqualTo(entities.get(2));
     }
@@ -219,10 +219,10 @@ class RepositoryImplAssignedIdEntityTest {
             AssignedIdEntity entity = entity(String.valueOf(i), "value" + i, 10 + i);
             entities.add(entity);
         }
-        boolean[] inserts = repository.batchUpsert(entities);
+        boolean updated = repository.batchUpsert(entities);
+        assertThat(updated).isTrue();
         assertThat(repository.get("0")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
         assertThat(repository.get("4")).get().usingRecursiveComparison().isEqualTo(entities.get(4));
-        assertThat(inserts).containsExactly(true, true, true, true, true);
 
         entities.get(0).intField = 2;
         entities.get(4).intField = 2;
@@ -241,8 +241,8 @@ class RepositoryImplAssignedIdEntityTest {
         }
         repository.batchInsert(entities);
 
-        boolean[] results = repository.batchDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
-        assertThat(results).hasSize(100).doesNotContain(false);
+        boolean result = repository.batchDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
+        assertThat(result).isTrue();
 
         assertThat(repository.get(entities.get(0).id)).isNotPresent();
         assertThat(repository.get(entities.get(1).id)).isNotPresent();
