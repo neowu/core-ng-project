@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.2-b1 (02/11/2022 - )
+### 7.10.2 (02/11/2022 - 02/23/2022)
 * scheduler: replaced jobExecutor with unlimited cached thread pool
   > no impact with regular cases, normally scheduler-service in one application should only send kafka message
   > this change is mainly to simplify test service or non-global jobs (e.g. no need to put real logic to Executors in Job)
@@ -14,6 +14,9 @@
   > with batch insert ignore (or insert on duplicate key), MySQL thin driver fills entire affectedRows array with same value, java.sql.Statement.SUCCESS_NO_INFO if updated count > 0
   > refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts Line 758
   > if you need to know result for each entity, you have to use single operation one by one (Transaction may help performance a bit)
+* db: mysql jdbc driver updated to 8.0.28
+  > one bug fixed: After calling Statement.setQueryTimeout(), when a query timeout was reached, a connection to the server was established to terminate the query,
+  > but the connection remained open afterward. With this fix, the new connection is closed after the query termination. (Bug #31189960, Bug #99260)
 
 ### 7.10.1 (12/13/2021 - 02/11/2022)
 
