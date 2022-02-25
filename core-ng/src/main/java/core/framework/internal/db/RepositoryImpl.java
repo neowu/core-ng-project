@@ -107,9 +107,8 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public boolean update(T entity) {
-        boolean updated = update(entity, false, null, null);
-        if (!updated) logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "row is not updated");
-        return updated;
+        // return true if any column changed, false if no column changed or id not found
+        return update(entity, false, null, null);
     }
 
     private boolean update(T entity, boolean partial, String where, Object[] params) {
@@ -119,19 +118,19 @@ public final class RepositoryImpl<T> implements Repository<T> {
         int updatedRows = 0;
         try {
             updatedRows = database.operation.update(query.sql, query.params);
+            // refer to https://dev.mysql.com/doc/c-api/8.0/en/mysql-affected-rows.html
+            // if all columns updated to its current values, the affectedRows will be 0
             return updatedRows == 1;
         } finally {
             long elapsed = watch.elapsed();
-            logger.debug("update, sql={}, params={}, updated={}, elapsed={}", query.sql, new SQLParams(database.operation.enumMapper, query.params), updatedRows == 1, elapsed);
+            logger.debug("update, sql={}, params={}, updatedRows={}, elapsed={}", query.sql, new SQLParams(database.operation.enumMapper, query.params), updatedRows, elapsed);
             database.track(elapsed, 0, updatedRows, 1);
         }
     }
 
     @Override
     public boolean partialUpdate(T entity) {
-        boolean updated = update(entity, true, null, null);
-        if (!updated) logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "row is not updated");
-        return updated;
+        return update(entity, true, null, null);
     }
 
     @Override

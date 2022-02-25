@@ -110,6 +110,7 @@ public final class DatabaseImpl implements Database {
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
             properties.setProperty(PropertyKey.connectTimeout.getKeyName(), timeoutValue);
             properties.setProperty(PropertyKey.socketTimeout.getKeyName(), timeoutValue);
+            // refer to https://dev.mysql.com/doc/c-api/8.0/en/mysql-affected-rows.html
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-connp-props-connection.html#cj-conn-prop_useAffectedRows
             // Don't set the CLIENT_FOUND_ROWS flag when connecting to the server (not JDBC-compliant, will break most applications that rely on "found" rows vs. "affected rows" for DML statements),
             // but does cause "correct" update counts from "INSERT ... ON DUPLICATE KEY UPDATE" statements to be returned by the server.

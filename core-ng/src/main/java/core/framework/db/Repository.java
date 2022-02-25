@@ -47,6 +47,7 @@ public interface Repository<T> {
 
     // use update carefully, it will update all the columns according to the entity fields, includes null fields
     // generally it's recommended to use partialUpdate if only few columns need to be updated and with optimistic lock
+    // return true if the row actually changed
     boolean update(T entity);
 
     // only update non-null fields, return true if the row actually changed
