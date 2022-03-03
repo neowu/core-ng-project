@@ -9,7 +9,7 @@ static_resources:
     - filters:
       - name: envoy.filters.network.redis_proxy
         typed_config:
-          "@type": type.googleapis.com/envoy.config.filter.network.redis_proxy.v2.RedisProxy
+          "@type": type.googleapis.com/envoy.extensions.filters.network.redis_proxy.v3.RedisProxy
           stat_prefix: egress_redis
           settings:
             op_timeout: 5s
@@ -20,15 +20,16 @@ static_resources:
   - name: redis_cluster
     connect_timeout: 1s
     type: strict_dns
+    # https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev
     lb_policy: MAGLEV
     load_assignment:
       cluster_name: redis_cluster
       endpoints:
       - lb_endpoints:
         - endpoint:
-            address: {"socket_address": {"address": "redis-1", "port_value": 6379}}
+            address: { "socket_address": { "address": "redis-1", "port_value": 6379 } }
         - endpoint:
-            address: {"socket_address": {"address": "redis-2", "port_value": 6379}}
+            address: { "socket_address": { "address": "redis-2", "port_value": 6379 } }
 admin:
   access_log_path: "/dev/null"
   address:
