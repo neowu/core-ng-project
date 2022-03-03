@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'com.github.spotbugs.snom:spotbugs-gradle-plugin:5.0.3'
+        classpath 'com.github.spotbugs.snom:spotbugs-gradle-plugin:5.0.6'
     }
 }
 
@@ -17,8 +17,8 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:9.2.1'
-            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.40.0'
+            checkstyle 'com.puppycrawl.tools:checkstyle:10.0'
+            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.41.0'
         }
 
         configFile = rootProject.file('gradle/check/checkstyle.xml')
@@ -45,7 +45,7 @@ subprojects {
     pmd {
         ruleSets = []
         ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
-        toolVersion = '6.41.0'
+        toolVersion = '6.43.0'
         consoleOutput = true
 
         tasks.withType(Pmd).configureEach {
@@ -60,7 +60,7 @@ subprojects {
 
         reportLevel = 'low'
         includeFilter = rootProject.file('gradle/check/spotbugs.xml')
-        toolVersion = '4.5.2'
+        toolVersion = '4.5.3'
 
         def spotbugsReport = tasks.register('spotbugsReport') {
             group = 'verification'
