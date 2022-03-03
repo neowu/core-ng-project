@@ -10,12 +10,7 @@ import java.util.concurrent.Future;
 public interface Executor {
     <T> Future<T> submit(String action, Callable<T> task);
 
-    default Future<Void> submit(String action, Task task) {
-        return submit(action, () -> {
-            task.execute();
-            return null;
-        });
-    }
+    Future<Void> submit(String action, Task task);
 
     void submit(String action, Task task, Duration delay);
 }

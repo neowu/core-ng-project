@@ -2,6 +2,7 @@ package core.framework.test.async;
 
 import core.framework.async.Executor;
 import core.framework.async.Task;
+import core.framework.internal.async.CallableTask;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
@@ -16,6 +17,11 @@ public class MockExecutor implements Executor {
     @Override
     public <T> Future<T> submit(String action, Callable<T> task) {
         return new ExecutorFuture<>(task);
+    }
+
+    @Override
+    public Future<Void> submit(String action, Task task) {
+        return submit(action, new CallableTask(task));
     }
 
     @Override

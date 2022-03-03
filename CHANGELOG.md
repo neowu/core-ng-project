@@ -3,6 +3,7 @@
 ### 7.10.3 (02/25/2022 - )
 
 * db: fix: revert previous update UNEXPECTED_UPDATE_RESULT warning if updated row is 0
+* executor: log task class in trace to make it easier to find the corresponding code of executor task
 
 ### 7.10.2 (02/11/2022 - 02/23/2022)
 

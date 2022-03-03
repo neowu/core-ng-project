@@ -60,6 +60,7 @@ public class ExecutorTask<T> implements Callable<T> {
                 actionLog.refIds = List.of(refId);
                 if (trace == Trace.CASCADE) actionLog.trace = Trace.CASCADE;
             }
+            LOGGER.debug("taskClass={}", CallableTask.taskClass(task).getName());
             Duration delay = Duration.between(startTime, actionLog.date);
             LOGGER.debug("taskDelay={}", delay);
             actionLog.stats.put("task_delay", (double) delay.toNanos());

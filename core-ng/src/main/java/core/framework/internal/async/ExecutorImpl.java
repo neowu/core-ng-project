@@ -63,9 +63,15 @@ public final class ExecutorImpl implements Executor {
     public <T> Future<T> submit(String action, Callable<T> task) {
         var now = Instant.now();
         String actionId = LogManager.ID_GENERATOR.next(now);
-        logger.debug("submit task, action={}, id={}", action, actionId);
+        logger.debug("submit task, action={}, id={}, taskClass={}", action, actionId, CallableTask.taskClass(task).getName());
         ExecutorTask<T> execution = execution(actionId, action, now, task);
         return submitTask(execution);
+    }
+
+    @Override
+    public Future<Void> submit(String action, Task task) {
+        // wrap task with class (rather than lambda), to preserve task class info
+        return submit(action, new CallableTask(task));
     }
 
     @Override
