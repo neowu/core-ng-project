@@ -94,10 +94,7 @@ public final class ExecutorImpl implements Executor {
         logger.debug("submit delayed task, action={}, id={}, delay={}", action, actionId, delay);
 
         // construct execution outside scheduler thread, to obtain parent action log
-        ExecutorTask<Void> execution = execution(actionId, action, now.plus(delay), () -> {
-            task.execute();
-            return null;
-        });
+        ExecutorTask<Void> execution = execution(actionId, action, now.plus(delay), new CallableTask(task));
         try {
             scheduler.schedule(new DelayedTask(execution), delay.toMillis(), TimeUnit.MILLISECONDS);
             return true;
