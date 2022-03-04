@@ -39,9 +39,9 @@ services:
     - KAFKA_CLUSTER_ID=lK_g8qooQNOD9klGoxLojA
     - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.rmi.port=1099 -Djava.rmi.server.hostname=kafka
     - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
-    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://localhost:9092 --override num.partitions=3
+    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka:9092 --override num.partitions=3
   log-processor:
-    image: neowu/log-processor:7.10.0
+    image: neowu/log-processor:7.10.2
     environment:
     - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092
@@ -51,8 +51,9 @@ services:
     depends_on:
     - kafka
     - elasticsearch
+    - kibana
   log-collector:
-    image: neowu/log-collector:7.10.0
+    image: neowu/log-collector:7.10.2
     environment:
     - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092
