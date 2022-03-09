@@ -4,8 +4,10 @@
 
 * db: fix: revert previous update UNEXPECTED_UPDATE_RESULT warning if updated row is 0
 * executor: log task class in trace to make it easier to find the corresponding code of executor task
-* log: update action-* context dynamic index template to support dot in context key
+* log-processor: update action-* context dynamic index template to support dot in context key
   > it's not recommended putting dot in action log context key
+* log-processor: kibana json updated for kibana 8.1.0
+  > TSVB metrics separate left axis bug fixed, so to revert GC diagrams back
 
 ### 7.10.2 (02/11/2022 - 02/23/2022)
 
