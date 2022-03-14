@@ -30,8 +30,8 @@ class MessageImplMultiLanguageTest {
         assertThat(message.language("messages.properties")).isEqualTo(MessageImpl.DEFAULT_LANGUAGE);
 
         assertThatThrownBy(() -> message.language("invalid.message_E.properties"))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("property path must match 'path/name_language.properties' pattern");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("property path must match 'path/name_language.properties' pattern");
     }
 
     @Test
@@ -47,24 +47,21 @@ class MessageImplMultiLanguageTest {
         assertThat(message.get("key3", "zh")).isEqualTo("value3");
         assertThat(message.get("key3", "en")).isEqualTo("en_value3");
         assertThat(message.get("key3", "en_US")).isEqualTo("en_US_value3");
+
+        // use first language if language is null
+        assertThat(message.get("key1")).isEqualTo("value1");
     }
 
     @Test
     void getWithNotDefinedLanguage() {
         assertThatThrownBy(() -> message.get("key1", "es_GT"))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("language is not defined");
-
-        assertThatThrownBy(() -> message.get("key1"))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("language is not defined");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("language is not defined");
     }
 
     @Test
     void getWithNotExistedKey() {
-        assertThatThrownBy(() -> message.get("notExistedKey", "zh"))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("can not find message");
+        assertThat(message.get("notExistedKey", "zh")).isEqualTo("notExistedKey");
     }
 
     @Test
@@ -74,8 +71,8 @@ class MessageImplMultiLanguageTest {
         message.messages.get("zh").add(properties);
 
         assertThatThrownBy(() -> message.validateMessageKeys())
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("message keys are missing for language")
-                .hasMessageContaining("language=en_US");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("message keys are missing for language")
+            .hasMessageContaining("language=en_US");
     }
 }

@@ -1,7 +1,5 @@
-FROM        adoptopenjdk/openjdk16:alpine-jre
+FROM        neowu/jre:17.0.2
 LABEL       app=log-processor
-# install /lib/ld-linux-x86-64.so.2 for native lib, e.g. kafka/snappy
-RUN         apk add --no-cache gcompat
 RUN         addgroup --system app && adduser --system --no-create-home --ingroup app app
 USER        app
 COPY        package/dependency     /opt/app

@@ -37,7 +37,7 @@ public class RedisConfig extends Config {
     Redis createRedis() {
         logger.info("create redis client, name={}", name);
         var redis = new RedisImpl("redis" + (name == null ? "" : "-" + name));
-        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
+        context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> redis.close());
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
         context.collector.metrics.add(new PoolMetrics(redis.pool));
         return redis;
@@ -51,6 +51,7 @@ public class RedisConfig extends Config {
     void setHost(String host) {
         RedisImpl redis = (RedisImpl) this.redis;
         redis.host(host);
+        context.probe.hostURIs.add(host);
     }
 
     public void password(String password) {

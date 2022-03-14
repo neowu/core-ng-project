@@ -48,7 +48,7 @@ public final class RequestParser {
         HeaderMap headers = exchange.getRequestHeaders();
 
         request.scheme = scheme(exchange.getRequestScheme(), headers.getFirst(Headers.X_FORWARDED_PROTO));
-        request.hostName = hostName(exchange.getHostName(), headers.getFirst(Headers.X_FORWARDED_HOST));
+        request.hostname = hostname(exchange.getHostName(), headers.getFirst(Headers.X_FORWARDED_HOST));
         int requestPort = requestPort(headers.getFirst(Headers.HOST), request.scheme, exchange);
         request.port = port(requestPort, headers.getFirst(Headers.X_FORWARDED_PORT));
 
@@ -78,8 +78,8 @@ public final class RequestParser {
         }
     }
 
-    String hostName(String hostName, String xForwardedHost) {
-        if (Strings.isBlank(xForwardedHost)) return hostName;
+    String hostname(String hostname, String xForwardedHost) {
+        if (Strings.isBlank(xForwardedHost)) return hostname;
         return xForwardedHost;
     }
 
@@ -239,8 +239,8 @@ public final class RequestParser {
             int port = request.port;
 
             builder.append(scheme)
-                    .append("://")
-                    .append(request.hostName);
+                .append("://")
+                .append(request.hostname);
 
             if (!(port == 80 && "http".equals(scheme)) && !(port == 443 && "https".equals(scheme))) {
                 builder.append(':').append(port);

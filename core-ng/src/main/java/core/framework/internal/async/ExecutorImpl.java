@@ -2,7 +2,6 @@ package core.framework.internal.async;
 
 import core.framework.async.Executor;
 import core.framework.async.Task;
-import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +26,13 @@ public final class ExecutorImpl implements Executor {
     private final ExecutorService executor;
     private final LogManager logManager;
     private final String name;
+    private final long maxProcessTimeInNano;
     volatile ScheduledExecutorService scheduler;
 
-    public ExecutorImpl(int poolSize, String name, LogManager logManager) {
+    public ExecutorImpl(int poolSize, String name, LogManager logManager, long maxProcessTimeInNano) {
         this.name = name;
         this.logManager = logManager;
+        this.maxProcessTimeInNano = maxProcessTimeInNano;
         this.executor = ThreadPools.cachedThreadPool(poolSize, "executor" + (name == null ? "" : "-" + name) + "-");
     }
 
@@ -62,9 +63,15 @@ public final class ExecutorImpl implements Executor {
     public <T> Future<T> submit(String action, Callable<T> task) {
         var now = Instant.now();
         String actionId = LogManager.ID_GENERATOR.next(now);
-        logger.debug("submit task, action={}, id={}", action, actionId);
+        logger.debug("submit task, action={}, id={}, taskClass={}", action, actionId, CallableTask.taskClass(task).getName());
         ExecutorTask<T> execution = execution(actionId, action, now, task);
         return submitTask(execution);
+    }
+
+    @Override
+    public Future<Void> submit(String action, Task task) {
+        // wrap task with class (rather than lambda), to preserve task class info
+        return submit(action, new CallableTask(task));
     }
 
     @Override
@@ -87,10 +94,7 @@ public final class ExecutorImpl implements Executor {
         logger.debug("submit delayed task, action={}, id={}, delay={}", action, actionId, delay);
 
         // construct execution outside scheduler thread, to obtain parent action log
-        ExecutorTask<Void> execution = execution(actionId, action, now.plus(delay), () -> {
-            task.execute();
-            return null;
-        });
+        ExecutorTask<Void> execution = execution(actionId, action, now.plus(delay), new CallableTask(task));
         try {
             scheduler.schedule(new DelayedTask(execution), delay.toMillis(), TimeUnit.MILLISECONDS);
             return true;
@@ -110,8 +114,13 @@ public final class ExecutorImpl implements Executor {
     }
 
     private <T> ExecutorTask<T> execution(String actionId, String action, Instant startTime, Callable<T> task) {
-        ActionLog parentActionLog = LogManager.CURRENT_ACTION_LOG.get();
-        return new ExecutorTask<>(actionId, action, startTime, parentActionLog, logManager, task);
+        var context = new ExecutorTask.TaskContext();
+        context.actionId = actionId;
+        context.action = action;
+        context.startTime = startTime;
+        context.parentActionLog = LogManager.CURRENT_ACTION_LOG.get();
+        context.maxProcessTimeInNano = maxProcessTimeInNano;
+        return new ExecutorTask<>(task, logManager, context);
     }
 
     class DelayedTask implements Callable<Void> {

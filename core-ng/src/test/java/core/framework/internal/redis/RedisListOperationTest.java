@@ -55,4 +55,12 @@ class RedisListOperationTest extends AbstractRedisOperationTest {
         assertThat(items).containsExactly("item1", "item2");
         assertRequestEquals("*4\r\n$6\r\nLRANGE\r\n$3\r\nkey\r\n$1\r\n0\r\n$2\r\n-1\r\n");
     }
+
+    @Test
+    void trim() {
+        response("+OK\r\n");
+        redis.list().trim("key", 10);
+
+        assertRequestEquals("*4\r\n$5\r\nLTRIM\r\n$3\r\nkey\r\n$3\r\n-10\r\n$2\r\n-1\r\n");
+    }
 }

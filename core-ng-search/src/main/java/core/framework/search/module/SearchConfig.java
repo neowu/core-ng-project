@@ -7,9 +7,7 @@ import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.impl.ElasticSearchHost;
 import core.framework.search.impl.ElasticSearchImpl;
-import core.framework.search.impl.log.ESLoggerContextFactory;
 import core.framework.util.Types;
-import org.apache.logging.log4j.LogManager;
 
 import java.time.Duration;
 
@@ -27,11 +25,9 @@ public class SearchConfig extends Config {
         this.context = context;
         this.name = name;
 
-        configureLogger();
-
         var search = new ElasticSearchImpl();
-        context.startupHook.add(search::initialize);
-        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> search.close());
+        context.startupHook.initialize.add(search::initialize);
+        context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> search.close());
         context.beanFactory.bind(ElasticSearch.class, name, search);
         this.search = search;
     }
@@ -46,15 +42,12 @@ public class SearchConfig extends Config {
     // comma separated hosts
     public void host(String host) {
         search.hosts = ElasticSearchHost.parse(host);
+        context.probe.urls.add(search.hosts[0].toURI() + "/_cluster/health?local=true");      // in kube env, it's ok to just check first pod of stateful set
     }
 
     public void auth(String apiKey) {
         if (apiKey.isEmpty()) throw new Error("search auth is configured but apiKey is empty");
         search.apiKey = apiKey;
-    }
-
-    void configureLogger() {
-        System.setProperty(LogManager.FACTORY_PROPERTY_NAME, ESLoggerContextFactory.class.getName());
     }
 
     public void slowOperationThreshold(Duration threshold) {

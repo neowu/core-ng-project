@@ -44,11 +44,11 @@ public class SessionManager implements SessionContext {
         return session;
     }
 
+    @SuppressWarnings("LogicConditionNeedOptimization") // false positive
     public void save(RequestImpl request, Response response, ActionLog actionLog) {
         // request.session can be null or ReadOnlySession for websocket, only regular http request may generate session
-        if (request.session instanceof SessionImpl) {
-            SessionImpl session = (SessionImpl) request.session;
-            if (!session.saved) save(session, response, actionLog);
+        if (request.session instanceof SessionImpl session && !session.saved) {
+            save(session, response, actionLog);
         }
     }
 
@@ -83,7 +83,7 @@ public class SessionManager implements SessionContext {
         // share sessionId requires multiple webapps decode session key/values consistently, which adds extra complexity for dev/deployment
         if (header == null && cookieSpec.domain != null)
             return cookieSpec.domain;
-        return request.hostName();
+        return request.hostname();
     }
 
     void putSessionId(Response response, String sessionId) {

@@ -2,7 +2,7 @@ package core.framework.internal.web.sys;
 
 import core.framework.internal.kafka.MessageHeaders;
 import core.framework.internal.log.LogManager;
-import core.framework.util.Strings;
+import core.framework.internal.log.Trace;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +32,6 @@ class KafkaControllerTest {
     @Test
     void record() {
         ProducerRecord<byte[], byte[]> record = controller.record("topic", "key", new byte[0]);
-        assertThat(record.headers().lastHeader(MessageHeaders.HEADER_TRACE).value()).isEqualTo(Strings.bytes("true"));
+        assertThat(record.headers().lastHeader(MessageHeaders.HEADER_TRACE).value()).asString().isEqualTo(Trace.CASCADE.name());
     }
 }

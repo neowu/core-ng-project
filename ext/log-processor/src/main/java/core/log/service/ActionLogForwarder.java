@@ -26,7 +26,6 @@ public class ActionLogForwarder {
     public void forward(List<ActionLogMessage> messages) {
         for (ActionLogMessage message : messages) {
             if (apps.contains(message.app) && !ignoreErrorCodes.contains(message.errorCode)) {
-                message.traceLog = null;    // strip traceLog to reduce overhead
                 publisher.publish(topic, null, message);
             }
         }

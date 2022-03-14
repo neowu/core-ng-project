@@ -3,6 +3,7 @@ package core.framework.internal.scheduler;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +54,7 @@ class SchedulerTest {
     @Test
     void next() {
         assertThatThrownBy(() -> scheduler.next(previous -> null, ZonedDateTime.now()))
-                .hasMessageContaining("must be after previous");
+            .hasMessageContaining("must be after previous");
 
         assertThat(scheduler.next(previous -> previous.plusHours(1), ZonedDateTime.now())).isNotNull();
     }
@@ -108,7 +109,7 @@ class SchedulerTest {
 
         task.getValue().call();
 
-        assertThat(actionLog.trace).isTrue();
+        assertThat(actionLog.trace).isEqualTo(Trace.CASCADE);
         assertThat(actionLog.context).containsKeys("trigger", "job", "job_class", "scheduled_time");
     }
 

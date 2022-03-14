@@ -1,8 +1,10 @@
 package app.monitor.job;
 
 import core.framework.internal.log.LogManager;
+import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
+import core.framework.util.ClasspathResources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -116,6 +118,14 @@ class KubeMonitorJobTest {
         assertThat(job.check(pod, ZonedDateTime.now()))
             .contains(status.state.waiting.reason)
             .contains(status.state.waiting.message);
+    }
+
+    @Test
+    void checkWithUnschedulable() {
+        KubePodList.Pod pod = JSON.fromJSON(KubePodList.Pod.class, ClasspathResources.text("kube-monitor-test/unschedulable.json"));
+
+        assertThat(job.check(pod, ZonedDateTime.parse("2021-11-23T14:52:34Z")))
+            .contains("Unschedulable: 0/4 nodes are available: 1 Insufficient cpu, 1 node(s) didn't match Pod's node affinity/selector,");
     }
 
     @Test

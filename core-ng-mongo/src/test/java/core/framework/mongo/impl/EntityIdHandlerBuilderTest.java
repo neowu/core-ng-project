@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -25,7 +25,7 @@ class EntityIdHandlerBuilderTest {
     @Test
     void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
-        assertEquals(ClasspathResources.text("mongo-test/entity-id-handler.java"), sourceCode);
+        assertThat(sourceCode).isEqualToIgnoringNewLines(ClasspathResources.text("mongo-test/entity-id-handler.java"));
     }
 
     @Test
@@ -34,7 +34,7 @@ class EntityIdHandlerBuilderTest {
         TestEntity entity = new TestEntity();
         handler.set(entity, id);
 
-        assertEquals(id, entity.id);
+        assertThat(entity.id).isEqualTo(id);
     }
 
     @Test
@@ -43,6 +43,6 @@ class EntityIdHandlerBuilderTest {
         entity.id = new ObjectId();
         ObjectId id = (ObjectId) handler.get(entity);
 
-        assertEquals(entity.id, id);
+        assertThat(entity.id).isEqualTo(id);
     }
 }

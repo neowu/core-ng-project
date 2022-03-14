@@ -31,22 +31,22 @@ public final class ActionLog {
     public final Map<String, List<String>> context;
     public final Map<String, Double> stats;
     final Map<String, PerformanceStat> performanceStats;
-    final List<LogEvent> events;
-    final long startTime;
+    private final List<LogEvent> events;
+    private final long startTime;
     private final long startCPUTime;
 
-    public boolean trace;  // whether flush trace log for all subsequent actions
+    public LogLevel result = LogLevel.INFO;
+    public Trace trace = Trace.NONE;        // whether flush trace log for all subsequent actions
     public String action = "unassigned";
-    public List<String> correlationIds;    // with bulk message handler, there will be multiple correlationIds handled by one batch
+    public List<String> correlationIds;     // with bulk message handler, there will be multiple correlationIds handled by one batch
     public List<String> clients;
     public List<String> refIds;
-    public boolean suppressSlowSQLWarning;
-    public long maxProcessTimeInNano = -1;
 
+    long maxProcessTimeInNano;
     String errorMessage;
     long elapsed;
 
-    private LogLevel result = LogLevel.INFO;
+    private InternalActionContext internalContext;
     private String errorCode;
 
     public ActionLog(String message, String id) {
@@ -113,13 +113,12 @@ public final class ActionLog {
     }
 
     String result() {
-        if (result == LogLevel.INFO)
-            return trace ? "TRACE" : "OK";
+        if (result == LogLevel.INFO) return "OK";
         return result.name();
     }
 
     boolean flushTraceLog() {
-        return trace || result.value >= WARN.value;
+        return trace != Trace.NONE || result.value >= WARN.value;
     }
 
     public String errorCode() {
@@ -137,9 +136,9 @@ public final class ActionLog {
                 process(new LogEvent(LOGGER, Markers.errorCode("CONTEXT_TOO_LONG"), WARN, "context value is too long, key={}, value={}", new Object[]{key, contextValue}, new Error("context value is too long")));
             } else {
                 contextValues.add(contextValue);
-                add(event("[context] {}={}", key, contextValue));
             }
         }
+        add(event("[context] {}={}", key, values.length == 1 ? values[0] : values));
     }
 
     public void stat(String key, double value) {
@@ -172,5 +171,31 @@ public final class ActionLog {
         long remainingTime = maxProcessTimeInNano - elapsed();
         if (remainingTime < 0) return 0;
         return remainingTime;
+    }
+
+    public String trace(int softLimit, int hardLimit) {
+        var builder = new StringBuilder(events.size() << 7);  // length * 128 as rough initial capacity
+        boolean softLimitReached = false;
+        for (LogEvent event : events) {
+            if (!softLimitReached || event.level.value >= WARN.value) { // after soft limit, only write warn+ event
+                event.appendTrace(builder, startTime);
+            }
+
+            if (!softLimitReached && builder.length() >= softLimit) {
+                softLimitReached = true;
+                if (event.level.value < LogLevel.WARN.value) builder.setLength(softLimit);  // do not truncate if current is warn
+                builder.append("...(soft trace limit reached)\n");
+            } else if (builder.length() >= hardLimit) {
+                builder.setLength(hardLimit);
+                builder.append("...(hard trace limit reached)");
+                break;
+            }
+        }
+        return builder.toString();
+    }
+
+    public InternalActionContext internalContext() {
+        if (internalContext == null) internalContext = new InternalActionContext();
+        return internalContext;
     }
 }

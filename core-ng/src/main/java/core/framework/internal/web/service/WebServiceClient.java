@@ -9,6 +9,7 @@ import core.framework.http.HTTPResponse;
 import core.framework.internal.http.HTTPClientImpl;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import core.framework.internal.web.HTTPHandler;
 import core.framework.internal.web.bean.RequestBeanWriter;
 import core.framework.internal.web.bean.ResponseBeanReader;
@@ -120,14 +121,12 @@ public class WebServiceClient {
         if (actionLog == null) return;  // web service client may be used without action log context
 
         headers.put(HTTPHandler.HEADER_CORRELATION_ID.toString(), actionLog.correlationId());
-        if (actionLog.trace) headers.put(HTTPHandler.HEADER_TRACE.toString(), "true");
+        if (actionLog.trace == Trace.CASCADE) headers.put(HTTPHandler.HEADER_TRACE.toString(), actionLog.trace.name());
         headers.put(HTTPHandler.HEADER_REF_ID.toString(), actionLog.id);
 
         long timeout = ((HTTPClientImpl) httpClient).timeoutInNano; // not count connect timeout, as action starts after connecting
-        if (actionLog.maxProcessTimeInNano != -1) {                 // only action initiated by http/message has max process time
-            long remainingTime = actionLog.remainingProcessTimeInNano();
-            if (remainingTime < timeout) timeout = remainingTime;
-        }
+        long remainingTime = actionLog.remainingProcessTimeInNano();
+        if (remainingTime > 0 && remainingTime < timeout) timeout = remainingTime;  // if remaining time is 0, means current action already triggered LONG_PROCESS, no need to propagate to child actions, to reduce unnecessary trace
         headers.put(HTTPHandler.HEADER_TIMEOUT.toString(), String.valueOf(timeout));
     }
 

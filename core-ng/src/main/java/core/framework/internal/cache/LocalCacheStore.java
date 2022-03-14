@@ -60,7 +60,7 @@ public class LocalCacheStore implements CacheStore {
         logger.debug("putAll, keys={}, expiration={}", new ArrayLogParam(keys(values)), expiration);
         long expirationTime = System.currentTimeMillis() + expiration.toMillis();
         for (Entry<T> value : values) {
-            caches.put(value.key, new CacheItem<>(value.value, expirationTime));
+            caches.put(value.key(), new CacheItem<>(value.value(), expirationTime));
         }
     }
 
@@ -68,7 +68,7 @@ public class LocalCacheStore implements CacheStore {
         String[] keys = new String[values.size()];
         int index = 0;
         for (Entry<T> value : values) {
-            keys[index] = value.key;
+            keys[index] = value.key();
             index++;
         }
         return keys;

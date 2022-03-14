@@ -31,7 +31,7 @@ public final class SchedulerConfig extends Config {
     @Override
     protected void initialize(ModuleContext context, String name) {
         var scheduler = new Scheduler(context.logManager);
-        context.startupHook.add(scheduler::start);
+        context.startupHook.start.add(scheduler::start);
         context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> scheduler.shutdown());
         context.shutdownHook.add(ShutdownHook.STAGE_1, scheduler::awaitTermination);
 

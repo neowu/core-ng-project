@@ -40,8 +40,8 @@ public class LogFilter {
             return;
         }
         // for performance reason, truncation will be handled by each type of LogParam, to best fit each specific cases
-        if (argument instanceof LogParam) {
-            ((LogParam) argument).append(builder, maskedFields, MAX_PARAM_LENGTH);
+        if (argument instanceof LogParam logParam) {
+            logParam.append(builder, maskedFields, MAX_PARAM_LENGTH);
             return;
         }
         appendRawArgument(builder, argument, MAX_PARAM_LENGTH);

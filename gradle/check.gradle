@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.7.1'
+        classpath 'com.github.spotbugs.snom:spotbugs-gradle-plugin:5.0.6'
     }
 }
 
@@ -13,12 +13,12 @@ subprojects {
     apply plugin: 'checkstyle'
     apply plugin: 'pmd'
     apply plugin: com.github.spotbugs.snom.SpotBugsPlugin
-    apply plugin: 'jacoco'
+    apply plugin: 'jacoco-report-aggregation'
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:8.45.1'
-            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.40.0'
+            checkstyle 'com.puppycrawl.tools:checkstyle:10.0'
+            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.41.0'
         }
 
         configFile = rootProject.file('gradle/check/checkstyle.xml')
@@ -45,7 +45,7 @@ subprojects {
     pmd {
         ruleSets = []
         ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
-        toolVersion = '6.37.0'
+        toolVersion = '6.43.0'
         consoleOutput = true
 
         tasks.withType(Pmd).configureEach {
@@ -60,7 +60,7 @@ subprojects {
 
         reportLevel = 'low'
         includeFilter = rootProject.file('gradle/check/spotbugs.xml')
-        toolVersion = '4.4.0'
+        toolVersion = '4.5.3'
 
         def spotbugsReport = tasks.register('spotbugsReport') {
             group = 'verification'
@@ -85,10 +85,7 @@ subprojects {
     jacoco {
         toolVersion = '0.8.7'
 
-        tasks.named('jacocoTestReport').configure {
-            // to generate cross sub project report, run: gradlew test && gradlew jacocoTestReport
-            executionData.setFrom(fileTree(rootDir).include('build/**/jacoco/test.exec'))
-
+        tasks.named('testCodeCoverageReport').configure {
             reports {
                 xml.required = true
                 xml.destination rootProject.file("${buildDir}/reports/jacoco/report.xml")

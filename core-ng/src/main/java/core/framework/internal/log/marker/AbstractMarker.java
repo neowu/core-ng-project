@@ -2,12 +2,14 @@ package core.framework.internal.log.marker;
 
 import org.slf4j.Marker;
 
+import java.io.Serial;
 import java.util.Iterator;
 
 /**
  * @author neo
  */
 public abstract class AbstractMarker implements Marker {
+    @Serial
     private static final long serialVersionUID = 8406894019332263130L;
 
     @Override

@@ -17,27 +17,26 @@ import static core.framework.log.Markers.errorCode;
  * @author neo
  */
 public final class ShutdownHook implements Runnable {
-    public static final int STAGE_0 = 0;    // send shutdown signal, begin to shutdown processor for external requests, e.g. http server / kafka listener / scheduler
+    public static final int STAGE_0 = 0;    // send shutdown signal, begin to shut down processor for external requests, e.g. http server / kafka listener / scheduler
     public static final int STAGE_1 = 1;    // await external request processor to stop
     public static final int STAGE_2 = 2;    // after no more new external requests, shutdown internal executors / background tasks
     public static final int STAGE_3 = 3;    // await internal executors to stop
     public static final int STAGE_4 = 4;    // after no any task running, shutdown kafka producer
     public static final int STAGE_5 = 5;    // release all application defined shutdown hook
-    public static final int STAGE_7 = 7;    // release all resources without dependencies, e.g. db / redis / mongo / search
-    public static final int STAGE_8 = 8;    // shutdown kafka log appender, give more time try to forward all logs
-    public static final int STAGE_9 = 9;    // finally stop the http server, to make sure it responses to incoming requests during shutdown
-
+    public static final int STAGE_6 = 6;    // release all resources without dependencies, e.g. db / redis / mongo / search
+    public static final int STAGE_7 = 7;    // shutdown kafka log appender, give more time try to forward all logs
+    public static final int STAGE_8 = 8;    // finally, stop the http server, to make sure it responds to incoming requests during shutdown
+    public final long shutdownTimeoutInNano;
     private final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
     private final LogManager logManager;
-    private final ShutdownStage[] stages = new ShutdownStage[STAGE_9 + 1];
+    private final Stage[] stages = new Stage[STAGE_8 + 1];
     private final long shutdownDelayInSec;
-    private final long shutdownTimeoutInMs;
 
     ShutdownHook(LogManager logManager) {
         this.logManager = logManager;
         Map<String, String> env = System.getenv();
         shutdownDelayInSec = shutdownDelayInSec(env);
-        shutdownTimeoutInMs = shutdownTimeoutInMs(env);
+        shutdownTimeoutInNano = shutdownTimeoutInNano(env);
     }
 
     // in kube env, once Pod is set to the “Terminating” State,
@@ -55,18 +54,18 @@ public final class ShutdownHook implements Runnable {
         return -1;
     }
 
-    long shutdownTimeoutInMs(Map<String, String> env) {
+    long shutdownTimeoutInNano(Map<String, String> env) {
         String shutdownTimeout = env.get("SHUTDOWN_TIMEOUT_IN_SEC");
         if (shutdownTimeout != null) {
-            long timeout = Long.parseLong(shutdownTimeout) * 1000;
+            long timeout = Long.parseLong(shutdownTimeout) * 1_000_000_000;
             if (timeout <= 0) throw new Error("shutdown timeout must be greater than 0, timeout=" + shutdownTimeout);
             return timeout;
         }
-        return 25000;   // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
+        return 25_000_000_000L;   // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
     }
 
     public void add(int stage, Shutdown shutdown) {
-        if (stages[stage] == null) stages[stage] = new ShutdownStage();
+        if (stages[stage] == null) stages[stage] = new Stage();
         stages[stage].shutdowns.add(shutdown);
     }
 
@@ -84,12 +83,12 @@ public final class ShutdownHook implements Runnable {
         ActionLog actionLog = logManager.begin("=== shutdown begin ===", null);
         logContext(actionLog);
 
-        long endTime = System.currentTimeMillis() + shutdownTimeoutInMs;
+        long endTime = System.currentTimeMillis() + shutdownTimeoutInNano / 1_000_000;
 
-        shutdown(endTime, STAGE_0, STAGE_5);
-        logManager.end("=== shutdown end ==="); // end action log before closing es/log appender, log-processor use es appender, so end action before close es
+        shutdown(endTime, STAGE_0, STAGE_6);
+        logManager.end("=== shutdown end ==="); // end action log before closing kafka log appender
 
-        shutdown(endTime, STAGE_7, STAGE_9);
+        shutdown(endTime, STAGE_7, STAGE_8);
         logger.info("shutdown completed, elapsed={}", actionLog.elapsed());
     }
 
@@ -101,7 +100,7 @@ public final class ShutdownHook implements Runnable {
 
     void shutdown(long endTime, int fromStage, int toStage) {
         for (int i = fromStage; i <= toStage; i++) {
-            ShutdownStage stage = stages[i];
+            Stage stage = stages[i];
             if (stage == null) continue;
             logger.info("shutdown stage: {}", i);
             for (Shutdown shutdown : stage.shutdowns) {
@@ -120,7 +119,7 @@ public final class ShutdownHook implements Runnable {
         void execute(long timeoutInMs) throws Exception;
     }
 
-    static class ShutdownStage {
+    static class Stage {
         final List<Shutdown> shutdowns = new ArrayList<>();
     }
 }

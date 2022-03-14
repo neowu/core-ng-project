@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.Serial;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,6 +69,7 @@ class LogManagerTest {
     }
 
     private static class TestException extends Exception implements ErrorCode {
+        @Serial
         private static final long serialVersionUID = 4243205974337190882L;
 
         @Override

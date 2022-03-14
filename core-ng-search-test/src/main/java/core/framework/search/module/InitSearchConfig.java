@@ -19,6 +19,7 @@ public final class InitSearchConfig extends Config {
     protected void initialize(ModuleContext context, String name) {
         this.context = (TestModuleContext) context;
         config = this.context.getConfig(SearchConfig.class, null);
+        config.search.initialize(); // for es integration test, it usually calls putIndex, so to initialize before for once
     }
 
     public void putIndex(String index, String sourcePath) {

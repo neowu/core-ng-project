@@ -49,7 +49,7 @@ public class KubePodList {  // refer to https://kubernetes.io/docs/reference/gen
         public String phase;
 
         @Property(name = "conditions")
-        public List<PodCondition> conditions;
+        public List<PodCondition> conditions = List.of();
 
         @Property(name = "initContainerStatuses")
         public List<ContainerStatus> initContainerStatuses;

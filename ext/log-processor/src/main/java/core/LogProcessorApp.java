@@ -20,7 +20,6 @@ import core.log.kafka.EventMessageHandler;
 import core.log.kafka.StatMessageHandler;
 import core.log.service.ActionLogForwarder;
 import core.log.service.ActionService;
-import core.log.service.ElasticSearchAppender;
 import core.log.service.EventForwarder;
 import core.log.service.EventService;
 import core.log.service.IndexOption;
@@ -39,6 +38,7 @@ import java.util.Optional;
 public class LogProcessorApp extends App {
     @Override
     protected void initialize() {
+        // not using SystemModule, and not put sys.log.appender property, to prevent log processor from sending its own action log to same log-kafka it's pulling from
         loadProperties("sys.properties");
         loadProperties("app.properties");
 
@@ -50,8 +50,7 @@ public class LogProcessorApp extends App {
         bind(StatService.class);
         bind(EventService.class);
 
-        configureLogAppender();
-        onStartup(indexService::createIndexTemplatesUntilSuccess);
+        onStartup(indexService::createIndexTemplates);
 
         configureKibanaService();
         Forwarders forwarders = configureLogForwarders();
@@ -72,20 +71,10 @@ public class LogProcessorApp extends App {
         });
     }
 
-    private void configureLogAppender() {
-        property("sys.log.appender").ifPresent(appender -> {
-            if ("console".equals(appender)) {
-                log().appendToConsole();
-            } else if ("elasticsearch".equals(appender)) {
-                log().appender(bind(ElasticSearchAppender.class));  // ElasticSearchAppender doesn't need to stop, es will be stopped at stage 7
-            }
-        });
-    }
-
     private void configureIndexOption() {
         var option = new IndexOption();
-        option.numberOfShards = Integer.parseInt(property("app.index.shards").orElse("1"));   // with small cluster one shard has best performance, for larger cluster use kube env to customize
-        option.refreshInterval = property("app.index.refresh.interval").orElse("10s");  // use longer refresh to tune load on log es
+        option.numberOfShards = Integer.parseInt(property("app.index.shards").orElse("1"));     // with small cluster one shard has the best performance, for larger cluster use kube env to customize
+        option.refreshInterval = property("app.index.refresh.interval").orElse("10s");          // use longer refresh to tune load on log es
         bind(option);
     }
 

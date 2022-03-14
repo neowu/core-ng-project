@@ -371,7 +371,9 @@
             LG_LOST_LOGGER_DUE_TO_WEAK_REFERENCE,
             DM_DEFAULT_ENCODING,
             NP_METHOD_RETURN_RELAXING_ANNOTATION,
-            NP_METHOD_PARAMETER_TIGHTENS_ANNOTATION"/>
+            NP_METHOD_PARAMETER_TIGHTENS_ANNOTATION,
+            DCN_NULLPOINTER_EXCEPTION,
+            REFL_REFLECTION_INCREASES_ACCESSIBILITY_OF_CLASS"/>
     </Match>
 
     <!--refer to http://fb-contrib.sourceforge.net/bugdescriptions.html-->

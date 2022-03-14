@@ -8,6 +8,7 @@ import core.framework.db.Table;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 /**
  * @author neo
@@ -34,4 +35,7 @@ public class AssignedIdEntity {
 
     @Column(name = "date_field")
     public LocalDate dateField;
+
+    @Column(name = "zoned_date_time_field")
+    public ZonedDateTime zonedDateTimeField;
 }

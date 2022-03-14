@@ -5,16 +5,18 @@ import core.framework.log.message.PerformanceStatMessage;
 import core.framework.util.Maps;
 import core.framework.util.Network;
 
+import java.util.List;
 import java.util.Map;
-
-import static core.framework.internal.log.LogLevel.WARN;
 
 /**
  * @author neo
  */
 public class ActionLogMessageFactory {
-    private static final int HARD_TRACE_LIMIT = 900000; // 900K, kafka max message size is 1M, leave 100K for rest, assume majority chars is in ascii (one char = one byte)
-    private static final int SOFT_TRACE_LIMIT = 600000; // 600K assume majority chars is in ascii (one char = one byte)
+    // 900K, kafka max message size is 1024 * 1024, leave 100K for rest, assume majority chars is in ascii (one char = one byte)
+    // refer to org.apache.kafka.clients.producer.ProducerConfig.MAX_REQUEST_SIZE_CONFIG
+    private static final int HARD_TRACE_LIMIT = 900_000;
+    // 600K assume majority chars is in ascii (one char = one byte)
+    private static final int SOFT_TRACE_LIMIT = 600_000;
 
     public ActionLogMessage create(ActionLog log) {
         var message = new ActionLogMessage();
@@ -34,9 +36,23 @@ public class ActionLogMessageFactory {
         message.stats = log.stats;
         message.performanceStats = performanceStats(log.performanceStats);
         if (log.flushTraceLog()) {
-            message.traceLog = trace(log, SOFT_TRACE_LIMIT, HARD_TRACE_LIMIT);
+            // balance precision and cost, only estimate rough size limit
+            int contextSize = Math.min(estimatedSize(log.context), 300_000);    // leave some room for trace if context is too large
+            message.traceLog = log.trace(SOFT_TRACE_LIMIT - contextSize, HARD_TRACE_LIMIT - contextSize);
         }
         return message;
+    }
+
+    int estimatedSize(Map<String, List<String>> context) {
+        int size = 0;
+        for (Map.Entry<String, List<String>> entry : context.entrySet()) {
+            size += entry.getKey().length();
+            for (String value : entry.getValue()) {
+                // MessageListener may put null in context.key
+                if (value != null) size += value.length();
+            }
+        }
+        return size;
     }
 
     private Map<String, PerformanceStatMessage> performanceStats(Map<String, PerformanceStat> stats) {
@@ -51,26 +67,5 @@ public class ActionLogMessageFactory {
             messages.put(entry.getKey(), message);
         }
         return messages;
-    }
-
-    String trace(ActionLog log, int softLimit, int hardLimit) {
-        var builder = new StringBuilder(log.events.size() << 7);  // length * 128 as rough initial capacity
-        boolean softLimitReached = false;
-        for (LogEvent event : log.events) {
-            if (!softLimitReached || event.level.value >= WARN.value) { // after soft limit, only write warn+ event
-                event.appendTrace(builder, log.startTime);
-            }
-
-            if (!softLimitReached && builder.length() >= softLimit) {
-                softLimitReached = true;
-                if (event.level.value < LogLevel.WARN.value) builder.setLength(softLimit);  // do not truncate if current is warn
-                builder.append("...(soft trace limit reached)\n");
-            } else if (builder.length() >= hardLimit) {
-                builder.setLength(hardLimit);
-                builder.append("...(hard trace limit reached)");
-                break;
-            }
-        }
-        return builder.toString();
     }
 }

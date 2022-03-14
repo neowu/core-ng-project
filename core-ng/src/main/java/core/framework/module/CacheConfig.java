@@ -5,16 +5,13 @@ import core.framework.http.HTTPMethod;
 import core.framework.internal.cache.CacheClassValidator;
 import core.framework.internal.cache.CacheImpl;
 import core.framework.internal.cache.CacheStore;
-import core.framework.internal.cache.InvalidateLocalCacheMessageListener;
 import core.framework.internal.cache.LocalCacheMetrics;
 import core.framework.internal.cache.LocalCacheStore;
 import core.framework.internal.cache.RedisCacheStore;
-import core.framework.internal.cache.RedisLocalCacheStore;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.internal.redis.RedisImpl;
-import core.framework.internal.redis.RedisSubscribeThread;
 import core.framework.internal.resource.PoolMetrics;
 import core.framework.internal.web.sys.CacheController;
 import core.framework.util.ASCII;
@@ -36,8 +33,6 @@ public class CacheConfig extends Config {
     private ModuleContext context;
     private LocalCacheStore localCacheStore;
     private CacheStore redisCacheStore;
-    private RedisImpl redis;
-    private CacheStore redisLocalCacheStore;
     private int maxLocalSize;
 
     @Override
@@ -106,14 +101,14 @@ public class CacheConfig extends Config {
         redis.host(host);
         redis.password(password);
         redis.timeout(Duration.ofSeconds(1));   // for cache, use shorter timeout than default redis config
-        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
+        context.probe.hostURIs.add(host);
+        context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> redis.close());
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
         context.collector.metrics.add(new PoolMetrics(redis.pool));
         redisCacheStore = new RedisCacheStore(redis);
-        this.redis = redis;
     }
 
-    private LocalCacheStore localCacheStore() {
+    LocalCacheStore localCacheStore() {
         if (localCacheStore == null) {
             logger.info("create local cache store");
             var localCacheStore = new LocalCacheStore();
@@ -122,17 +117,5 @@ public class CacheConfig extends Config {
             this.localCacheStore = localCacheStore;
         }
         return localCacheStore;
-    }
-
-    CacheStore redisLocalCacheStore() {
-        if (redisLocalCacheStore == null) {
-            logger.info("create redis local cache store");
-            LocalCacheStore localCache = localCacheStore();
-            var thread = new RedisSubscribeThread("cache-invalidator", redis, new InvalidateLocalCacheMessageListener(localCache), RedisLocalCacheStore.CHANNEL_INVALIDATE_CACHE);
-            context.startupHook.add(thread::start);
-            context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> thread.close());
-            redisLocalCacheStore = new RedisLocalCacheStore(localCache, redisCacheStore, redis);
-        }
-        return redisLocalCacheStore;
     }
 }

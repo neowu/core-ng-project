@@ -1,7 +1,7 @@
 package core.framework.search.impl;
 
+import core.framework.internal.log.LogLevel;
 import core.framework.internal.log.LoggerImpl;
-import core.framework.search.impl.log.ESLogger;
 import core.framework.util.Maps;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -14,6 +14,7 @@ import org.apache.logging.log4j.core.config.ConfigurationFactory;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.DefaultConfiguration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.config.Property;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
@@ -27,13 +28,13 @@ public class ESLoggerConfigFactory extends ConfigurationFactory {  // due to ela
         LoggerContext context = (LoggerContext) LogManager.getContext(false);
         Configuration config = context.getConfiguration();
 
-        Map<String, ESLogger> loggers = Maps.newConcurrentHashMap();
-        Appender appender = new AbstractAppender("", null, null) {
+        Map<String, LoggerImpl> loggers = Maps.newConcurrentHashMap();
+        Appender appender = new AbstractAppender("", null, null, true, Property.EMPTY_ARRAY) {
             @Override
             public void append(LogEvent event) {
                 String name = event.getLoggerName();
-                ESLogger logger = loggers.computeIfAbsent(name, key -> new ESLogger(key, null, (LoggerImpl) LoggerFactory.getLogger(key)));
-                logger.log(event.getLevel(), event.getMarker(), event.getMessage(), event.getThrown());
+                LoggerImpl logger = loggers.computeIfAbsent(name, key -> (LoggerImpl) LoggerFactory.getLogger(key));
+                logger.log(null, logLevel(event.getLevel()), event.getMessage().getFormattedMessage(), event.getMessage().getParameters(), event.getThrown());
             }
         };
         appender.start();
@@ -43,6 +44,15 @@ public class ESLoggerConfigFactory extends ConfigurationFactory {  // due to ela
         loggerConfig.addAppender(appender, null, null);
         config.addLogger("", loggerConfig);
         context.updateLoggers();
+    }
+
+    private static LogLevel logLevel(Level level) {
+        return switch (level.getStandardLevel()) {
+            case INFO -> LogLevel.INFO;
+            case WARN -> LogLevel.WARN;
+            case ERROR, FATAL -> LogLevel.ERROR;
+            default -> LogLevel.DEBUG;
+        };
     }
 
     @Override

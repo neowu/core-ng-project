@@ -2,6 +2,7 @@ package core.framework.internal.async;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,17 +22,20 @@ public class ExecutorTask<T> implements Callable<T> {
     private final LogManager logManager;
     private final Callable<T> task;
     private final Instant startTime;
+    private final long maxProcessTimeInNano;
     private String rootAction;
     private String refId;
     private String correlationId;
-    private boolean trace;
+    private Trace trace;
 
-    ExecutorTask(String actionId, String action, Instant startTime, ActionLog parentActionLog, LogManager logManager, Callable<T> task) {
-        this.action = action;
+    ExecutorTask(Callable<T> task, LogManager logManager, TaskContext context) {
         this.task = task;
         this.logManager = logManager;
-        this.startTime = startTime;
-        this.actionId = actionId;
+        actionId = context.actionId;
+        action = context.action;
+        startTime = context.startTime;
+        maxProcessTimeInNano = context.maxProcessTimeInNano;
+        ActionLog parentActionLog = context.parentActionLog;
         if (parentActionLog != null) {  // only keep info needed by call(), so parentActionLog can be GCed sooner
             List<String> parentActionContext = parentActionLog.context.get("root_action");
             rootAction = parentActionContext != null ? parentActionContext.get(0) : parentActionLog.action;
@@ -46,6 +50,7 @@ public class ExecutorTask<T> implements Callable<T> {
         try {
             ActionLog actionLog = logManager.begin("=== task execution begin ===", actionId);
             actionLog.action(action());
+            actionLog.maxProcessTime(maxProcessTimeInNano);
             // here it doesn't log task class, is due to task usually is lambda or method reference, it's expensive to inspect, refer to ControllerInspector
             if (rootAction != null) { // if rootAction != null, then all parent info are available
                 actionLog.context("root_action", rootAction);
@@ -53,11 +58,13 @@ public class ExecutorTask<T> implements Callable<T> {
                 actionLog.correlationIds = List.of(correlationId);
                 LOGGER.debug("refId={}", refId);
                 actionLog.refIds = List.of(refId);
-                actionLog.trace = trace;
+                if (trace == Trace.CASCADE) actionLog.trace = Trace.CASCADE;
             }
+            LOGGER.debug("taskClass={}", CallableTask.taskClass(task).getName());
             Duration delay = Duration.between(startTime, actionLog.date);
             LOGGER.debug("taskDelay={}", delay);
             actionLog.stats.put("task_delay", (double) delay.toNanos());
+            actionLog.context.put("thread", List.of(Thread.currentThread().getName()));
             return task.call();
         } catch (Throwable e) {
             logManager.logError(e);
@@ -75,5 +82,13 @@ public class ExecutorTask<T> implements Callable<T> {
     @Override
     public String toString() {
         return action() + ":" + actionId;
+    }
+
+    static class TaskContext {
+        String actionId;
+        String action;
+        Instant startTime;
+        ActionLog parentActionLog;
+        long maxProcessTimeInNano;
     }
 }

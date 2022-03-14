@@ -1,5 +1,5 @@
 {
-  "index_patterns": "stat-*",
+  "index_patterns": ["stat-*"],
   "priority": 1,
   "template": {
     "settings": {

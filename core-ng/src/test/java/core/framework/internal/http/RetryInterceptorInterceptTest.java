@@ -40,9 +40,7 @@ class RetryInterceptorInterceptTest {
 
     @BeforeEach
     void createRetryInterceptor() {
-        interceptor = new RetryInterceptor(3, Duration.ofMillis(500), time -> {
-            // skip sleep
-        });
+        interceptor = new TestRetryInterceptor();
 
         request = new Request.Builder().url("http://localhost").build();
         when(chain.request()).thenReturn(request);
@@ -109,5 +107,16 @@ class RetryInterceptorInterceptTest {
         assertThat(response).isSameAs(serviceUnavailableResponse);
 
         verify(chain, times(1)).proceed(request);
+    }
+
+    static class TestRetryInterceptor extends RetryInterceptor {
+        TestRetryInterceptor() {
+            super(3, Duration.ofMillis(500));
+        }
+
+        @Override
+        void sleep(Duration duration) {
+            // skip sleep
+        }
     }
 }

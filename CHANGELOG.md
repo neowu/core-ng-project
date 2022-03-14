@@ -1,9 +1,156 @@
 ## Change log
 
+### 7.10.3-b0 (02/25/2022 - )
+
+* db: fix: revert previous update UNEXPECTED_UPDATE_RESULT warning if updated row is 0
+* executor: log task class in trace to make it easier to find the corresponding code of executor task
+* log-processor: update action-* context dynamic index template to support dot in context key
+  > it's not recommended putting dot in action log context key
+* log-processor: kibana json updated for kibana 8.1.0
+  > TSVB metrics separate left axis bug fixed, so to revert GC diagrams back
+
+### 7.10.2 (02/11/2022 - 02/23/2022)
+
+* scheduler: replaced jobExecutor with unlimited cached thread pool
+  > no impact with regular cases, normally scheduler-service in one application should only send kafka message
+  > this change is mainly to simplify test service or non-global jobs (e.g. no need to put real logic to Executors in Job)
+* jre: published neowu/jre:17.0.2
+* search: update es to 8.0.0
+  > Elastic dropped more modules from this version, now we have to include transport-netty4, mapper-extras libs
+  > and it doesn't provide standard way of integration test, refer to https://github.com/elastic/elasticsearch/issues/55258
+  > opensearch is doing opposite, https://mvnrepository.com/artifact/org.opensearch.plugin
+* db: updated batchInsertIgnore, batchUpsert, batchDelete return value from boolean[] to boolean
+  > this is drawback of MySQL thin driver, though expected behavior
+  > with batch insert ignore (or insert on duplicate key), MySQL thin driver fills entire affectedRows array with same value, java.sql.Statement.SUCCESS_NO_INFO if updated count > 0
+  > refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts Line 758
+  > if you need to know result for each entity, you have to use single operation one by one (Transaction may help performance a bit)
+* db: mysql jdbc driver updated to 8.0.28
+  > one bug fixed: After calling Statement.setQueryTimeout(), when a query timeout was reached, a connection to the server was established to terminate the query,
+  > but the connection remained open afterward. With this fix, the new connection is closed after the query termination. (Bug #31189960, Bug #99260)
+* known bugs:
+  > db, due to use affected rows (not found rows), if repository updates entity without any change, it warns with UNEXPECTED_UPDATE_RESULT, please ignore this, will fix in next version
+
+### 7.10.1 (12/13/2021 - 02/11/2022)
+
+* search: update to es 7.17.0, high level rest client is deprecated, migrated to elasticsearch java client !!! Query API changed
+  > refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/introduction.html
+  > the new API in my opinion abused java lambda, which added lots accidental complexity, and not jvm/gc friendly (although the bottleneck of es call usually is not on java side),   
+  > in many cases it's actually much harder to use compare to old HLRC
+* maven-repo: deleted all 6.x version except 6.13.9
+  > recommend to upgrade to latest version
+* monitor: support pagerduty (thanks Ajax for the contribution !!!)
+* log: set kafka log appender "enable.idempotence" to false
+  > since kafka 3.0.0, enable.idempotence is default to true, and it overrides "acks" to "all"
+  > so this is set back to previous behavior, which means possible duplicate log messages if there is connection error
+* api: allow using custom-built httpClient into api().createClient()
+  > for regression ajax test use case, it can use stateful httpClient(enabled cookies)
+* json: JSON.class won't allow null as json string or instance, to make sure always return non-null result
+  > generally we never use "null" as json text, and it was triggering Intellij's warning (dereference of JSON.from() may produce NullPointerException)
+* cache: removed redisLocal support, now cache only supports local or redis store
+  > RedisLocalCacheStore (use pubsub to evict in memory keys) is not as useful as expected, and it also assumes cache redis is shared across services
+  > it violates "share nothing" design principle, based on our experience, only few places requires high performance of local/in-memory cache
+  > for those places, we can simply use local cache and kafka message to invalidate cache
+  > and performance of redis cache is fast enough, usually 100 redis calls per action took less than 10ms
+  > cache().add(name).local() for local store, for sensitive data or performance reason
+* db: removed DBConfig.maxOperations() (default is 2000), added Database.maxOperations(threshold)
+  > in real application, only very few actions do large number of db operations (e.g. replay, sync),
+  > so added per action basis threshold
+* db: check "*" for execute sql as well, for case like "insert into table select * from table"
+* log: tweak trace log truncation, and added defensive logic to print actionLog/trace to console, if it's larger than kafka maxRequestSize
+* kafka: update kafka to 3.1.0
+
+### 7.9.3 (11/23/2021 - 12/10/2021)
+
+* monitor: improve kube pod monitor error message for "Unschedulable" condition
+* action: fixed webserviceClient/messagePublisher/executor only pass trace header when trace = cascade
+* action: redesigned maxProcessTime behavior, use http client timeout and shutdown time out as benchmark
+  > for executor task actions, use SHUTDOWN_TIMEOUT as maxProcessTime
+  > for kafka listener, use SHUTDOWN_TIMEOUT as maxProcessTime for each message handling (just for warning purpose), ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG is still 30min
+  > for http handler, use request timeout header or HTTPConfig.maxProcessTime(), (default to 30s)
+  > for scheduler job, use 10s, scheduler job should be fast, generally just sending kafka message
+* db: updated "too many db operations" check
+  > if within maxProcessTime, it logs warning with error code TOO_MANY_DB_OPERATIONS, otherwise throws error
+  > not break if critical workload generates massive db operations, and still protect from infinite loop by mistake
+* db: added stats.db_queries to track how many db queries (batch operation counts as 1 perf_stats.db operation)
+  > log-processor / kibana.json is updated with new diagram
+
+### 7.9.2 (11/03/2021 - 11/22/2021)
+
+* db: validate timestamp param must be after 1970-01-01 00:00:01
+  > with insert ignore, out of range timestamp param will be converted to "0000-00-00 00:00:00" into db, and will trigger "Zero date value prohibited" error on read
+  > refer to https://dev.mysql.com/doc/refman/8.0/en/insert.html
+  > Data conversions that would trigger errors abort the statement if IGNORE is not specified. With IGNORE, invalid values are adjusted to the closest values and inserted; warnings are produced but the statement does not abort.
+  > current we only check > 0, make trade off between validating TIMESTAMP column type and keeping compatible with DATETIME column type
+  > most likely the values we deal with from external systems are lesser (e.g. nodejs default year is 1900, it converts 0 into 1900/01/01 00:00:00)
+  > if it passes timestamp after 2038-01-19 03:14:07 (Instant.ofEpochSecond(Integer.MAX_VALUE)), it will still trigger this issue on MySQL
+  > so on application level, if you can not ensure the range of input value, write your own utils to check before assigning
+* jre: 17.0.1 released, published "neowu/jre:17.0.1"
+* app: added external dependency checking before startup
+  > it currently checks kafka, redis/cache, mongo, es to be ready (not db, generally we use managed db service created before kube cluster)
+  > in kube env, during node upgrading or provision, app pods usually start faster than kafka/redis/other stateful set (e.g. one common issue we see is that scheduler job failed to send kafka message)
+  > by this way, app pods will wait until external dependencies ready, it will fail to start if not ready in 30s
+  > log kafka appender still treat log-kafka as optional
+  > for es, it checks http://es:9200/_cluster/health?local=true
+* http: Request.hostName() renamed to Request.hostname() to keep consistent with other places  !!! breaking change but easy to fix
+* action: replaced ActionLogContext.trace() to ActionLogContext.triggerTrace(boolean cascade)
+  > for audit context, we may not want to trace all correlated actions, with this way we can tweak the scope of tracing
+* app: startupHooks introduced 2 stages (initialize and start), removed lazy init for kafka producer / elasticsearch / mongo
+  > since client initialize() will be called during startup, it removes lazy init to simplify
+  > if you want to call Mongo/ElasticSearch directly (e.g. local arbitrary main method), call initialize() before using
+* log-processor: removed elasticsearch appender support
+  > in prod env, we use null log appender for log-processor, since log-processor is stable, and not necessary to double the amount of action logs in log-es
+  > if anything wrong happened, error output of log-processor is good enough for troubleshooting
+
+### 7.9.1 (10/22/2021 - 11/03/2021)
+
+* site: StaticDirectoryController will normalize path before serving the requested file, to prevent controller serving files outside content directory
+  > it's not recommended serving static directory or file directly through java webapp,
+  > better use CDN + static bucket or put Nginx in front of java process to server /static
+* db: use useAffectedRows=true on mysql connection, return boolean for update/delete/upsert !!! pls read this carefully
+  > refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-connp-props-connection.html#cj-conn-prop_useAffectedRows
+  > the MySQL affected rows means the row actually changed,
+  > e.g. sql like update table set column = 'value' where id = 'id', the affected row = 0 means either id not found or column value is set to its current values (no row affected)
+  > so if you want to use update with optimistic lock or determine whether id exists, you can make one column always be changed, like set updatedTime = now()
+* db: added Repository.upsert() and Repository.batchUpsert()
+  > upsert is using "insert on duplicate key update", a common use case is data sync
+  > !!! due to HSQL doesn't support MySQL useAffectedRows=true behavior, so upsert always return true
+  > we may create HSQL upsert impl to support unit test if there is need in future (get by id then create or update approach)
+* db: Repository update and delete operations return boolean to indicate whether updated
+  > normally we expect a valid PK when updating by PK, if there is no row updated, framework will log warning,
+  > and the boolean result is used by app code to determine whether break by throwing error
+* db: removed DBConfig.batchSize() configuration
+  > with recent MySQL server and jdbc driver, it is already auto split batch according to max_allowed_packet
+  > refer to com.mysql.cj.AbstractPreparedQuery.computeBatchSize
+  > and MySQL prefers large batch as the default max_allowed_packet value is getting larger
+* db: mysql jdbc driver updated to 8.0.27
+* redis: added Redis.list().trim(key, maxSize)
+  > to make it easier to manage fixed length list in redis
+
+### 7.9.0 (09/29/2021 - 10/21/2021)  !!! only support java 17
+
+* jdk: updated to JDK 17
+  > for local env, it's easier to use intellij builtin way to download SDK, or go to https://adoptium.net/
+  > adoptium (renamed from adoptopenjdk) doesn't provide JRE docker image anymore, you should build for yourself (or use JDK one if you don't mind image size)
+  > refer to docker/jre folder, here it has slimmed jre image for generic core-ng app
+* message: make Message.get() more tolerable, won't fail but log as error if key is missing or language is null
+  > use first language defined in site().message() if language is null
+  > return key and log error if message key is missing,
+  > with integration test context, still throw error if key is missing, to make message unit test easier to write
+* http: update undertow to 2.2.12
+* actionLog: added ActionLogContext.trace() to trigger trace log
+  > e.g. to integrate with external services, we want to track all the request/response for critical actions
+  > recommended way is to use log-processor forward all action log messages to application kafka
+  > then to create audit-service, consume the action log messages, save trace to designated location (Cloud Storage Service)
+* action: removed ActionLogContext.remainingProcessTime(), and httpClient retryInterceptor won't consider actionLog.remainingProcessTimeInNano
+  > it's not feasible to adapt time left before making external call (most likely http call with timeout),
+  > due to http call is out of control (e.g. take long to create connection with external site), or external sdk/client not managed by framework
+  > so it's better to careful plan in advance for sync chained http calls
+  > maxProcessTime mechanism will be mainly used for measurement/visibility purpose (alert if one action took too long, close to maxProcessTime)
+
 ### 7.8.2 (09/20/2021 - 09/28/2021)
 
-* java: target to Java 16,
-  > since all projects are on java 16 for long time, this should not be issue, will update to java 17 LTS, once adoptopenjdk released java 17 build
+* java: target to Java 16
+  > since all projects are on java 16 for long time, this should not be issue, will update to java 17 LTS soon
 * kafka: update client to 3.0.0
 * es: update to 7.15.0
 * db: added "boolean partialUpdate(T entity, String where, Object... params)" on Repository, to support updating with optimistic lock
@@ -240,7 +387,7 @@
 
 * http: httpClient does not read response body if status code is 204
 * executor: improve warning for task rejection/cancellation during shutdown
-* db: added Repository.insertIgnore(entity) to handle duplicated key / constraint violation cases without catching UncheckedSQLException
+* db: added Repository.insertIgnore(entity) to handle duplicate key / constraint violation cases without catching UncheckedSQLException
 * redis: added initial zset support
 
 ### 7.6.0 (09/30/2020 - 10/13/2020) !!! only support java 15
@@ -623,7 +770,7 @@
 
 ### 7.1.0 (10/1/2019 - 10/7/2019) !!! Action Log format changed, must update both core-ng and log-processor to same version !!!
 
-### action-log will be send to new topic (action-log-v2), to avoid error during transition, only impact could be some old action-log is not indexed which is minor
+### action-log will be sent to new topic (action-log-v2), to avoid error during transition, only impact could be some old action-log is not indexed which is minor
 
 * log: support put multiple values in same action log context, to make bulk handler / api easier to track, ActionLogContext.get(key) returns List<String> now
 * log-collector: add errorMessage field in event, to keep consistent with action log

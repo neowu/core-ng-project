@@ -6,6 +6,12 @@ import core.framework.log.message.PerformanceStatMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -26,6 +32,7 @@ class ActionLogMessageFactoryTest {
         log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null));
         log.track("db", 1000, 1, 2);
         log.track("http", 2000, 0, 0);
+        log.context("order_id", "id1", "id2");
 
         ActionLogMessage message = factory.create(log);
 
@@ -49,25 +56,12 @@ class ActionLogMessageFactoryTest {
     }
 
     @Test
-    void trace() {
-        String suffix = "...(soft trace limit reached)\n";
-        var log = new ActionLog("begin", null);
-        String trace = factory.trace(log, 200, 500);
-        assertThat(trace).hasSize(200 + suffix.length())
-                .contains("ActionLog - begin")
-                .endsWith(suffix);
-
-        log.process(new LogEvent("logger", null, LogLevel.WARN, "warning", null, null));
-
-        trace = factory.trace(log, 200, 500);
-        assertThat(trace).endsWith("warning\n");
-
-        trace = factory.trace(log, 250, 500);   // the max debug length will hit warning event
-        assertThat(trace).contains("warning")
-                .endsWith(suffix);
-
-        log.process(new LogEvent("logger", null, LogLevel.WARN, "warning2", null, null));
-        trace = factory.trace(log, 250, 320);   // truncate with hard limit
-        assertThat(trace).endsWith("...(hard trace limit reached)");
+    void estimate() {
+        Map<String, List<String>> context = new HashMap<>();
+        List<String> values = new ArrayList<>();
+        values.add(null);
+        context.put("key1", values);
+        context.put("key2", Collections.singletonList(null));
+        assertThat(factory.estimatedSize(context)).isGreaterThan(0);
     }
 }

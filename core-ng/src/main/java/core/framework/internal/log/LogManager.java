@@ -70,16 +70,15 @@ public class LogManager {
     }
 
     void checkSlowProcess(long elapsed, long maxProcessTimeInNano) {
-        if (maxProcessTimeInNano != -1 && elapsed > maxProcessTimeInNano * 0.8) {
-            LOGGER.warn(Markers.errorCode("SLOW_PROCESS"), "action took more than 80% of max process time, maxProcessTime={}, elapsed={}", Duration.ofNanos(maxProcessTimeInNano), Duration.ofNanos(elapsed));
+        if (maxProcessTimeInNano > 0 && elapsed > maxProcessTimeInNano) {
+            LOGGER.warn(Markers.errorCode("SLOW_PROCESS"), "action took longer than of max process time, maxProcessTime={}, elapsed={}", Duration.ofNanos(maxProcessTimeInNano), Duration.ofNanos(elapsed));
         }
     }
 
     public void logError(Throwable e) {
         String errorMessage = e.getMessage();
-        String errorCode = errorCode(e);
-        Marker marker = Markers.errorCode(errorCode);
-        if (e instanceof ErrorCode && ((ErrorCode) e).severity() == Severity.WARN) {
+        Marker marker = Markers.errorCode(errorCode(e));
+        if (e instanceof ErrorCode errorCode && errorCode.severity() == Severity.WARN) {
             LOGGER.warn(marker, errorMessage, e);
         } else {
             LOGGER.error(marker, errorMessage, e);

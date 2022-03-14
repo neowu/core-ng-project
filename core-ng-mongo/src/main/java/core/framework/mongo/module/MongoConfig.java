@@ -29,8 +29,8 @@ public class MongoConfig extends Config {
         this.name = name;
 
         var mongo = new MongoImpl();
-        this.context.startupHook.add(mongo::initialize);
-        this.context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> mongo.close());
+        this.context.startupHook.initialize.add(mongo::initialize);
+        this.context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> mongo.close());
         context.beanFactory.bind(Mongo.class, name, mongo);
         this.mongo = mongo;
     }
@@ -47,6 +47,7 @@ public class MongoConfig extends Config {
         var connectionString = new ConnectionString(uri);
         if (connectionString.getDatabase() == null) throw new Error("uri must have database, uri=" + uri);
         mongo.uri = connectionString(connectionString);
+        context.probe.hostURIs.add(connectionString.getHosts().get(0));
         this.uri = uri;
     }
 

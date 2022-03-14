@@ -4,6 +4,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.http.IPv4Ranges;
+import core.framework.internal.web.site.MessageImpl;
 import core.framework.internal.web.site.StaticContentController;
 import core.framework.internal.web.site.StaticDirectoryController;
 import core.framework.internal.web.site.StaticFileController;
@@ -42,12 +43,16 @@ public class SiteConfig extends Config {
 
     public void message(List<String> paths, String... languages) {
         if (messageConfigured) {
-            throw new Error("site message can only be configured once and must before adding template");
+            throw new Error("site().message() can only be configured once and must before adding template");
         }
         messageConfigured = true;
 
-        context.beanFactory.bind(Message.class, null, context.httpServer.siteManager.message);
         context.httpServer.siteManager.message.load(paths, languages);
+        context.beanFactory.bind(Message.class, null, message(context.httpServer.siteManager.message));
+    }
+
+    Message message(MessageImpl message) {
+        return message;
     }
 
     public void template(String path, Class<?> modelClass) {

@@ -13,7 +13,7 @@ class MessageListenerTest {
 
     @BeforeEach
     void createMessageListener() {
-        listener = new MessageListener(new KafkaURI("localhost"), null, null);
+        listener = new MessageListener(new KafkaURI("localhost"), null, null, 300_000L);
     }
 
     @Test

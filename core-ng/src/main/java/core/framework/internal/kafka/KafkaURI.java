@@ -2,7 +2,6 @@ package core.framework.internal.kafka;
 
 import core.framework.util.Strings;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,6 @@ import java.util.List;
 public class KafkaURI {
     public final List<String> bootstrapURIs;
     private final String uri;
-    private volatile boolean resolved;
 
     public KafkaURI(String uri) {
         this.uri = uri;
@@ -33,23 +31,6 @@ public class KafkaURI {
             }
         }
         return uris;
-    }
-
-    public boolean resolveURI() {
-        if (resolved) return true;
-
-        for (String uri : bootstrapURIs) {
-            int index = uri.indexOf(':');
-            if (index == -1) throw new Error("invalid kafka uri, uri=" + uri);
-            String host = uri.substring(0, index);
-            var address = new InetSocketAddress(host, 9092);
-            if (!address.isUnresolved()) {
-                resolved = true;
-                return true;    // break if any uri is resolvable
-            }
-        }
-
-        return false;
     }
 
     @Override

@@ -75,9 +75,9 @@ class RequestParserTest {
     }
 
     @Test
-    void hostName() {
-        assertThat(parser.hostName("proxy", "original")).isEqualTo("original");
-        assertThat(parser.hostName("original", null)).isEqualTo("original");
+    void hostname() {
+        assertThat(parser.hostname("proxy", "original")).isEqualTo("original");
+        assertThat(parser.hostname("original", null)).isEqualTo("original");
     }
 
     @Test
@@ -147,7 +147,7 @@ class RequestParserTest {
         exchange.setQueryString("key=value");
         var request = new RequestImpl(exchange, null);
         request.scheme = "https";
-        request.hostName = "localhost";
+        request.hostname = "localhost";
         request.port = 443;
 
         assertThat(parser.requestURL(request, exchange))

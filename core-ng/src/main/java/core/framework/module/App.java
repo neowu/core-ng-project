@@ -1,7 +1,6 @@
 package core.framework.module;
 
 import com.sun.management.OperatingSystemMXBean;
-import core.framework.async.Task;
 import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.log.ActionLog;
@@ -27,10 +26,10 @@ public abstract class App extends Module {
         try {
             logContext(actionLog);
             configure();
+            context.probe.check();    // readiness probe only needs to run on actual startup, not on test
             logger.info("execute startup tasks");
-            for (Task task : context.startupHook) {
-                task.execute();
-            }
+            context.startupHook.initialize();
+            context.startupHook.start();
             cleanup();
             logger.info("startup completed, elapsed={}", actionLog.elapsed());
         } catch (Throwable e) {

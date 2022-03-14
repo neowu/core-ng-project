@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -19,12 +20,19 @@ class PropertyValidatorTest {
     }
 
     @Test
-    void validate() {
+    void validateWithNotUsedKey() {
         validator.usedProperties.add("app.usedKey");
 
         assertThatThrownBy(() -> validator.validate(Set.of("app.usedKey", "app.notUsedKey")))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("found not used properties")
-                .hasMessageContaining("keys=[app.notUsedKey]");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("found not used properties")
+            .hasMessageContaining("keys=[app.notUsedKey]");
+    }
+
+    @Test
+    void validate() {
+        validator.usedProperties.add("app.usedKey");
+        validator.validate(Set.of("app.usedKey"));
+        assertThat(validator.usedProperties).isNull();
     }
 }

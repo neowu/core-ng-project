@@ -20,16 +20,16 @@ public final class MockRedisList implements RedisList {
     }
 
     @Override
-    public List<String> pop(String key, int count) {
+    public List<String> pop(String key, int size) {
         var value = store.get(key);
         if (value == null) return List.of();
         List<String> list = value.list();
 
-        List<String> results = new ArrayList<>(count);
+        List<String> results = new ArrayList<>(size);
         long removed = 0;
         Iterator<String> iterator = list.iterator();
         while (iterator.hasNext()) {
-            if (removed == count) break;
+            if (removed == size) break;
             String item = iterator.next();
             iterator.remove();
             results.add(item);
@@ -58,5 +58,17 @@ public final class MockRedisList implements RedisList {
         int endIndex = stop < 0 ? (int) stop + size : (int) stop;
         if (endIndex >= size) endIndex = size - 1;
         return List.copyOf(list.subList(startIndex, endIndex + 1));
+    }
+
+    @Override
+    public void trim(String key, int maxSize) {
+        var value = store.get(key);
+        if (value == null) return;
+
+        List<String> list = value.list();
+        int size = list.size();
+        if (size <= maxSize) return;
+
+        list.subList(0, size - maxSize).clear();
     }
 }

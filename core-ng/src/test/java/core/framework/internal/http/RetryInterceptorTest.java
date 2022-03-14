@@ -1,8 +1,6 @@
 package core.framework.internal.http;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.internal.log.ActionLog;
-import core.framework.internal.log.LogManager;
 import okhttp3.Request;
 import okhttp3.internal.http2.ConnectionShutdownException;
 import okhttp3.internal.http2.ErrorCode;
@@ -28,7 +26,7 @@ class RetryInterceptorTest {
 
     @BeforeEach
     void createRetryInterceptor() {
-        interceptor = new RetryInterceptor(3, Duration.ofMillis(500), null);
+        interceptor = new RetryInterceptor(3, Duration.ofMillis(500));
     }
 
     /*
@@ -421,17 +419,5 @@ class RetryInterceptorTest {
     void uri() {
         var request = new Request.Builder().url("http://localhost/path?query=value").build();
         assertThat(interceptor.uri(request)).isEqualTo("http://localhost/path");
-    }
-
-    @Test
-    void withinMaxProcessTime() {
-        var logManager = new LogManager();
-        ActionLog actionLog = logManager.begin("begin", null);
-        actionLog.maxProcessTimeInNano = Duration.ofSeconds(1).toNanos();
-
-        assertThat(interceptor.withinMaxProcessTime(1)).isTrue();
-        assertThat(interceptor.withinMaxProcessTime(2)).isFalse();
-
-        logManager.end("end");
     }
 }

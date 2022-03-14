@@ -1,6 +1,7 @@
 package core.framework.mongo.impl;
 
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import core.framework.inject.Inject;
 import core.framework.mongo.IntegrationTest;
@@ -33,6 +34,11 @@ class MongoIntegrationTest extends IntegrationTest {
     @AfterEach
     void cleanup() {
         mongo.dropCollection("entity");
+    }
+
+    @Test
+    void createIndex() {
+        mongo.createIndex("entity", Indexes.ascending("string_field"));
     }
 
     @Test
@@ -76,7 +82,7 @@ class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     void find() {
-        TestMongoEntity entity = createEntity("value2", TestMongoEntity.TestEnum.VALUE2);
+        TestMongoEntity entity = entity("value2", TestMongoEntity.TestEnum.VALUE2);
 
         List<TestMongoEntity> entities = collection.find(Filters.eq("string_field", "value2"));
         assertThat(entities).hasSize(1).first()
@@ -85,7 +91,7 @@ class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     void findByEnum() {
-        TestMongoEntity entity = createEntity("value1", TestMongoEntity.TestEnum.VALUE1);
+        TestMongoEntity entity = entity("value1", TestMongoEntity.TestEnum.VALUE1);
 
         List<TestMongoEntity> entities = collection.find(Filters.eq("enum_field", TestMongoEntity.TestEnum.VALUE1));
         assertThat(entities).hasSize(1).first()
@@ -94,7 +100,7 @@ class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     void findOne() {
-        TestMongoEntity entity = createEntity("value3", TestMongoEntity.TestEnum.VALUE1);
+        TestMongoEntity entity = entity("value3", TestMongoEntity.TestEnum.VALUE1);
 
         assertThat(collection.findOne(Filters.eq("string_field", "value3"))).get()
                 .usingRecursiveComparison().isEqualTo(entity);
@@ -109,7 +115,7 @@ class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     void bulkInsert() {
-        List<TestMongoEntity> entities = testEntities();
+        List<TestMongoEntity> entities = entities();
         collection.bulkInsert(entities);
 
         for (TestMongoEntity entity : entities) {
@@ -121,7 +127,7 @@ class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     void bulkReplace() {
-        List<TestMongoEntity> entities = testEntities();
+        List<TestMongoEntity> entities = entities();
         entities.forEach(entity -> entity.id = new ObjectId());
         collection.bulkReplace(entities);
 
@@ -138,7 +144,7 @@ class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     void bulkDelete() {
-        List<TestMongoEntity> entities = testEntities();
+        List<TestMongoEntity> entities = entities();
         collection.bulkInsert(entities);
 
         long deletedCount = collection.bulkDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
@@ -148,7 +154,7 @@ class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     void delete() {
-        TestMongoEntity entity = createEntity("value1", TestMongoEntity.TestEnum.VALUE1);
+        TestMongoEntity entity = entity("value1", TestMongoEntity.TestEnum.VALUE1);
 
         boolean deleted = collection.delete(entity.id);
         assertThat(deleted).isTrue();
@@ -157,7 +163,7 @@ class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     void deleteByFilter() {
-        TestMongoEntity entity = createEntity("value1", TestMongoEntity.TestEnum.VALUE1);
+        TestMongoEntity entity = entity("value1", TestMongoEntity.TestEnum.VALUE1);
 
         long deleted = collection.delete(Filters.eq("string_field", "value1"));
         assertThat(deleted).isEqualTo(1);
@@ -166,7 +172,7 @@ class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     void update() {
-        List<TestMongoEntity> entities = testEntities();
+        List<TestMongoEntity> entities = entities();
         collection.bulkInsert(entities);
 
         long updatedCount = collection.update(Filters.eq("string_field", entities.get(0).stringField), Updates.set("enum_field", TestMongoEntity.TestEnum.VALUE2));
@@ -176,15 +182,14 @@ class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     void forEach() {
-        List<TestMongoEntity> entities = testEntities();
-        collection.bulkInsert(entities);
+        collection.bulkInsert(entities());
 
         List<TestMongoEntity> returnedEntities = new ArrayList<>();
         collection.forEach(new Query(), returnedEntities::add);
         assertThat(returnedEntities).hasSize(2);
     }
 
-    private TestMongoEntity createEntity(String stringField, TestMongoEntity.TestEnum enumField) {
+    private TestMongoEntity entity(String stringField, TestMongoEntity.TestEnum enumField) {
         TestMongoEntity entity = new TestMongoEntity();
         entity.id = new ObjectId();
         entity.stringField = stringField;
@@ -193,7 +198,7 @@ class MongoIntegrationTest extends IntegrationTest {
         return entity;
     }
 
-    private List<TestMongoEntity> testEntities() {
+    private List<TestMongoEntity> entities() {
         List<TestMongoEntity> entities = Lists.newArrayList();
         TestMongoEntity entity1 = new TestMongoEntity();
         entity1.stringField = "string1";

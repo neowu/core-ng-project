@@ -2,6 +2,7 @@ package core.framework.internal.kafka;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,7 @@ class MessagePublisherImplTest {
     void publish() {
         ActionLog actionLog = logManager.begin("begin", null);
         actionLog.correlationIds = List.of("correlationId");
+        actionLog.trace = Trace.CASCADE;
 
         var message = new TestMessage();
         message.stringField = "value";
@@ -46,6 +48,7 @@ class MessagePublisherImplTest {
             assertThat(record.key()).isNull();
             assertThat(new String(record.headers().lastHeader(MessageHeaders.HEADER_CORRELATION_ID).value(), UTF_8)).isEqualTo("correlationId");
             assertThat(new String(record.headers().lastHeader(MessageHeaders.HEADER_REF_ID).value(), UTF_8)).isEqualTo(actionLog.id);
+            assertThat(new String(record.headers().lastHeader(MessageHeaders.HEADER_TRACE).value(), UTF_8)).isEqualTo(Trace.CASCADE.name());
             return true;
         }));
 

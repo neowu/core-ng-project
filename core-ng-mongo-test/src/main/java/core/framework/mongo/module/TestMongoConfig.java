@@ -32,7 +32,7 @@ public class TestMongoConfig extends MongoConfig {
             if (localMongoAddress == null) {
                 var server = new MongoServer(new MemoryBackend());
                 localMongoAddress = server.bind();
-                context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> server.shutdown());
+                context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> server.shutdown());
             }
         }
     }

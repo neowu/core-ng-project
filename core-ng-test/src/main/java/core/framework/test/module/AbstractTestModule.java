@@ -13,14 +13,15 @@ import java.lang.reflect.Type;
 public abstract class AbstractTestModule extends Module {
     private final Logger logger = LoggerFactory.getLogger(AbstractTestModule.class);
 
-    public final void configure() {
+    public final void configure() throws Exception {
         logger.info("initialize test context");
         context = new TestModuleContext();
-        Runtime.getRuntime().addShutdownHook(new Thread(context.shutdownHook, "shutdown")); // register shutdown hook for integration test, to cleanup external resources if needed
+        Runtime.getRuntime().addShutdownHook(new Thread(context.shutdownHook, "shutdown")); // register shutdown hook for integration test, to clean up external resources if needed
 
         logger.info("initialize application");
         initialize();
         context.validate();
+        context.startupHook.initialize();   // only initialize clients, not start process
     }
 
     public <T> T overrideBinding(Class<? super T> type, T instance) {

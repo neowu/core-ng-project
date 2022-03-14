@@ -51,6 +51,8 @@ public class KafkaConfig extends Config {
         if (this.uri != null)
             throw new Error(format("kafka uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri));
         this.uri = new KafkaURI(uri);
+        // in kube env, it's ok to just check first pod dns of stateful set
+        context.probe.hostURIs.add(this.uri.bootstrapURIs.get(0));
     }
 
     // for use case as replying message back to publisher, so the topic can be dynamic (different services (consumer group) expect to receive reply in their own topic)
@@ -72,8 +74,8 @@ public class KafkaConfig extends Config {
     <T> MessagePublisher<T> createMessagePublisher(String topic, Class<T> messageClass) {
         if (producer == null) {
             var producer = new MessageProducer(uri, name, maxRequestSize);
-            producer.tryCreateProducer();  // try to init kafka during startup
             context.collector.metrics.add(producer.producerMetrics);
+            context.startupHook.initialize.add(producer::initialize);
             context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
             var controller = new KafkaController(producer);
             context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/message/:key"), (LambdaController) controller::publish, true);
@@ -109,8 +111,8 @@ public class KafkaConfig extends Config {
     private MessageListener listener() {
         if (listener == null) {
             if (uri == null) throw new Error("kafka uri must be configured first, name=" + name);
-            var listener = new MessageListener(uri, name, context.logManager);
-            context.startupHook.add(listener::start);
+            var listener = new MessageListener(uri, name, context.logManager, context.shutdownHook.shutdownTimeoutInNano);
+            context.startupHook.start.add(listener::start);
             context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> listener.shutdown());
             context.shutdownHook.add(ShutdownHook.STAGE_1, listener::awaitTermination);
             context.collector.metrics.add(listener.consumerMetrics);
@@ -130,10 +132,6 @@ public class KafkaConfig extends Config {
         listener().poolSize = poolSize;
     }
 
-    public void maxProcessTime(Duration maxProcessTime) {
-        listener().maxProcessTime = maxProcessTime;
-    }
-
     // to increase max message size, it must change on both producer and broker sides
     // on broker size use "--override message.max.bytes=size"
     // refer to https://kafka.apache.org/documentation/#message.max.bytes
@@ -144,7 +142,7 @@ public class KafkaConfig extends Config {
     }
 
     public void longConsumerDelayThreshold(Duration threshold) {
-        listener().longConsumerDelayThreshold = threshold;
+        listener().longConsumerDelayThresholdInNano = threshold.toNanos();
     }
 
     public void maxPoll(int maxRecords, int maxBytes) {

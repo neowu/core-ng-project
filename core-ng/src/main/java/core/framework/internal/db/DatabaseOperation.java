@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -28,7 +29,6 @@ import static core.framework.util.Strings.format;
 public class DatabaseOperation {
     public final TransactionManager transactionManager;
     final EnumDBMapper enumMapper = new EnumDBMapper();
-    public int batchSize = 1000;   // use 1000 as default batch size by considering actual use cases
     int queryTimeoutInSeconds;
 
     DatabaseOperation(Pool<Connection> pool) {
@@ -51,23 +51,17 @@ public class DatabaseOperation {
         }
     }
 
+    // mysql jdbc driver will adjust batch size according to max_allowed_packet param, check this value by "SHOW VARIABLES LIKE '%max_allowed_packet'"
+    // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts, com.mysql.cj.AbstractPreparedQuery.computeBatchSize
     int[] batchUpdate(String sql, List<Object[]> params) {
-        int size = params.size();
-        int[] results = new int[size];
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
-            int index = 1;
             for (Object[] batchParams : params) {
                 setParams(statement, batchParams);
                 statement.addBatch();
-                if (index % batchSize == 0 || index == size) {
-                    int[] batchResults = statement.executeBatch();
-                    System.arraycopy(batchResults, 0, results, index - batchResults.length, batchResults.length);
-                }
-                index++;
             }
-            return results;
+            return statement.executeBatch();
         } catch (SQLException e) {
             Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
@@ -121,26 +115,19 @@ public class DatabaseOperation {
     }
 
     Optional<long[]> batchInsert(String sql, List<Object[]> params, String generatedColumn) {
-        int size = params.size();
-        long[] results = generatedColumn != null ? new long[size] : null;
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = insertStatement(connection.resource, sql, generatedColumn)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
-            int index = 1;
-            int resultIndex = 0;
             for (Object[] batchParams : params) {
                 setParams(statement, batchParams);
                 statement.addBatch();
-                if (index % batchSize == 0 || index == size) {
-                    statement.executeBatch();
-                    if (generatedColumn != null) {
-                        fetchGeneratedKeys(statement, results, resultIndex);
-                        resultIndex = index - 1;
-                    }
-                }
-                index++;
             }
-            return generatedColumn != null ? Optional.of(results) : Optional.empty();
+            statement.executeBatch();
+            if (generatedColumn != null) {
+                long[] results = fetchGeneratedKeys(statement, params.size());
+                return Optional.of(results);
+            }
+            return Optional.empty();
         } catch (SQLException e) {
             Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
@@ -189,8 +176,9 @@ public class DatabaseOperation {
         return OptionalLong.empty();
     }
 
-    private void fetchGeneratedKeys(PreparedStatement statement, long[] results, int resultIndex) throws SQLException {
-        int index = resultIndex;
+    private long[] fetchGeneratedKeys(PreparedStatement statement, int size) throws SQLException {
+        long[] results = new long[size];
+        int index = 0;
         try (ResultSet keys = statement.getGeneratedKeys()) {
             if (keys != null) {
                 while (keys.next()) {
@@ -198,6 +186,7 @@ public class DatabaseOperation {
                 }
             }
         }
+        return results;
     }
 
     private void setParams(PreparedStatement statement, Object... params) throws SQLException {
@@ -222,7 +211,18 @@ public class DatabaseOperation {
             // TIMESTAMP has a range of '1970-01-01 00:00:01' UTC to '2038-01-19 03:14:07' UTC.
             // for timestamp column type, there is year 2038 issue
             // for datetime column type, jdbc will save UTC values
-            statement.setTimestamp(index, Timestamp.from(((ZonedDateTime) param).toInstant()));
+
+            // with insert ignore, out of range timestamp param will be converted to "0000-00-00 00:00:00" into db, and will trigger "Zero date value prohibited" error on read
+            // refer to https://dev.mysql.com/doc/refman/8.0/en/insert.html
+            // Data conversions that would trigger errors abort the statement if IGNORE is not specified. With IGNORE, invalid values are adjusted to the closest values and inserted; warnings are produced but the statement does not abort.
+
+            // here only to check > 0, make trade off between validating TIMESTAMP column type and keeping compatible with DATETIME column type
+            // most likely the values we deal with from external systems are lesser (e.g. nodejs default year is 1900, it converts 0 into 1900/01/01 00:00:00)
+            // if it passes timestamp after 2038-01-19 03:14:07 (Instant.ofEpochSecond(Integer.MAX_VALUE)), it will still trigger this issue on MySQL
+            // so on application level, if you can not ensure the range of input value, write its own utils to check
+            Instant instant = ((ZonedDateTime) param).toInstant();
+            if (instant.getEpochSecond() <= 0) throw new Error("timestamp must be after 1970-01-01 00:00:00, value=" + param);
+            statement.setTimestamp(index, Timestamp.from(instant));
         } else if (param instanceof Boolean) {
             statement.setBoolean(index, (Boolean) param);
         } else if (param instanceof Long) {

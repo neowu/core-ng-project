@@ -10,7 +10,6 @@ import core.framework.internal.http.RetryInterceptor;
 import core.framework.internal.http.ServiceUnavailableInterceptor;
 import core.framework.internal.http.TimeoutInterceptor;
 import core.framework.util.StopWatch;
-import core.framework.util.Threads;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
@@ -104,7 +103,7 @@ public final class HTTPClientBuilder {
             builder.addInterceptor(new TimeoutInterceptor());
             if (maxRetries != null) {
                 builder.addNetworkInterceptor(new ServiceUnavailableInterceptor());
-                builder.addInterceptor(new RetryInterceptor(maxRetries, retryWaitTime, Threads::sleepRoughly));
+                builder.addInterceptor(new RetryInterceptor(maxRetries, retryWaitTime));
             }
             if (enableCookie) builder.cookieJar(new CookieManager());
             if (enableFallbackDNSCache) builder.dns(new FallbackDNSCache());

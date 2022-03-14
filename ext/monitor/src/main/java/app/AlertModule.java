@@ -4,6 +4,7 @@ import app.monitor.AlertConfig;
 import app.monitor.alert.AlertService;
 import app.monitor.channel.Channel;
 import app.monitor.channel.ChannelManager;
+import app.monitor.channel.PagerDutyClient;
 import app.monitor.channel.SlackClient;
 import app.monitor.kafka.ActionLogMessageHandler;
 import app.monitor.kafka.EventMessageHandler;
@@ -19,6 +20,7 @@ import core.framework.module.Module;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -33,14 +35,24 @@ public class AlertModule extends Module {
 
     private void configureChannels() {
         Map<String, Channel> channels = new HashMap<>();
-        property("app.slack.token").ifPresent((String slackToken) -> {
-            HTTPClient httpClient = HTTPClient.builder()
-                    .maxRetries(3)
-                    .retryWaitTime(Duration.ofSeconds(2))   // slack has rate limit with 1 message per second, here to slow down further when hit limit, refer to https://api.slack.com/docs/rate-limits
-                    .build();
-            channels.put("slack", new SlackClient(httpClient, slackToken));
-        });
+        HTTPClient httpClient = HTTPClient.builder()
+            .maxRetries(3)
+            .retryWaitTime(Duration.ofSeconds(2))    // slack has rate limit with 1 message per second, here to slow down further when hit limit, refer to https://api.slack.com/docs/rate-limits
+            .build();
+        configureSlackChannel(channels, httpClient);
+        configurePagerDutyChannel(channels, httpClient);
         bind(new ChannelManager(channels, "slack"));
+    }
+
+    private void configureSlackChannel(Map<String, Channel> channels, HTTPClient httpClient) {
+        property("app.slack.token").ifPresent((String token) ->
+            channels.put("slack", new SlackClient(httpClient, token)));
+    }
+
+    private void configurePagerDutyChannel(Map<String, Channel> channels, HTTPClient httpClient) {
+        Optional<String> from = property("app.pagerduty.from");
+        property("app.pagerduty.token").ifPresent((String token) ->
+            channels.put("pagerduty", new PagerDutyClient(httpClient, token, from.orElseThrow())));
     }
 
     private void configureAlert(String alertConfig) {

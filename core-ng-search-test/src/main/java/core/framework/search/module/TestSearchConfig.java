@@ -24,12 +24,14 @@ public class TestSearchConfig extends SearchConfig {
 
         // disable warning from org.elasticsearch.node.Node
         // refer to org.elasticsearch.node.Node deprecationLogger/no-jdk
+        // org.elasticsearch.monitor.jvm.JvmInfo Line 144
         System.setProperty("es.bundled_jdk", "true");
     }
 
     @Override
     protected void initialize(ModuleContext context, String name) {
         super.initialize(context, name);
+        configureLogger();
         startLocalElasticSearch(context);
     }
 
@@ -39,7 +41,7 @@ public class TestSearchConfig extends SearchConfig {
             if (localESHost == null) {
                 var server = new LocalElasticSearch();
                 localESHost = server.start();
-                context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> server.close());
+                context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> server.close());
             }
         }
     }
@@ -49,11 +51,16 @@ public class TestSearchConfig extends SearchConfig {
         search.hosts = new HttpHost[]{localESHost};
     }
 
-    // es refers to log4j core directly in org.elasticsearch.common.logging.Loggers, this is to bridge es log to coreng logger
-    // log4j-to-slf4j works only if client is used, but integration test uses Node.
-    // refer to org.elasticsearch.common.logging.NodeAndClusterIdStateListener, NodeAndClusterIdConverter.setNodeIdAndClusterId(nodeId, clusterUUID);
-    // ES keeps removing log4j-core dependency, now seems only above one left
-    @Override
+    // ES uses log4j2 core api directly, cannot use log4j-to-slf4j to bridge, refer to following exception
+    // here is to bridge to core-ng logger
+    /*
+      java.lang.ClassCastException: class org.apache.logging.slf4j.SLF4JLoggerContext cannot be cast to class org.apache.logging.log4j.core.LoggerContext (org.apache.logging.slf4j.SLF4JLoggerContext and org.apache.logging.log4j.core.LoggerContext are in unnamed module of loader 'app')
+        at org.apache.logging.log4j.core.LoggerContext.getContext(LoggerContext.java:231)
+        at org.apache.logging.log4j.core.config.Configurator.setLevel(Configurator.java:366)
+        at org.elasticsearch.common.logging.Loggers.setLevel(Loggers.java:114)
+        at org.elasticsearch.index.SearchSlowLog.<init>(SearchSlowLog.java:111)
+        at org.elasticsearch.index.IndexModule.<init>(IndexModule.java:176)
+    * */
     void configureLogger() {
         if (System.getProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY) != null) return;
         System.setProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY, ESLoggerConfigFactory.class.getName());

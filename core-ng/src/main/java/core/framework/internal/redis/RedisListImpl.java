@@ -15,6 +15,7 @@ import java.util.List;
 
 import static core.framework.internal.redis.Protocol.Command.LPOP;
 import static core.framework.internal.redis.Protocol.Command.LRANGE;
+import static core.framework.internal.redis.Protocol.Command.LTRIM;
 import static core.framework.internal.redis.Protocol.Command.RPUSH;
 import static core.framework.internal.redis.RedisEncodings.decode;
 import static core.framework.internal.redis.RedisEncodings.encode;
@@ -32,20 +33,20 @@ public final class RedisListImpl implements RedisList {
     }
 
     @Override
-    public List<String> pop(String key, int count) {
+    public List<String> pop(String key, int size) {
         var watch = new StopWatch();
         validate("key", key);
-        if (count <= 0) throw new Error("count must be greater than 0");
-        List<String> values = new ArrayList<>(count);
+        if (size <= 0) throw new Error("size must be greater than 0");
+        List<String> values = new ArrayList<>(size);
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            if (count == 1) {   // "lpop key count" only be supported since redis 6.2, to use old protocol if count=1
+            if (size == 1) {   // "lpop key count" only be supported since redis 6.2, to use old protocol if count=1
                 connection.writeKeyCommand(LPOP, key);
                 String value = decode(connection.readBlobString());
                 if (value != null) values.add(value);
             } else {
-                connection.writeKeyArgumentCommand(LPOP, key, encode(count));
+                connection.writeKeyArgumentCommand(LPOP, key, encode(size));
                 Object[] response = connection.readArray();
                 if (response != null) {     // lpop returns nil array if no element, this is different behavior of other pop (e.g. spop), it's likely due to blpop impl, use nil array to distinguish between timeout and empty list
                     for (Object value : response) {
@@ -61,7 +62,7 @@ public final class RedisListImpl implements RedisList {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, values.size(), 0);
-            logger.debug("lpop, key={}, count={}, returnedValues={}, elapsed={}", key, count, values, elapsed);
+            logger.debug("lpop, key={}, size={}, returnedValues={}, elapsed={}", key, size, values, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
@@ -116,6 +117,28 @@ public final class RedisListImpl implements RedisList {
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
             logger.debug("lrange, key={}, start={}, stop={}, returnedValues={}, elapsed={}", key, start, stop, values, elapsed);
+            redis.checkSlowOperation(elapsed);
+        }
+    }
+
+    @Override
+    public void trim(String key, int maxSize) {
+        var watch = new StopWatch();
+        validate("key", key);
+        if (maxSize <= 0) throw new Error("maxSize must be greater than 0");
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.writeKeyArgumentsCommand(LTRIM, key, encode(-maxSize), encode(-1));
+            connection.readSimpleString();
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, 0, 1);
+            logger.debug("ltrim, key={}, maxSize={}, elapsed={}", key, maxSize, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }

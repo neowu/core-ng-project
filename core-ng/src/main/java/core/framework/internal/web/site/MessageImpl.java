@@ -1,5 +1,6 @@
 package core.framework.internal.web.site;
 
+import core.framework.log.Markers;
 import core.framework.util.Maps;
 import core.framework.util.Properties;
 import core.framework.util.Sets;
@@ -41,7 +42,7 @@ public class MessageImpl implements Message {
             String language = language(path);
             validateLanguage(path, language);
             properties.computeIfAbsent(language, key -> new Properties())
-                    .load(path);
+                .load(path);
         }
 
         for (String language : this.languages) {
@@ -108,11 +109,16 @@ public class MessageImpl implements Message {
 
     @Override
     public String get(String key, String language) {
-        return getMessage(key, language).orElseThrow(() -> new Error("can not find message, key=" + key));
+        String message = getMessage(key, language).orElse(null);
+        if (message == null) {
+            logger.error(Markers.errorCode("INVALID_MESSAGE_KEY"), "can not find message, key={}, language={}", key, language);
+            return key;
+        }
+        return message;
     }
 
     Optional<String> getMessage(String key, String language) {
-        String targetLanguage = language == null ? DEFAULT_LANGUAGE : language;
+        String targetLanguage = language == null ? languages[0] : language;
         List<Properties> properties = messages.get(targetLanguage);
         if (properties == null) throw new Error("language is not defined, please check site().message(), language=" + targetLanguage);
         for (Properties property : properties) {

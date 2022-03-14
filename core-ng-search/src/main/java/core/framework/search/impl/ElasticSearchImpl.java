@@ -1,43 +1,32 @@
 package core.framework.search.impl;
 
-import core.framework.json.JSON;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch._types.ErrorCause;
+import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
+import core.framework.internal.json.JSONMapper;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
+import core.framework.search.SearchException;
 import core.framework.util.StopWatch;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.util.EntityUtils;
 import org.apache.http.message.BasicHeader;
-import org.elasticsearch.action.support.ActiveShardCount;
-import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.Request;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.CloseIndexRequest;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.client.indices.PutComposableIndexTemplateRequest;
-import org.elasticsearch.client.indices.PutMappingRequest;
-import org.elasticsearch.cluster.metadata.ComposableIndexTemplate;
-import org.elasticsearch.common.bytes.BytesArray;
-import org.elasticsearch.common.xcontent.DeprecationHandler;
-import org.elasticsearch.common.xcontent.NamedXContentRegistry;
-import org.elasticsearch.common.xcontent.XContentParser;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.time.Duration;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -49,21 +38,26 @@ public class ElasticSearchImpl implements ElasticSearch {
     public HttpHost[] hosts;
     public String apiKey;
     public int maxResultWindow = 10000;
-    private RestHighLevelClient client;
+    ElasticsearchClient client;
+    private RestClient restClient;
 
-    // initialize will be called in startup hook, so no need to synchronize
+    // initialize will be called in startup hook, no need to synchronize
     public void initialize() {
-        RestClientBuilder builder = RestClient.builder(hosts);
-        if (apiKey != null) {
-            Header[] authHeader = {new BasicHeader("Authorization", "ApiKey " + apiKey)};
-            builder.setDefaultHeaders(authHeader);
+        if (client == null) {   // initialize can be called by initSearch explicitly during test,
+            RestClientBuilder builder = RestClient.builder(hosts);
+            if (apiKey != null) {
+                Header[] authHeader = {new BasicHeader("Authorization", "ApiKey " + apiKey)};
+                builder.setDefaultHeaders(authHeader);
+            }
+            builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
+                .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
+            builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
+                .setMaxConnPerRoute(100)
+                .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis()));
+            builder.setHttpClientConfigCallback(config -> config.addInterceptorFirst(new ElasticSearchLogInterceptor()));
+            restClient = builder.build();
+            client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper(JSONMapper.OBJECT_MAPPER)));
         }
-        builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
-            .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
-        builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
-            .setMaxConnPerRoute(100)
-            .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis()));
-        client = new RestHighLevelClient(builder);
     }
 
     public <T> ElasticSearchType<T> type(Class<T> documentClass) {
@@ -80,27 +74,33 @@ public class ElasticSearchImpl implements ElasticSearch {
         if (client == null) return;
 
         logger.info("close elasticsearch client, host={}", hosts[0]);
-        client.close();
+        restClient.close(); // same as client._transport().close()
     }
 
     // this is generally used in es migration, to create index or update mapping if index exists, be aware of mapping fields can't be deleted in es, but can be removed from mapping json
     @Override
     public void putIndex(String index, String source) {
         var watch = new StopWatch();
+        HttpEntity entity = null;
         try {
-            IndicesClient client = client().indices();
-            CreateIndexRequest request = new CreateIndexRequest(index).source(new BytesArray(source), XContentType.JSON);
-            boolean exists = client.exists(new GetIndexRequest(index), RequestOptions.DEFAULT);
+            ElasticsearchIndicesClient client = this.client.indices();
+            boolean exists = client.exists(builder -> builder.index(index)).value();
+            Request request;
             if (!exists) {
-                client.create(request, RequestOptions.DEFAULT);
+                request = new Request("PUT", "/" + index);
+                request.setJsonEntity(source);
             } else {
-                // only try to update mappings, as for settings it generally requires to close index first then open after update
+                // only try to update mappings, as for settings it generally requires closing index first then open after update
                 logger.info("index already exists, update mapping, index={}", index);
-                client.putMapping(new PutMappingRequest(index).source(request.mappings(), XContentType.JSON), RequestOptions.DEFAULT);
+                request = new Request("PUT", "/" + index + "/_mapping");
+                request.setJsonEntity(JSONMapper.OBJECT_MAPPER.readTree(source).get("mappings").toString());
             }
+            Response response = restClient.performRequest(request);
+            entity = response.getEntity();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
+            EntityUtils.consumeQuietly(entity);
             logger.info("put index, index={}, source={}, elapsed={}", index, source, watch.elapsed());
         }
     }
@@ -108,13 +108,17 @@ public class ElasticSearchImpl implements ElasticSearch {
     @Override
     public void putIndexTemplate(String name, String source) {
         var watch = new StopWatch();
+        HttpEntity entity = null;
         try {
-            XContentParser parser = XContentType.JSON.xContent().createParser(NamedXContentRegistry.EMPTY, DeprecationHandler.THROW_UNSUPPORTED_OPERATION, source);
-            client().indices().putIndexTemplate(new PutComposableIndexTemplateRequest().name(name).indexTemplate(ComposableIndexTemplate.parse(parser)), RequestOptions.DEFAULT);
+            var request = new Request("PUT", "/_index_template/" + name);
+            request.setJsonEntity(source);
+            Response response = restClient.performRequest(request);
+            entity = response.getEntity();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
-            logger.info("put index template, name={}, elapsed={}", name, watch.elapsed());
+            EntityUtils.consumeQuietly(entity);
+            logger.info("put index template, name={}, source={}, elapsed={}", name, source, watch.elapsed());
         }
     }
 
@@ -122,9 +126,11 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void refreshIndex(String index) {
         var watch = new StopWatch();
         try {
-            client().indices().refresh(Requests.refreshRequest(index), RequestOptions.DEFAULT);
+            client.indices().refresh(builder -> builder.index(index));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw searchException(e);
         } finally {
             logger.info("refresh index, index={}, elapsed={}", index, watch.elapsed());
         }
@@ -134,9 +140,11 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void closeIndex(String index) {
         var watch = new StopWatch();
         try {
-            client().indices().close(new CloseIndexRequest(index).waitForActiveShards(ActiveShardCount.NONE), RequestOptions.DEFAULT);
+            client.indices().close(builder -> builder.index(index).waitForActiveShards(w -> w.count(0)));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw searchException(e);
         } finally {
             logger.info("close index, index={}, elapsed={}", index, watch.elapsed());
         }
@@ -146,9 +154,11 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void deleteIndex(String index) {
         var watch = new StopWatch();
         try {
-            client().indices().delete(Requests.deleteIndexRequest(index), RequestOptions.DEFAULT);
+            client.indices().delete(builder -> builder.index(index));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw searchException(e);
         } finally {
             logger.info("delete index, index={}, elapsed={}", index, watch.elapsed());
         }
@@ -158,24 +168,23 @@ public class ElasticSearchImpl implements ElasticSearch {
     public ClusterStateResponse state() {
         var watch = new StopWatch();
         try {
-            Response response = client().getLowLevelClient().performRequest(new Request("GET", "/_cluster/state/metadata"));
-            byte[] bytes = responseBody(response.getEntity());
-            return JSON.fromJSON(ClusterStateResponse.class, new String(bytes, UTF_8));
+            return client.cluster().state(builder -> builder.metric("metadata")).valueBody().to(ClusterStateResponse.class);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw searchException(e);
         } finally {
             logger.info("get cluster state, elapsed={}", watch.elapsed());
         }
     }
 
-    private byte[] responseBody(HttpEntity entity) throws IOException {
-        try (InputStream stream = entity.getContent()) {
-            return stream.readAllBytes();
+    // convert elasticsearch-java client exception, to append detailed error message
+    SearchException searchException(ElasticsearchException e) {
+        ErrorCause causedBy = e.error().causedBy();
+        var builder = new StringBuilder(e.getMessage());
+        if (causedBy != null) {
+            builder.append("\nreason: ").append(causedBy.reason());
         }
-    }
-
-    RestHighLevelClient client() {
-        if (client == null) initialize();
-        return client;
+        return new SearchException(builder.toString(), e);
     }
 }

@@ -46,4 +46,11 @@ class KafkaAppenderTest {
     void initialize() {
         appender.initialize();
     }
+
+
+    @Test
+    void resolveURI() {
+        assertThat(appender.resolveURI(new KafkaURI("localhost"))).isTrue();
+        assertThat(appender.resolveURI(new KafkaURI("notExistedHost"))).isFalse();
+    }
 }

@@ -1,12 +1,10 @@
 package core.diagram.service;
 
+import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.search.SearchResponse;
 import core.framework.util.ASCII;
 import core.log.domain.ActionDocument;
-import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -33,25 +31,25 @@ public class ArchDiagram {
     }
 
     public void load(SearchResponse<ActionDocument> response) {
-        List<? extends Terms.Bucket> apps = ((ParsedTerms) response.aggregations.get("app")).getBuckets();
-        for (Terms.Bucket appBucket : apps) {
-            load(appBucket.getKeyAsString(), ((ParsedTerms) appBucket.getAggregations().get("action")).getBuckets());
+        var apps = response.aggregations.get("app").sterms().buckets().array();
+        for (var appBucket : apps) {
+            load(appBucket.key(), appBucket.aggregations().get("action").sterms().buckets().array());
         }
     }
 
-    private void load(String app, List<? extends Terms.Bucket> actions) {
+    private void load(String app, List<StringTermsBucket> actions) {
         if (excludeApps.contains(app)) return;
 
-        for (Terms.Bucket actionBucket : actions) {
-            String action = actionBucket.getKeyAsString();
-            long totalCount = actionBucket.getDocCount();
-            List<? extends Terms.Bucket> clients = ((ParsedTerms) actionBucket.getAggregations().get("client")).getBuckets();
-            for (Terms.Bucket clientBucket : clients) {
-                String client = clientBucket.getKeyAsString();
-                long count = clientBucket.getDocCount();
+        for (StringTermsBucket actionBucket : actions) {
+            String action = actionBucket.key();
+            long totalCount = actionBucket.docCount();
+            List<StringTermsBucket> clients = actionBucket.aggregations().get("client").sterms().buckets().array();
+            for (StringTermsBucket clientBucket : clients) {
+                String client = clientBucket.key();
+                long count = clientBucket.docCount();
                 loadAction(app, action, client, count);
             }
-            final long totalByClient = clients.stream().mapToLong(MultiBucketsAggregation.Bucket::getDocCount).sum();
+            long totalByClient = clients.stream().mapToLong(StringTermsBucket::docCount).sum();
             if (totalCount > totalByClient) {
                 loadAction(app, action, "_direct_" + app, totalCount - totalByClient);
             }
@@ -89,7 +87,7 @@ public class ArchDiagram {
         for (String app : apps()) {
             if (excludeApps.contains(app)) continue;
             if (app.startsWith("_direct_")) {
-                dot.append("{} [label=direct, shape=point];\n", app);
+                dot.append("\"{}\" [label=direct, shape=point];\n", app);
                 continue;
             }
             String color = color(app);

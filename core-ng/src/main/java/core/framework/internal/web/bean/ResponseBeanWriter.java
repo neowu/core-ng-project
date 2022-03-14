@@ -38,8 +38,7 @@ public class ResponseBeanWriter {   // used by controller and web service
     }
 
     public byte[] toJSON(Object bean) {
-        if (bean instanceof Optional) {  // only support Optional<T> as response bean type
-            Optional<?> optional = (Optional<?>) bean;
+        if (bean instanceof Optional<?> optional) {  // only support Optional<T> as response bean type
             if (optional.isEmpty()) return Strings.bytes("null");
             Object value = optional.get();
             Context<Object> context = context(this.context, value.getClass());

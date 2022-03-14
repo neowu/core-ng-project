@@ -30,9 +30,9 @@ class JSONTest {
 
         String json = JSON.toJSON(bean);
         assertThat(json)
-                .contains("\"map\":{\"key1\":\"value1\",\"key2\":\"value2\"}")
-                .contains("\"enumMap\":{\"A1\":\"A1\",\"B1\":\"B1\"}")
-                .contains("\"listMap\":{\"key1\":[\"v1\"]}");
+            .contains("\"map\":{\"key1\":\"value1\",\"key2\":\"value2\"}")
+            .contains("\"enumMap\":{\"A1\":\"A1\",\"B1\":\"B1\"}")
+            .contains("\"listMap\":{\"key1\":[\"v1\"]}");
 
         var parsedBean = JSON.fromJSON(TestBean.class, json);
         assertThat(parsedBean).usingRecursiveComparison().isEqualTo(bean);
@@ -86,8 +86,8 @@ class JSONTest {
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertThat(parsedBean).usingRecursiveComparison()
-                .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
-                .isEqualTo(bean);
+            .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
+            .isEqualTo(bean);
     }
 
     @Test
@@ -102,28 +102,28 @@ class JSONTest {
     @Test
     void nanoFractionOfDateField() {
         assertThat(JSON.toJSON(LocalDateTime.of(2019, 4, 25, 1, 0, 0, 200000000)))
-                .isEqualTo("\"2019-04-25T01:00:00.200\"");
+            .isEqualTo("\"2019-04-25T01:00:00.200\"");
 
         assertThat(JSON.toJSON(LocalDateTime.of(2019, 4, 25, 1, 0, 0, 0)))
-                .isEqualTo("\"2019-04-25T01:00:00.000\"");
+            .isEqualTo("\"2019-04-25T01:00:00.000\"");
 
         assertThat(JSON.toJSON(ZonedDateTime.of(2019, 4, 25, 1, 0, 0, 200000000, ZoneId.of("UTC"))))
-                .isEqualTo("\"2019-04-25T01:00:00.200Z\"");
+            .isEqualTo("\"2019-04-25T01:00:00.200Z\"");
 
         assertThat(JSON.toJSON(ZonedDateTime.of(2019, 4, 25, 1, 0, 0, 0, ZoneId.of("UTC"))))
-                .isEqualTo("\"2019-04-25T01:00:00Z\"");
+            .isEqualTo("\"2019-04-25T01:00:00Z\"");
 
         assertThat(JSON.toJSON(ZonedDateTime.of(2019, 4, 25, 1, 0, 0, 0, ZoneId.of("America/New_York"))))
-                .isEqualTo("\"2019-04-25T05:00:00Z\"");  // New york is UTC+5
+            .isEqualTo("\"2019-04-25T05:00:00Z\"");  // New york is UTC+5
 
         assertThat(JSON.toJSON(LocalTime.of(18, 0)))
-                .isEqualTo("\"18:00:00.000\"");
+            .isEqualTo("\"18:00:00.000\"");
 
         assertThat(JSON.toJSON(LocalTime.of(18, 1, 2, 200000000)))
-                .isEqualTo("\"18:01:02.200\"");
+            .isEqualTo("\"18:01:02.200\"");
 
         assertThat(JSON.toJSON(LocalTime.of(18, 1, 2, 123456789)))
-                .isEqualTo("\"18:01:02.123456789\"");
+            .isEqualTo("\"18:01:02.123456789\"");
     }
 
     @Test
@@ -148,11 +148,13 @@ class JSONTest {
 
     @Test
     void nullObject() {
-        String json = JSON.toJSON(null);
-        assertThat(json).isEqualTo("null");
+        assertThatThrownBy(() -> JSON.fromJSON(TestBean.class, "null"))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("invalid json");
 
-        TestBean bean = JSON.fromJSON(TestBean.class, json);
-        assertThat(bean).isNull();
+        assertThatThrownBy(() -> JSON.toJSON(null))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("instance must not be null");
     }
 
     @Test
@@ -165,7 +167,7 @@ class JSONTest {
 
         // ordinal should be treated as invalid value
         assertThatThrownBy(() -> JSON.fromEnumValue(TestBean.TestEnum.class, "0"))
-                .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -189,9 +191,9 @@ class JSONTest {
     @Test
     void invalidJSON() {
         assertThatThrownBy(() -> JSON.fromJSON(TestBean.class, "{"))
-                .isInstanceOf(UncheckedIOException.class);
+            .isInstanceOf(UncheckedIOException.class);
 
         assertThatThrownBy(() -> JSON.fromJSON(Types.list(TestBean.class), "{"))
-                .isInstanceOf(UncheckedIOException.class);
+            .isInstanceOf(UncheckedIOException.class);
     }
 }

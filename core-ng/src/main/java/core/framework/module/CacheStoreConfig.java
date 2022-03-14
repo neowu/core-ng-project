@@ -15,9 +15,12 @@ public class CacheStoreConfig {
         this.config = config;
     }
 
+    // for rarely changed data, or stale data is tolerated
+    // or use kafka with custom groupId to evict keys
+    // otherwise refresh can also be done by restarting service if there is emergence
     public void local() {
         if (cache.cacheStore instanceof RedisCacheStore) {
-            cache.cacheStore = config.redisLocalCacheStore();
+            cache.cacheStore = config.localCacheStore();
         }
     }
 }

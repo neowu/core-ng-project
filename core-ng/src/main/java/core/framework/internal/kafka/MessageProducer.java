@@ -1,6 +1,5 @@
 package core.framework.internal.kafka;
 
-import core.framework.kafka.KafkaException;
 import core.framework.util.StopWatch;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -27,7 +26,7 @@ public class MessageProducer {
     private final KafkaURI uri;
     private final String name;
     private final int maxRequestSize;
-    private volatile Producer<byte[], byte[]> producer;
+    private Producer<byte[], byte[]> producer;
 
     public MessageProducer(KafkaURI uri, String name, int maxRequestSize) {
         this.uri = uri;
@@ -36,35 +35,25 @@ public class MessageProducer {
         this.producerMetrics = new ProducerMetrics(name);
     }
 
-    public void send(ProducerRecord<byte[], byte[]> record) {
-        Producer<byte[], byte[]> producer = this.producer;
-        if (producer == null) {
-            synchronized (this) {   // make sure only one producer will be created
-                if (this.producer == null) tryCreateProducer();
-                if (this.producer == null) throw new KafkaException("kafka uri is not resolvable, uri=" + uri);
-                producer = this.producer;
-            }
-        }
-        producer.send(record, new KafkaCallback(record));
+    public void initialize() {
+        producer = createProducer(uri);
     }
 
-    public void tryCreateProducer() {
-        if (uri.resolveURI()) {
-            producer = createProducer(uri);
-        }
+    public void send(ProducerRecord<byte[], byte[]> record) {
+        producer.send(record, new KafkaCallback(record));
     }
 
     Producer<byte[], byte[]> createProducer(KafkaURI uri) {
         var watch = new StopWatch();
         try {
             Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs,
-                    ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
-                    ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000,                           // 60s, DELIVERY_TIMEOUT_MS_CONFIG is INT type
-                    ProducerConfig.LINGER_MS_CONFIG, 5L,                                         // use small linger time within acceptable range to improve batching
-                    ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                            // longer backoff to reduce cpu usage when kafka is not available
-                    ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L,                      // 5s
-                    ProducerConfig.MAX_BLOCK_MS_CONFIG, 30_000L,                                 // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
-                    ProducerConfig.MAX_REQUEST_SIZE_CONFIG, maxRequestSize);
+                ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
+                ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000,                           // 60s, DELIVERY_TIMEOUT_MS_CONFIG is INT type
+                ProducerConfig.LINGER_MS_CONFIG, 5L,                                         // use small linger time within acceptable range to improve batching
+                ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                            // longer backoff to reduce cpu usage when kafka is not available
+                ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L,                      // 5s
+                ProducerConfig.MAX_BLOCK_MS_CONFIG, 30_000L,                                 // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+                ProducerConfig.MAX_REQUEST_SIZE_CONFIG, maxRequestSize);
 
             var serializer = new ByteArraySerializer();
             var producer = new KafkaProducer<>(config, serializer, serializer);
@@ -95,10 +84,12 @@ public class MessageProducer {
         public void onCompletion(RecordMetadata metadata, Exception exception) {
             if (exception != null) {    // if failed to send message (kafka is down), fallback to error output
                 byte[] key = record.key();
-                LOGGER.error("failed to send kafka message, key={}, value={}",
-                        key == null ? null : new String(key, UTF_8),
-                        new String(record.value(), UTF_8),
-                        exception);
+                LOGGER.error("failed to send kafka message, topic={}, key={}, value={}, error={}",
+                    record.topic(),
+                    key == null ? null : new String(key, UTF_8),
+                    new String(record.value(), UTF_8),
+                    exception.getMessage(),
+                    exception);
             }
         }
     }

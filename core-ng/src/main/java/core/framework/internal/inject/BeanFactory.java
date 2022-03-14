@@ -90,8 +90,8 @@ public class BeanFactory {
     }
 
     private Type stripOwnerType(Type paramType) {    // type from field/method params could has owner type, which is not used in bind/key
-        if (paramType instanceof ParameterizedType)
-            return Types.generic((Class<?>) ((ParameterizedType) paramType).getRawType(), ((ParameterizedType) paramType).getActualTypeArguments());
+        if (paramType instanceof ParameterizedType parameterizedType)
+            return Types.generic((Class<?>) parameterizedType.getRawType(), parameterizedType.getActualTypeArguments());
         return paramType;
     }
 

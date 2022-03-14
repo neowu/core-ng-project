@@ -1,9 +1,8 @@
 package core.framework.log;
 
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,12 +41,13 @@ class ActionLogContextTest {
     }
 
     @Test
-    void remainingProcessTime() {
-        assertThat(ActionLogContext.remainingProcessTime()).isNull();
+    void trace() {
+        ActionLogContext.triggerTrace(true);
 
         var logManager = new LogManager();
         logManager.begin("begin", null);
-        assertThat(ActionLogContext.remainingProcessTime()).isGreaterThanOrEqualTo(Duration.ZERO);
+        ActionLogContext.triggerTrace(false);
+        assertThat(LogManager.CURRENT_ACTION_LOG.get().trace).isEqualTo(Trace.CURRENT);
         logManager.end("end");
     }
 }

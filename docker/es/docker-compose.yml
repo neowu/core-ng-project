@@ -1,7 +1,9 @@
 version: "3"
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.0
+    volumes:
+    - ./log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
     ports:
     - 9200:9200
     environment:
@@ -10,24 +12,22 @@ services:
     - ES_JAVA_OPTS=-Xms512m -Xmx512m
     - xpack.security.enabled=false
     - xpack.ml.enabled=false
+    - ingest.geoip.downloader.enabled=false
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.15.0
+    image: docker.elastic.co/kibana/kibana:8.1.0
     ports:
     - 5601:5601
     environment:
-    - SERVER_HOST=0.0.0.0
     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     - LOGGING_JSON=false
-    - ENTERPRISESEARCH_ENABLED=false
+    - INTERACTIVESETUP_ENABLED=false
     - TELEMETRY_ENABLED=false
-    - MONITORING_ENABLED=false
+    - MONITORING_UI_ENABLED=false
+    - MONITORING_KIBANA_COLLECTION_ENABLED=false
     - NEWSFEED_ENABLED=false
-    - XPACK_APM_ENABLED=false
-    - XPACK_GRAPH_ENABLED=false
-    - XPACK_MAPS_ENABLED=false
-    - XPACK_ML_ENABLED=false
+    - XPACK_APM_UI_ENABLED=false
+    - XPACK_FLEET_AGENTS_ENABLED=false
     - XPACK_REPORTING_ENABLED=false
-    - XPACK_ROLLUP_ENABLED=false
-    - XPACK_LICENSE_MANAGEMENT_ENABLED=false
+    - XPACK_REPORTING_ROLES_ENABLED=false
     depends_on:
     - elasticsearch

@@ -84,6 +84,7 @@ public class TestModule extends AbstractTestModule {
         site().cdn().host("//cdn");
         site().security().contentSecurityPolicy("default-src 'self' https://cdn; img-src 'self' https://cdn data:; object-src 'none'; frame-src 'none';");
         site().allowAPI(List.of("0.0.0.0/0"));
+        site().message(List.of("messages/messages.properties"));
     }
 
     private void configureHTTP() {
@@ -99,8 +100,7 @@ public class TestModule extends AbstractTestModule {
     }
 
     private void configureKafka() {
-        kafka().uri("kafka://localhost:9092");
-        kafka().maxProcessTime(Duration.ofMinutes(30));
+        kafka().uri("localhost:9092");
         kafka().maxRequestSize(2 * 1024 * 1024);
         kafka().longConsumerDelayThreshold(Duration.ofSeconds(60));
         kafka().poolSize(1);
@@ -116,11 +116,9 @@ public class TestModule extends AbstractTestModule {
         db().url("jdbc:mysql://localhost:3306/test");
         db().isolationLevel(IsolationLevel.READ_UNCOMMITTED);
         db().timeout(Duration.ofSeconds(10));
-        db().batchSize(7);
         db().slowOperationThreshold(Duration.ofSeconds(5));
         db().longTransactionThreshold(Duration.ofSeconds(5));
         db().tooManyRowsReturnedThreshold(1000);
-        db().maxOperations(5000);
         db().repository(TestDBEntity.class);
         db().view(TestDBView.class);
         initDB().createSchema();

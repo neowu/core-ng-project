@@ -26,7 +26,20 @@ public interface Database {
         // pass flag thru thread local to MySQLQueryInterceptor, and put in action log to reset for every action
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {
-            actionLog.suppressSlowSQLWarning = suppress;
+            actionLog.internalContext().suppressSlowSQLWarning = suppress;
+        }
+    }
+
+    /**
+     * for action does large number of db calls, increase max operations threshold for current action
+     * better put at beginning of action
+     *
+     * @param threshold the max operations allowed within current action
+     */
+    static void maxOperations(int threshold) {
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        if (actionLog != null) {
+            actionLog.internalContext().maxDBOperations = threshold;
         }
     }
 
@@ -37,7 +50,7 @@ public interface Database {
     int execute(String sql, Object... params);
 
     // for bulk update operations, you may want to enclose it with Transaction to improve performance
-    // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executePreparedBatchAsMultiStatement, mysql driver simply sends multiple queries with ';' as one statement
+    // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executePreparedBatchAsMultiStatement, mysql driver simply sends multiple queries with ';' as one statement,
     // so it will reduce cost of creating transaction for each statement
     int[] batchExecute(String sql, List<Object[]> params);
 

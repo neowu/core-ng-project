@@ -11,6 +11,7 @@
         {
           "context": {
             "path_match": "context.*",
+            "match_mapping_type": "string",
             "mapping": {
               "type": "keyword"
             }

@@ -28,7 +28,7 @@ public final class StaticDirectoryController implements StaticContentController 
     @Override
     public Response execute(Request request) {
         String path = request.pathParam("path");
-        Path filePath = contentDirectory.resolve(path);
+        Path filePath = contentDirectory.resolve(path).normalize();
         logger.debug("requestFile={}", filePath);
 
         if (!Files.isRegularFile(filePath, LinkOption.NOFOLLOW_LINKS) || !filePath.startsWith(contentDirectory))

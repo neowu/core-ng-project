@@ -68,6 +68,12 @@ public class KubeMonitorJob implements Job {
                     return "ImagePullBackOff: " + status.state.waiting.message;
                 }
             }
+            // for unschedulable pod
+            for (KubePodList.PodCondition condition : pod.status.conditions) {
+                if ("PodScheduled".equals(condition.type) && "False".equals(condition.status) && Duration.between(condition.lastTransitionTime, now).toSeconds() >= 300) {
+                    return condition.reason + ": " + condition.message;
+                }
+            }
         }
         if ("Running".equals(phase)) {
             boolean ready = true;

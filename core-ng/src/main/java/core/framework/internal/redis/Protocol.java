@@ -64,6 +64,7 @@ final class Protocol {
 
     static class Command {
         static final byte[] AUTH = Strings.bytes("AUTH");
+        static final byte[] INFO = Strings.bytes("INFO");
 
         static final byte[] GET = Strings.bytes("GET");
         static final byte[] SET = Strings.bytes("SET");
@@ -95,12 +96,7 @@ final class Protocol {
         static final byte[] LRANGE = Strings.bytes("LRANGE");
         static final byte[] RPUSH = Strings.bytes("RPUSH");
         static final byte[] LPOP = Strings.bytes("LPOP");
-
-        static final byte[] SUBSCRIBE = Strings.bytes("SUBSCRIBE");
-        static final byte[] PUBLISH = Strings.bytes("PUBLISH");
-
-        static final byte[] INFO = Strings.bytes("INFO");
-        static final byte[] QUIT = Strings.bytes("QUIT");
+        static final byte[] LTRIM = Strings.bytes("LTRIM");
 
         static final byte[] ZADD = Strings.bytes("ZADD");
         static final byte[] ZRANGE = Strings.bytes("ZRANGE");

@@ -2,6 +2,7 @@ package core.framework.internal.web;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
 import core.framework.internal.web.bean.RequestBeanReader;
 import core.framework.internal.web.bean.ResponseBeanWriter;
 import core.framework.internal.web.controller.ControllerHolder;
@@ -102,7 +103,8 @@ public class HTTPHandler implements HttpHandler {
 
             ControllerHolder controller = route.get(request.path(), request.method(), request.pathParams, actionLog);
             actionLog.action(controller.action);
-            actionLog.context("controller", controller.controllerInfo);
+            actionLog.context.put("controller", List.of(controller.controllerInfo));
+            logger.debug("controller={}", controller.controllerInfo);
 
             request.session = sessionManager.load(request, actionLog);  // load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
 
@@ -131,7 +133,8 @@ public class HTTPHandler implements HttpHandler {
         String correlationId = headers.getFirst(HTTPHandler.HEADER_CORRELATION_ID);
         if (correlationId != null) actionLog.correlationIds = List.of(correlationId);
 
-        if ("true".equals(headers.getFirst(HEADER_TRACE))) actionLog.trace = true;
+        String trace = headers.getFirst(HEADER_TRACE);
+        if (trace != null) actionLog.trace = Trace.parse(trace);
 
         actionLog.maxProcessTime(maxProcessTime(headers.getFirst(HTTPHandler.HEADER_TIMEOUT)));
     }
