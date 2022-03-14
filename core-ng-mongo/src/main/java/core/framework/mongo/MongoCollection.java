@@ -50,8 +50,6 @@ public interface MongoCollection<T> {
 
     <V> List<V> aggregate(Aggregate<V> aggregate);
 
-    <V> List<V> mapReduce(MapReduce<V> mapReduce);
-
     void replace(T entity);
 
     void bulkReplace(List<T> entities);

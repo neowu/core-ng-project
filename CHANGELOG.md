@@ -11,6 +11,8 @@
 * search: update es to 8.1.0
   > > BTW: ES cannot upgrade a node from version [7.14.0] directly to version [8.1.0], upgrade to version [7.17.0] first.
 * mongo: updated driver to 4.5.0
+  > removed mapReduce in favor of aggregate, it's deprecated by mongo 5.0  
+  > refer to https://docs.mongodb.com/manual/reference/command/mapReduce/#mapreduce
 
 ### 7.10.2 (02/11/2022 - 02/23/2022)
 

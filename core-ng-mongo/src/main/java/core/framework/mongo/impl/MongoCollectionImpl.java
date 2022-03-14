@@ -4,7 +4,6 @@ import com.mongodb.ReadPreference;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.MapReduceIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.BulkWriteOptions;
@@ -24,12 +23,10 @@ import core.framework.mongo.Collection;
 import core.framework.mongo.Count;
 import core.framework.mongo.FindOne;
 import core.framework.mongo.Get;
-import core.framework.mongo.MapReduce;
 import core.framework.mongo.MongoCollection;
 import core.framework.mongo.Query;
 import core.framework.util.Lists;
 import core.framework.util.StopWatch;
-import core.framework.util.Strings;
 import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
@@ -71,10 +68,10 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             ActionLogContext.track("mongo", elapsed, 1, 0);
             logger.debug("count, collection={}, filter={}, readPref={}, elapsed={}",
-                    collectionName,
-                    new BsonLogParam(filter, mongo.registry),
-                    count.readPreference == null ? null : count.readPreference.getName(),
-                    elapsed);
+                collectionName,
+                new BsonLogParam(filter, mongo.registry),
+                count.readPreference == null ? null : count.readPreference.getName(),
+                elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -125,11 +122,11 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             ActionLogContext.track("mongo", elapsed, returnedDocs, 0);
             logger.debug("get, collection={}, id={}, readPref={}, returnedDocs={}, elapsed={}",
-                    collectionName,
-                    get.id,
-                    get.readPreference == null ? null : get.readPreference.getName(),
-                    returnedDocs,
-                    elapsed);
+                collectionName,
+                get.id,
+                get.readPreference == null ? null : get.readPreference.getName(),
+                returnedDocs,
+                elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -142,9 +139,9 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         try {
             List<T> results = new ArrayList<>(2);
             FindIterable<T> query = collection()
-                    .find(filter)
-                    .limit(2)
-                    .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
+                .find(filter)
+                .limit(2)
+                .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
             fetch(query, results);
             if (results.isEmpty()) return Optional.empty();
             if (results.size() > 1) throw new Error("more than one row returned");
@@ -154,11 +151,11 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             ActionLogContext.track("mongo", elapsed, returnedDocs, 0);
             logger.debug("findOne, collection={}, filter={}, readPref={}, returnedDocs={}, elapsed={}",
-                    collectionName,
-                    new BsonLogParam(filter, mongo.registry),
-                    findOne.readPreference == null ? null : findOne.readPreference.getName(),
-                    returnedDocs,
-                    elapsed);
+                collectionName,
+                new BsonLogParam(filter, mongo.registry),
+                findOne.readPreference == null ? null : findOne.readPreference.getName(),
+                returnedDocs,
+                elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -177,15 +174,15 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             int size = results.size();
             ActionLogContext.track("mongo", elapsed, size, 0);
             logger.debug("find, collection={}, filter={}, projection={}, sort={}, skip={}, limit={}, readPref={}, returnedDocs={}, elapsed={}",
-                    collectionName,
-                    new BsonLogParam(query.filter, mongo.registry),
-                    new BsonLogParam(query.projection, mongo.registry),
-                    new BsonLogParam(query.sort, mongo.registry),
-                    query.skip,
-                    query.limit,
-                    query.readPreference == null ? null : query.readPreference.getName(),
-                    size,
-                    elapsed);
+                collectionName,
+                new BsonLogParam(query.filter, mongo.registry),
+                new BsonLogParam(query.projection, mongo.registry),
+                new BsonLogParam(query.sort, mongo.registry),
+                query.skip,
+                query.limit,
+                query.readPreference == null ? null : query.readPreference.getName(),
+                size,
+                elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -210,16 +207,16 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             ActionLogContext.track("mongo", mongoTook, returnedDocs, 0);
             logger.debug("forEach, collection={}, filter={}, projection={}, sort={}, skip={}, limit={}, readPref={}, returnedDocs={}, mongoTook={}, elapsed={}",
-                    collectionName,
-                    new BsonLogParam(query.filter, mongo.registry),
-                    new BsonLogParam(query.projection, mongo.registry),
-                    new BsonLogParam(query.sort, mongo.registry),
-                    query.skip,
-                    query.limit,
-                    query.readPreference == null ? null : query.readPreference.getName(),
-                    returnedDocs,
-                    mongoTook,
-                    elapsed);
+                collectionName,
+                new BsonLogParam(query.filter, mongo.registry),
+                new BsonLogParam(query.projection, mongo.registry),
+                new BsonLogParam(query.sort, mongo.registry),
+                query.skip,
+                query.limit,
+                query.readPreference == null ? null : query.readPreference.getName(),
+                returnedDocs,
+                mongoTook,
+                elapsed);
         }
     }
 
@@ -232,8 +229,8 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         List<V> results = Lists.newArrayList();
         try {
             AggregateIterable<V> query = collection(aggregate.readPreference)
-                    .aggregate(aggregate.pipeline, aggregate.resultClass)
-                    .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
+                .aggregate(aggregate.pipeline, aggregate.resultClass)
+                .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
             fetch(query, results);
             checkTooManyRowsReturned(results.size());
             return results;
@@ -242,42 +239,11 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             int size = results.size();
             ActionLogContext.track("mongo", elapsed, size, 0);
             logger.debug("aggregate, collection={}, pipeline={}, readPref={}, returnedDocs={}, elapsed={}",
-                    collectionName,
-                    aggregate.pipeline.stream().map(stage -> new BsonLogParam(stage, mongo.registry)).collect(Collectors.toList()),
-                    aggregate.readPreference == null ? null : aggregate.readPreference.getName(),
-                    size,
-                    elapsed);
-        }
-    }
-
-    @Override
-    public <V> List<V> mapReduce(MapReduce<V> mapReduce) {
-        var watch = new StopWatch();
-        if (Strings.isBlank(mapReduce.mapFunction)) throw new Error("mapReduce.mapFunction must not be blank");
-        if (Strings.isBlank(mapReduce.reduceFunction)) throw new Error("mapReduce.reduceFunction must not be blank");
-        if (mapReduce.resultClass == null) throw new Error("mapReduce.resultClass must not be null");
-
-        List<V> results = Lists.newArrayList();
-        try {
-            MapReduceIterable<V> query = collection(mapReduce.readPreference)
-                    .mapReduce(mapReduce.mapFunction, mapReduce.reduceFunction, mapReduce.resultClass)
-                    .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
-            if (mapReduce.filter != null) query.filter(mapReduce.filter);
-            fetch(query, results);
-            checkTooManyRowsReturned(results.size());
-            return results;
-        } finally {
-            long elapsed = watch.elapsed();
-            int size = results.size();
-            ActionLogContext.track("mongo", elapsed, size, 0);
-            logger.debug("mapReduce, collection={}, map={}, reduce={}, filter={}, readPref={}, returnedDocs={}, elapsed={}",
-                    collectionName,
-                    mapReduce.mapFunction,
-                    mapReduce.reduceFunction,
-                    new BsonLogParam(mapReduce.filter, mongo.registry),
-                    mapReduce.readPreference == null ? null : mapReduce.readPreference.getName(),
-                    size,
-                    elapsed);
+                collectionName,
+                aggregate.pipeline.stream().map(stage -> new BsonLogParam(stage, mongo.registry)).collect(Collectors.toList()),
+                aggregate.readPreference == null ? null : aggregate.readPreference.getName(),
+                size,
+                elapsed);
         }
     }
 
@@ -333,11 +299,11 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             ActionLogContext.track("mongo", elapsed, 0, (int) updatedRows);
             logger.debug("update, collection={}, filter={}, update={}, updatedRows={}, elapsed={}",
-                    collectionName,
-                    new BsonLogParam(filter, mongo.registry),
-                    new BsonLogParam(update, mongo.registry),
-                    updatedRows,
-                    elapsed);
+                collectionName,
+                new BsonLogParam(filter, mongo.registry),
+                new BsonLogParam(update, mongo.registry),
+                updatedRows,
+                elapsed);
             checkSlowOperation(elapsed);
         }
     }
