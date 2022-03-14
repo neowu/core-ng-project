@@ -45,7 +45,8 @@ public class MongoImpl implements Mongo {
         // mongo client could be used by test context directly (e.g. get bean(Mongo.class) then init data)
         // to handle initializing multiply times, this is still better than lazy initialize for prod runtime env
         if (database == null) {
-            registry = CodecRegistries.fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), codecs.codecRegistry());
+            // put our own codec before mongo default codec, as override mongo default enum codec, refer to com.mongodb.MongoClientSettings.DEFAULT_CODEC_REGISTRY
+            registry = CodecRegistries.fromRegistries(codecs.codecRegistry(), MongoClientSettings.getDefaultCodecRegistry());
             database = createDatabase(registry);
         }
     }

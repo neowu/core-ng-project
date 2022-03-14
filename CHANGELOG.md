@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.3-b0 (02/25/2022 - )
+### 7.10.3 (02/25/2022 - 03/14/2022)
 
 * db: fix: revert previous update UNEXPECTED_UPDATE_RESULT warning if updated row is 0
 * executor: log task class in trace to make it easier to find the corresponding code of executor task
@@ -8,6 +8,9 @@
   > it's not recommended putting dot in action log context key
 * log-processor: kibana json updated for kibana 8.1.0
   > TSVB metrics separate left axis bug fixed, so to revert GC diagrams back
+* search: update es to 8.1.0
+  > > BTW: ES cannot upgrade a node from version [7.14.0] directly to version [8.1.0], upgrade to version [7.17.0] first.
+* mongo: updated driver to 4.5.0
 
 ### 7.10.2 (02/11/2022 - 02/23/2022)
 
