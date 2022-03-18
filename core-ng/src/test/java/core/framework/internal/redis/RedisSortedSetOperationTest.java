@@ -2,6 +2,7 @@ package core.framework.internal.redis;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,5 +59,23 @@ class RedisSortedSetOperationTest extends AbstractRedisOperationTest {
         assertRequestEquals("*8\r\n$13\r\nZRANGEBYSCORE\r\n$3\r\nkey\r\n$3\r\n100\r\n$3\r\n200\r\n$10\r\nWITHSCORES\r\n$5\r\nLIMIT\r\n$1\r\n0\r\n$2\r\n-1\r\n"
                 + "*3\r\n$4\r\nZREM\r\n$3\r\nkey\r\n$2\r\nv1\r\n"
                 + "*3\r\n$4\r\nZREM\r\n$3\r\nkey\r\n$2\r\nv2\r\n");
+    }
+
+    @Test
+    void popMin() {
+        response("*2\r\n$3\r\none\r\n$1\r\n1\r\n");
+        Map<String, Long> values = redis.sortedSet().popMin("key");
+
+        assertThat(values).containsExactly(entry("one", 1L));
+        assertRequestEquals("*3\r\n$7\r\nZPOPMIN\r\n$3\r\nkey\r\n$1\r\n1\r\n");
+    }
+
+    @Test
+    void removeRangeByScore() {
+        response(":2\r\n");
+        long values = redis.sortedSet().removeRangeByScore("key", 1, 10);
+
+        assertThat(values).isEqualTo(2);
+        assertRequestEquals("*4\r\n$16\r\nZREMRANGEBYSCORE\r\n$3\r\nkey\r\n$1\r\n1\r\n$2\r\n10\r\n");
     }
 }

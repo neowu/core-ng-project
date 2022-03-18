@@ -217,7 +217,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     public long removeRangeByScore(String key, long minScore, long maxScore) {
         var watch = new StopWatch();
         validate("key", key);
-        if (maxScore < minScore) throw new Error("stop must be larger than start");
+        if (maxScore < minScore) throw new Error("maxScore must be larger than minScore");
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
 
         int removed = 0;
