@@ -1,6 +1,5 @@
 package core.framework.test.redis;
 
-import core.framework.internal.redis.RedisImpl;
 import core.framework.redis.RedisSortedSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

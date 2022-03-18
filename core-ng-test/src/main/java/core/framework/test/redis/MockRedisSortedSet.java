@@ -84,7 +84,7 @@ public class MockRedisSortedSet implements RedisSortedSet {
         var sortedSet = value.sortedSet();
         return sortedSet.entrySet().stream()
             .sorted(Entry.comparingByValue())
-            .limit(limit < 1  ? 1 : limit)
+            .limit(limit < 1 ? 1 : limit)
             .peek(entry -> sortedSet.remove(entry.getKey()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
     }
@@ -94,8 +94,8 @@ public class MockRedisSortedSet implements RedisSortedSet {
         var value = store.get(key);
         if (value == null) return 0;
         var sortedSet = value.sortedSet();
-        var concurrentMapOfSortedSet = new ConcurrentHashMap<>(value.sortedSet());
-        return concurrentMapOfSortedSet.entrySet().stream()
+        var concurrentMap = new ConcurrentHashMap<>(value.sortedSet());
+        return concurrentMap.entrySet().stream()
             .filter(entry -> entry.getValue() >= minScore && entry.getValue() <= maxScore)
             .peek(entry -> sortedSet.remove(entry.getKey()))
             .count();
