@@ -5,6 +5,7 @@ import core.framework.redis.RedisSortedSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -74,5 +75,29 @@ public class MockRedisSortedSet implements RedisSortedSet {
                 .limit(limit == -1 ? Long.MAX_VALUE : limit)
                 .peek(entry -> sortedSet.remove(entry.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
+    }
+
+    @Override
+    public Map<String, Long> popMin(String key, long limit) {
+        var value = store.get(key);
+        if (value == null) return Map.of();
+        var sortedSet = value.sortedSet();
+        return sortedSet.entrySet().stream()
+            .sorted(Entry.comparingByValue())
+            .limit(limit < 1  ? 1 : limit)
+            .peek(entry -> sortedSet.remove(entry.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
+    }
+
+    @Override
+    public long removeRangeByScore(String key, long minScore, long maxScore) {
+        var value = store.get(key);
+        if (value == null) return 0;
+        var sortedSet = value.sortedSet();
+        var concurrentMapOfSortedSet = new ConcurrentHashMap<>(value.sortedSet());
+        return concurrentMapOfSortedSet.entrySet().stream()
+            .filter(entry -> entry.getValue() >= minScore && entry.getValue() <= maxScore)
+            .peek(entry -> sortedSet.remove(entry.getKey()))
+            .count();
     }
 }

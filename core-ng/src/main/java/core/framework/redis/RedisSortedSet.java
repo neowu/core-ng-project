@@ -30,4 +30,12 @@ public interface RedisSortedSet {
     }
 
     Map<String, Long> popByScore(String key, long minScore, long maxScore, long limit);
+
+    default Map<String, Long> popMin(String key) {
+        return popMin(key, 1);
+    }
+
+    Map<String, Long> popMin(String key, long limit);
+
+    long removeRangeByScore(String key, long minScore, long maxScore);
 }

@@ -1,5 +1,6 @@
 package core.framework.test.redis;
 
+import core.framework.internal.redis.RedisImpl;
 import core.framework.redis.RedisSortedSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -97,5 +98,30 @@ class MockRedisSortedSetTest {
         assertThat(sortedSet.range("key", -1, 5))
             .containsOnlyKeys(List.of("1", "2", "3", "4"));
         assertThat(sortedSet.range("key", 9, 10)).isEmpty();
+    }
+
+    @Test
+    void popMin() {
+        sortedSet.add("key", "1", 1);
+        sortedSet.add("key", "3", 3);
+        sortedSet.add("key", "2", 2);
+        sortedSet.add("key", "4", 4);
+
+        assertThat(sortedSet.popMin("key")).containsExactly(entry("1", 1L));
+        assertThat(sortedSet.popMin("key", 2)).containsExactly(entry("2", 2L), entry("3", 3L));
+        assertThat(sortedSet.popMin("key", 5)).containsExactly(entry("4", 4L));
+    }
+
+    @Test
+    void removeRangeByScore() {
+        sortedSet.add("key", "1", 1);
+        sortedSet.add("key", "3", 3);
+        sortedSet.add("key", "2", 2);
+        sortedSet.add("key", "4", 4);
+        sortedSet.add("key", "6", 6);
+
+        assertThat(sortedSet.removeRangeByScore("key", 1, 3)).isEqualTo(3);
+        assertThat(sortedSet.removeRangeByScore("key", 1, 3)).isEqualTo(0);
+        assertThat(sortedSet.removeRangeByScore("key", 1, 5)).isEqualTo(1);
     }
 }
