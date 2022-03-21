@@ -26,13 +26,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MessageListener {
     private static final AtomicInteger CONSUMER_CLIENT_ID_SEQUENCE = new AtomicInteger(1);
     public final ConsumerMetrics consumerMetrics;
+    public final Set<String> topics = new HashSet<>();
     final Map<String, MessageProcess<?>> processes = new HashMap<>();
     final LogManager logManager;
 
     private final Logger logger = LoggerFactory.getLogger(MessageListener.class);
     private final KafkaURI uri;
     private final String name;
-    private final Set<String> topics = new HashSet<>();
 
     public int poolSize = Runtime.getRuntime().availableProcessors() * 4;
     public long longConsumerDelayThresholdInNano = Duration.ofSeconds(60).toNanos();

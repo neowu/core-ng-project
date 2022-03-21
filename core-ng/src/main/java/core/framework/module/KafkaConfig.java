@@ -44,7 +44,9 @@ public class KafkaConfig extends Config {
     @Override
     protected void validate() {
         if (!handlerAdded)
-            throw new Error("kafka is configured, but no producer/consumer added, please remove unnecessary config, name=" + name);
+            throw new Error("kafka is configured, but no publisher/handler added, please remove unnecessary config, name=" + name);
+        if (listener != null && listener.topics.isEmpty())
+            throw new Error("kafka listener is configured, but no handler added, please remove unnecessary config, name=" + name);
     }
 
     public void uri(String uri) {
