@@ -6,6 +6,7 @@
 * redis: replaced ZRANGEBYSCORE with ZRANGE, requires redis 6.2 !!!
 * redis: for list.pop always use "LPOP count" to simplify, requires redis 6.2 !!!
 * redis: added RedisSortedSet.popMin
+* redis: improved RedisSortedSet.popByScore concurrency handling
 
 ### 7.10.3 (02/25/2022 - 03/14/2022)
 
