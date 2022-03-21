@@ -162,7 +162,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
                 if (removed == 1L) {
                     values.put(decode(value), (long) Double.parseDouble(decode((byte[]) response[i + 1])));
                     size++;
-                    if (size >= limit) break;
+                    if (limit > 0 && size >= limit) break;
                 }
             }
             return values;
