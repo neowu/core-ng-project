@@ -5,7 +5,6 @@ import core.framework.redis.RedisSortedSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -46,10 +45,10 @@ public class MockRedisSortedSet implements RedisSortedSet {
         int endIndex = stop < 0 ? (int) stop + size : (int) stop;
         if (endIndex >= size) endIndex = size - 1;
         return sortedSet.entrySet().stream()
-                .sorted(Entry.comparingByValue())
-                .skip(startIndex)
-                .limit(endIndex - startIndex + 1)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
+            .sorted(Entry.comparingByValue())
+            .skip(startIndex)
+            .limit(endIndex - startIndex + 1)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
     }
 
     @Override
@@ -58,10 +57,10 @@ public class MockRedisSortedSet implements RedisSortedSet {
         if (value == null) return Map.of();
         var sortedSet = value.sortedSet();
         return sortedSet.entrySet().stream()
-                .filter(entry -> entry.getValue() >= minScore && entry.getValue() <= maxScore)
-                .sorted(Entry.comparingByValue())
-                .limit(limit == -1 ? Long.MAX_VALUE : limit)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
+            .filter(entry -> entry.getValue() >= minScore && entry.getValue() <= maxScore)
+            .sorted(Entry.comparingByValue())
+            .limit(limit == -1 ? Long.MAX_VALUE : limit)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
     }
 
     @Override
@@ -70,11 +69,11 @@ public class MockRedisSortedSet implements RedisSortedSet {
         if (value == null) return Map.of();
         var sortedSet = value.sortedSet();
         return sortedSet.entrySet().stream()
-                .filter(entry -> entry.getValue() >= minScore && entry.getValue() <= maxScore)
-                .sorted(Entry.comparingByValue())
-                .limit(limit == -1 ? Long.MAX_VALUE : limit)
-                .peek(entry -> sortedSet.remove(entry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
+            .filter(entry -> entry.getValue() >= minScore && entry.getValue() <= maxScore)
+            .sorted(Entry.comparingByValue())
+            .limit(limit == -1 ? Long.MAX_VALUE : limit)
+            .peek(entry -> sortedSet.remove(entry.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
     }
 
     @Override
@@ -84,20 +83,8 @@ public class MockRedisSortedSet implements RedisSortedSet {
         var sortedSet = value.sortedSet();
         return sortedSet.entrySet().stream()
             .sorted(Entry.comparingByValue())
-            .limit(limit < 1 ? 1 : limit)
+            .limit(limit)
             .peek(entry -> sortedSet.remove(entry.getKey()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
-    }
-
-    @Override
-    public long removeRangeByScore(String key, long minScore, long maxScore) {
-        var value = store.get(key);
-        if (value == null) return 0;
-        var sortedSet = value.sortedSet();
-        var concurrentMap = new ConcurrentHashMap<>(value.sortedSet());
-        return concurrentMap.entrySet().stream()
-            .filter(entry -> entry.getValue() >= minScore && entry.getValue() <= maxScore)
-            .peek(entry -> sortedSet.remove(entry.getKey()))
-            .count();
     }
 }

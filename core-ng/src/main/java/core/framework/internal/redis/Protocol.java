@@ -101,7 +101,6 @@ final class Protocol {
         static final byte[] ZADD = Strings.bytes("ZADD");
         static final byte[] ZRANGE = Strings.bytes("ZRANGE");
         static final byte[] ZREM = Strings.bytes("ZREM");
-        static final byte[] ZREMRANGEBYSCORE = Strings.bytes("ZREMRANGEBYSCORE");
         static final byte[] ZPOPMIN = Strings.bytes("ZPOPMIN");
     }
 

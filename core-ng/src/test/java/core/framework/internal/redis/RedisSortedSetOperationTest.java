@@ -50,8 +50,8 @@ class RedisSortedSetOperationTest extends AbstractRedisOperationTest {
     @Test
     void popByScore() {
         response("*4\r\n$2\r\nv1\r\n$3\r\n100\r\n$2\r\nv2\r\n$3\r\n200\r\n"
-                + ":1\r\n"
-                + ":1\r\n");
+                 + ":1\r\n"
+                 + ":1\r\n");
         Map<String, Long> values = redis.sortedSet().popByScore("key", 100, 200);
 
         assertThat(values).containsExactly(entry("v1", 100L), entry("v2", 200L));
@@ -63,18 +63,9 @@ class RedisSortedSetOperationTest extends AbstractRedisOperationTest {
     @Test
     void popMin() {
         response("*2\r\n$3\r\none\r\n$1\r\n1\r\n");
-        Map<String, Long> values = redis.sortedSet().popMin("key");
+        String value = redis.sortedSet().popMin("key");
 
-        assertThat(values).containsExactly(entry("one", 1L));
+        assertThat(value).isEqualTo("one");
         assertRequestEquals("*3\r\n$7\r\nZPOPMIN\r\n$3\r\nkey\r\n$1\r\n1\r\n");
-    }
-
-    @Test
-    void removeRangeByScore() {
-        response(":2\r\n");
-        long values = redis.sortedSet().removeRangeByScore("key", 1, 10);
-
-        assertThat(values).isEqualTo(2);
-        assertRequestEquals("*4\r\n$16\r\nZREMRANGEBYSCORE\r\n$3\r\nkey\r\n$1\r\n1\r\n$2\r\n10\r\n");
     }
 }
