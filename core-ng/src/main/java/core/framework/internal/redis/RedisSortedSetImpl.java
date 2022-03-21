@@ -13,6 +13,7 @@ import java.io.UncheckedIOException;
 import java.util.Map;
 
 import static core.framework.internal.redis.Protocol.Command.ZADD;
+import static core.framework.internal.redis.Protocol.Command.ZPOPMIN;
 import static core.framework.internal.redis.Protocol.Command.ZRANGE;
 import static core.framework.internal.redis.Protocol.Command.ZREM;
 import static core.framework.internal.redis.Protocol.Keyword.BYSCORE;
@@ -181,6 +182,63 @@ public class RedisSortedSetImpl implements RedisSortedSet {
             ActionLogContext.track("redis", elapsed, fetchedEntries, size);
             logger.debug("popByScore, key={}, start={}, stop={}, returnedValues={}, size={}, elapsed={}", key, minScore, maxScore, values, size, elapsed);
             redis.checkSlowOperation(elapsed);
+        }
+    }
+
+    @Override
+    public Map<String, Long> popMin(String key, long limit) {
+        var watch = new StopWatch();
+        validate("key", key);
+        if (limit == 0) throw new Error("limit must not be 0");
+        Map<String, Long> values = null;
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.writeArray(3);
+            connection.writeBlobString(ZPOPMIN);
+            connection.writeBlobString(encode(key));
+            connection.writeBlobString(encode(limit));
+            connection.flush();
+            Object[] response = connection.readArray();
+            values = valuesWithScores(response);
+            return values;
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
+            logger.debug("zpopmin, key={}, count={}, returnedValues={}, elapsed={}", key, limit, values, elapsed);
+        }
+    }
+
+    @Override
+    public long removeRangeByScore(String key, long minScore, long maxScore) {
+        var watch = new StopWatch();
+        validate("key", key);
+        if (maxScore < minScore) throw new Error("maxScore must be larger than minScore");
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+
+        int removed = 0;
+        try {
+            RedisConnection connection = item.resource;
+            connection.writeArray(4);
+            connection.writeBlobString(ZREMRANGEBYSCORE);
+            connection.writeBlobString(encode(key));
+            connection.writeBlobString(encode(minScore));
+            connection.writeBlobString(encode(maxScore));
+            connection.flush();
+            removed = (int) connection.readLong();
+            return removed;
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, 0, removed);
+            logger.debug("zremrangebyscore, key={}, minScore={}, maxScore={}, removed={}, elapsed={}", key, minScore, maxScore, removed, elapsed);
         }
     }
 }
