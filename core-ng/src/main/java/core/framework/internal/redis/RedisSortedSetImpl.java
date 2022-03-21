@@ -123,6 +123,21 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         }
     }
 
+    private Object[] rangeByScore(RedisConnection connection, String key, long minScore, long maxScore, long limit) throws IOException {
+        connection.writeArray(9);
+        connection.writeBlobString(ZRANGE);
+        connection.writeBlobString(encode(key));
+        connection.writeBlobString(encode(minScore));
+        connection.writeBlobString(encode(maxScore));
+        connection.writeBlobString(BYSCORE);
+        connection.writeBlobString(WITHSCORES);
+        connection.writeBlobString(LIMIT);
+        connection.writeBlobString(encode(0));
+        connection.writeBlobString(encode(limit));
+        connection.flush();
+        return connection.readArray();
+    }
+
     @Override
     public Map<String, Long> popByScore(String key, long minScore, long maxScore, long limit) {
         var watch = new StopWatch();
@@ -185,21 +200,6 @@ public class RedisSortedSetImpl implements RedisSortedSet {
             ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
             logger.debug("zpopmin, key={}, limit={}, returnedValues={}, elapsed={}", key, limit, values, elapsed);
         }
-    }
-
-    private Object[] rangeByScore(RedisConnection connection, String key, long minScore, long maxScore, long limit) throws IOException {
-        connection.writeArray(9);
-        connection.writeBlobString(ZRANGE);
-        connection.writeBlobString(encode(key));
-        connection.writeBlobString(encode(minScore));
-        connection.writeBlobString(encode(maxScore));
-        connection.writeBlobString(BYSCORE);
-        connection.writeBlobString(WITHSCORES);
-        connection.writeBlobString(LIMIT);
-        connection.writeBlobString(encode(0));
-        connection.writeBlobString(encode(limit));
-        connection.flush();
-        return connection.readArray();
     }
 
     private Map<String, Long> valuesWithScores(Object[] response) throws IOException {
