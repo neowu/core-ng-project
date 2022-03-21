@@ -41,17 +41,11 @@ public final class RedisListImpl implements RedisList {
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            if (size == 1) {   // "lpop key count" only be supported since redis 6.2, to use old protocol if count=1
-                connection.writeKeyCommand(LPOP, key);
-                String value = decode(connection.readBlobString());
-                if (value != null) values.add(value);
-            } else {
-                connection.writeKeyArgumentCommand(LPOP, key, encode(size));
-                Object[] response = connection.readArray();
-                if (response != null) {     // lpop returns nil array if no element, this is different behavior of other pop (e.g. spop), it's likely due to blpop impl, use nil array to distinguish between timeout and empty list
-                    for (Object value : response) {
-                        values.add(decode((byte[]) value));
-                    }
+            connection.writeKeyArgumentCommand(LPOP, key, encode(size));
+            Object[] response = connection.readArray();
+            if (response != null) {     // lpop returns nil array if no element, this is different behavior of other pop (e.g. spop), it's likely due to blpop impl, use nil array to distinguish between timeout and empty list
+                for (Object value : response) {
+                    values.add(decode((byte[]) value));
                 }
             }
             return values;

@@ -28,6 +28,6 @@ class KafkaConfigTest {
     @Test
     void validate() {
         assertThatThrownBy(() -> config.validate())
-                .hasMessageContaining("no producer/consumer added");
+            .hasMessageContaining("no publisher/handler added");
     }
 }

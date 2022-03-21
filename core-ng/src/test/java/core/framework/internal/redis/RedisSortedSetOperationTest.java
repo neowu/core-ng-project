@@ -44,7 +44,7 @@ class RedisSortedSetOperationTest extends AbstractRedisOperationTest {
         Map<String, Long> values = redis.sortedSet().rangeByScore("key", 100, 200);
 
         assertThat(values).containsExactly(entry("v1", 100L), entry("v2", 200L));
-        assertRequestEquals("*8\r\n$13\r\nZRANGEBYSCORE\r\n$3\r\nkey\r\n$3\r\n100\r\n$3\r\n200\r\n$10\r\nWITHSCORES\r\n$5\r\nLIMIT\r\n$1\r\n0\r\n$2\r\n-1\r\n");
+        assertRequestEquals("*9\r\n$6\r\nZRANGE\r\n$3\r\nkey\r\n$3\r\n100\r\n$3\r\n200\r\n$7\r\nBYSCORE\r\n$10\r\nWITHSCORES\r\n$5\r\nLIMIT\r\n$1\r\n0\r\n$2\r\n-1\r\n");
     }
 
     @Test
@@ -55,9 +55,9 @@ class RedisSortedSetOperationTest extends AbstractRedisOperationTest {
         Map<String, Long> values = redis.sortedSet().popByScore("key", 100, 200);
 
         assertThat(values).containsExactly(entry("v1", 100L), entry("v2", 200L));
-        assertRequestEquals("*8\r\n$13\r\nZRANGEBYSCORE\r\n$3\r\nkey\r\n$3\r\n100\r\n$3\r\n200\r\n$10\r\nWITHSCORES\r\n$5\r\nLIMIT\r\n$1\r\n0\r\n$2\r\n-1\r\n"
-                + "*3\r\n$4\r\nZREM\r\n$3\r\nkey\r\n$2\r\nv1\r\n"
-                + "*3\r\n$4\r\nZREM\r\n$3\r\nkey\r\n$2\r\nv2\r\n");
+        assertRequestEquals("*9\r\n$6\r\nZRANGE\r\n$3\r\nkey\r\n$3\r\n100\r\n$3\r\n200\r\n$7\r\nBYSCORE\r\n$10\r\nWITHSCORES\r\n$5\r\nLIMIT\r\n$1\r\n0\r\n$2\r\n-1\r\n"
+                            + "*3\r\n$4\r\nZREM\r\n$3\r\nkey\r\n$2\r\nv1\r\n"
+                            + "*3\r\n$4\r\nZREM\r\n$3\r\nkey\r\n$2\r\nv2\r\n");
     }
 
     @Test

@@ -2,6 +2,10 @@
 
 ### 7.10.4 (03/15/2022 - )
 
+* maven: deleted old published version older than 7.9.0
+* redis: replaced ZRANGEBYSCORE with ZRANGE, requires redis 6.2 !!!
+* redis: for list.pop always use "LPOP count" to simplify, requires redis 6.2 !!!
+
 ### 7.10.3 (02/25/2022 - 03/14/2022)
 
 * db: fix: revert previous update UNEXPECTED_UPDATE_RESULT warning if updated row is 0

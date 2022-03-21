@@ -15,9 +15,8 @@ import java.util.Map;
 import static core.framework.internal.redis.Protocol.Command.ZADD;
 import static core.framework.internal.redis.Protocol.Command.ZPOPMIN;
 import static core.framework.internal.redis.Protocol.Command.ZRANGE;
-import static core.framework.internal.redis.Protocol.Command.ZRANGEBYSCORE;
 import static core.framework.internal.redis.Protocol.Command.ZREM;
-import static core.framework.internal.redis.Protocol.Command.ZREMRANGEBYSCORE;
+import static core.framework.internal.redis.Protocol.Keyword.BYSCORE;
 import static core.framework.internal.redis.Protocol.Keyword.LIMIT;
 import static core.framework.internal.redis.Protocol.Keyword.NX;
 import static core.framework.internal.redis.Protocol.Keyword.WITHSCORES;
@@ -125,11 +124,12 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     }
 
     private Object[] rangeByScore(RedisConnection connection, String key, long minScore, long maxScore, long limit) throws IOException {
-        connection.writeArray(8);
-        connection.writeBlobString(ZRANGEBYSCORE);
+        connection.writeArray(9);
+        connection.writeBlobString(ZRANGE);
         connection.writeBlobString(encode(key));
         connection.writeBlobString(encode(minScore));
         connection.writeBlobString(encode(maxScore));
+        connection.writeBlobString(BYSCORE);
         connection.writeBlobString(WITHSCORES);
         connection.writeBlobString(LIMIT);
         connection.writeBlobString(encode(0));
