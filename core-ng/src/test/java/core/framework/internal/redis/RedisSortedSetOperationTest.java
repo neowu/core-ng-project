@@ -61,6 +61,17 @@ class RedisSortedSetOperationTest extends AbstractRedisOperationTest {
     }
 
     @Test
+    void popByScoreWithLimit() {
+        response("*4\r\n$2\r\nv1\r\n$3\r\n100\r\n$2\r\nv2\r\n$3\r\n200\r\n"
+                 + ":1\r\n");
+        Map<String, Long> values = redis.sortedSet().popByScore("key", 100, 200, 1);
+
+        assertThat(values).containsExactly(entry("v1", 100L));
+        assertRequestEquals("*9\r\n$6\r\nZRANGE\r\n$3\r\nkey\r\n$3\r\n100\r\n$3\r\n200\r\n$7\r\nBYSCORE\r\n$10\r\nWITHSCORES\r\n$5\r\nLIMIT\r\n$1\r\n0\r\n$2\r\n-1\r\n"
+                            + "*3\r\n$4\r\nZREM\r\n$3\r\nkey\r\n$2\r\nv1\r\n");
+    }
+
+    @Test
     void popMin() {
         response("*2\r\n$3\r\none\r\n$1\r\n1\r\n");
         String value = redis.sortedSet().popMin("key");
