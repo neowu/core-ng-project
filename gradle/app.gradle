@@ -13,6 +13,10 @@ tasks.named("processResources").configure {
     }
 }
 
+tasks.named("test").configure {
+    inputs.files(fileTree("conf"))
+}
+
 tasks.named("distTar").configure {
     archiveFileName = "${archiveBaseName.get()}.${archiveExtension.get()}"
 }
