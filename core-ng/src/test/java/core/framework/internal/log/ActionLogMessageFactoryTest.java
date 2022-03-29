@@ -6,12 +6,6 @@ import core.framework.log.message.PerformanceStatMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -53,15 +47,5 @@ class ActionLogMessageFactoryTest {
         assertThat(stats.count).isEqualTo(1);
         assertThat(stats.readEntries).isNull();
         assertThat(stats.writeEntries).isNull();
-    }
-
-    @Test
-    void estimate() {
-        Map<String, List<String>> context = new HashMap<>();
-        List<String> values = new ArrayList<>();
-        values.add(null);
-        context.put("key1", values);
-        context.put("key2", Collections.singletonList(null));
-        assertThat(factory.estimatedSize(context)).isGreaterThan(0);
     }
 }

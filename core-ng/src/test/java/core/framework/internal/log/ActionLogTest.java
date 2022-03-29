@@ -34,6 +34,16 @@ class ActionLogTest {
     }
 
     @Test
+    void tooManyContextValues() {
+        for (int i = 0; i < ActionLog.MAX_CONTEXT_VALUES_SIZE + 10; i++) {
+            log.context("key", i);
+        }
+        assertThat(log.result()).isEqualTo("WARN");
+        assertThat(log.errorMessage).contains("too many context values");
+        assertThat(log.context.get("key")).hasSize(ActionLog.MAX_CONTEXT_VALUES_SIZE);
+    }
+
+    @Test
     void flushTraceLogWithTrace() {
         log.trace = Trace.CURRENT;
         assertThat(log.flushTraceLog()).isTrue();

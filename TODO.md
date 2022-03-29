@@ -9,7 +9,6 @@
 * impl own json bind by referring https://github.com/json-iterator/java and https://github.com/ngs-doo/dsl-json with annotation processor?
 
 * /_sys/, kafka controller, should call message handler directly?
-* revisit trace log truncation, better/more elegant handling?
 
 * redis using ping/pong to validate connection? for zero downtime upgrading e.g. with gcloud memory store
 * websocket, replace AbstractReceiveListener, so it can include IO/error handling within action lifecycle?

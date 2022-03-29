@@ -21,10 +21,11 @@ import static core.framework.internal.log.LogLevel.WARN;
  */
 public final class ActionLog {
     public static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
+    static final int MAX_CONTEXT_VALUES_SIZE = 5000;    // e.g. roughly 5000 "order_id=UUID"=>(8+36+3)*5000=235k
 
     private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
     private static final ThreadMXBean THREAD = ManagementFactory.getThreadMXBean();
-    private static final int SOFT_EVENTS_LIMIT = 3000;    // normally 3000 lines trace is about 350k
+    private static final int SOFT_EVENTS_LIMIT = 3000;    // normally 3000 lines trace is about 350k, and limit memory usage for each action
 
     public final String id;
     public final Instant date;
@@ -133,7 +134,11 @@ public final class ActionLog {
             String contextValue = String.valueOf(value);
             if (contextValue.length() > MAX_CONTEXT_VALUE_LENGTH) { // prevent application code from putting large blob as context, e.g. xml or json response
                 // use new Error() to print calling stack
-                process(new LogEvent(LOGGER, Markers.errorCode("CONTEXT_TOO_LONG"), WARN, "context value is too long, key={}, value={}", new Object[]{key, contextValue}, new Error("context value is too long")));
+                process(new LogEvent(LOGGER, Markers.errorCode("CONTEXT_TOO_LARGE"), WARN, "context value is too long, key={}, value={}", new Object[]{key, contextValue}, new Error("context value is too long")));
+            } else if (contextValues.size() >= MAX_CONTEXT_VALUES_SIZE) {
+                // try to warn once only, generally if hits here, the app likely will add much more within loop
+                if (!"CONTEXT_TOO_LARGE".equals(errorCode))
+                    process(new LogEvent(LOGGER, Markers.errorCode("CONTEXT_TOO_LARGE"), WARN, "too many context values, key={}, size={}", new Object[]{key, contextValues.size()}, new Error("too many context values")));
             } else {
                 contextValues.add(contextValue);
             }

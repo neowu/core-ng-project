@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -83,16 +84,18 @@ public final class KafkaAppender implements LogAppender {
     KafkaProducer<byte[], byte[]> createProducer(KafkaURI uri) {
         var watch = new StopWatch();
         try {
-            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs,
-                ProducerConfig.ACKS_CONFIG, "0",                                        // no acknowledge to maximize performance
-                ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, Boolean.FALSE,                    // since kafka 3.0.0, "enable.idempotence" is true by default, and it overrides "acks" to all
-                ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder",                           // if not specify, kafka uses producer-${seq} name, also impact jmx naming
-                ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
-                ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000,                      // 60s, type is INT
-                ProducerConfig.LINGER_MS_CONFIG, 50L,
-                ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                       // longer backoff to reduce cpu usage when kafka is not available
-                ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L,                     // 5s
-                ProducerConfig.MAX_BLOCK_MS_CONFIG, 30_000L);                               // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+            Map<String, Object> config = new HashMap<>();                               // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+            config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs);
+            config.put(ProducerConfig.ACKS_CONFIG, "0");                                // no acknowledge to maximize performance
+            config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, Boolean.FALSE);        // since kafka 3.0.0, "enable.idempotence" is true by default, and it overrides "acks" to all
+            config.put(ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");               // if not specify, kafka uses producer-${seq} name, also impact jmx naming
+            config.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name);
+            config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000);              // 60s, type is INT
+            config.put(ProducerConfig.LINGER_MS_CONFIG, 50L);
+            config.put(ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L);               // longer backoff to reduce cpu usage when kafka is not available
+            config.put(ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L);         // 5s
+            config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 30_000L);
+            config.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 2_097_152);              // 2M, 1024*1024*2, kafka producer checks uncompressed request size, but with snappy, it is generally ok to send larger value, compression ratio is 1.5x~1.7x
             var serializer = new ByteArraySerializer();
             var producer = new KafkaProducer<>(config, serializer, serializer);
             producerMetrics.set(producer.metrics());
@@ -107,14 +110,16 @@ public final class KafkaAppender implements LogAppender {
         byte[] value = actionLogWriter.toJSON(message);
 
         // refer to org.apache.kafka.common.record.DefaultRecordBatch.estimateBatchSizeUpperBound
-        if (value.length > 1_000_000) {
+        // overhead is 88 + valueSize
+        if (value.length > 2_000_000) {
+            // not send to kafka if length is too large, as in KafkaCallback it clears all records if encounter failure
             logger.warn(Markers.errorCode("LOG_TOO_LARGE"), "kafka log message size is too large, size={}", value.length);
             new ConsoleAppender().append(message);  // fall back to console appender to print
+        } else {
+            // not specify message key for sticky partition, StickyPartitionCache will be used if key is null
+            // refer to org.apache.kafka.clients.producer.internals.DefaultPartitioner.partition
+            records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, value));
         }
-
-        // not specify message key for sticky partition, StickyPartitionCache will be used if key is null
-        // refer to org.apache.kafka.clients.producer.internals.DefaultPartitioner.partition
-        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, value));
     }
 
     @Override

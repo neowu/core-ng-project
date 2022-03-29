@@ -203,7 +203,7 @@
       {"id": "stat-kafka_disk", "name": "panel_11", "type": "visualization"},
       {"id": "stat-kafka_bytes_rate", "name": "panel_12", "type": "visualization"},
       {"id": "stat-kafka_producer_log-forwarder_produced_rate", "name": "panel_13", "type": "visualization"},
-      {"id": "stat-kafka_producer_log-forwarder_request_size_avg", "name": "panel_14", "type": "visualization"}
+      {"id": "stat-kafka_producer_log-forwarder_request_size", "name": "panel_14", "type": "visualization"}
     ]
   },
   {
@@ -580,7 +580,7 @@
     "attributes": {
       "title": "stat-kafka_producer_request_size",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "visState": "{\"title\":\"stat-kafka_producer_request_size\",\"type\":\"metrics\",\"params\":{\"id\":\"stat-kafka_producer_request_size\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"stat-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"avg-stats-kafka_producer_request_size_avg\",\"label\":\"avg request size\",\"color\":\"#F3722C\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"avg\",\"type\":\"avg\",\"field\":\"stats.kafka_producer_request_size_avg\"}]},{\"id\":\"max-stats-kafka_producer_request_size_max\",\"label\":\"max request size\",\"color\":\"#F8961E\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.kafka_producer_request_size_max\"}]}]}}"
+      "visState": "{\"title\":\"stat-kafka_producer_request_size\",\"type\":\"metrics\",\"params\":{\"id\":\"stat-kafka_producer_request_size\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"stat-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"max-stats-kafka_producer_request_size_max\",\"label\":\"max request size\",\"color\":\"#F3722C\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.kafka_producer_request_size_max\"}]},{\"id\":\"avg-stats-kafka_producer_request_size_avg\",\"label\":\"avg request size\",\"color\":\"#F8961E\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"avg\",\"type\":\"avg\",\"field\":\"stats.kafka_producer_request_size_avg\"}]}]}}"
     }
   },
   {
@@ -607,7 +607,7 @@
     "attributes": {
       "title": "stat-kafka_producer_log-forwarder_request_size",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "visState": "{\"title\":\"stat-kafka_producer_log-forwarder_request_size\",\"type\":\"metrics\",\"params\":{\"id\":\"stat-kafka_producer_log-forwarder_request_size\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"stat-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"avg-stats-kafka_producer_log-forwarder_request_size_avg\",\"label\":\"avg request size\",\"color\":\"#43AA8B\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"avg\",\"type\":\"avg\",\"field\":\"stats.kafka_producer_log-forwarder_request_size_avg\"}]},{\"id\":\"max-stats-kafka_producer_log-forwarder_request_size_max\",\"label\":\"max request size\",\"color\":\"#4D908E\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.kafka_producer_log-forwarder_request_size_max\"}]}]}}"
+      "visState": "{\"title\":\"stat-kafka_producer_log-forwarder_request_size\",\"type\":\"metrics\",\"params\":{\"id\":\"stat-kafka_producer_log-forwarder_request_size\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"stat-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"max-stats-kafka_producer_log-forwarder_request_size_max\",\"label\":\"max request size\",\"color\":\"#43AA8B\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.kafka_producer_log-forwarder_request_size_max\"}]},{\"id\":\"avg-stats-kafka_producer_log-forwarder_request_size_avg\",\"label\":\"avg request size\",\"color\":\"#4D908E\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"avg\",\"type\":\"avg\",\"field\":\"stats.kafka_producer_log-forwarder_request_size_avg\"}]}]}}"
     }
   },
   {

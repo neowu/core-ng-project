@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.4-b0 (03/15/2022 - )
+### 7.10.4-b1 (03/15/2022 - )
 
 * maven: deleted old published version older than 7.9.0
 * redis: replaced ZRANGEBYSCORE with ZRANGE, requires redis 6.2 !!!
@@ -13,6 +13,12 @@
   > action.stats.kafka_max_message_size is uncompressed size of value bytes, (kafka().maxRequestSize() should be larger than this)
 * log-processor: added stat-kafka_max_message_size vis, added to kafka dashboard
 * log-processor: updated stat-kafka_request_size vis, added max request size
+* log: limit max size of actionLog.context() to 5000 for one key
+  > warn with "CONTEXT_TOO_LARGE" if too many context values
+* log: increased max request size to 2M
+  > with snappy compression, it's generally ok with broker message.max.bytes=1M
+  > in worst case, we can set log-kafka message.max.bytes=2M
+  > will review the current setup and potentially adjust in future
 
 ### 7.10.3 (02/25/2022 - 03/14/2022)
 
