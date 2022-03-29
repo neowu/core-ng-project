@@ -589,7 +589,7 @@
     "attributes": {
       "title": "stat-kafka_max_message_size",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "visState": "{\"title\":\"stat-kafka_max_message_size\",\"type\":\"metrics\",\"params\":{\"id\":\"stat-kafka_max_message_size\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"stat-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"max-stats-kafka_max_message_size\",\"label\":\"max message size\",\"color\":\"#F9844A\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.kafka_max_message_size\"}]}]}}"
+      "visState": "{\"title\":\"stat-kafka_max_message_size\",\"type\":\"metrics\",\"params\":{\"id\":\"stat-kafka_max_message_size\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"action-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"max-stats-kafka_max_message_size\",\"label\":\"max message size\",\"color\":\"#F9844A\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.kafka_max_message_size\"}]}]}}"
     }
   },
   {
