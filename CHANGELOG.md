@@ -1,12 +1,18 @@
 ## Change log
 
-### 7.10.4 (03/15/2022 - )
+### 7.10.4-b0 (03/15/2022 - )
 
 * maven: deleted old published version older than 7.9.0
 * redis: replaced ZRANGEBYSCORE with ZRANGE, requires redis 6.2 !!!
 * redis: for list.pop always use "LPOP count" to simplify, requires redis 6.2 !!!
 * redis: added RedisSortedSet.popMin
 * redis: improved RedisSortedSet.popByScore concurrency handling
+* kafka: collect producer kafka_request_size_max, collect kafka_max_message_size
+  > stats.kafka_request_size_max is from kafka producer metrics, which is compressed size (include key/value/header/protocol),
+  > broker size config "message.max.bytes" should be larger than this
+  > action.stats.kafka_max_message_size is uncompressed size of value bytes, (kafka().maxRequestSize() should be larger than this)
+* log-processor: added stat-kafka_max_message_size vis, added to kafka dashboard
+* log-processor: updated stat-kafka_request_size vis, added max request size
 
 ### 7.10.3 (02/25/2022 - 03/14/2022)
 

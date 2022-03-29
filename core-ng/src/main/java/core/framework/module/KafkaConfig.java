@@ -134,9 +134,14 @@ public class KafkaConfig extends Config {
         listener().poolSize = poolSize;
     }
 
-    // to increase max message size, it must change on both producer and broker sides
-    // on broker size use "--override message.max.bytes=size"
-    // refer to https://kafka.apache.org/documentation/#message.max.bytes
+    // to increase max message size, both producer and broker sides have size limitation
+    // for broker
+    // use "--override message.max.bytes=size", refer to https://kafka.apache.org/documentation/#message.max.bytes
+    // for producer
+    // refer to org.apache.kafka.clients.producer.ProducerConfig.MAX_REQUEST_SIZE_CONFIG
+    // producer checks uncompressed request size, broker checks compressed request (actual request) size
+    // if message size exceeds producer limit, it throws error within current action
+    // if exceeds broker limit, broker rejects the message, error only shows on KafkaCallback (console output on kafka producer thread), no warning on broker side
     public void maxRequestSize(int size) {
         if (size <= 0) throw new Error("max request size must be greater than 0, value=" + size);
         if (producer != null) throw new Error("kafka().maxRequestSize() must be configured before adding publisher");

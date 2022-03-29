@@ -8,7 +8,6 @@ import core.framework.internal.log.Trace;
 import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.internal.validate.Validator;
 import core.framework.kafka.MessagePublisher;
-import core.framework.log.ActionLogContext;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -55,8 +54,22 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
             producer.send(record);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("kafka", elapsed, 0, 1);   // kafka producer send message in background, the main purpose of track is to count how many message sent in action
+            ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+            if (actionLog != null) {
+                trackMaxMessageSize(actionLog, message.length);
+                actionLog.track("kafka", elapsed, 0, 1);   // kafka producer send message in background, the main purpose of track is to count how many message sent in action
+            }
             logger.debug("publish, topic={}, key={}, message={}, elapsed={}", topic, key, new BytesLogParam(message), elapsed);
+        }
+    }
+
+    private void trackMaxMessageSize(ActionLog actionLog, double messageSize) {
+        // refer to org.apache.kafka.clients.producer.KafkaProducer.doSend
+        // int serializedSize = AbstractRecords.estimateSizeInBytesUpperBound(apiVersions.maxUsableProduceMagic(), compressionType, serializedKey, serializedValue, headers);
+        // kafka limits entire request size includes key/value/headers, here we only track value size
+        double maxSize = actionLog.stats.getOrDefault("kafka_max_message_size", 0D);
+        if (messageSize > maxSize) {
+            actionLog.stats.put("kafka_max_message_size", messageSize);
         }
     }
 
