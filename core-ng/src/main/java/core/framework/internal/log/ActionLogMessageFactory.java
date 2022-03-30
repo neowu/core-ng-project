@@ -11,12 +11,6 @@ import java.util.Map;
  * @author neo
  */
 public class ActionLogMessageFactory {
-    // 900K, kafka max message size is 1024 * 1024, leave 100K for rest, assume majority chars is in ascii (one char = one byte)
-    // refer to core.framework.internal.log.appender.KafkaAppender.append()
-    private static final int HARD_TRACE_LIMIT = 900_000;
-    // 600K assume majority chars is in ascii (one char = one byte)
-    private static final int SOFT_TRACE_LIMIT = 600_000;
-
     public ActionLogMessage create(ActionLog log) {
         var message = new ActionLogMessage();
         message.app = LogManager.APP_NAME;
@@ -35,7 +29,7 @@ public class ActionLogMessageFactory {
         message.stats = log.stats;
         message.performanceStats = performanceStats(log.performanceStats);
         if (log.flushTraceLog()) {
-            message.traceLog = log.trace(SOFT_TRACE_LIMIT, HARD_TRACE_LIMIT);
+            message.traceLog = log.trace();
         }
         return message;
     }

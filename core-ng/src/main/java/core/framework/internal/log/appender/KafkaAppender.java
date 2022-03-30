@@ -4,7 +4,6 @@ import core.framework.internal.json.JSONWriter;
 import core.framework.internal.kafka.KafkaURI;
 import core.framework.internal.kafka.ProducerMetrics;
 import core.framework.log.LogAppender;
-import core.framework.log.Markers;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.log.message.StatMessage;
@@ -27,6 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import static core.framework.log.Markers.errorCode;
 
 /**
  * @author neo
@@ -112,14 +113,16 @@ public final class KafkaAppender implements LogAppender {
         // refer to org.apache.kafka.common.record.DefaultRecordBatch.estimateBatchSizeUpperBound
         // overhead is 88 + valueSize
         if (value.length > 2_000_000) {
-            // not send to kafka if length is too large, as in KafkaCallback it clears all records if encounter failure
-            logger.warn(Markers.errorCode("LOG_TOO_LARGE"), "kafka log message size is too large, size={}", value.length);
+            logger.warn(errorCode("LOG_TOO_LARGE"), "action log message is too large, size={}, id={}, action={}", value.length, message.id, message.action);
             new ConsoleAppender().append(message);  // fall back to console appender to print
-        } else {
-            // not specify message key for sticky partition, StickyPartitionCache will be used if key is null
-            // refer to org.apache.kafka.clients.producer.internals.DefaultPartitioner.partition
-            records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, value));
+
+            truncate(message, value.length - 2_000_000, 5000);
+            value = actionLogWriter.toJSON(message);    // the value length is supposed to be less than 2_000_000, since json escapes '\n' as 2 chars, but in trace string it's one char
         }
+
+        // not specify message key for sticky partition, StickyPartitionCache will be used if key is null
+        // refer to org.apache.kafka.clients.producer.internals.DefaultPartitioner.partition
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, value));
     }
 
     @Override
@@ -144,6 +147,20 @@ public final class KafkaAppender implements LogAppender {
                 producer.send(record);
             }
             producer.close(Duration.ofMillis(timeoutInMs));
+        }
+    }
+
+    void truncate(ActionLogMessage message, int overflow, int minTraceLength) {
+        // clear all large context
+        message.context.entrySet().removeIf(entry -> entry.getValue().size() > 10);
+        if (message.traceLog != null) {
+            int traceLength = message.traceLog.length();
+            // leave trace at least minTraceLength chars, if large context is removed, trace log most likely has enough room
+            int endIndex = Math.max(traceLength - overflow, minTraceLength);
+            String warning = "...(hard trace limit reached, please check console log for full trace)";
+            if (endIndex + warning.length() < traceLength) {
+                message.traceLog = message.traceLog.substring(0, endIndex) + warning;
+            }
         }
     }
 

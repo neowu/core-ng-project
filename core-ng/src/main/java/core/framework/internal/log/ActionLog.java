@@ -178,23 +178,10 @@ public final class ActionLog {
         return remainingTime;
     }
 
-    public String trace(int softLimit, int hardLimit) {
+    public String trace() {
         var builder = new StringBuilder(events.size() << 7);  // length * 128 as rough initial capacity
-        boolean softLimitReached = false;
         for (LogEvent event : events) {
-            if (!softLimitReached || event.level.value >= WARN.value) { // after soft limit, only write warn+ event
-                event.appendTrace(builder, startTime);
-            }
-
-            if (!softLimitReached && builder.length() >= softLimit) {
-                softLimitReached = true;
-                if (event.level.value < LogLevel.WARN.value) builder.setLength(softLimit);  // do not truncate if current is warn
-                builder.append("...(soft trace limit reached)\n");
-            } else if (builder.length() >= hardLimit) {
-                builder.setLength(hardLimit);
-                builder.append("...(hard trace limit reached)");
-                break;
-            }
+            event.appendTrace(builder, startTime);
         }
         return builder.toString();
     }
