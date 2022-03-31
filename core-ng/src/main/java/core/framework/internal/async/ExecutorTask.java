@@ -23,10 +23,10 @@ public class ExecutorTask<T> implements Callable<T> {
     private final Callable<T> task;
     private final Instant startTime;
     private final long maxProcessTimeInNano;
-    private String rootAction;
-    private String refId;
-    private String correlationId;
-    private Trace trace;
+    private final String rootAction;
+    private final String refId;
+    private final String correlationId;
+    private final Trace trace;
 
     ExecutorTask(Callable<T> task, LogManager logManager, TaskContext context) {
         this.task = task;
@@ -42,6 +42,11 @@ public class ExecutorTask<T> implements Callable<T> {
             correlationId = parentActionLog.correlationId();
             refId = parentActionLog.id;
             trace = parentActionLog.trace;
+        } else {
+            rootAction = null;
+            correlationId = null;
+            refId = null;
+            trace = null;
         }
     }
 
