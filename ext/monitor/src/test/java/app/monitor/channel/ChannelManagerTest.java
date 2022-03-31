@@ -19,11 +19,11 @@ import static org.mockito.Mockito.verify;
  */
 @ExtendWith(MockitoExtension.class)
 class ChannelManagerTest {
+    @Mock
+    Channel slackChannel;
+    @Mock
+    Channel pagerChannel;
     private ChannelManager channelManager;
-    @Mock
-    private Channel slackChannel;
-    @Mock
-    private Channel pagerChannel;
 
     @BeforeEach
     void createChannelManager() {
