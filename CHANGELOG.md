@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.4-b2 (03/15/2022 - )
+### 7.10.4 (03/15/2022 - 03/31/2022)
 
 * maven: deleted old published version older than 7.9.0
 * redis: replaced ZRANGEBYSCORE with ZRANGE, requires redis 6.2 !!!
