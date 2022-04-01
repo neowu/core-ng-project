@@ -116,7 +116,7 @@ public final class KafkaAppender implements LogAppender {
             logger.warn(errorCode("LOG_TOO_LARGE"), "action log message is too large, size={}, id={}, action={}", value.length, message.id, message.action);
             new ConsoleAppender().append(message);  // fall back to console appender to print
 
-            truncate(message, value.length - 2_000_000, 5000);
+            truncate(message, value.length - 2_000_000, 10_000);
             value = actionLogWriter.toJSON(message);    // the value length is supposed to be less than 2_000_000, since json escapes '\n' as 2 chars, but in trace string it's one char
         }
 
@@ -150,6 +150,10 @@ public final class KafkaAppender implements LogAppender {
         }
     }
 
+    // traceLog string length can be much smaller than json bytes size,
+    // since json encodes some chars into 2 bytes, e.g. \n, '"',
+    // if traceLog contains many of them like logs contains json string, it may over truncates
+    // in worst case, minTraceLength will be kept
     void truncate(ActionLogMessage message, int overflow, int minTraceLength) {
         // clear all large context
         message.context.entrySet().removeIf(entry -> entry.getValue().size() > 10);

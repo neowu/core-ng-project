@@ -1,5 +1,10 @@
 ## Change log
 
+### 7.10.5 (04/01/2022 - )
+
+* search: truncate es request log
+  > bulk index request body can be huge, to reduce heap usage
+
 ### 7.10.4 (03/15/2022 - 03/31/2022)
 
 * maven: deleted old published version older than 7.9.0
