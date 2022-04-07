@@ -7,6 +7,7 @@ import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
+import core.framework.internal.db.cloud.GCloudAuthProvider;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogLevel;
 import core.framework.internal.log.LogManager;
@@ -48,6 +49,7 @@ public final class DatabaseImpl implements Database {
     private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
     public String user;
     public String password;
+    public GCloudAuthProvider authProvider;
     public int tooManyRowsReturnedThreshold = 1000;
     public long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     public IsolationLevel isolationLevel;
@@ -87,9 +89,10 @@ public final class DatabaseImpl implements Database {
         if (url == null) throw new Error("url must not be null");
         Properties driverProperties = this.driverProperties;
         if (driverProperties == null) {
-            driverProperties = driverProperties(url, user, password);
+            driverProperties = driverProperties(url);
             this.driverProperties = driverProperties;
         }
+        if (authProvider != null) authProvider.fetchCredential(driverProperties);
         Connection connection = null;
         try {
             connection = driver.connect(url, driverProperties);
@@ -101,10 +104,10 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    Properties driverProperties(String url, String user, String password) {
+    Properties driverProperties(String url) {
         var properties = new Properties();
-        if (user != null) properties.setProperty("user", user);
-        if (password != null) properties.setProperty("password", password);
+        if (authProvider == null && user != null) properties.setProperty("user", user);
+        if (authProvider == null && password != null) properties.setProperty("password", password);
         if (url.startsWith("jdbc:mysql:")) {
             String timeoutValue = String.valueOf(timeout.toMillis());
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
@@ -122,8 +125,13 @@ public final class DatabaseImpl implements Database {
             properties.setProperty(PropertyKey.queryInterceptors.getKeyName(), MySQLQueryInterceptor.class.getName());
             properties.setProperty(PropertyKey.logger.getKeyName(), "Slf4JLogger");
             int index = url.indexOf('?');
+
             // mysql with ssl has overhead, usually we ensure security on arch level, e.g. gcloud sql proxy or firewall rule
-            if (index == -1 || url.indexOf("useSSL=", index + 1) == -1) properties.setProperty(PropertyKey.useSSL.getKeyName(), "false");
+            // with gcloud iam / clear_text_password plugin, ssl is required
+            // refer to https://cloud.google.com/sql/docs/mysql/authentication
+            if (authProvider != null) properties.setProperty(PropertyKey.useSSL.getKeyName(), "true");
+            else if (index == -1 || url.indexOf("useSSL=", index + 1) == -1) properties.setProperty(PropertyKey.useSSL.getKeyName(), "false");
+
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-charsets.html
             if (index == -1 || url.indexOf("characterEncoding=", index + 1) == -1) properties.setProperty(PropertyKey.characterEncoding.getKeyName(), "utf-8");
         }

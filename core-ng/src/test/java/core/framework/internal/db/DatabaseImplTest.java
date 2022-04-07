@@ -3,6 +3,7 @@ package core.framework.internal.db;
 import core.framework.db.Database;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
+import core.framework.internal.db.cloud.GCloudAuthProvider;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import org.junit.jupiter.api.AfterAll;
@@ -21,6 +22,7 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author neo
@@ -220,19 +222,24 @@ class DatabaseImplTest {
 
     @Test
     void driverProperties() {
-        Properties properties = database.driverProperties("jdbc:mysql://localhost/demo", null, null);
+        Properties properties = database.driverProperties("jdbc:mysql://localhost/demo");
         assertThat(properties)
             .doesNotContainKeys("user", "password")
             .containsEntry("useSSL", "false")
             .containsEntry("characterEncoding", "utf-8");
 
-        properties = database.driverProperties("jdbc:mysql://localhost/demo?useSSL=true&characterEncoding=latin1", "user", "password");
+        properties = database.driverProperties("jdbc:mysql://localhost/demo?useSSL=true&characterEncoding=latin1");
         assertThat(properties).doesNotContainKeys("useSSL", "characterEncoding");
 
-        properties = database.driverProperties("jdbc:mysql://localhost/demo?useSSL=true", null, null);
+        properties = database.driverProperties("jdbc:mysql://localhost/demo?useSSL=true");
         assertThat(properties)
             .doesNotContainKeys("useSSL")
             .containsEntry("characterEncoding", "utf-8");
+
+        database.authProvider = mock(GCloudAuthProvider.class);
+        properties = database.driverProperties("jdbc:mysql://localhost/demo");
+        assertThat(properties)
+            .containsEntry("useSSL", "true");
     }
 
     @Test
