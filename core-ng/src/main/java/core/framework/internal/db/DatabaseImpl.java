@@ -49,13 +49,11 @@ public final class DatabaseImpl implements Database {
     private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
     public String user;
     public String password;
-    private GCloudAuthProvider authProvider;     // generalize if support more clouds later
     public int tooManyRowsReturnedThreshold = 1000;
     public long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     public IsolationLevel isolationLevel;
-
     int maxOperations = 2000;  // max db calls per action, if exceeds, it indicates either wrong impl (e.g. infinite loop with db calls) or bad practice (not CD friendly), better split into multiple actions
-
+    private GCloudAuthProvider authProvider;     // generalize if support more clouds later
     private String url;
     private Properties driverProperties;
     private Duration timeout;
@@ -124,16 +122,19 @@ public final class DatabaseImpl implements Database {
             properties.setProperty(PropertyKey.rewriteBatchedStatements.getKeyName(), "true");
             properties.setProperty(PropertyKey.queryInterceptors.getKeyName(), MySQLQueryInterceptor.class.getName());
             properties.setProperty(PropertyKey.logger.getKeyName(), "Slf4JLogger");
-            int index = url.indexOf('?');
 
+            int index = url.indexOf('?');
             // mysql with ssl has overhead, usually we ensure security on arch level, e.g. gcloud sql proxy or firewall rule
             // with gcloud iam / clear_text_password plugin, ssl is required
             // refer to https://cloud.google.com/sql/docs/mysql/authentication
-            if (authProvider != null) properties.setProperty(PropertyKey.useSSL.getKeyName(), "true");
-            else if (index == -1 || url.indexOf("useSSL=", index + 1) == -1) properties.setProperty(PropertyKey.useSSL.getKeyName(), "false");
-
+            if (authProvider != null) {
+                properties.setProperty(PropertyKey.sslMode.getKeyName(), PropertyDefinitions.SslMode.PREFERRED.name());
+            } else if (index == -1 || url.indexOf("sslMode=", index + 1) == -1) {
+                properties.setProperty(PropertyKey.sslMode.getKeyName(), PropertyDefinitions.SslMode.DISABLED.name());
+            }
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-charsets.html
-            if (index == -1 || url.indexOf("characterEncoding=", index + 1) == -1) properties.setProperty(PropertyKey.characterEncoding.getKeyName(), "utf-8");
+            if (index == -1 || url.indexOf("characterEncoding=", index + 1) == -1)
+                properties.setProperty(PropertyKey.characterEncoding.getKeyName(), "utf-8");
         }
         return properties;
     }

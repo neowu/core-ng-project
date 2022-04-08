@@ -7,6 +7,8 @@
 * db: support gcloud IAM auth
   > gcloud mysql supported IAM service account auth, to use access token instead of user/password
   > set db user to "iam/gcloud" to use gcloud iam auth
+* monitor: add retry on kube client
+  > to reduce failures when kube cluster upgrades by cloud
 
 ### 7.10.4 (03/15/2022 - 03/31/2022)
 
