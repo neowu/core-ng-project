@@ -23,8 +23,9 @@ public class KubeClient {
     // only support Pod ServiceAccount auth within cluster
     public void initialize() {
         httpClient = HTTPClient.builder()
-                .trust(Files.text(Path.of("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")))
-                .build();
+            .trust(Files.text(Path.of("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")))
+            .maxRetries(3)
+            .build();
         // token will not be refreshed after pod created, if the token is changed somehow, it has to recreate pod
         token = Files.text(Path.of("/var/run/secrets/kubernetes.io/serviceaccount/token"));
     }

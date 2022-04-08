@@ -49,7 +49,7 @@ public final class DatabaseImpl implements Database {
     private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
     public String user;
     public String password;
-    public GCloudAuthProvider authProvider;
+    private GCloudAuthProvider authProvider;     // generalize if support more clouds later
     public int tooManyRowsReturnedThreshold = 1000;
     public long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     public IsolationLevel isolationLevel;
@@ -147,6 +147,11 @@ public final class DatabaseImpl implements Database {
         this.timeout = timeout;
         operation.queryTimeoutInSeconds = (int) timeout.getSeconds();
         pool.checkoutTimeout(timeout);
+    }
+
+    public void authProvider(String provider) {
+        logger.info("use cloud auth provider, provider={}", provider);
+        authProvider = new GCloudAuthProvider();
     }
 
     public void url(String url) {

@@ -1,12 +1,12 @@
 ## Change log
 
-### 7.10.5-b1 (04/01/2022 - )
+### 7.10.5-b2 (04/01/2022 - )
 
 * search: truncate es request log
   > bulk index request body can be huge, to reduce heap usage
 * db: support gcloud IAM auth
-  > gcloud mysql supported IAM service account auth, to use token instead of user/password
-  > set db user to "gcloud:iam" to use token to auth
+  > gcloud mysql supported IAM service account auth, to use access token instead of user/password
+  > set db user to "iam/gcloud" to use gcloud iam auth
 
 ### 7.10.4 (03/15/2022 - 03/31/2022)
 
