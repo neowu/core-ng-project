@@ -47,15 +47,18 @@ public final class DatabaseImpl implements Database {
     public final DatabaseOperation operation;
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
     private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
+
     public String user;
     public String password;
     public int tooManyRowsReturnedThreshold = 1000;
     public long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     public IsolationLevel isolationLevel;
+
     int maxOperations = 2000;  // max db calls per action, if exceeds, it indicates either wrong impl (e.g. infinite loop with db calls) or bad practice (not CD friendly), better split into multiple actions
-    private GCloudAuthProvider authProvider;     // generalize if support more clouds later
+
     private String url;
     private Properties driverProperties;
+    private GCloudAuthProvider authProvider;     // generalize if support more clouds later
     private Duration timeout;
     private Driver driver;
 
