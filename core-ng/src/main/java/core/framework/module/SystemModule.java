@@ -47,8 +47,8 @@ public final class SystemModule extends Module {
     }
 
     void configureHTTP() {
-        property("sys.http.port").ifPresent(port -> http().httpPort(Integer.parseInt(port)));
-        property("sys.https.port").ifPresent(port -> http().httpsPort(Integer.parseInt(port)));
+        property("sys.http.listen").ifPresent(host -> http().listenHTTP(host));
+        property("sys.https.listen").ifPresent(host -> http().listenHTTPS(host));
         property("sys.http.allowCIDR").ifPresent(cidrs -> http().access().allow(new IPv4RangePropertyValueParser(cidrs).parse()));
     }
 

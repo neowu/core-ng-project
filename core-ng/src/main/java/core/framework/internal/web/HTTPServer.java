@@ -32,8 +32,8 @@ public class HTTPServer {
     final ShutdownHandler shutdownHandler = new ShutdownHandler();
 
     private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
-    public Integer httpPort;
-    public Integer httpsPort;
+    public HTTPHost httpHost;
+    public HTTPHost httpsHost;
     public boolean gzip;
     public long maxEntitySize = 10_000_000;    // limit max post body to 10M, apply to multipart as well
     private Undertow server;
@@ -43,13 +43,13 @@ public class HTTPServer {
     }
 
     public void start() {
-        if (httpPort == null && httpsPort == null) httpsPort = 8443;    // by default start https only
+        if (httpHost == null && httpsHost == null) httpsHost = new HTTPHost("0.0.0.0", 8443);    // by default start https only
 
         var watch = new StopWatch();
         try {
             Undertow.Builder builder = Undertow.builder();
-            if (httpPort != null) builder.addHttpListener(httpPort, "0.0.0.0");
-            if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
+            if (httpHost != null) builder.addHttpListener(httpHost.port(), httpHost.host());
+            if (httpsHost != null) builder.addHttpsListener(httpsHost.port(), httpsHost.host(), new SSLContextBuilder().build());
 
             builder.setHandler(handler())
                 // undertow accepts incoming connection very quick, backlog is hard to be filled even under load test, this setting is more for DDOS protection
@@ -74,7 +74,7 @@ public class HTTPServer {
             server = builder.build();
             server.start();
         } finally {
-            logger.info("http server started, httpPort={}, httpsPort={}, gzip={}, elapsed={}", httpPort, httpsPort, gzip, watch.elapsed());
+            logger.info("http server started, http={}, https={}, gzip={}, elapsed={}", httpHost, httpsHost, gzip, watch.elapsed());
         }
     }
 

@@ -88,8 +88,8 @@ public class TestModule extends AbstractTestModule {
     }
 
     private void configureHTTP() {
-        http().httpPort(8080);
-        http().httpsPort(8443);
+        http().listenHTTP("8080");
+        http().listenHTTPS("0.0.0.0:8443");
         http().gzip();
         http().maxForwardedIPs(2);
         http().maxProcessTime(Duration.ofSeconds(30));

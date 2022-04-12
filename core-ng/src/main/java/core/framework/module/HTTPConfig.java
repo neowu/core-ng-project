@@ -5,6 +5,7 @@ import core.framework.internal.inject.InjectValidator;
 import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
+import core.framework.internal.web.HTTPHost;
 import core.framework.internal.web.HTTPIOHandler;
 import core.framework.internal.web.bean.RequestBeanReader;
 import core.framework.internal.web.bean.ResponseBeanWriter;
@@ -78,12 +79,13 @@ public final class HTTPConfig extends Config {
         context.httpServer.handler.errorHandler.customErrorHandler = handler;
     }
 
-    public void httpPort(int port) {
-        context.httpServer.httpPort = port;
+    // host is in "host:port" or "port" format, e.g. 8080 or 127.0.0.1:8080
+    public void listenHTTP(String host) {
+        context.httpServer.httpHost = HTTPHost.parse(host);
     }
 
-    public void httpsPort(int port) {
-        context.httpServer.httpsPort = port;
+    public void listenHTTPS(String host) {
+        context.httpServer.httpsHost = HTTPHost.parse(host);
     }
 
     public LimitRateConfig limitRate() {

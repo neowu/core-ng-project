@@ -17,33 +17,33 @@ class SystemModuleTest {
         module = new SystemModule(null);
         module.context = new ModuleContext(null);
 
-        System.clearProperty("sys.http.port");
+        System.clearProperty("sys.http.listen");
     }
 
     @Test
     void configureHTTP() {
         module.configureHTTP();
 
-        assertThat(module.context.httpServer.httpPort).isNull();
-        assertThat(module.context.httpServer.httpsPort).isNull();
+        assertThat(module.context.httpServer.httpHost).isNull();
+        assertThat(module.context.httpServer.httpsHost).isNull();
     }
 
     @Test
     void configureHTTPPortFromSystemProperty() {
-        System.setProperty("sys.http.port", "8081");
-        module.context.propertyManager.properties.set("sys.http.port", "8082");
+        System.setProperty("sys.http.listen", "8081");
+        module.context.propertyManager.properties.set("sys.http.listen", "8082");
 
         module.configureHTTP();
-        assertThat(module.context.httpServer.httpPort).isEqualTo(8081);
+        assertThat(module.context.httpServer.httpHost.port()).isEqualTo(8081);
     }
 
     @Test
     void configureHTTPPortFromProperty() {
-        module.context.propertyManager.properties.set("sys.https.port", "8082");
+        module.context.propertyManager.properties.set("sys.https.listen", "8082");
 
         module.configureHTTP();
-        assertThat(module.context.httpServer.httpPort).isNull();
-        assertThat(module.context.httpServer.httpsPort).isEqualTo(8082);
+        assertThat(module.context.httpServer.httpHost).isNull();
+        assertThat(module.context.httpServer.httpsHost.port()).isEqualTo(8082);
     }
 
     @Test

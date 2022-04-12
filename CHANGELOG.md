@@ -9,6 +9,11 @@
   > set db user to "iam/gcloud" to use gcloud iam auth
 * monitor: add retry on kube client
   > to reduce failures when kube cluster upgrades by cloud
+* http: removed http().httpPort() and http().httpsPort(), replaced with http().listenHTTP(host) and http().listenHTTPS(host)
+  > replaced sys.http.port, sys.https.port with sys.http.listen and sys.https.listen
+  > host are in "host:port" format, e.g. 127.0.0.1:8080 or 8080 (equivalent to 0.0.0.0:8080)
+  > with cloud env, all envs have same dns/service name, so to simplify properties config, it's actually better to setup dns name to minic cloud in local
+  > e.g. set "customer-service" to 127.0.0.2 in local dns, and hardcode "https://customer-service" as customerServiceURL
 
 ### 7.10.4 (03/15/2022 - 03/31/2022)
 
