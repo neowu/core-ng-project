@@ -34,11 +34,13 @@ public class KafkaConfig extends Config {
     private MessageListener listener;
     private boolean handlerAdded;
     private int maxRequestSize = 1024 * 1024;   // default 1M, refer to org.apache.kafka.clients.producer.ProducerConfig.MAX_REQUEST_SIZE_CONFIG
+    private KafkaController controller;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
+        controller = new KafkaController();
     }
 
     @Override
@@ -79,8 +81,8 @@ public class KafkaConfig extends Config {
             context.collector.metrics.add(producer.producerMetrics);
             context.startupHook.initialize.add(producer::initialize);
             context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
-            var controller = new KafkaController(producer);
-            context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/message/:key"), (LambdaController) controller::publish, true);
+            controller.producer = producer;
+            context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/key/:key/publish"), (LambdaController) controller::publish, true);
             this.producer = producer;
         }
         return new MessagePublisherImpl<>(producer, topic, messageClass);
@@ -118,6 +120,8 @@ public class KafkaConfig extends Config {
             context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> listener.shutdown());
             context.shutdownHook.add(ShutdownHook.STAGE_1, listener::awaitTermination);
             context.collector.metrics.add(listener.consumerMetrics);
+            controller.listener = listener;
+            context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/key/:key/handle"), (LambdaController) controller::handle, true);
             this.listener = listener;   // make lambda not refer to this class/field
         }
         return listener;

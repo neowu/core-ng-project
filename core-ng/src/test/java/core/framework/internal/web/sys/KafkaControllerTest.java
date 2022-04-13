@@ -19,7 +19,7 @@ class KafkaControllerTest {
 
     @BeforeEach
     void createKafkaController() {
-        controller = new KafkaController(null);
+        controller = new KafkaController();
         logManager = new LogManager();
         logManager.begin("begin", null);
     }

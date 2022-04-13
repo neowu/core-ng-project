@@ -27,7 +27,7 @@ public class MessageListener {
     private static final AtomicInteger CONSUMER_CLIENT_ID_SEQUENCE = new AtomicInteger(1);
     public final ConsumerMetrics consumerMetrics;
     public final Set<String> topics = new HashSet<>();
-    final Map<String, MessageProcess<?>> processes = new HashMap<>();
+    public final Map<String, MessageProcess<?>> processes = new HashMap<>();
     final LogManager logManager;
 
     private final Logger logger = LoggerFactory.getLogger(MessageListener.class);

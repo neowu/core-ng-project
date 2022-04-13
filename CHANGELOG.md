@@ -14,6 +14,10 @@
   > host are in "host:port" format, e.g. 127.0.0.1:8080 or 8080 (equivalent to 0.0.0.0:8080)
   > with cloud env, all envs have same dns/service name, so to simplify properties config, it's actually better to setup dns name to minic cloud in local
   > e.g. set "customer-service" to 127.0.0.2 in local dns, and hardcode "https://customer-service" as customerServiceURL
+* log-collector: refer to above, use sys.http.listen and sys.https.listen env if needed
+* kafka: redesigned /_sys/ controller, now they are /_sys/kafka/topic/:topic/key/:key/publish and /_sys/kafka/topic/:topic/key/:key/handle
+  > publish is to publish message to kafka, visible to all consumers
+  > handle is to handle the message on the current pod, not visible to kafka, just call handler to process the message (manual recovery or replay message)
 
 ### 7.10.4 (03/15/2022 - 03/31/2022)
 

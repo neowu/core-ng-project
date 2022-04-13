@@ -9,11 +9,11 @@ import core.framework.kafka.MessageHandler;
 /**
  * @author neo
  */
-class MessageProcess<T> {
-    final MessageHandler<T> handler;
-    final BulkMessageHandler<T> bulkHandler;
-    final JSONReader<T> reader;
-    final Validator<T> validator;
+public class MessageProcess<T> {
+    public final MessageHandler<T> handler;
+    public final BulkMessageHandler<T> bulkHandler;
+    public final JSONReader<T> reader;
+    public final Validator<T> validator;
 
     MessageProcess(MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler, Class<T> messageClass) {
         this.handler = handler;

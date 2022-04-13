@@ -8,8 +8,6 @@
   > refer to https://docs.gradle.org/current/userguide/kotlin_dsl.html#sec:kotlin_using_standard_api)
 * impl own json bind by referring https://github.com/json-iterator/java and https://github.com/ngs-doo/dsl-json with annotation processor?
 
-* /_sys/, kafka controller, should call message handler directly?
-
 * redis using ping/pong to validate connection? for zero downtime upgrading e.g. with gcloud memory store
 * websocket, replace AbstractReceiveListener, so it can include IO/error handling within action lifecycle?
 
