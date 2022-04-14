@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.5-b2 (04/01/2022 - )
+### 7.10.5 (04/01/2022 - 04/14/2022)
 
 * search: truncate es request log
   > bulk index request body can be huge, to reduce heap usage
