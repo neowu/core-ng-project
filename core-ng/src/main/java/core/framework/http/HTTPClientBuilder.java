@@ -126,7 +126,7 @@ public final class HTTPClientBuilder {
                 trustManagerFactory.init(trustStore);
                 trustManagers = trustManagerFactory.getTrustManagers();
             }
-            sslContext.init(keyManagers, trustManagers, null);
+            sslContext.init(keyManagers, trustManagers, null);  // lgtm [java/insecure-trustmanager]
             builder.hostnameVerifier((hostname, sslSession) -> true)
                 .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustManagers[0]);
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
