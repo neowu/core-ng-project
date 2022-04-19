@@ -46,7 +46,9 @@ public class GCloudAuthProvider {
         long now = System.currentTimeMillis();  // record current time, to make sure expire time is always earlier than metadata side
         String tokenJSON = metadata("token");
         accessToken = parseAccessToken(tokenJSON);
-        expirationTime = now + parseExpirationTimeInSec(tokenJSON) * 1_000L;    // set expirationTime after access token, to handle multi thread conditions
+        // token will be refreshed 300s before expiration, and connected connection will not be invalidated
+        // set expirationTime after access token, to handle multi thread conditions
+        expirationTime = now + (parseExpirationTimeInSec(tokenJSON) - 300) * 1_000L;
         return accessToken;
     }
 

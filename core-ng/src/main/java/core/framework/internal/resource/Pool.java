@@ -72,7 +72,7 @@ public class Pool<T extends AutoCloseable> {
         while (true) {
             PoolItem<T> item = idleItems.poll();
             if (item != null) {
-                if (check(item)) return item;
+                if (validate(item)) return item;
                 else continue;
             }
 
@@ -84,7 +84,7 @@ public class Pool<T extends AutoCloseable> {
         }
     }
 
-    private boolean check(PoolItem<T> item) {
+    private boolean validate(PoolItem<T> item) {
         if (validator == null || System.currentTimeMillis() - item.returnTime < aliveWindowInMs) return true;
         boolean valid;
         try {

@@ -1,5 +1,11 @@
 ## Change log
 
+### 7.10.6-b0 (04/19/2022 - )
+
+* db: tweak gcloud iam auth provider expiration time
+* db: tweak query timeout handling
+  > increase db socket timeout, to make MySQL cancel timer (CancelQueryTaskImpl) has more room to kill query
+
 ### 7.10.5 (04/01/2022 - 04/14/2022)
 
 * search: truncate es request log

@@ -110,10 +110,12 @@ public final class DatabaseImpl implements Database {
         if (authProvider == null && user != null) properties.setProperty("user", user);
         if (authProvider == null && password != null) properties.setProperty("password", password);
         if (url.startsWith("jdbc:mysql:")) {
-            String timeoutValue = String.valueOf(timeout.toMillis());
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
-            properties.setProperty(PropertyKey.connectTimeout.getKeyName(), timeoutValue);
-            properties.setProperty(PropertyKey.socketTimeout.getKeyName(), timeoutValue);
+            properties.setProperty(PropertyKey.connectTimeout.getKeyName(), String.valueOf(timeout.toMillis()));
+            // add 10s for socket timeout which is read timeout, as all queries have queryTimeout, MySQL will send "KILL QUERY" command to MySQL server
+            // otherwise we will see socket timeout exception (com.mysql.cj.exceptions.StatementIsClosedException: No operations allowed after statement closed)
+            // refer to com.mysql.cj.CancelQueryTaskImpl
+            properties.setProperty(PropertyKey.socketTimeout.getKeyName(), String.valueOf(timeout.toMillis() + 10_000));
             // refer to https://dev.mysql.com/doc/c-api/8.0/en/mysql-affected-rows.html
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-connp-props-connection.html#cj-conn-prop_useAffectedRows
             // Don't set the CLIENT_FOUND_ROWS flag when connecting to the server (not JDBC-compliant, will break most applications that rely on "found" rows vs. "affected rows" for DML statements),
