@@ -5,6 +5,9 @@
 * db: tweak gcloud iam auth provider expiration time
 * db: tweak query timeout handling
   > increase db socket timeout, to make MySQL cancel timer (CancelQueryTaskImpl) has more room to kill query
+* http: update undertow to 2.2.17
+  > UNDERTOW-2041 Error when X-forwarded-For header contains ipv6 address with leading zeroes
+  > UNDERTOW-2022 FixedLengthStreamSourceConduit must overwrite resumeReads
 
 ### 7.10.5 (04/01/2022 - 04/14/2022)
 
