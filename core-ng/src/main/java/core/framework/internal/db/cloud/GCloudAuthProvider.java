@@ -6,12 +6,14 @@ import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 
 import java.time.Duration;
-import java.util.Properties;
 
 /**
  * @author neo
  */
-public class GCloudAuthProvider {
+public final class GCloudAuthProvider implements CloudAuthProvider {
+    // in cloud env, only need one instance per pod, and will be accessed by MySQL CancelQueryTaskImpl
+    public static final GCloudAuthProvider INSTANCE = new GCloudAuthProvider();
+
     // for timeout settings, refer to gcloud sdk com.google.auth.oauth2.ComputeEngineCredentials#runningOnComputeEngine
     private final HTTPClient httpClient = HTTPClient.builder()
         .connectTimeout(Duration.ofMillis(500))
@@ -24,13 +26,11 @@ public class GCloudAuthProvider {
     String accessToken;
     long expirationTime;
 
-    public void fetchCredential(Properties properties) {
-        // properties are thread safe, it's ok to set user/password with multiple threads
-        properties.setProperty("user", user());
-        properties.setProperty("password", accessToken());
+    GCloudAuthProvider() {
     }
 
-    private String user() {
+    @Override
+    public String user() {
         // email won't change once pod created
         if (user == null) {
             user = parseUser(metadata("email"));
@@ -38,7 +38,8 @@ public class GCloudAuthProvider {
         return user;
     }
 
-    private String accessToken() {
+    @Override
+    public String accessToken() {
         if (accessToken != null && System.currentTimeMillis() < expirationTime) {
             return accessToken;
         }

@@ -15,3 +15,5 @@
 
 * use adminClient to check kafka ready? or retry sending message?
 * retry on message handler? like when mysql is in maintenance
+
+* action id root should have correlation_id ?

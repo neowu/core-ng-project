@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
@@ -27,15 +26,15 @@ class GCloudAuthProviderTest {
     }
 
     @Test
-    void fetchCredential() {
-        var properties = new Properties();
-        provider.fetchCredential(properties);
-
-        assertThat(properties.getProperty("user"))
+    void user() {
+        assertThat(provider.user())
             .isEqualTo("lab-customer-service")
             .isEqualTo(provider.user);
+    }
 
-        assertThat(properties.getProperty("password"))
+    @Test
+    void accessToken() {
+        assertThat(provider.accessToken())
             .startsWith("ya29.c.b0AXv0zT").endsWith("....................")
             .isEqualTo(provider.accessToken);
 
@@ -43,8 +42,8 @@ class GCloudAuthProviderTest {
             .isGreaterThan(Duration.ZERO)
             .isLessThan(Duration.ofHours(1));    // expires_in is 3561s
 
-        provider.fetchCredential(properties);   // fetch again to use cache
-        assertThat(properties.getProperty("password"))
+        // fetch again to use cache
+        assertThat(provider.accessToken())
             .isEqualTo(provider.accessToken);
     }
 
