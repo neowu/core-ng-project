@@ -21,6 +21,7 @@ public class ElasticSearchMonitorJob implements Job {
     private final String app;
     private final String host;
     private final Map<String, GCStat> gcStats = Maps.newHashMapWithExpectedSize(2);
+    public double highCPUUsageThreshold;
     public double highHeapUsageThreshold;
     public double highDiskUsageThreshold;
 
@@ -48,6 +49,10 @@ public class ElasticSearchMonitorJob implements Job {
 
     Stats collect(ElasticSearchNodeStats.Node node) {
         var stats = new Stats();
+
+        double cpuUsage = node.os.cpu.percent / 100d;
+        stats.put("es_cpu_usage", cpuUsage);
+        stats.checkHighUsage(cpuUsage, highCPUUsageThreshold, "cpu");
 
         double heapUsed = node.jvm.mem.heapUsedInBytes;
         stats.put("es_heap_used", heapUsed);

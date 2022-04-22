@@ -20,8 +20,8 @@ public class ElasticSearchClient {
     // refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-stats.html
     public ElasticSearchNodeStats stats(String host) throws IOException {
         var request = new HTTPRequest(HTTPMethod.GET, "http://" + host + ":9200/_nodes/stats");
-        request.params.put("metric", "indices,jvm,fs");
-        request.params.put("filter_path", "nodes.*.name,nodes.*.indices.docs,nodes.*.jvm.mem,nodes.*.jvm.gc,nodes.*.fs.total");
+        request.params.put("metric", "indices,jvm,fs,os");
+        request.params.put("filter_path", "nodes.*.name,nodes.*.indices.docs,nodes.*.jvm.mem,nodes.*.jvm.gc,nodes.*.fs.total,nodes.*.os.cpu.percent");
         HTTPResponse response = httpClient.execute(request);
         if (response.statusCode != HTTPStatus.OK.code)
             throw new Error(Strings.format("failed to call elasticsearch node stats api, uri={}, status={}", request.requestURI(), response.statusCode));

@@ -68,6 +68,8 @@ public class CancelQueryTaskImpl extends TimerTask implements CancelQueryTask {
             String user = authProvider != null ? authProvider.user() : hostInfo.getUser();
             String password = authProvider != null ? authProvider.accessToken() : hostInfo.getPassword();
 
+            LOGGER.warn("kill query due to timeout, processId={}, query={}", origConnId, queryToCancel);
+
             NativeSession newSession = null;
             try {
                 newSession = new NativeSession(hostInfo, session.getPropertySet());

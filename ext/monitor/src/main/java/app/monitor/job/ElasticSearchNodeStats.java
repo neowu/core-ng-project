@@ -20,6 +20,8 @@ public class ElasticSearchNodeStats {
         public JVM jvm;
         @Property(name = "fs")
         public FS fs;
+        @Property(name = "os")
+        public OS os;
     }
 
     public static class Indices {
@@ -73,5 +75,15 @@ public class ElasticSearchNodeStats {
         public Long totalInBytes;
         @Property(name = "free_in_bytes")
         public Long freeInBytes;
+    }
+
+    public static class OS {
+        @Property(name = "cpu")
+        public CPU cpu;
+    }
+
+    public static class CPU {
+        @Property(name = "percent")
+        public Integer percent;
     }
 }

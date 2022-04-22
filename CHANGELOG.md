@@ -8,6 +8,8 @@
 * http: update undertow to 2.2.17
   > UNDERTOW-2041 Error when X-forwarded-For header contains ipv6 address with leading zeroes
   > UNDERTOW-2022 FixedLengthStreamSourceConduit must overwrite resumeReads
+* monitor: collect ES cpu usage
+  > added highCPUUsageThreshold in monitor es config
 
 ### 7.10.5 (04/01/2022 - 04/14/2022)
 

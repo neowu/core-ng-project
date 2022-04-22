@@ -18,7 +18,7 @@ class CPUStat {
     }
 
     // due to os.getProcessCpuLoad() returns host level info, not for container, so here uses process time to calculate container level java cpu usage
-    // be aware there is limitation，the availableProcessors is always round up to nearest integer
+    // be aware there is limitation，the availableProcessors is always round up to the nearest integer
     // e.g. if limit.cpu=500m, max cpu usage is 50%
     // for limit.cpu=1000m, max cpu usage is 100%
     // for limit.cpu=1500m, max cpu usage is 150/200=75%

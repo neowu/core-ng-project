@@ -52,6 +52,12 @@ public class MonitorConfig {
         @NotNull
         @Min(0)
         @Max(1)
+        @Property(name = "highCPUUsageThreshold")
+        public Double highCPUUsageThreshold = 0.5;
+
+        @NotNull
+        @Min(0)
+        @Max(1)
         @Property(name = "highDiskUsageThreshold")
         public Double highDiskUsageThreshold = 0.7;
 

@@ -70,6 +70,7 @@ public class MonitorModule extends Module {
             MonitorConfig.ElasticSearchConfig esConfig = entry.getValue();
 
             var job = new ElasticSearchMonitorJob(elasticSearchClient, app, esConfig.host, publisher);
+            job.highCPUUsageThreshold = esConfig.highCPUUsageThreshold;
             job.highHeapUsageThreshold = esConfig.highHeapUsageThreshold;
             job.highDiskUsageThreshold = esConfig.highDiskUsageThreshold;
             schedule().fixedRate("monitor:es:" + app, job, Duration.ofSeconds(10));
