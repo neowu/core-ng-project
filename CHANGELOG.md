@@ -10,6 +10,9 @@
   > UNDERTOW-2022 FixedLengthStreamSourceConduit must overwrite resumeReads
 * monitor: collect ES cpu usage
   > added highCPUUsageThreshold in monitor es config
+* httpClient: verify hostname with trusting specific cert !!! behavior changed, check carefully
+  > previously, HTTPClient.builder().trust(CERT) will use empty hostname verifier
+  > now, only trustAll() will bypass hostname verifying, so right now if you trust specific cert, make sure you have CN/ALT_NAME matches the dns name (wildcard domain name also works)
 
 ### 7.10.5 (04/01/2022 - 04/14/2022)
 
