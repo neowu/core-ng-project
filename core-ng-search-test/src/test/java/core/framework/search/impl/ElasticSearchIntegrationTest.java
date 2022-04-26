@@ -10,12 +10,14 @@ import core.framework.inject.Inject;
 import core.framework.json.JSON;
 import core.framework.search.BulkDeleteRequest;
 import core.framework.search.ClusterStateResponse;
+import core.framework.search.DeleteByQueryRequest;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.ForEach;
 import core.framework.search.IntegrationTest;
 import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
+import core.framework.search.query.Queries;
 import core.framework.search.query.Sorts;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Lists;
@@ -176,6 +178,22 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
         boolean result = documentType.delete("1");
         assertThat(result).isTrue();
+    }
+
+    @Test
+    void deleteByQuery() {
+        documentType.bulkIndex(range(0, 30).mapToObj(i -> document(String.valueOf(i), String.valueOf(i), i, 0, null, null))
+            .collect(toMap(document -> document.id, identity())));
+        elasticSearch.refreshIndex("document");
+
+        var request = new DeleteByQueryRequest();
+        request.query = new Query.Builder().range(Queries.range("int_field", 1, 15)).build();
+        request.refresh = Boolean.TRUE;
+        long deleted = documentType.deleteByQuery(request);
+
+        assertThat(deleted).isEqualTo(15);
+        assertThat(documentType.get("1")).isNotPresent();
+        assertThat(documentType.get("15")).isNotPresent();
     }
 
     @Test

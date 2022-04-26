@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '7.10.6-b0'
+    version = '7.10.6-b1'
 
     repositories {
         maven {
@@ -14,7 +14,7 @@ subprojects {
     }
 }
 
-def elasticVersion = '8.1.0'
+def elasticVersion = '8.1.3'
 def kafkaVersion = '3.1.0'
 def jacksonVersion = '2.13.1'
 def junitVersion = '5.8.2'
@@ -29,7 +29,7 @@ project('core-ng-api') {
 project('core-ng') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
-        api project(":core-ng-api")
+        api project(':core-ng-api')
         api 'org.slf4j:slf4j-api:1.8.0-beta4'
         implementation 'org.javassist:javassist:3.28.0-GA'
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
@@ -73,8 +73,8 @@ project('core-ng-mongo') {
 project('core-ng-mongo-test') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
-        implementation project(":core-ng-test")
-        implementation project(":core-ng-mongo")
+        implementation project(':core-ng-test')
+        implementation project(':core-ng-mongo')
         implementation 'de.bwaldvogel:mongo-java-server:1.39.0'
     }
 }
@@ -82,23 +82,24 @@ project('core-ng-mongo-test') {
 project('core-ng-search') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
-        api project(":core-ng")
+        api project(':core-ng')
         api "co.elastic.clients:elasticsearch-java:${elasticVersion}"
         implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-        testImplementation project(":core-ng-test")
+        testImplementation project(':core-ng-test')
     }
 }
 
 project('core-ng-search-test') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
-        implementation project(":core-ng-test")
-        implementation project(":core-ng-search")
+        implementation project(':core-ng-test')
+        implementation project(':core-ng-search')
         implementation "org.elasticsearch:elasticsearch:${elasticVersion}"
         implementation "core.framework.elasticsearch.module:transport-netty4:${elasticVersion}"
         implementation "core.framework.elasticsearch.module:mapper-extras:${elasticVersion}"    // used by elasticsearch scaled_float
         implementation "core.framework.elasticsearch.module:lang-painless:${elasticVersion}"
         implementation "core.framework.elasticsearch.module:analysis-common:${elasticVersion}"  // used by elasticsearch stemmer
+        implementation "core.framework.elasticsearch.module:reindex:${elasticVersion}"  // used by elasticsearch deleteByQuery
         implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"              // override transitive jackson dependencies of elasticsearch, only for intellij, gradle woks fine
     }
 }

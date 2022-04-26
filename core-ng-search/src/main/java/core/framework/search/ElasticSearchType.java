@@ -71,6 +71,8 @@ public interface ElasticSearchType<T> {
         bulkDelete(request);
     }
 
+    long deleteByQuery(DeleteByQueryRequest request);
+
     List<String> analyze(AnalyzeRequest request);   // can be used to test customized analyzer
 
     default List<String> analyze(String analyzer, String text) {

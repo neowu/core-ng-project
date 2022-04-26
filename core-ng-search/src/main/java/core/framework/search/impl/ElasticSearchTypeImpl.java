@@ -1,11 +1,14 @@
 package core.framework.search.impl;
 
+import co.elastic.clients.elasticsearch._types.Conflicts;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.ErrorCause;
 import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.Result;
+import co.elastic.clients.elasticsearch._types.ShardFailure;
 import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
 import co.elastic.clients.elasticsearch.core.DeleteResponse;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
@@ -23,6 +26,7 @@ import core.framework.search.AnalyzeRequest;
 import core.framework.search.BulkDeleteRequest;
 import core.framework.search.BulkIndexRequest;
 import core.framework.search.CompleteRequest;
+import core.framework.search.DeleteByQueryRequest;
 import core.framework.search.DeleteRequest;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.ForEach;
@@ -38,6 +42,7 @@ import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
@@ -84,16 +89,20 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
                 builder.index(index).query(request.query).aggregations(request.aggregations).sort(request.sorts)
                     .searchType(request.type)
                     .from(request.skip)
-                    .size(request.limit);
+                    .size(request.limit)
+                    .timeout(elasticSearch.timeout.toMillis() + "ms");
                 if (request.trackTotalHitsUpTo != null) builder.trackTotalHits(t -> t.count(request.trackTotalHitsUpTo));
                 return builder;
             });
             var response = elasticSearch.client.search(searchRequest, documentClass);
-
+            validate(response);
             esTook = response.took() * 1_000_000;
             hits = response.hits().hits().size();
-            long total = response.hits().total().value();
-            List<T> items = response.hits().hits().stream().map(Hit::source).toList();
+            long total = response.hits().total() == null ? 0 : response.hits().total().value();
+            List<T> items = new ArrayList<>(hits);
+            for (Hit<T> hit : response.hits().hits()) {
+                items.add(hit.source());
+            }
             return new SearchResponse<>(items, total, response.aggregations());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -102,7 +111,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, hits, 0);
-            logger.debug("search, hits={}, esTook={}, elapsed={}", hits, esTook, elapsed);
+            logger.debug("search, index={}, hits={}, esTook={}, elapsed={}", index, hits, esTook, elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -122,8 +131,11 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
                 return builder;
             });
             var response = elasticSearch.client.search(builder ->
-                builder.index(index).suggest(suggest).source(s -> s.fetch(Boolean.FALSE)), documentClass);
-
+                builder.index(index)
+                    .suggest(suggest)
+                    .source(s -> s.fetch(Boolean.FALSE))
+                    .timeout(elasticSearch.timeout.toMillis() + "ms"), documentClass);
+            validate(response);
             esTook = response.took() * 1_000_000;
             List<String> suggestions = response.suggest().values().stream()
                 .flatMap(Collection::stream).flatMap(suggestion -> suggestion.completion().options().stream()).map(CompletionSuggestOption::text)
@@ -138,7 +150,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, options, 0);
-            logger.debug("complete, options={}, esTook={}, elapsed={}", options, esTook, elapsed);
+            logger.debug("complete, index={}, options={}, esTook={}, elapsed={}", index, options, esTook, elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -152,7 +164,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             GetResponse<T> response = elasticSearch.client.get(builder -> builder.index(index).id(request.id), documentClass);
             if (!response.found()) return Optional.empty();
             hits = 1;
-            return Optional.of(response.source());
+            return Optional.of(response.source());  // if source = null, means it didn't save source in es index, which is unexpected, better break here
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
@@ -198,7 +210,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         }
         long esTook = 0;
         try {
-            BulkResponse response = elasticSearch.client.bulk(builder -> builder.operations(operations).refresh(request.refresh ? Refresh.True : Refresh.False));
+            BulkResponse response = elasticSearch.client.bulk(builder -> builder.operations(operations).refresh(refreshValue(request.refresh)));
             esTook = response.took() * 1_000_000; // mills to nano
             validate(response);
         } catch (IOException e) {
@@ -267,7 +279,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         }
         long esTook = 0;
         try {
-            BulkResponse response = elasticSearch.client.bulk(builder -> builder.operations(operations).refresh(request.refresh ? Refresh.True : Refresh.False));
+            BulkResponse response = elasticSearch.client.bulk(builder -> builder.operations(operations).refresh(refreshValue(request.refresh)));
 
             esTook = response.took() * 1_000_000; // mills to nano
             validate(response);
@@ -280,6 +292,33 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             int size = request.ids.size();
             ActionLogContext.track("elasticsearch", elapsed, 0, size);
             logger.debug("bulkDelete, index={}, ids={}, size={}, esTook={}, elapsed={}", index, request.ids, size, esTook, elapsed);
+            checkSlowOperation(elapsed);
+        }
+    }
+
+    @Override
+    public long deleteByQuery(DeleteByQueryRequest request) {
+        var watch = new StopWatch();
+        String index = request.index == null ? this.index : request.index;
+        long esTook = 0;
+        long deleted = 0;
+        try {
+            DeleteByQueryResponse response = elasticSearch.client.deleteByQuery(builder -> builder.index(index)
+                .query(request.query)
+                .conflicts(Conflicts.Proceed)
+                .maxDocs(request.limits)
+                .refresh(request.refresh));
+            if (response.deleted() != null) deleted = response.deleted();
+            if (response.took() != null) esTook = response.took() * 1_000_000;
+            return deleted;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw elasticSearch.searchException(e);
+        } finally {
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, 0, (int) deleted);
+            logger.debug("deleteByQuery, index={}, deleted={}, esTook={}, elapsed={}", index, deleted, esTook, elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -310,7 +349,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         long esClientTook = 0;
         long esServerTook = 0;
         validate(forEach);
-        Time keepAlive = Time.of(t -> t.time(forEach.scrollTimeout.toNanos() + "nanos"));
+        Time keepAlive = Time.of(t -> t.time(forEach.scrollTimeout.toMillis() + "ms"));
         String index = forEach.index == null ? this.index : forEach.index;
         int totalHits = 0;
         try {
@@ -355,6 +394,20 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             throw new Error(Strings.format("result window is too large, skip + limit must be less than or equal to max result window, skip={}, limit={}, maxResultWindow={}", request.skip, request.limit, maxResultWindow));
     }
 
+    private void validate(co.elastic.clients.elasticsearch.core.SearchResponse<T> response) {
+        if (response.shards().failed().intValue() > 0) {
+            for (ShardFailure failure : response.shards().failures()) {
+                ErrorCause reason = failure.reason();
+                logger.warn("shared failed, index={}, node={}, status={}, reason={}, trace={}",
+                    failure.index(), failure.node(), failure.status(),
+                    reason.reason(), reason.stackTrace());
+            }
+        }
+        if (response.timedOut()) {
+            logger.warn(errorCode("SLOW_ES"), "some of elasticsearch shards timed out");
+        }
+    }
+
     private void validate(ForEach<T> forEach) {
         if (forEach.consumer == null) throw new Error("forEach.consumer must not be null");
         if (forEach.query == null) throw new Error("forEach.query must not be null");
@@ -375,6 +428,12 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         }
         builder.append("]");
         throw new SearchException(builder.build());
+    }
+
+    @Nullable
+    private Refresh refreshValue(Boolean value) {
+        if (value == null) return null;
+        return Boolean.TRUE.equals(value) ? Refresh.True : Refresh.False;
     }
 
     private void checkSlowOperation(long elapsed) {

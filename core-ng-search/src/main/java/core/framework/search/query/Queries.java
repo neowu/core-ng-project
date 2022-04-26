@@ -8,8 +8,6 @@ import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
 import co.elastic.clients.json.JsonData;
 
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -24,14 +22,7 @@ public class Queries {
         return new MatchQuery.Builder().field(field).query(FieldValue.of(value)).build();
     }
 
-    public static RangeQuery range(String field, ZonedDateTime from, ZonedDateTime to) {
-        var builder = new RangeQuery.Builder().field(field);
-        if (from != null) builder.gte(JsonData.of(from));
-        if (to != null) builder.lte(JsonData.of(to));
-        return builder.build();
-    }
-
-    public static RangeQuery range(String field, BigDecimal from, BigDecimal to) {
+    public static <T> RangeQuery range(String field, T from, T to) {
         var builder = new RangeQuery.Builder().field(field);
         if (from != null) builder.gte(JsonData.of(from));
         if (to != null) builder.lte(JsonData.of(to));

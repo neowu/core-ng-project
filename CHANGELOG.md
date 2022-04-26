@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.6-b0 (04/19/2022 - )
+### 7.10.6-b1 (04/19/2022 - )
 
 * db: tweak gcloud iam auth provider expiration time, make CancelQueryTaskImpl be aware of gcloud auth provider
 * db: tweak query timeout handling
@@ -17,6 +17,8 @@
   > for short circuit, e.g. heavy load request causes remote service busy, and client timeout triggers more retry requests, to amplify the load
 * es: support refresh on bulk request
   > to specify whether auto refresh after bulk request
+* es: added timeout in search/complete request
+* es: added DeleteByQuery
 
 ### 7.10.5 (04/01/2022 - 04/14/2022)
 

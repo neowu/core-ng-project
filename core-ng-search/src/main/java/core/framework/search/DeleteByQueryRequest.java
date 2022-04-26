@@ -1,15 +1,18 @@
 package core.framework.search;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+
 import javax.annotation.Nullable;
-import java.util.List;
 
 /**
  * @author neo
  */
-public class BulkDeleteRequest {
+public class DeleteByQueryRequest {
     @Nullable
     public String index;
-    public List<String> ids;
+    public Query query;
+    @Nullable
+    public Long limits; // limit max docs to delete
     @Nullable
     public Boolean refresh; // whether refresh index after operation, by default, changes only visible after index settings->refresh_interval
 }
