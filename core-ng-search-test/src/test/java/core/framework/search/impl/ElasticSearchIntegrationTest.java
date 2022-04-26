@@ -17,7 +17,6 @@ import core.framework.search.ForEach;
 import core.framework.search.IntegrationTest;
 import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
-import core.framework.search.query.Queries;
 import core.framework.search.query.Sorts;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Lists;
@@ -187,7 +186,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         elasticSearch.refreshIndex("document");
 
         var request = new DeleteByQueryRequest();
-        request.query = new Query.Builder().range(Queries.range("int_field", 1, 15)).build();
+        request.query = new Query.Builder().range(range("int_field", 1, 15)).build();
         request.refresh = Boolean.TRUE;
         long deleted = documentType.deleteByQuery(request);
 
@@ -204,7 +203,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
         var request = new BulkDeleteRequest();
         request.ids = List.of("1", "2");
-        request.refresh = true;
+        request.refresh = Boolean.TRUE;
         documentType.bulkDelete(request);
         assertThat(documentType.get("1")).isNotPresent();
         assertThat(documentType.get("2")).isNotPresent();
