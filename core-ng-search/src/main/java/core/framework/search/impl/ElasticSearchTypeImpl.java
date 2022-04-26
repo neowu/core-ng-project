@@ -2,6 +2,7 @@ package core.framework.search.impl;
 
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.ErrorCause;
+import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.Result;
 import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
@@ -197,7 +198,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         }
         long esTook = 0;
         try {
-            BulkResponse response = elasticSearch.client.bulk(builder -> builder.operations(operations));
+            BulkResponse response = elasticSearch.client.bulk(builder -> builder.operations(operations).refresh(request.refresh ? Refresh.True : Refresh.False));
             esTook = response.took() * 1_000_000; // mills to nano
             validate(response);
         } catch (IOException e) {
@@ -266,7 +267,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         }
         long esTook = 0;
         try {
-            BulkResponse response = elasticSearch.client.bulk(builder -> builder.operations(operations));
+            BulkResponse response = elasticSearch.client.bulk(builder -> builder.operations(operations).refresh(request.refresh ? Refresh.True : Refresh.False));
 
             esTook = response.took() * 1_000_000; // mills to nano
             validate(response);

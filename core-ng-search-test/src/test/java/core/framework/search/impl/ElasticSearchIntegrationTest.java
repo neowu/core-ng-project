@@ -8,6 +8,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.json.JsonData;
 import core.framework.inject.Inject;
 import core.framework.json.JSON;
+import core.framework.search.BulkDeleteRequest;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
@@ -183,7 +184,10 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         documentType.index("2", document("2", "value2", 2, 0, null, null));
         elasticSearch.refreshIndex("document");
 
-        documentType.bulkDelete(List.of("1", "2"));
+        var request = new BulkDeleteRequest();
+        request.ids = List.of("1", "2");
+        request.refresh = true;
+        documentType.bulkDelete(request);
         assertThat(documentType.get("1")).isNotPresent();
         assertThat(documentType.get("2")).isNotPresent();
     }
