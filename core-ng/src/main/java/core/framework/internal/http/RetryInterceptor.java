@@ -78,6 +78,7 @@ public class RetryInterceptor implements Interceptor {
     boolean shouldRetry(boolean canceled, int attempts, int statusCode) {
         if (canceled) return false;    // AsyncTimout cancels call if callTimeout, refer to RealCall.kt/timout field
         if (attempts >= maxRetries) return false;
+        if (!withinMaxProcessTime(attempts)) return false;
 
         return statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code;
     }
@@ -86,6 +87,7 @@ public class RetryInterceptor implements Interceptor {
     boolean shouldRetry(boolean canceled, String method, int attempts, Exception e) {
         if (canceled) return false;    // AsyncTimout cancels call if callTimeout, refer to RealCall.kt/timout field
         if (attempts >= maxRetries) return false;
+        if (!withinMaxProcessTime(attempts)) return false;
 
         if (e instanceof RouteException) return true;   // if it's route failure, then request is not sent yet
 
@@ -99,6 +101,18 @@ public class RetryInterceptor implements Interceptor {
         // okHTTP uses both socket timeout and AsyncTimeout, it closes socket/connection when timeout is detected by background thread, so no need to close exchange
         // refer to AsyncTimeout.newTimeoutException() -> SocketAsyncTimeout.newTimeoutException()
         return !(e instanceof SocketTimeoutException && "timeout".equals(e.getMessage()));
+    }
+
+    // for short circuit, e.g. heavy load request causes remote service busy, and client timeout triggers more retry requests, to amplify the load
+    boolean withinMaxProcessTime(int attempts) {
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        if (actionLog == null) return true;
+        long remainingTime = actionLog.remainingProcessTimeInNano();
+        if (remainingTime <= waitTime(attempts).toNanos()) {
+            logger.debug("not retry due to max process time limit, remainingTime={}", Duration.ofNanos(remainingTime));
+            return false;
+        }
+        return true;
     }
 
     Duration waitTime(int attempts) {

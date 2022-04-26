@@ -329,7 +329,7 @@ public final class DatabaseImpl implements Database {
         // check default max operations first then check if specified action level max operations
         if (operations > maxOperations && operations > actionLog.internalContext().maxDBOperations) {
             if (actionLog.remainingProcessTimeInNano() <= 0) {
-                // break if it took long and execute too many db queries
+                // break if it took too long and execute too many db queries
                 throw new Error("too many db operations, operations=" + operations);
             }
             if (actionLog.result == LogLevel.INFO) {    // only warn once, action hits here typically will call db more times ongoing

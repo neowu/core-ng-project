@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -63,5 +64,13 @@ public final class ActionLogContext {
             LOGGER.debug("trigger trace, trace={}", trace);
             actionLog.trace = trace;
         }
+    }
+
+    // for long process, use this guidance to determine whether continue to do more work
+    @Nullable
+    public static Duration remainingProcessTime() {
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        if (actionLog == null) return null;
+        return Duration.ofNanos(actionLog.remainingProcessTimeInNano());
     }
 }
