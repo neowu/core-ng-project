@@ -2,6 +2,7 @@ package app.monitor.job;
 
 import core.framework.internal.stat.Stats;
 import core.framework.kafka.MessagePublisher;
+import core.framework.log.Severity;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
@@ -94,7 +95,10 @@ public class KafkaMonitorJob implements Job {
             diskUsed += size;
         }
         stats.put("kafka_disk_used", diskUsed);
-        stats.checkHighUsage(diskUsed, highDiskSizeThreshold, "disk");
+        boolean highUsage = stats.checkHighUsage(diskUsed, highDiskSizeThreshold, "disk");
+        if (highUsage) {
+            stats.severity = Severity.ERROR;
+        }
     }
 
     private void collectGCStats(Stats stats, MBeanServerConnection connection, GCStat gcStats, ObjectName gcBean) throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException, IOException {

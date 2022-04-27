@@ -1,5 +1,6 @@
 package core.framework.internal.stat;
 
+import core.framework.log.Severity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +23,9 @@ class StatsTest {
 
         stats.errorCode = "HIGH_CPU_USAGE";
         assertThat(stats.result()).isEqualTo("WARN");
+
+        stats.severity = Severity.ERROR;
+        assertThat(stats.result()).isEqualTo("ERROR");
     }
 
     @Test

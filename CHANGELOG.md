@@ -20,6 +20,8 @@
 * es: added timeout in search/complete request
 * es: added DeleteByQuery
 * es: added perf trace for elasticSearch.refreshIndex
+* monitor: treat high disk usage as error
+  > disk full requires immediate attention to expand
 
 ### 7.10.5 (04/01/2022 - 04/14/2022)
 
