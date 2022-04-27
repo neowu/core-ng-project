@@ -305,6 +305,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         try {
             DeleteByQueryResponse response = elasticSearch.client.deleteByQuery(builder -> builder.index(index)
                 .query(request.query)
+                .scrollSize(request.batchSize)
                 .conflicts(Conflicts.Proceed)
                 .maxDocs(request.limits)
                 .refresh(request.refresh));
