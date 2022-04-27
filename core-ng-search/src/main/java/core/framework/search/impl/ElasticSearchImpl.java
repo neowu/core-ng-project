@@ -7,6 +7,7 @@ import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import core.framework.internal.json.JSONMapper;
+import core.framework.log.ActionLogContext;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
@@ -125,7 +126,9 @@ public class ElasticSearchImpl implements ElasticSearch {
         } catch (ElasticsearchException e) {
             throw searchException(e);
         } finally {
-            logger.info("refresh index, index={}, elapsed={}", index, watch.elapsed());
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed);
+            logger.info("refresh index, index={}, elapsed={}", index, elapsed);
         }
     }
 

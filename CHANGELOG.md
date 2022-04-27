@@ -19,6 +19,7 @@
   > to specify whether auto refresh after bulk request
 * es: added timeout in search/complete request
 * es: added DeleteByQuery
+* es: added perf trace for elasticSearch.refreshIndex
 
 ### 7.10.5 (04/01/2022 - 04/14/2022)
 
