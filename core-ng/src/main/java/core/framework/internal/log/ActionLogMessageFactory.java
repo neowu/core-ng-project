@@ -18,7 +18,7 @@ public class ActionLogMessageFactory {
         message.id = log.id;
         message.date = log.date;
         message.result = log.result();
-        message.correlationIds = log.correlationIds;
+        message.correlationIds = log.correlationIds();
         message.clients = log.clients;
         message.refIds = log.refIds;
         message.elapsed = log.elapsed;

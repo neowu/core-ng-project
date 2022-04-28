@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.6-b1 (04/19/2022 - )
+### 7.10.6 (04/19/2022 - 04/28/2022)
 
 * db: tweak gcloud iam auth provider expiration time, make CancelQueryTaskImpl be aware of gcloud auth provider
 * db: tweak query timeout handling
@@ -22,6 +22,9 @@
 * es: added perf trace for elasticSearch.refreshIndex
 * monitor: treat high disk usage as error
   > disk full requires immediate attention to expand
+* action: use id as correlationId for root action
+  > to make kibana search easier, e.g. search by correlationId will list all actions
+  > log-processor action diagram also simplified
 
 ### 7.10.5 (04/01/2022 - 04/14/2022)
 

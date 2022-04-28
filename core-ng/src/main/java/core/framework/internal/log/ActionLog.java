@@ -167,6 +167,11 @@ public final class ActionLog {
         return id; // if there are multiple correlationIds (in batch), use current id as following correlationId
     }
 
+    public List<String> correlationIds() {
+        if (correlationIds != null) return correlationIds;
+        return List.of(id);     // current action is root action, use self id as correlationId
+    }
+
     public void action(String action) {
         add(event("action={}", action));
         this.action = action;

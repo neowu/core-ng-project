@@ -42,20 +42,14 @@ public class DiagramService {
     public String action(String actionId) {
         var diagram = new ActionDiagram();
         ActionDocument action = getActionById(actionId);
-        boolean isRootAction = action.correlationIds == null;
-        if (isRootAction) diagram.add(action);
-        List<String> correlationIds = isRootAction ? List.of(actionId) : action.correlationIds;
-        List<ActionDocument> actions = findActionByCorrelationIds(correlationIds);
-        actions.forEach(diagram::add);
-        if (!isRootAction) {    // if not root action, then correlationId will be id of root action
-            List<ActionDocument> rootActions = findActionByIds(correlationIds);
-            for (ActionDocument rootAction : rootActions) {
-                diagram.add(rootAction);
-            }
+        List<ActionDocument> actions = findActionByCorrelationIds(action.correlationIds);
+        for (ActionDocument document : actions) {
+            diagram.add(document);
         }
         return diagram.dot();
     }
 
+    // due to action index sharded by date, to get by id, it has to use search, rather than get by id from specific index
     private ActionDocument getActionById(String id) {
         var request = new SearchRequest();
         request.index = "action-*";
@@ -63,13 +57,6 @@ public class DiagramService {
         List<ActionDocument> documents = actionType.search(request).hits;
         if (documents.isEmpty()) throw new NotFoundException("action not found, id=" + id);
         return documents.get(0);
-    }
-
-    private List<ActionDocument> findActionByIds(List<String> ids) {
-        var request = new SearchRequest();
-        request.index = "action-*";
-        request.query = new Query.Builder().ids(ids(ids)).build();
-        return actionType.search(request).hits;
     }
 
     private List<ActionDocument> findActionByCorrelationIds(List<String> correlationIds) {

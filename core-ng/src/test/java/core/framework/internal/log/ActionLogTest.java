@@ -129,4 +129,12 @@ class ActionLogTest {
         trace = log.trace();
         assertThat(trace).contains("WARN logger - warning");
     }
+
+    @Test
+    void correlationIds() {
+        assertThat(log.correlationIds()).containsExactly(log.id);
+
+        log.correlationIds = List.of("correlationId");
+        assertThat(log.correlationIds()).isSameAs(log.correlationIds);
+    }
 }
