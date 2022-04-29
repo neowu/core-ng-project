@@ -11,7 +11,6 @@ import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.internal.web.http.IPv4AccessControl;
 import core.framework.json.JSON;
 import core.framework.kafka.Message;
-import core.framework.log.Markers;
 import core.framework.util.Strings;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -22,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static core.framework.log.Markers.errorCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -39,7 +39,7 @@ public class KafkaController {
         String key = request.pathParam("key");
         byte[] body = request.body().orElseThrow(() -> new Error("body must not be null"));
 
-        logger.warn(Markers.errorCode("MANUAL_OPERATION"), "publish message manually, topic={}", topic);   // log trace message, due to potential impact
+        logger.warn(errorCode("MANUAL_OPERATION"), "publish message manually, topic={}", topic);   // log trace message, due to potential impact
 
         ProducerRecord<byte[], byte[]> record = record(topic, key, body);
         producer.send(record);
@@ -53,7 +53,7 @@ public class KafkaController {
         String key = request.pathParam("key");
         byte[] body = request.body().orElseThrow(() -> new Error("body must not be null"));
 
-        logger.warn(Markers.errorCode("MANUAL_OPERATION"), "handle message manually, topic={}", topic);   // log trace message, due to potential impact
+        logger.warn(errorCode("MANUAL_OPERATION"), "handle message manually, topic={}", topic);   // log trace message, due to potential impact
 
         @SuppressWarnings("unchecked")
         MessageProcess<Object> process = (MessageProcess<Object>) listener.processes.get(topic);

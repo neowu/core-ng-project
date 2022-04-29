@@ -54,8 +54,10 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @AfterEach
     void cleanup() {
-        documentType.bulkDelete(range(0, 100).mapToObj(String::valueOf).toList());
-        elasticSearch.refreshIndex("document");
+        var request = new BulkDeleteRequest();
+        request.ids = range(0, 100).mapToObj(String::valueOf).toList();
+        request.refresh = Boolean.TRUE;
+        documentType.bulkDelete(request);
     }
 
     @Test
@@ -173,7 +175,6 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     @Test
     void delete() {
         documentType.index("1", document("1", "value", 1, 0, null, null));
-        elasticSearch.refreshIndex("document");
 
         boolean result = documentType.delete("1");
         assertThat(result).isTrue();
@@ -199,7 +200,6 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void bulkDelete() {
         documentType.index("1", document("1", "value1", 1, 0, null, null));
         documentType.index("2", document("2", "value2", 2, 0, null, null));
-        elasticSearch.refreshIndex("document");
 
         var request = new BulkDeleteRequest();
         request.ids = List.of("1", "2");

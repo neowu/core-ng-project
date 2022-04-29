@@ -50,7 +50,7 @@ public class HTTPHandler implements HttpHandler {
     public final RequestBeanReader requestBeanReader = new RequestBeanReader();
     public final ResponseBeanWriter responseBeanWriter = new ResponseBeanWriter();
 
-    public final RateControl rateControl = new RateControl(1000);   // save at max 1000 group/ip combination
+    public final RateControl rateControl = new RateControl(5000);   // save at max 5000 group/ip combination per pod
 
     private final Logger logger = LoggerFactory.getLogger(HTTPHandler.class);
     private final LogManager logManager;

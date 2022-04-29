@@ -1,5 +1,7 @@
 ## Change log
 
+### 7.10.7 (04/29/2022 - )
+
 ### 7.10.6 (04/19/2022 - 04/28/2022)
 
 * db: tweak gcloud iam auth provider expiration time, make CancelQueryTaskImpl be aware of gcloud auth provider
