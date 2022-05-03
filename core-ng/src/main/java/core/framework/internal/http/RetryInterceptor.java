@@ -43,7 +43,7 @@ public class RetryInterceptor implements Interceptor {
             try {
                 Response response = chain.proceed(request);
                 int statusCode = response.code();
-                if (shouldRetry(chain.call().isCanceled(), attempts, statusCode)) {
+                if (shouldRetry(statusCode, attempts)) {    // do not check call.isCanceled(), RetryAndFollowUpInterceptor already checked and throw exception
                     logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, responseStatus={}, uri={}", statusCode, uri(request));
                     closeResponseBody(response);
                 } else {
@@ -70,17 +70,19 @@ public class RetryInterceptor implements Interceptor {
         return request.url().newBuilder().query(null).build().toString();
     }
 
+    // response.close asserts body not null, refer to Response.close()
+    // RetryAndFollowUpInterceptor also closes body directly
     private void closeResponseBody(Response response) {
         ResponseBody body = response.body();
         if (body != null) closeQuietly(body);
     }
 
-    boolean shouldRetry(boolean canceled, int attempts, int statusCode) {
-        if (canceled) return false;    // AsyncTimout cancels call if callTimeout, refer to RealCall.kt/timout field
-        if (attempts >= maxRetries) return false;
-        if (!withinMaxProcessTime(attempts)) return false;
-
-        return statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code;
+    boolean shouldRetry(int statusCode, int attempts) {
+        if (statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code) {
+            if (attempts >= maxRetries) return false;
+            return withinMaxProcessTime(attempts);
+        }
+        return false;
     }
 
     // refer to RetryAndFollowUpInterceptor.intercept for built-in error handling

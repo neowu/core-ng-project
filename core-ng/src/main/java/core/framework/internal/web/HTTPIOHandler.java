@@ -47,7 +47,7 @@ public class HTTPIOHandler implements HttpHandler {
         if (shutdown) return;
 
         if (hasBody(contentLength, exchange.getRequestMethod())) {    // parse body early, not process until body is read (e.g. for chunked), to save one blocking thread during read
-            FormDataParser parser = formParserFactory.createParser(exchange);
+            FormDataParser parser = formParserFactory.createParser(exchange);   // no need to close, refer to io.undertow.server.handlers.form.MultiPartParserDefinition.create, it closes on ExchangeCompletionListener
             if (parser != null) {
                 parser.parse(handler);
                 return;

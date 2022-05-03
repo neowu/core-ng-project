@@ -394,8 +394,6 @@ class RetryInterceptorTest {
         var exception = new ConnectException("connection failed");
         assertThat(interceptor.shouldRetry(true, "POST", 1, exception)).isFalse();
         assertThat(interceptor.shouldRetry(true, "PUT", 2, exception)).isFalse();
-
-        assertThat(interceptor.shouldRetry(true, 2, HTTPStatus.SERVICE_UNAVAILABLE.code)).isFalse();
     }
 
     @Test
@@ -406,15 +404,15 @@ class RetryInterceptorTest {
 
     @Test
     void shouldRetryWithServiceUnavailable() {
-        assertThat(interceptor.shouldRetry(false, 1, HTTPStatus.OK.code)).isFalse();
-        assertThat(interceptor.shouldRetry(false, 1, HTTPStatus.SERVICE_UNAVAILABLE.code)).isTrue();
-        assertThat(interceptor.shouldRetry(false, 3, HTTPStatus.SERVICE_UNAVAILABLE.code)).isFalse();
+        assertThat(interceptor.shouldRetry(HTTPStatus.OK.code, 1)).isFalse();
+        assertThat(interceptor.shouldRetry(HTTPStatus.SERVICE_UNAVAILABLE.code, 1)).isTrue();
+        assertThat(interceptor.shouldRetry(HTTPStatus.SERVICE_UNAVAILABLE.code, 3)).isFalse();
     }
 
     @Test
     void shouldRetryWithTooManyRequest() {
-        assertThat(interceptor.shouldRetry(false, 1, HTTPStatus.TOO_MANY_REQUESTS.code)).isTrue();
-        assertThat(interceptor.shouldRetry(false, 3, HTTPStatus.TOO_MANY_REQUESTS.code)).isFalse();
+        assertThat(interceptor.shouldRetry(HTTPStatus.TOO_MANY_REQUESTS.code, 1)).isTrue();
+        assertThat(interceptor.shouldRetry(HTTPStatus.TOO_MANY_REQUESTS.code, 3)).isFalse();
     }
 
     @Test
