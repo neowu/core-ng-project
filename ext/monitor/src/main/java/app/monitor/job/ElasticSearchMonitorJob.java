@@ -53,6 +53,9 @@ public class ElasticSearchMonitorJob implements Job {
 
         collectDiskUsage(stats, node);  // disk usage is most important to check, if disk usage is high, requires to expand disk immediately
 
+        // refer to https://github.com/elastic/elasticsearch/blob/master/server/src/main/java/org/elasticsearch/monitor/os/OsProbe.java
+        // es use com.sun.management.OperatingSystemMXBean.getSystemCpuLoad() to retrieve cpu load, which is host cpu usage, not process cpu usage
+        // in kube env, better set cpu limit to get more accurate usage data
         double cpuUsage = node.os.cpu.percent / 100d;
         stats.put("es_cpu_usage", cpuUsage);
         stats.checkHighUsage(cpuUsage, highCPUUsageThreshold, "cpu");

@@ -3,6 +3,8 @@
 ### 7.10.7 (04/29/2022 - )
 * log-collector: make http().maxForwardedIPs() read property "sys.http.maxForwardedIPs"
   > so it can be configured by env
+* stats: replace cpu usage to JDK built-in OperatingSystemMXBean.getProcessCpuLoad()
+  > since jdk 17, java is aware of container, refer to https://developers.redhat.com/articles/2022/04/19/java-17-whats-new-openjdks-container-awareness
 
 ### 7.10.6 (04/19/2022 - 04/28/2022)
 
