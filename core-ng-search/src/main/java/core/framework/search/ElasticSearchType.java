@@ -45,10 +45,10 @@ public interface ElasticSearchType<T> {
         bulkIndex(request);
     }
 
-    void update(UpdateRequest<T> request);
+    void update(UpdateRequest request);
 
     default void update(String id, String script, @Nullable Map<String, Object> params) {
-        var request = new UpdateRequest<T>();
+        var request = new UpdateRequest();
         request.id = id;
         request.script = script;
         request.params = params;

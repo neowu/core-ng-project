@@ -226,14 +226,17 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     }
 
     @Override
-    public void update(UpdateRequest<T> request) {
+    public void update(UpdateRequest request) {
         var watch = new StopWatch();
         if (request.script == null) throw new Error("request.script must not be null");
         String index = request.index == null ? this.index : request.index;
         try {
             Map<String, JsonData> params = request.params == null ? Map.of() : request.params.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, value -> JsonData.of(value.getValue())));
             elasticSearch.client.update(builder ->
-                builder.index(index).id(request.id).script(s -> s.inline(i -> i.source(request.script).params(params))), documentClass);
+                builder.index(index)
+                    .id(request.id)
+                    .script(s -> s.inline(i -> i.source(request.script).params(params)))
+                    .retryOnConflict(request.retryOnConflict), documentClass);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
