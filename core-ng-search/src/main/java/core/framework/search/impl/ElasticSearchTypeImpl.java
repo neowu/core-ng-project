@@ -6,7 +6,6 @@ import co.elastic.clients.elasticsearch._types.ErrorCause;
 import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.Result;
 import co.elastic.clients.elasticsearch._types.ShardFailure;
-import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
 import co.elastic.clients.elasticsearch.core.DeleteResponse;
@@ -130,11 +129,10 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
                 }
                 return builder;
             });
-            var response = elasticSearch.client.search(builder ->
-                builder.index(index)
-                    .suggest(suggest)
-                    .source(s -> s.fetch(Boolean.FALSE))
-                    .timeout(elasticSearch.timeout.toMillis() + "ms"), documentClass);
+            var response = elasticSearch.client.search(builder -> builder.index(index)
+                .suggest(suggest)
+                .source(s -> s.fetch(Boolean.FALSE))
+                .timeout(elasticSearch.timeout.toMillis() + "ms"), documentClass);
             validate(response);
             esTook = response.took() * 1_000_000;
             List<String> suggestions = response.suggest().values().stream()
@@ -232,11 +230,10 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         String index = request.index == null ? this.index : request.index;
         try {
             Map<String, JsonData> params = request.params == null ? Map.of() : request.params.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, value -> JsonData.of(value.getValue())));
-            elasticSearch.client.update(builder ->
-                builder.index(index)
-                    .id(request.id)
-                    .script(s -> s.inline(i -> i.source(request.script).params(params)))
-                    .retryOnConflict(request.retryOnConflict), documentClass);
+            elasticSearch.client.update(builder -> builder.index(index)
+                .id(request.id)
+                .script(s -> s.inline(i -> i.source(request.script).params(params)))
+                .retryOnConflict(request.retryOnConflict), documentClass);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
@@ -348,47 +345,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     @Override
     public void forEach(ForEach<T> forEach) {
-        var watch = new StopWatch();
-        long start = System.nanoTime();
-        long esClientTook = 0;
-        long esServerTook = 0;
-        validate(forEach);
-        Time keepAlive = Time.of(t -> t.time(forEach.scrollTimeout.toMillis() + "ms"));
         String index = forEach.index == null ? this.index : forEach.index;
-        int totalHits = 0;
-        try {
-            var response = elasticSearch.client.search(builder -> builder.index(index)
-                .scroll(keepAlive)
-                .query(forEach.query)
-                .sort(s -> s.field(f -> f.field("_doc")))
-                .size(forEach.limit), documentClass);
-            var holder = new ScrollIdHolder();
-            holder.scrollId = response.scrollId();
-            while (true) {
-                esServerTook += response.took() * 1_000_000;
-
-                var hits = response.hits().hits();
-                esClientTook += System.nanoTime() - start;
-                if (hits.isEmpty()) break;
-                totalHits += hits.size();
-
-                for (var hit : hits) {
-                    forEach.consumer.accept(hit.source());
-                }
-
-                start = System.nanoTime();
-                response = elasticSearch.client.scroll(builder -> builder.scrollId(holder.scrollId).scroll(keepAlive), documentClass);
-                holder.scrollId = response.scrollId();
-            }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        } catch (ElasticsearchException e) {
-            throw elasticSearch.searchException(e);
-        } finally {
-            long elapsed = watch.elapsed();
-            ActionLogContext.track("elasticsearch", elapsed, totalHits, 0);
-            logger.debug("forEach, totalHits={}, esServerTook={}, esClientTook={}, elapsed={}", totalHits, esServerTook, esClientTook, elapsed);
-        }
+        new ElasticSearchForEach<>(forEach, index, documentClass, elasticSearch).process();
     }
 
     private void validate(SearchRequest request) {
@@ -410,13 +368,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         if (response.timedOut()) {
             logger.warn(errorCode("SLOW_ES"), "some of elasticsearch shards timed out");
         }
-    }
-
-    private void validate(ForEach<T> forEach) {
-        if (forEach.consumer == null) throw new Error("forEach.consumer must not be null");
-        if (forEach.query == null) throw new Error("forEach.query must not be null");
-        if (forEach.scrollTimeout == null) throw new Error("forEach.scrollTimeout must not be null");
-        if (forEach.limit == null || forEach.limit <= 0) throw new Error("forEach.limit must not be null or less than one");
     }
 
     private void validate(BulkResponse response) {
@@ -444,9 +395,5 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         if (elapsed > slowOperationThresholdInNanos) {
             logger.warn(errorCode("SLOW_ES"), "slow elasticsearch operation, elapsed={}", Duration.ofNanos(elapsed));
         }
-    }
-
-    private static class ScrollIdHolder {
-        String scrollId;
     }
 }
