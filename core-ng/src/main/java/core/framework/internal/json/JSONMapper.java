@@ -60,7 +60,7 @@ public class JSONMapper {
                 // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
                 .addModule(new AfterburnerModule().setUseValueClassLoader(false))
                 .defaultDateFormat(new StdDateFormat())
-                // only auto detect field, and default visibility is public_only, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
+                // only detect public fields, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
                 .visibility(new VisibilityChecker.Std(NONE, NONE, NONE, NONE, PUBLIC_ONLY))
                 .enable(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS)
                 .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)

@@ -25,6 +25,7 @@ public class TestDocument {
     @Property(name = "string_field")
     public String stringField;
 
+    @NotNull
     @Property(name = "int_field")
     public Integer intField;
 

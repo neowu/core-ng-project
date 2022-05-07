@@ -6,6 +6,8 @@ import co.elastic.clients.elasticsearch._types.ErrorCause;
 import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import core.framework.internal.json.JSONMapper;
 import core.framework.log.ActionLogContext;
 import core.framework.search.ClusterStateResponse;
@@ -50,7 +52,8 @@ public class ElasticSearchImpl implements ElasticSearch {
                 .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis()));
             builder.setHttpClientConfigCallback(config -> config.addInterceptorFirst(new ElasticSearchLogInterceptor()));
             restClient = builder.build();
-            client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper(JSONMapper.OBJECT_MAPPER)));
+            ObjectMapper mapper = JSONMapper.OBJECT_MAPPER.copy().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper(mapper)));
         }
     }
 

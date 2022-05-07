@@ -52,7 +52,18 @@ public interface ElasticSearchType<T> {
         request.id = id;
         request.script = script;
         request.params = params;
+        request.retryOnConflict = 5;
         update(request);
+    }
+
+    void partialUpdate(PartialUpdateRequest<T> request);
+
+    default void partialUpdate(String id, T source) {
+        var request = new PartialUpdateRequest<T>();
+        request.id = id;
+        request.source = source;
+        request.retryOnConflict = 5;
+        partialUpdate(request);
     }
 
     boolean delete(DeleteRequest request);

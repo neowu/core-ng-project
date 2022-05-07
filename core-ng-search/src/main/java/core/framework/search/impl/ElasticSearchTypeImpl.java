@@ -32,6 +32,7 @@ import core.framework.search.ForEach;
 import core.framework.search.GetRequest;
 import core.framework.search.Index;
 import core.framework.search.IndexRequest;
+import core.framework.search.PartialUpdateRequest;
 import core.framework.search.SearchException;
 import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
@@ -242,6 +243,28 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, 0, 1);
             logger.debug("update, index={}, id={}, script={}, elapsed={}", index, request.id, request.script, elapsed);
+            checkSlowOperation(elapsed);
+        }
+    }
+
+    @Override
+    public void partialUpdate(PartialUpdateRequest<T> request) {
+        var watch = new StopWatch();
+        String index = request.index == null ? this.index : request.index;
+        validator.validate(request.source, true);
+        try {
+            elasticSearch.client.update(builder -> builder.index(index)
+                .id(request.id)
+                .doc(request.source)
+                .retryOnConflict(request.retryOnConflict), documentClass);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        } catch (ElasticsearchException e) {
+            throw elasticSearch.searchException(e);
+        } finally {
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, 0, 1);
+            logger.debug("partialUpdate, index={}, id={}, elapsed={}", index, request.id, elapsed);
             checkSlowOperation(elapsed);
         }
     }

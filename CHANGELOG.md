@@ -10,6 +10,7 @@
   > e.g. add("group", 10, 5, Duration.ofSeconds(1)) keeps 10 permits at most, fills 5 permits every second
   > e.g. add("group", 20, 10, Duration.ofMinutes(5)) keeps 20 permits at most, fills 10 permits every 5 minutes
 * search: added retryOnConflict on UpdateRequest to handle
+* search: added partialUpdate
 
 ### 7.10.6 (04/19/2022 - 04/28/2022)
 

@@ -232,6 +232,22 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    void partialUpdate() {
+        documentType.index("5", document("5", "value4", 4, 0, null, null));
+
+        var document = new TestDocument();
+        document.stringField = "value5";
+        document.localTimeField = LocalTime.now();
+        documentType.partialUpdate("5", document);
+
+        TestDocument result = documentType.get("5").orElseThrow();
+        assertThat(result.stringField).isEqualTo("value5");
+        assertThat(result.intField).isEqualTo(4);
+        assertThat(result.localTimeField).isEqualTo(document.localTimeField);
+        assertThat(result.zonedDateTimeField).isNull();
+    }
+
+    @Test
     void aggregate() {
         documentType.index("1", document("1", "value1", 0, 19.13, null, null));
         documentType.index("2", document("2", "value1", 0, 0.01, null, null));
