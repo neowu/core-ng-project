@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.7-b2 (04/29/2022 - )
+### 7.10.7 (04/29/2022 - )
 
 * log-collector: make http().maxForwardedIPs() read property "sys.http.maxForwardedIPs"
   > so it can be configured by env
@@ -11,6 +11,7 @@
   > e.g. add("group", 20, 10, Duration.ofMinutes(5)) keeps 20 permits at most, fills 10 permits every 5 minutes
 * search: added retryOnConflict on UpdateRequest to handle
 * search: added partialUpdate
+* db: mysql jdbc driver updated to 8.0.29 !!! framework depends on mysql api, must use matched jdbc driver
 
 ### 7.10.6 (04/19/2022 - 04/28/2022)
 
