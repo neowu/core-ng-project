@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.7-b1 (04/29/2022 - )
+### 7.10.7-b2 (04/29/2022 - )
 
 * log-collector: make http().maxForwardedIPs() read property "sys.http.maxForwardedIPs"
   > so it can be configured by env
