@@ -2,6 +2,7 @@ package core.framework.search.impl;
 
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.Time;
+import co.elastic.clients.elasticsearch.core.search.ResponseBody;
 import core.framework.log.ActionLogContext;
 import core.framework.search.ForEach;
 import core.framework.util.StopWatch;
@@ -41,7 +42,7 @@ public class ElasticSearchForEach<T> {
 
         int totalHits = 0;
         try {
-            var response = elasticSearch.client.search(builder -> builder.index(index)
+            ResponseBody<T> response = elasticSearch.client.search(builder -> builder.index(index)
                 .scroll(keepAlive)
                 .query(forEach.query)
                 .sort(s -> s.field(f -> f.field("_doc")))

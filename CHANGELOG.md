@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.7 (04/29/2022 - )
+### 7.10.7 (04/29/2022 - 05/12/2022)
 
 * log-collector: make http().maxForwardedIPs() read property "sys.http.maxForwardedIPs"
   > so it can be configured by env
@@ -12,6 +12,7 @@
 * search: added retryOnConflict on UpdateRequest to handle
 * search: added partialUpdate
 * db: mysql jdbc driver updated to 8.0.29 !!! framework depends on mysql api, must use matched jdbc driver
+* search: update es to 8.2.0
 
 ### 7.10.6 (04/19/2022 - 04/28/2022)
 
