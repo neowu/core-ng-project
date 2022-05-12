@@ -1,6 +1,7 @@
 package core.framework.internal.web.sys;
 
 import core.framework.internal.kafka.MessageHeaders;
+import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.Trace;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -16,12 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class KafkaControllerTest {
     private KafkaController controller;
     private LogManager logManager;
+    private ActionLog actionLog;
 
     @BeforeEach
     void createKafkaController() {
         controller = new KafkaController();
         logManager = new LogManager();
-        logManager.begin("begin", null);
+        actionLog = logManager.begin("begin", null);
     }
 
     @AfterEach
@@ -31,7 +33,7 @@ class KafkaControllerTest {
 
     @Test
     void record() {
-        ProducerRecord<byte[], byte[]> record = controller.record("topic", "key", new byte[0]);
+        ProducerRecord<byte[], byte[]> record = controller.record("topic", "key", new byte[0], actionLog);
         assertThat(record.headers().lastHeader(MessageHeaders.HEADER_TRACE).value()).asString().isEqualTo(Trace.CASCADE.name());
     }
 }

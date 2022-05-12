@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.TimerTask;
 
+// track change with https://github.com/mysql/mysql-connector-j/blob/release/8.0/src/main/core-impl/java/com/mysql/cj/CancelQueryTaskImpl.java
 public class CancelQueryTaskImpl extends TimerTask implements CancelQueryTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(CancelQueryTaskImpl.class);
 
