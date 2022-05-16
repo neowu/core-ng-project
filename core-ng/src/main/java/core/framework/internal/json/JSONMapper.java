@@ -1,6 +1,7 @@
 package core.framework.internal.json;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
@@ -56,15 +57,17 @@ public class JSONMapper {
 
     private static ObjectMapper createObjectMapper() {
         return JsonMapper.builder()
-                .addModule(timeModule())
-                // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
-                .addModule(new AfterburnerModule().setUseValueClassLoader(false))
-                .defaultDateFormat(new StdDateFormat())
-                // only detect public fields, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
-                .visibility(new VisibilityChecker.Std(NONE, NONE, NONE, NONE, PUBLIC_ONLY))
-                .enable(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS)
-                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .addModule(timeModule())
+            // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
+            .addModule(new AfterburnerModule().setUseValueClassLoader(false))
+            .defaultDateFormat(new StdDateFormat())
+            // only detect public fields, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
+            .visibility(new VisibilityChecker.Std(NONE, NONE, NONE, NONE, PUBLIC_ONLY))
+            .enable(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS)
+            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            // e.g. disable convert empty string to Integer null
+            .disable(MapperFeature.ALLOW_COERCION_OF_SCALARS)
                 .annotationIntrospector(new JSONAnnotationIntrospector())
                 .deactivateDefaultTyping()
                 .build();

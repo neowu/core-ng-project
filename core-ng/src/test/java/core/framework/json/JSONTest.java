@@ -196,4 +196,10 @@ class JSONTest {
         assertThatThrownBy(() -> JSON.fromJSON(Types.list(TestBean.class), "{"))
             .isInstanceOf(UncheckedIOException.class);
     }
+
+    @Test
+    void invalidInteger() {
+        assertThatThrownBy(() -> JSON.fromJSON(Integer.class, "\"\""))
+            .isInstanceOf(UncheckedIOException.class);
+    }
 }

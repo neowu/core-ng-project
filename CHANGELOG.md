@@ -4,6 +4,9 @@
 
 * log-processor: action forward supports by result
   > e.g. only forward OK actions
+* json: disabled ALLOW_COERCION_OF_SCALARS, to make it stricter
+  > thru JSONMapper.disable(MapperFeature.ALLOW_COERCION_OF_SCALARS)
+  > previously, [""] will convert [null] if target type is List<Integer>
 
 ### 7.10.7 (04/29/2022 - 05/12/2022)
 
