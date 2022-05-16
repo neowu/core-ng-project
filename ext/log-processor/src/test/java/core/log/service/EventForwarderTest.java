@@ -24,7 +24,7 @@ class EventForwarderTest {
 
     @BeforeEach
     void createEventForwarder() {
-        forwarder = new EventForwarder(publisher, "event", List.of("website"), List.of("NOT_FOUND"));
+        forwarder = new EventForwarder(publisher, "event", List.of("website"), List.of(), List.of("NOT_FOUND"));
     }
 
     @Test

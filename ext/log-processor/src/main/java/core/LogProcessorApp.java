@@ -121,12 +121,12 @@ public class LogProcessorApp extends App {
             LogForwardConfig.Forward actionConfig = config.action;
             if (actionConfig != null) {
                 MessagePublisher<ActionLogMessage> publisher = kafka("forward").publish(ActionLogMessage.class);
-                forwarders.action = new ActionLogForwarder(publisher, actionConfig.topic, actionConfig.apps, actionConfig.ignoreErrorCodes);
+                forwarders.action = new ActionLogForwarder(publisher, actionConfig.topic, actionConfig.apps, actionConfig.results, actionConfig.ignoreErrorCodes);
             }
             LogForwardConfig.Forward eventConfig = config.event;
             if (eventConfig != null) {
                 MessagePublisher<EventMessage> publisher = kafka("forward").publish(EventMessage.class);
-                forwarders.event = new EventForwarder(publisher, eventConfig.topic, eventConfig.apps, eventConfig.ignoreErrorCodes);
+                forwarders.event = new EventForwarder(publisher, eventConfig.topic, eventConfig.apps, eventConfig.results, eventConfig.ignoreErrorCodes);
             }
         }
         return forwarders;
