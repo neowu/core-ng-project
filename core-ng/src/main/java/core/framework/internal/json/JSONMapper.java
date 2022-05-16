@@ -68,9 +68,9 @@ public class JSONMapper {
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             // e.g. disable convert empty string to Integer null
             .disable(MapperFeature.ALLOW_COERCION_OF_SCALARS)
-                .annotationIntrospector(new JSONAnnotationIntrospector())
-                .deactivateDefaultTyping()
-                .build();
+            .annotationIntrospector(new JSONAnnotationIntrospector())
+            .deactivateDefaultTyping()
+            .build();
     }
 
     private static JavaTimeModule timeModule() {
@@ -78,26 +78,26 @@ public class JSONMapper {
 
         // redefine date time formatter to output nano seconds in at least 3 digits, which inline with ISO standard and ES standard
         DateTimeFormatter localTimeFormatter = new DateTimeFormatterBuilder()
-                .parseStrict()
-                .appendValue(HOUR_OF_DAY, 2)
-                .appendLiteral(':')
-                .appendValue(MINUTE_OF_HOUR, 2)
-                .appendLiteral(':')
-                .appendValue(SECOND_OF_MINUTE, 2)
-                .appendFraction(NANO_OF_SECOND, 3, 9, true) // always output 3 digits of nano seconds (iso date format doesn't specify how many digits it should present, here always keep 3)
-                .toFormatter();
+            .parseStrict()
+            .appendValue(HOUR_OF_DAY, 2)
+            .appendLiteral(':')
+            .appendValue(MINUTE_OF_HOUR, 2)
+            .appendLiteral(':')
+            .appendValue(SECOND_OF_MINUTE, 2)
+            .appendFraction(NANO_OF_SECOND, 3, 9, true) // always output 3 digits of nano seconds (iso date format doesn't specify how many digits it should present, here always keep 3)
+            .toFormatter();
 
         module.addSerializer(ZonedDateTime.class, new ZonedDateTimeSerializer(ISO_INSTANT));
         module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(new DateTimeFormatterBuilder()
-                .parseStrict()
-                .append(ISO_LOCAL_DATE)
-                .appendLiteral('T')
-                .append(localTimeFormatter)
-                .toFormatter()));
+            .parseStrict()
+            .append(ISO_LOCAL_DATE)
+            .appendLiteral('T')
+            .append(localTimeFormatter)
+            .toFormatter()));
         module.addSerializer(LocalTime.class, new LocalTimeSerializer(new DateTimeFormatterBuilder()
-                .parseStrict()
-                .append(localTimeFormatter)
-                .toFormatter()));
+            .parseStrict()
+            .append(localTimeFormatter)
+            .toFormatter()));
         return module;
     }
 }
