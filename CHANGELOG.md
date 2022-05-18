@@ -8,6 +8,7 @@
   > thru JSONMapper.disable(MapperFeature.ALLOW_COERCION_OF_SCALARS)
   > previously, [""] will convert [null] if target type is List<Integer>
 * search: put detailed error in SearchException
+* kafka: update to 3.2.0
 
 ### 7.10.7 (04/29/2022 - 05/12/2022)
 
