@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.ErrorCause;
 import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
+import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
+import java.util.Map;
 
 /**
  * @author neo
@@ -177,12 +179,26 @@ public class ElasticSearchImpl implements ElasticSearch {
         }
     }
 
-    // convert elasticsearch-java client exception, to append detailed error message
+    /*
+     convert elasticsearch-java client exception, to append detailed error message
+     es put actual reason within metadata, e.g.
+
+     core.framework.search.SearchException: [es/search] failed: [search_phase_execution_exception] all shards failed
+     metadata:
+     phase="query"
+     failed_shards=[{"shard":0,"index":"document","node":"lcqF3AYgTyqBZe7HNApmjg","reason":{"type":"query_shard_exception","reason":"No mapping found for [unexisted] in order to sort on","index_uuid":"vlA9-8zeT2O-aDnnxxnsXA","index":"document"}}]
+     grouped=true
+    */
     SearchException searchException(ElasticsearchException e) {
-        ErrorCause causedBy = e.error().causedBy();
+        ErrorCause error = e.error();
         var builder = new StringBuilder(e.getMessage());
+        builder.append("\nmetadata:\n");
+        for (Map.Entry<String, JsonData> entry : error.metadata().entrySet()) {
+            builder.append(entry).append('\n');
+        }
+        ErrorCause causedBy = error.causedBy();
         if (causedBy != null) {
-            builder.append("\nreason: ").append(causedBy.reason());
+            builder.append("causedBy: ").append(causedBy.reason());
         }
         return new SearchException(builder.toString(), e);
     }
