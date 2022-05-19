@@ -71,7 +71,7 @@ public class JSONMapper {
             .deactivateDefaultTyping();
     }
 
-    private static JsonMapper createObjectMapper() {
+    private static ObjectMapper createObjectMapper() {
         JsonMapper.Builder builder = builder();
         // enable afterburner only for framework managed beans
         // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
