@@ -21,11 +21,13 @@ public interface Query<T> {
 
     Optional<T> fetchOne();
 
-    <P> Optional<P> project(String projection, Class<P> viewClass);
+    <P> List<P> project(String projection, Class<P> viewClass);
+
+    <P> Optional<P> projectOne(String projection, Class<P> viewClass);
 
     // refer to https://dev.mysql.com/doc/refman/8.0/en/group-by-functions.html#function_count, count function return BIGINT
     default long count() {
-        return project("count(1)", Long.class).orElseThrow();
+        return projectOne("count(1)", Long.class).orElseThrow();
     }
 
     // syntax sugar, to help to build "where in clause" with dynamic params

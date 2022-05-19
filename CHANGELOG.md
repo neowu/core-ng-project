@@ -1,6 +1,6 @@
 ## Change log
 
-### 7.10.8 (05/16/2022 - )
+### 7.10.8 (05/16/2022 - 05/19/2022)
 
 * log-processor: action forward supports by result
   > e.g. only forward OK actions
@@ -9,6 +9,8 @@
   > previously, [""] will convert [null] if target type is List<Integer>
 * search: put detailed error in SearchException
 * kafka: update to 3.2.0
+* db: query.project() renamed to query.projectOne(), added query.project() to return List<View> !!!
+  > should be easy to fix with compiler errors
 
 ### 7.10.7 (04/29/2022 - 05/12/2022)
 

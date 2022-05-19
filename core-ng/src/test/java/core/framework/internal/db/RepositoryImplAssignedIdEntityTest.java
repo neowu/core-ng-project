@@ -248,7 +248,6 @@ class RepositoryImplAssignedIdEntityTest {
         assertThat(repository.get(entities.get(1).id)).isNotPresent();
     }
 
-
     @Test
     void batchDeleteWithEmptyPrimaryKeys() {
         assertThatThrownBy(() -> repository.batchDelete(List.of()))
@@ -268,7 +267,7 @@ class RepositoryImplAssignedIdEntityTest {
         Query<AssignedIdEntity> query = repository.select();
         query.where("string_field = ?", "group");
         query.groupBy("string_field");
-        Optional<Integer> sum = query.project("sum(int_field)", Integer.class);
+        Optional<Integer> sum = query.projectOne("sum(int_field)", Integer.class);
 
         assertThat(sum).hasValue(50);
 

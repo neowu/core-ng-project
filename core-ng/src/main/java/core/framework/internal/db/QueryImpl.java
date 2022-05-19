@@ -79,9 +79,16 @@ public class QueryImpl<T> implements Query<T> {
     }
 
     @Override
-    public <P> Optional<P> project(String projection, Class<P> viewClass) {
-        // project ignores skip and limit, and not report error, mainly for pagination search
-        String sql = selectQuery.projectionSQL(projection, whereClause, groupBy);
+    public <P> List<P> project(String projection, Class<P> viewClass) {
+        String sql = selectQuery.projectionSQL(projection, whereClause, groupBy, sort, skip, limit);
+        Object[] params = selectQuery.fetchParams(this.params, skip, limit);
+        return database.select(sql, viewClass, params);
+    }
+
+    @Override
+    public <P> Optional<P> projectOne(String projection, Class<P> viewClass) {
+        // project ignores sort, skip and limit, and not report error, mainly for pagination search
+        String sql = selectQuery.projectionSQL(projection, whereClause, groupBy, null, null, null);
         Object[] params = this.params.toArray();
         return database.selectOne(sql, viewClass, params);
     }
