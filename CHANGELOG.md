@@ -1,5 +1,11 @@
 ## Change log
 
+### 7.10.9 (05/19/2022 - )
+
+* json: expose JSONMapper.builder() method to allow app create its own JSON parser
+
+> e.g. to parse external json with custom DeserializationFeature/MapperFeature
+
 ### 7.10.8 (05/16/2022 - 05/19/2022)
 
 * log-processor: action forward supports by result

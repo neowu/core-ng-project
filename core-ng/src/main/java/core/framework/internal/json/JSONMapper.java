@@ -55,11 +55,10 @@ public class JSONMapper {
         writers = null;
     }
 
-    private static ObjectMapper createObjectMapper() {
+    // expose builder, to allow app build its own JSON mapper to parse external json, e.g. can be less strict
+    public static JsonMapper.Builder builder() {
         return JsonMapper.builder()
             .addModule(timeModule())
-            // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
-            .addModule(new AfterburnerModule().setUseValueClassLoader(false))
             .defaultDateFormat(new StdDateFormat())
             // only detect public fields, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
             .visibility(new VisibilityChecker.Std(NONE, NONE, NONE, NONE, PUBLIC_ONLY))
@@ -69,8 +68,15 @@ public class JSONMapper {
             // e.g. disable convert empty string to Integer null
             .disable(MapperFeature.ALLOW_COERCION_OF_SCALARS)
             .annotationIntrospector(new JSONAnnotationIntrospector())
-            .deactivateDefaultTyping()
-            .build();
+            .deactivateDefaultTyping();
+    }
+
+    private static JsonMapper createObjectMapper() {
+        JsonMapper.Builder builder = builder();
+        // enable afterburner only for framework managed beans
+        // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
+        builder.addModule(new AfterburnerModule().setUseValueClassLoader(false));
+        return builder.build();
     }
 
     private static JavaTimeModule timeModule() {
