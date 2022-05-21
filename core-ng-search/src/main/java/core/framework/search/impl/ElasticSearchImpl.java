@@ -42,6 +42,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public int maxResultWindow = 10000;
     ElasticsearchClient client;
     private RestClient restClient;
+    private ObjectMapper mapper;
 
     // initialize will be called in startup hook, no need to synchronize
     public void initialize() {
@@ -54,7 +55,7 @@ public class ElasticSearchImpl implements ElasticSearch {
                 .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis()));
             builder.setHttpClientConfigCallback(config -> config.addInterceptorFirst(new ElasticSearchLogInterceptor()));
             restClient = builder.build();
-            ObjectMapper mapper = JSONMapper.OBJECT_MAPPER.copy().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            mapper = JSONMapper.builder().serializationInclusion(JsonInclude.Include.NON_NULL).build();
             client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper(mapper)));
         }
     }
@@ -92,7 +93,7 @@ public class ElasticSearchImpl implements ElasticSearch {
                 // only try to update mappings, as for settings it generally requires closing index first then open after update
                 logger.info("index already exists, update mapping, index={}", index);
                 request = new Request("PUT", "/" + index + "/_mapping");
-                request.setJsonEntity(JSONMapper.OBJECT_MAPPER.readTree(source).get("mappings").toString());
+                request.setJsonEntity(mapper.readTree(source).get("mappings").toString());
             }
             Response response = restClient.performRequest(request);
             entity = response.getEntity();

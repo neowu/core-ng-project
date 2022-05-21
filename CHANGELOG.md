@@ -1,10 +1,11 @@
 ## Change log
 
-### 7.10.9 (05/19/2022 - )
+### 8.0.0 (05/19/2022 - )
 
 * json: expose JSONMapper.builder() method to allow app create its own JSON parser
-
-> e.g. to parse external json with custom DeserializationFeature/MapperFeature
+  > e.g. to parse external json with custom DeserializationFeature/MapperFeature
+* search: add validation, document class must not have default values
+  > with partialUpdate, it could override es with those default values
 
 ### 7.10.8 (05/16/2022 - 05/19/2022)
 

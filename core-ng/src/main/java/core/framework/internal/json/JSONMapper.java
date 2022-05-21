@@ -34,7 +34,7 @@ import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
  * @author neo
  */
 public class JSONMapper {
-    public static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
+    public static final ObjectMapper OBJECT_MAPPER = builder().build();
     private static Map<Class<?>, JSONReader<?>> readers = new HashMap<>();
     private static Map<Class<?>, JSONWriter<?>> writers = new HashMap<>();
 
@@ -60,6 +60,8 @@ public class JSONMapper {
         return JsonMapper.builder()
             .addModule(timeModule())
             .defaultDateFormat(new StdDateFormat())
+            // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
+            .addModule(new AfterburnerModule().setUseValueClassLoader(false))
             // only detect public fields, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
             .visibility(new VisibilityChecker.Std(NONE, NONE, NONE, NONE, PUBLIC_ONLY))
             .enable(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS)
@@ -69,14 +71,6 @@ public class JSONMapper {
             .disable(MapperFeature.ALLOW_COERCION_OF_SCALARS)
             .annotationIntrospector(new JSONAnnotationIntrospector())
             .deactivateDefaultTyping();
-    }
-
-    private static ObjectMapper createObjectMapper() {
-        JsonMapper.Builder builder = builder();
-        // enable afterburner only for framework managed beans
-        // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
-        builder.addModule(new AfterburnerModule().setUseValueClassLoader(false));
-        return builder.build();
     }
 
     private static JavaTimeModule timeModule() {
