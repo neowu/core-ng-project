@@ -6,6 +6,8 @@
   > e.g. to parse external json with custom DeserializationFeature/MapperFeature
 * search: add validation, document class must not have default values
   > with partialUpdate, it could override es with those default values
+* search: update and partialUpdate return if target doc is updated
+  > refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html#_detect_noop_updates
 
 ### 7.10.8 (05/16/2022 - 05/19/2022)
 

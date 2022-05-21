@@ -176,8 +176,8 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void delete() {
         documentType.index("1", document("1", "value", 1, 0, null, null));
 
-        boolean result = documentType.delete("1");
-        assertThat(result).isTrue();
+        boolean deleted = documentType.delete("1");
+        assertThat(deleted).isTrue();
     }
 
     @Test
@@ -226,9 +226,13 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void update() {
         documentType.index("4", document("4", "value4", 4, 0, null, null));
 
-        documentType.update("4", "ctx._source.int_field = ctx._source.int_field + params.value", Map.of("value", 1));
-
+        boolean updated = documentType.update("4", "ctx._source.int_field = ctx._source.int_field + params.value", Map.of("value", 1));
+        assertThat(updated).isTrue();
         assertThat(documentType.get("4").orElseThrow().intField).isEqualTo(5);
+
+        updated = documentType.update("4", "if (ctx._source.int_field != 5) { ctx._source.int_field = 5 } else { ctx.op = 'noop' }", Map.of());
+        assertThat(documentType.get("4").orElseThrow().intField).isEqualTo(5);
+        assertThat(updated).isFalse();
     }
 
     @Test
@@ -238,13 +242,17 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         var document = new TestDocument();
         document.stringField = "value5";
         document.localTimeField = LocalTime.now();
-        documentType.partialUpdate("5", document);
+        boolean updated = documentType.partialUpdate("5", document);
+        assertThat(updated).isTrue();
 
         TestDocument result = documentType.get("5").orElseThrow();
         assertThat(result.stringField).isEqualTo("value5");
         assertThat(result.intField).isEqualTo(4);
         assertThat(result.localTimeField).isEqualTo(document.localTimeField);
         assertThat(result.zonedDateTimeField).isNull();
+
+        updated = documentType.partialUpdate("5", document);
+        assertThat(updated).isFalse();
     }
 
     @Test

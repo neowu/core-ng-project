@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
 import co.elastic.clients.elasticsearch.core.DeleteResponse;
 import co.elastic.clients.elasticsearch.core.GetResponse;
+import co.elastic.clients.elasticsearch.core.UpdateResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.search.CompletionSuggestOption;
@@ -225,46 +226,52 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     }
 
     @Override
-    public void update(UpdateRequest request) {
+    public boolean update(UpdateRequest request) {
         var watch = new StopWatch();
         if (request.script == null) throw new Error("request.script must not be null");
         String index = request.index == null ? this.index : request.index;
+        boolean updated = false;
         try {
             Map<String, JsonData> params = request.params == null ? Map.of() : request.params.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, value -> JsonData.of(value.getValue())));
-            elasticSearch.client.update(builder -> builder.index(index)
+            UpdateResponse<T> response = elasticSearch.client.update(builder -> builder.index(index)
                 .id(request.id)
                 .script(s -> s.inline(i -> i.source(request.script).params(params)))
                 .retryOnConflict(request.retryOnConflict), documentClass);
+            updated = response.result() == Result.Updated;
+            return updated;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
             throw elasticSearch.searchException(e);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("elasticsearch", elapsed, 0, 1);
-            logger.debug("update, index={}, id={}, script={}, elapsed={}", index, request.id, request.script, elapsed);
+            ActionLogContext.track("elasticsearch", elapsed, 0, updated ? 1 : 0);
+            logger.debug("update, index={}, id={}, script={}, updated={}, elapsed={}", index, request.id, request.script, updated, elapsed);
             checkSlowOperation(elapsed);
         }
     }
 
     @Override
-    public void partialUpdate(PartialUpdateRequest<T> request) {
+    public boolean partialUpdate(PartialUpdateRequest<T> request) {
         var watch = new StopWatch();
-        String index = request.index == null ? this.index : request.index;
         validator.validate(request.source, true);
+        String index = request.index == null ? this.index : request.index;
+        boolean updated = false;
         try {
-            elasticSearch.client.update(builder -> builder.index(index)
+            UpdateResponse<T> response = elasticSearch.client.update(builder -> builder.index(index)
                 .id(request.id)
                 .doc(request.source)
                 .retryOnConflict(request.retryOnConflict), documentClass);
+            updated = response.result() == Result.Updated;
+            return updated;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
             throw elasticSearch.searchException(e);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("elasticsearch", elapsed, 0, 1);
-            logger.debug("partialUpdate, index={}, id={}, elapsed={}", index, request.id, elapsed);
+            ActionLogContext.track("elasticsearch", elapsed, 0, updated ? 1 : 0);
+            logger.debug("partialUpdate, index={}, id={}, updated={}, elapsed={}", index, request.id, updated, elapsed);
             checkSlowOperation(elapsed);
         }
     }

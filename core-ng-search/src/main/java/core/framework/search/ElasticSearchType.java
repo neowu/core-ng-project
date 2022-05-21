@@ -45,25 +45,26 @@ public interface ElasticSearchType<T> {
         bulkIndex(request);
     }
 
-    void update(UpdateRequest request);
+    // with script update, unless script assigns current op with 'noop', result is always updated, e.g. ctx.op = 'noop'
+    boolean update(UpdateRequest request);
 
-    default void update(String id, String script, @Nullable Map<String, Object> params) {
+    default boolean update(String id, String script, @Nullable Map<String, Object> params) {
         var request = new UpdateRequest();
         request.id = id;
         request.script = script;
         request.params = params;
         request.retryOnConflict = 5;
-        update(request);
+        return update(request);
     }
 
-    void partialUpdate(PartialUpdateRequest<T> request);
+    boolean partialUpdate(PartialUpdateRequest<T> request);
 
-    default void partialUpdate(String id, T source) {
+    default boolean partialUpdate(String id, T source) {
         var request = new PartialUpdateRequest<T>();
         request.id = id;
         request.source = source;
         request.retryOnConflict = 5;
-        partialUpdate(request);
+        return partialUpdate(request);
     }
 
     boolean delete(DeleteRequest request);

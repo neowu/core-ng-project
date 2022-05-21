@@ -19,14 +19,12 @@ class DocumentClassValidatorTest {
     void validate() {
         new DocumentClassValidator(TestDocument.class).validate();
     }
-
     @Test
     void validateWithoutIndexAnnotation() {
         assertThatThrownBy(() -> new DocumentClassValidator(TestDocumentWithoutIndexAnnotation.class).validate())
             .isInstanceOf(Error.class)
             .hasMessageContaining("document class must have @Index");
     }
-
     @Test
     void validateWithDefaultValue() {
         assertThatThrownBy(() -> new DocumentClassValidator(TestDocumentWithDefaultValue.class).validate())
