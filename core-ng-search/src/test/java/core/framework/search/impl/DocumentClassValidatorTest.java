@@ -19,12 +19,14 @@ class DocumentClassValidatorTest {
     void validate() {
         new DocumentClassValidator(TestDocument.class).validate();
     }
+
     @Test
     void validateWithoutIndexAnnotation() {
         assertThatThrownBy(() -> new DocumentClassValidator(TestDocumentWithoutIndexAnnotation.class).validate())
             .isInstanceOf(Error.class)
             .hasMessageContaining("document class must have @Index");
     }
+
     @Test
     void validateWithDefaultValue() {
         assertThatThrownBy(() -> new DocumentClassValidator(TestDocumentWithDefaultValue.class).validate())
@@ -53,7 +55,16 @@ class DocumentClassValidatorTest {
 
     @Index(name = "test")
     public static class TestDocumentWithDefaultValue {
+        @Property(name = "child")
+        public Child child;
+
         @Property(name = "list_field")
         public List<String> listField = List.of();
+    }
+
+    public static class Child {
+        @NotNull
+        @Property(name = "string_field")
+        public String stringField;
     }
 }

@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.0.0 (05/19/2022 - )
+### 8.0.0-b1 (05/19/2022 - )  !!! breaking changes
 
 * json: expose JSONMapper.builder() method to allow app create its own JSON parser
   > e.g. to parse external json with custom DeserializationFeature/MapperFeature

@@ -35,6 +35,10 @@ public class LogForwardConfig {
         public List<String> results = List.of();
 
         @NotNull
+        @Property(name = "ignoreActions")
+        public List<String> ignoreActions = List.of();
+
+        @NotNull
         @Property(name = "ignoreErrorCodes")
         public List<String> ignoreErrorCodes = List.of();
     }
