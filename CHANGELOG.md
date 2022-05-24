@@ -8,6 +8,7 @@
   > with partialUpdate, it could override es with those default values
 * search: update and partialUpdate return if target doc is updated
   > refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html#_detect_noop_updates
+* log-processor: action forward supports ignoring actions
 
 ### 7.10.8 (05/16/2022 - 05/19/2022)
 

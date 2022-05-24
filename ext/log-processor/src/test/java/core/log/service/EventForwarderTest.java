@@ -2,6 +2,7 @@ package core.log.service;
 
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.EventMessage;
+import core.log.LogForwardConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,11 @@ class EventForwarderTest {
 
     @BeforeEach
     void createEventForwarder() {
-        forwarder = new EventForwarder(publisher, "event", List.of("website"), List.of(), List.of("NOT_FOUND"));
+        var forward = new LogForwardConfig.Forward();
+        forward.topic = "event";
+        forward.apps = List.of("website");
+        forward.ignoreErrorCodes = List.of("NOT_FOUND");
+        forwarder = new EventForwarder(publisher, forward);
     }
 
     @Test

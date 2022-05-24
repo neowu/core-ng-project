@@ -2,6 +2,7 @@ package core.log.service;
 
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.ActionLogMessage;
+import core.log.LogForwardConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -22,7 +23,7 @@ class ActionLogForwarderTest {
 
     @Test
     void forwardWithMatchedApp() {
-        var forwarder = new ActionLogForwarder(publisher, "action", List.of("website"), List.of(), List.of());
+        var forwarder = new ActionLogForwarder(publisher, forward(List.of("website"), List.of(), List.of()));
 
         var message = new ActionLogMessage();
         message.app = "website";
@@ -33,7 +34,7 @@ class ActionLogForwarderTest {
 
     @Test
     void forwardWithMatchedResult() {
-        var forwarder = new ActionLogForwarder(publisher, "action", List.of("website"), List.of("OK"), List.of());
+        var forwarder = new ActionLogForwarder(publisher, forward(List.of("website"), List.of("OK"), List.of()));
 
         var message = new ActionLogMessage();
         message.app = "website";
@@ -45,7 +46,7 @@ class ActionLogForwarderTest {
 
     @Test
     void forwardWithMismatchedResult() {
-        var forwarder = new ActionLogForwarder(publisher, "action", List.of("website"), List.of("OK"), List.of());
+        var forwarder = new ActionLogForwarder(publisher, forward(List.of("website"), List.of("OK"), List.of()));
 
         var message = new ActionLogMessage();
         message.app = "website";
@@ -56,7 +57,7 @@ class ActionLogForwarderTest {
 
     @Test
     void forwardWithIgnoredErrorCode() {
-        var forwarder = new ActionLogForwarder(publisher, "action", List.of("website"), List.of(), List.of("NOT_FOUND"));
+        var forwarder = new ActionLogForwarder(publisher, forward(List.of("website"), List.of(), List.of("NOT_FOUND")));
 
         var message = new ActionLogMessage();
         message.app = "website";
@@ -64,5 +65,28 @@ class ActionLogForwarderTest {
         message.errorCode = "NOT_FOUND";
         forwarder.forward(List.of(message));
         verifyNoInteractions(publisher);
+    }
+
+    @Test
+    void forwardWithIgnoredAction() {
+        LogForwardConfig.Forward forward = forward(List.of("website"), List.of(), List.of());
+        forward.ignoreActions = List.of("api:get:/ajax/current-customer");
+        var forwarder = new ActionLogForwarder(publisher, forward);
+
+        var message = new ActionLogMessage();
+        message.app = "website";
+        message.result = "OK";
+        message.action = "api:get:/ajax/current-customer";
+        forwarder.forward(List.of(message));
+        verifyNoInteractions(publisher);
+    }
+
+    private LogForwardConfig.Forward forward(List<String> apps, List<String> results, List<String> ignoreErrorCodes) {
+        LogForwardConfig.Forward forward = new LogForwardConfig.Forward();
+        forward.topic = "action";
+        forward.apps = apps;
+        forward.results = results;
+        forward.ignoreErrorCodes = ignoreErrorCodes;
+        return forward;
     }
 }
