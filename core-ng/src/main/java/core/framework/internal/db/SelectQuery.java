@@ -66,7 +66,7 @@ final class SelectQuery<T> {
         return builder.toString();
     }
 
-    Object[] fetchParams(List<Object> params, Integer skip, Integer limit) {
+    Object[] params(List<Object> params, Integer skip, Integer limit) {
         if (skip != null && limit == null) throw new Error("limit must not be null if skip is not, skip=" + skip);
         if (skip == null && limit == null) return params.toArray();
 

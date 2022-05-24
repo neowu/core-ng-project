@@ -53,12 +53,12 @@ class DBIntegrationTest extends IntegrationTest {
         Query<TestDBEntity> query = repository.select();
         query.where("int_field > ?", 3);
         query.where("string_field like ?", "value%");
-        query.orderBy("int_field");
         assertThat(query.count()).isEqualTo(26);
 
         Optional<Integer> sum = query.projectOne("sum(int_field)", Integer.class);
         assertThat(sum).hasValue(429);  // (4+29)*(26/2)
 
+        query.orderBy("int_field");
         query.limit(5);
         List<TestDBEntity> entities = query.fetch();
         assertThat(entities).hasSize(5);

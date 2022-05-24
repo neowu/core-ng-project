@@ -13,9 +13,9 @@ public interface Query<T> {
 
     void groupBy(String groupBy);
 
-    void skip(int skip);
+    void skip(Integer skip);    // pass null to reset skip
 
-    void limit(int limit);
+    void limit(Integer limit);  // pass null to reset limit
 
     List<T> fetch();
 

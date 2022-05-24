@@ -9,6 +9,11 @@
 * search: update and partialUpdate return if target doc is updated
   > refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html#_detect_noop_updates
 * log-processor: action forward supports ignoring actions
+* db: query.count() and query.projectOne() honor sort/skip/limit   !!! behavior changed !!!
+  > repository.select() is designed as syntax sugar api, to make it easier to construct single table SQL (ORM is not design goal)
+  > since it supports groupBy() projectOne() project(), now we removed all customized rules, it degraded to plain SQL builder
+  > if you uses query.count(), it's better not set skip/limit/orderBy before that
+  > with this, projection works as intended, e.g. query.limit(1); query.projectOne("col1, col2", View.class); results in "select col1, col2 from table limit 1"
 
 ### 7.10.8 (05/16/2022 - 05/19/2022)
 

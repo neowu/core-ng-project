@@ -30,8 +30,8 @@ class SelectQueryTest {
     }
 
     @Test
-    void fetchParams() {
-        Object[] params = selectQuery.fetchParams(List.of("value"), null, 100);
+    void params() {
+        Object[] params = selectQuery.params(List.of("value"), null, 100);
 
         assertThat(params).containsExactly("value", 0, 100);    // default skip should be 0
     }
