@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'com.github.spotbugs.snom:spotbugs-gradle-plugin:5.0.6'
+        classpath 'com.github.spotbugs.snom:spotbugs-gradle-plugin:5.0.7'
     }
 }
 
@@ -17,8 +17,8 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:10.1'
-            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.41.0'
+            checkstyle 'com.puppycrawl.tools:checkstyle:10.2'
+            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.42.0'
         }
 
         configFile = rootProject.file('gradle/check/checkstyle.xml')
@@ -45,7 +45,7 @@ subprojects {
     pmd {
         ruleSets = []
         ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
-        toolVersion = '6.44.0'
+        toolVersion = '6.46.0'
         consoleOutput = true
 
         tasks.withType(Pmd).configureEach {
@@ -60,7 +60,7 @@ subprojects {
 
         reportLevel = 'low'
         includeFilter = rootProject.file('gradle/check/spotbugs.xml')
-        toolVersion = '4.6.0'
+        toolVersion = '4.7.0'
 
         def spotbugsReport = tasks.register('spotbugsReport') {
             group = 'verification'
@@ -83,7 +83,7 @@ subprojects {
     }
 
     jacoco {
-        toolVersion = '0.8.7'
+        toolVersion = '0.8.8'
 
         tasks.named('testCodeCoverageReport').configure {
             reports {

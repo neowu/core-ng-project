@@ -120,15 +120,7 @@ class RepositoryImplAutoIncrementIdEntityTest {
     @Test
     void selectWithLimit() {
         Query<AutoIncrementIdEntity> query = repository.select();
-        query.limit(0);
-        assertThat(query.fetch()).isEmpty();
-        assertThat(query.fetchOne()).isEmpty();
-
-        query.limit(1000);
-        assertThat(query.fetch()).isEmpty();
-
-        query.where("string_field = ?", "value");
-        assertThat(query.fetch()).isEmpty();
+        assertThatThrownBy(() -> query.limit(0)).isInstanceOf(Error.class).hasMessageContaining("limit must be greater than 0");
     }
 
     @Test
