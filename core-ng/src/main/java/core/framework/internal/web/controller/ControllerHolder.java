@@ -1,7 +1,9 @@
 package core.framework.internal.web.controller;
 
+import core.framework.db.DBWarning;
 import core.framework.web.Controller;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 
 /**
@@ -11,6 +13,9 @@ public class ControllerHolder {
     public final String controllerInfo;
     public final Controller controller;
     public final String action;
+    @Nullable
+    public final DBWarning dbWarning;
+
     final Method targetMethod;      // targetMethod is used to find associated annotation
     final boolean skipInterceptor;
 
@@ -20,5 +25,6 @@ public class ControllerHolder {
         this.controllerInfo = controllerInfo;
         this.action = action;
         this.skipInterceptor = skipInterceptor;
+        dbWarning = targetMethod.getDeclaredAnnotation(DBWarning.class);
     }
 }

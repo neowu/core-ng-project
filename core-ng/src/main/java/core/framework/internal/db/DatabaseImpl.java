@@ -53,11 +53,8 @@ public final class DatabaseImpl implements Database {
 
     public String user;
     public String password;
-    public int tooManyRowsReturnedThreshold = 1000;
     public long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     public IsolationLevel isolationLevel;
-
-    int maxOperations = 2000;  // max db calls per action, if exceeds, it indicates either wrong impl (e.g. infinite loop with db calls) or bad practice (not CD friendly), better split into multiple actions
 
     private String url;
     private Properties driverProperties;
@@ -235,8 +232,7 @@ public final class DatabaseImpl implements Database {
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("select, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
-            track(elapsed, returnedRows, 0, 1);
-            checkTooManyRowsReturned(returnedRows); // check returnedRows after sql debug log, to make log easier to read
+            track(elapsed, returnedRows, 0, 1);   // check after sql debug log, to make log easier to read
         }
     }
 
@@ -310,34 +306,21 @@ public final class DatabaseImpl implements Database {
         rowMappers.put(viewClass, mapper);
     }
 
-    private void checkTooManyRowsReturned(int size) {
-        if (size > tooManyRowsReturnedThreshold) {
-            logger.warn(errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
-        }
-    }
-
     void track(long elapsed, int readRows, int writeRows, int queries) {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {
             actionLog.stats.compute("db_queries", (k, oldValue) -> (oldValue == null) ? queries : oldValue + queries);
             int operations = actionLog.track("db", elapsed, readRows, writeRows);
-            checkOperations(actionLog, elapsed, operations);
-        }
-    }
-
-    private void checkOperations(ActionLog actionLog, long elapsed, int operations) {
-        // check default max operations first then check if specified action level max operations
-        if (operations > maxOperations && operations > actionLog.internalContext().maxDBOperations) {
-            if (actionLog.remainingProcessTimeInNano() <= 0) {
-                // break if it took too long and execute too many db queries
-                throw new Error("too many db operations, operations=" + operations);
-            }
-            if (actionLog.result == LogLevel.INFO) {    // only warn once, action hits here typically will call db more times ongoing
+            // check default max operations first then check if specified action level max operations
+            if (operations > actionLog.warningContext.maxDBOperations && actionLog.result == LogLevel.INFO) {    // only warn once, action hits here typically will call db more ongoing
                 logger.warn(errorCode("TOO_MANY_DB_OPERATIONS"), "too many db operations, operations={}", operations);
             }
-        }
-        if (elapsed > slowOperationThresholdInNanos) {
-            logger.warn(errorCode("SLOW_DB"), "slow db operation, elapsed={}", Duration.ofNanos(elapsed));
+            if (elapsed > slowOperationThresholdInNanos) {
+                logger.warn(errorCode("SLOW_DB"), "slow db operation, elapsed={}", Duration.ofNanos(elapsed));
+            }
+            if (readRows > actionLog.warningContext.maxRows) {
+                logger.warn(errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", readRows);
+            }
         }
     }
 

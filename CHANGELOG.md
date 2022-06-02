@@ -1,5 +1,12 @@
 ## Change log
 
+### 8.0.1 (06/02/2022 - )
+
+* db: redesign db max operations, removed Database.maxOperations(), introduced @DBWarning
+  > one service may mix multiple type of workload, some could be async and call db many times while others API needs to be sync and responsive
+  > with new design, it allows to specify warning threshold in granular level
+  > currently @DBWarning only support Controller/WS method, MessageHandler method, and executor task inherits from parent @DBWarning
+
 ### 8.0.0 (05/19/2022 - 05/31/2022)  !!! breaking changes
 
 * json: expose JSONMapper.builder() method to allow app create its own JSON parser

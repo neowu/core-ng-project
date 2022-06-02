@@ -29,9 +29,9 @@ class InvocationImplTest {
         var stack = new Stack();
         var controller = new TestController(stack, 3);
         List<Interceptor> interceptors = List.of(new TestInterceptor(stack, 0),
-                new TestInterceptor(stack, 1),
-                new TestInterceptor(stack, 2));
-        var invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, false), interceptors, request, new WebContextImpl());
+            new TestInterceptor(stack, 1),
+            new TestInterceptor(stack, 2));
+        var invocation = new InvocationImpl(new ControllerHolder(controller, TestController.class.getMethod("execute", Request.class), null, null, false), interceptors, request, new WebContextImpl());
 
         Response response = invocation.proceed();
         assertThat(response.status()).isEqualTo(HTTPStatus.NO_CONTENT);
@@ -46,7 +46,7 @@ class InvocationImplTest {
         var stack = new Stack();
         var controller = new TestController(stack, 0);
         List<Interceptor> interceptors = List.of(new TestInterceptor(stack, 0));
-        var invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, true), interceptors, request, new WebContextImpl());
+        var invocation = new InvocationImpl(new ControllerHolder(controller, TestController.class.getMethod("execute", Request.class), null, null, true), interceptors, request, new WebContextImpl());
 
         Response response = invocation.proceed();
         assertThat(response.status()).isEqualTo(HTTPStatus.NO_CONTENT);
@@ -57,12 +57,13 @@ class InvocationImplTest {
     }
 
     @Test
-    void withNullResponse() {
+    void withNullResponse() throws NoSuchMethodException {
         Controller controller = request -> null;
-        var invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, false), List.of(), request, new WebContextImpl());
+        var invocation = new InvocationImpl(new ControllerHolder(controller, controller.getClass().getMethod("execute", Request.class), null, null, false), List.of(), request, new WebContextImpl());
         assertThatThrownBy(invocation::proceed).isInstanceOf(Error.class).hasMessageContaining("controller must not return null response");
 
-        invocation = new InvocationImpl(new ControllerHolder(request -> Response.empty(), null, null, null, false), List.of(new TestNullResponseInterceptor()), request, new WebContextImpl());
+        controller = request -> Response.empty();
+        invocation = new InvocationImpl(new ControllerHolder(controller, controller.getClass().getMethod("execute", Request.class), null, null, false), List.of(new TestNullResponseInterceptor()), request, new WebContextImpl());
         assertThatThrownBy(invocation::proceed).isInstanceOf(Error.class).hasMessageContaining("interceptor must not return null response");
     }
 

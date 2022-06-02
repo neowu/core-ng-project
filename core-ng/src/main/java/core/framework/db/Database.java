@@ -26,20 +26,7 @@ public interface Database {
         // pass flag thru thread local to MySQLQueryInterceptor, and put in action log to reset for every action
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {
-            actionLog.internalContext().suppressSlowSQLWarning = suppress;
-        }
-    }
-
-    /**
-     * for action does large number of db calls, increase max operations threshold for current action
-     * better put at beginning of action
-     *
-     * @param threshold the max operations allowed within current action
-     */
-    static void maxOperations(int threshold) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
-        if (actionLog != null) {
-            actionLog.internalContext().maxDBOperations = threshold;
+            actionLog.warningContext.suppressSlowSQLWarning = suppress;
         }
     }
 

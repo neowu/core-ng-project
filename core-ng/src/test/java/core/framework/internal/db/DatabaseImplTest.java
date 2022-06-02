@@ -1,9 +1,9 @@
 package core.framework.internal.db;
 
-import core.framework.db.Database;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
 import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogLevel;
 import core.framework.internal.log.LogManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,7 +34,6 @@ class DatabaseImplTest {
         database = new DatabaseImpl("db");
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
         database.view(EntityView.class);
-        database.maxOperations = 10;
 
         database.execute("CREATE TABLE database_test (id INT PRIMARY KEY, string_field VARCHAR(20), enum_field VARCHAR(10), date_field DATE, date_time_field TIMESTAMP)");
     }
@@ -249,16 +248,31 @@ class DatabaseImplTest {
         assertThat(actionLog.stats).containsEntry("db_queries", 1.0);
         database.track(100, 1, 0, 1);
         assertThat(actionLog.stats).containsEntry("db_queries", 2.0);
-        assertThatThrownBy(() -> {
-            for (int i = 0; i < 10; i++) {
-                database.track(100, 0, 1, 20);
-            }
-        }).isInstanceOf(Error.class)
-            .hasMessageContaining("too many db operations");
-        assertThat(actionLog.stats).containsEntry("db_queries", 182.0);
-        Database.maxOperations(100);
-        database.track(100, 0, 1, 20);
-        assertThat(actionLog.stats).containsEntry("db_queries", 202.0);
+        logManager.end("end");
+    }
+
+    @Test
+    void trackWithTooManyDBOperations() {
+        var logManager = new LogManager();
+        ActionLog actionLog = logManager.begin("begin", null);
+        actionLog.warningContext.maxDBOperations = 5;
+        for (int i = 0; i < 10; i++) {
+            database.track(100, 0, 1, 20);
+        }
+        assertThat(actionLog.result).isEqualTo(LogLevel.WARN);
+        assertThat(actionLog.errorCode()).isEqualTo("TOO_MANY_DB_OPERATIONS");
+        assertThat(actionLog.stats).containsEntry("db_queries", 200.0);
+        logManager.end("end");
+    }
+
+    @Test
+    void trackWithTooManyRowsReturned() {
+        var logManager = new LogManager();
+        ActionLog actionLog = logManager.begin("begin", null);
+        actionLog.warningContext.maxRows = 50;
+        database.track(100, 100, 1, 20);
+        assertThat(actionLog.result).isEqualTo(LogLevel.WARN);
+        assertThat(actionLog.errorCode()).isEqualTo("TOO_MANY_ROWS_RETURNED");
         logManager.end("end");
     }
 

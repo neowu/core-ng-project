@@ -3,6 +3,7 @@ package core.framework.internal.async;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.Trace;
+import core.framework.internal.log.WarningContext;
 import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ public class ExecutorTask<T> implements Callable<T> {
     private final String refId;
     private final String correlationId;
     private final Trace trace;
+    private final WarningContext parentWarningContext;
 
     ExecutorTask(Callable<T> task, LogManager logManager, TaskContext context) {
         this.task = task;
@@ -42,11 +44,13 @@ public class ExecutorTask<T> implements Callable<T> {
             correlationId = parentActionLog.correlationId();
             refId = parentActionLog.id;
             trace = parentActionLog.trace;
+            parentWarningContext = parentActionLog.warningContext;
         } else {
             rootAction = null;
             correlationId = null;
             refId = null;
             trace = null;
+            parentWarningContext = null;
         }
     }
 
@@ -64,6 +68,7 @@ public class ExecutorTask<T> implements Callable<T> {
                 LOGGER.debug("refId={}", refId);
                 actionLog.refIds = List.of(refId);
                 if (trace == Trace.CASCADE) actionLog.trace = Trace.CASCADE;
+                actionLog.warningContext.initialize(parentWarningContext);
             }
             LOGGER.debug("taskClass={}", CallableTask.taskClass(task).getName());
             Duration delay = Duration.between(startTime, actionLog.date);

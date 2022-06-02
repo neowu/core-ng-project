@@ -1,5 +1,6 @@
 package core.framework.internal.kafka;
 
+import core.framework.db.DBWarning;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
@@ -132,7 +133,7 @@ class MessageListenerThread extends Thread {
         for (ConsumerRecord<byte[], byte[]> record : records) {
             ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
             try {
-                initAction(actionLog, topic, process.handler.getClass().getCanonicalName());
+                initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), process.dbWarning);
 
                 actionLog.track("kafka", 0, 1, 0);
 
@@ -169,7 +170,7 @@ class MessageListenerThread extends Thread {
     <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records) {
         ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
         try {
-            initAction(actionLog, topic, process.bulkHandler.getClass().getCanonicalName());
+            initAction(actionLog, topic, process.bulkHandler.getClass().getCanonicalName(), process.dbWarning);
 
             List<Message<T>> messages = messages(records, actionLog, process.reader);
             for (Message<T> message : messages) {   // validate after fromJSON, so it can track refId/correlationId
@@ -184,12 +185,13 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    private void initAction(ActionLog actionLog, String topic, String handler) {
+    private void initAction(ActionLog actionLog, String topic, String handler, DBWarning dbWarning) {
         actionLog.action("topic:" + topic);
         actionLog.maxProcessTime(listener.maxProcessTimeInNano);
         actionLog.context.put("topic", List.of(topic));
         actionLog.context.put("handler", List.of(handler));
         logger.debug("topic={}, handler={}", topic, handler);
+        actionLog.warningContext.initialize(dbWarning);
     }
 
     <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONReader<T> reader) throws IOException {

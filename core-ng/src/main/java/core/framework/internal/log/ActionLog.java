@@ -31,23 +31,21 @@ public final class ActionLog {
     public final Instant date;
     public final Map<String, List<String>> context;
     public final Map<String, Double> stats;
+    public final WarningContext warningContext = new WarningContext();
+
     final Map<String, PerformanceStat> performanceStats;
     private final List<LogEvent> events;
     private final long startTime;
     private final long startCPUTime;
-
     public LogLevel result = LogLevel.INFO;
     public Trace trace = Trace.NONE;        // whether flush trace log for all subsequent actions
     public String action = "unassigned";
     public List<String> correlationIds;     // with bulk message handler, there will be multiple correlationIds handled by one batch
     public List<String> clients;
     public List<String> refIds;
-
     long maxProcessTimeInNano;
     String errorMessage;
     long elapsed;
-
-    private InternalActionContext internalContext;
     private String errorCode;
 
     public ActionLog(String message, String id) {
@@ -189,10 +187,5 @@ public final class ActionLog {
             event.appendTrace(builder, startTime);
         }
         return builder.toString();
-    }
-
-    public InternalActionContext internalContext() {
-        if (internalContext == null) internalContext = new InternalActionContext();
-        return internalContext;
     }
 }

@@ -81,10 +81,6 @@ public class DBConfig extends Config {
         database.slowOperationThresholdInNanos = threshold.toNanos();
     }
 
-    public void tooManyRowsReturnedThreshold(int threshold) {
-        database.tooManyRowsReturnedThreshold = threshold;
-    }
-
     public void longTransactionThreshold(Duration threshold) {
         database.operation.transactionManager.longTransactionThresholdInNanos = threshold.toNanos();
     }
