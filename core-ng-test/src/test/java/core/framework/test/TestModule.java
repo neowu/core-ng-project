@@ -119,7 +119,6 @@ public class TestModule extends AbstractTestModule {
         db().timeout(Duration.ofSeconds(10));
         db().slowOperationThreshold(Duration.ofSeconds(5));
         db().longTransactionThreshold(Duration.ofSeconds(5));
-        db().tooManyRowsReturnedThreshold(1000);
         db().repository(TestDBEntity.class);
         db().view(TestDBView.class);
         db().view(TestDBProjection.class);

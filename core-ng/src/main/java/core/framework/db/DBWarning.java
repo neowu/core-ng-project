@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(METHOD)
 @Retention(RUNTIME)
-public @interface DBWarning {
+public @interface DBWarning {   // currently only supports WS/Controller and MessageHandler methods, and Executor task inherits from parent
     int maxOperations() default -1;
 
     int maxRows() default -1;
