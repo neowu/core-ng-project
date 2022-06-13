@@ -318,7 +318,7 @@ public final class DatabaseImpl implements Database {
             if (elapsed > slowOperationThresholdInNanos) {
                 logger.warn(errorCode("SLOW_DB"), "slow db operation, elapsed={}", Duration.ofNanos(elapsed));
             }
-            if (readRows > actionLog.warningContext.maxRows) {
+            if (readRows > actionLog.warningContext.maxDBRows) {
                 logger.warn(errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", readRows);
             }
         }

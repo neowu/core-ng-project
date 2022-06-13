@@ -269,7 +269,7 @@ class DatabaseImplTest {
     void trackWithTooManyRowsReturned() {
         var logManager = new LogManager();
         ActionLog actionLog = logManager.begin("begin", null);
-        actionLog.warningContext.maxRows = 50;
+        actionLog.warningContext.maxDBRows = 50;
         database.track(100, 100, 1, 20);
         assertThat(actionLog.result).isEqualTo(LogLevel.WARN);
         assertThat(actionLog.errorCode()).isEqualTo("TOO_MANY_ROWS_RETURNED");
