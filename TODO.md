@@ -12,6 +12,4 @@
 * websocket, replace AbstractReceiveListener, so it can include IO/error handling within action lifecycle?
 
 * monitor: alert on kafka message api_changed? always publish api, not only for frontend?
-
 * use adminClient to check kafka ready? or retry sending message?
-* retry on message handler? like when mysql is in maintenance

@@ -16,8 +16,10 @@ import core.framework.internal.web.sys.DiagnosticController;
 import core.framework.internal.web.sys.PropertyController;
 import core.framework.module.LambdaController;
 import core.framework.util.ASCII;
+import core.framework.util.Lists;
 import core.framework.util.Maps;
 import core.framework.web.Controller;
+import core.framework.web.Interceptor;
 import core.framework.web.SessionContext;
 import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
@@ -25,6 +27,7 @@ import core.framework.web.site.WebDirectory;
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -32,7 +35,7 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class ModuleContext {
+public class ModuleContext {    // after core.framework.module.App.start(), entire ModuleContext will be GCed
     public final LogManager logManager;
     public final StartupHook startupHook = new StartupHook();
     public final ShutdownHook shutdownHook;
@@ -41,6 +44,7 @@ public class ModuleContext {
     public final PropertyManager propertyManager = new PropertyManager();
     public final StatCollector collector = new StatCollector();
     public final HTTPServer httpServer;
+    public final List<Interceptor> httpInterceptors = Lists.newArrayList();
     public final APIController apiController = new APIController();
     public final BeanClassValidator beanClassValidator = new BeanClassValidator();
     protected final Map<String, Config> configs = Maps.newHashMap();

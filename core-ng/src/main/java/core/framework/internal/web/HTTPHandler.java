@@ -18,7 +18,6 @@ import core.framework.internal.web.route.Route;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.internal.web.site.TemplateManager;
 import core.framework.internal.web.websocket.WebSocketHandler;
-import core.framework.util.Lists;
 import core.framework.web.Interceptor;
 import core.framework.web.Response;
 import io.undertow.server.HttpHandler;
@@ -43,7 +42,6 @@ public class HTTPHandler implements HttpHandler {
 
     public final RequestParser requestParser = new RequestParser();
     public final Route route = new Route();
-    public final List<Interceptor> interceptors = Lists.newArrayList();
     public final WebContextImpl webContext = new WebContextImpl();
     public final HTTPErrorHandler errorHandler;
 
@@ -57,9 +55,9 @@ public class HTTPHandler implements HttpHandler {
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;
 
+    public Interceptor[] interceptors;
     public WebSocketHandler webSocketHandler;
     public IPv4AccessControl accessControl;
-
     public long maxProcessTimeInNano = Duration.ofSeconds(30).toNanos();    // the default backend timeout of popular cloud lb (gcloud/azure) is 30s
 
     HTTPHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager) {

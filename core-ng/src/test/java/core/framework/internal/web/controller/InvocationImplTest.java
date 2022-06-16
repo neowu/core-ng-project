@@ -11,8 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -28,9 +26,7 @@ class InvocationImplTest {
     void process() throws Exception {
         var stack = new Stack();
         var controller = new TestController(stack, 3);
-        List<Interceptor> interceptors = List.of(new TestInterceptor(stack, 0),
-            new TestInterceptor(stack, 1),
-            new TestInterceptor(stack, 2));
+        Interceptor[] interceptors = {new TestInterceptor(stack, 0), new TestInterceptor(stack, 1), new TestInterceptor(stack, 2)};
         var invocation = new InvocationImpl(new ControllerHolder(controller, TestController.class.getMethod("execute", Request.class), null, null, false), interceptors, request, new WebContextImpl());
 
         Response response = invocation.proceed();
@@ -45,7 +41,7 @@ class InvocationImplTest {
     void skipInterceptor() throws Exception {
         var stack = new Stack();
         var controller = new TestController(stack, 0);
-        List<Interceptor> interceptors = List.of(new TestInterceptor(stack, 0));
+        Interceptor[] interceptors = {new TestInterceptor(stack, 0)};
         var invocation = new InvocationImpl(new ControllerHolder(controller, TestController.class.getMethod("execute", Request.class), null, null, true), interceptors, request, new WebContextImpl());
 
         Response response = invocation.proceed();
@@ -59,11 +55,11 @@ class InvocationImplTest {
     @Test
     void withNullResponse() throws NoSuchMethodException {
         Controller controller = request -> null;
-        var invocation = new InvocationImpl(new ControllerHolder(controller, controller.getClass().getMethod("execute", Request.class), null, null, false), List.of(), request, new WebContextImpl());
+        var invocation = new InvocationImpl(new ControllerHolder(controller, controller.getClass().getMethod("execute", Request.class), null, null, false), new Interceptor[0], request, new WebContextImpl());
         assertThatThrownBy(invocation::proceed).isInstanceOf(Error.class).hasMessageContaining("controller must not return null response");
 
         controller = request -> Response.empty();
-        invocation = new InvocationImpl(new ControllerHolder(controller, controller.getClass().getMethod("execute", Request.class), null, null, false), List.of(new TestNullResponseInterceptor()), request, new WebContextImpl());
+        invocation = new InvocationImpl(new ControllerHolder(controller, controller.getClass().getMethod("execute", Request.class), null, null, false), new Interceptor[]{new TestNullResponseInterceptor()}, request, new WebContextImpl());
         assertThatThrownBy(invocation::proceed).isInstanceOf(Error.class).hasMessageContaining("interceptor must not return null response");
     }
 

@@ -29,6 +29,11 @@ public final class HTTPConfig extends Config {
         this.context = context;
     }
 
+    @Override
+    protected void validate() {
+        context.httpServer.handler.interceptors = context.httpInterceptors.toArray(new Interceptor[0]);
+    }
+
     public void route(HTTPMethod method, String path, Controller controller) {
         if (HTTPIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
         context.route(method, path, controller, false);
@@ -72,7 +77,7 @@ public final class HTTPConfig extends Config {
         if (interceptor.getClass().isSynthetic())
             throw new Error("interceptor class must not be anonymous class or lambda, please use static class, interceptorClass=" + interceptor.getClass().getCanonicalName());
         new InjectValidator(interceptor).validate();
-        context.httpServer.handler.interceptors.add(interceptor);
+        context.httpInterceptors.add(interceptor);
     }
 
     public void errorHandler(ErrorHandler handler) {

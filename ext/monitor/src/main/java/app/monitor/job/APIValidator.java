@@ -231,7 +231,7 @@ class APIValidator {
         List<String> types = new ArrayList<>();
         types.add(field.type);
         if (field.typeParams != null) types.addAll(field.typeParams);
-        return types.toArray(String[]::new);
+        return types.toArray(new String[0]);
     }
 
     private void removeReferenceType(String typeName, Severity severity) {
