@@ -80,7 +80,7 @@ public class SiteConfig extends Config {
     public WebSecurityConfig security() {
         if (webSecurityInterceptor == null) {
             webSecurityInterceptor = new WebSecurityInterceptor();
-            context.httpInterceptors.add(webSecurityInterceptor);
+            context.httpServerConfig.interceptors.add(webSecurityInterceptor);
         }
         return new WebSecurityConfig(webSecurityInterceptor);
     }

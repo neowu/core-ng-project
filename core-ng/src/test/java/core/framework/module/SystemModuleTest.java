@@ -24,8 +24,8 @@ class SystemModuleTest {
     void configureHTTP() {
         module.configureHTTP();
 
-        assertThat(module.context.httpServer.httpHost).isNull();
-        assertThat(module.context.httpServer.httpsHost).isNull();
+        assertThat(module.context.httpServerConfig.httpHost).isNull();
+        assertThat(module.context.httpServerConfig.httpsHost).isNull();
     }
 
     @Test
@@ -34,7 +34,7 @@ class SystemModuleTest {
         module.context.propertyManager.properties.set("sys.http.listen", "8082");
 
         module.configureHTTP();
-        assertThat(module.context.httpServer.httpHost.port()).isEqualTo(8081);
+        assertThat(module.context.httpServerConfig.httpHost.port()).isEqualTo(8081);
     }
 
     @Test
@@ -42,8 +42,8 @@ class SystemModuleTest {
         module.context.propertyManager.properties.set("sys.https.listen", "8082");
 
         module.configureHTTP();
-        assertThat(module.context.httpServer.httpHost).isNull();
-        assertThat(module.context.httpServer.httpsHost.port()).isEqualTo(8082);
+        assertThat(module.context.httpServerConfig.httpHost).isNull();
+        assertThat(module.context.httpServerConfig.httpsHost.port()).isEqualTo(8082);
     }
 
     @Test

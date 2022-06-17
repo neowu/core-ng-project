@@ -29,11 +29,6 @@ public final class HTTPConfig extends Config {
         this.context = context;
     }
 
-    @Override
-    protected void validate() {
-        context.httpServer.handler.interceptors = context.httpInterceptors.toArray(new Interceptor[0]);
-    }
-
     public void route(HTTPMethod method, String path, Controller controller) {
         if (HTTPIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
         context.route(method, path, controller, false);
@@ -77,7 +72,7 @@ public final class HTTPConfig extends Config {
         if (interceptor.getClass().isSynthetic())
             throw new Error("interceptor class must not be anonymous class or lambda, please use static class, interceptorClass=" + interceptor.getClass().getCanonicalName());
         new InjectValidator(interceptor).validate();
-        context.httpInterceptors.add(interceptor);
+        context.httpServerConfig.interceptors.add(interceptor);
     }
 
     public void errorHandler(ErrorHandler handler) {
@@ -86,11 +81,11 @@ public final class HTTPConfig extends Config {
 
     // host is in "host:port" or "port" format, e.g. 8080 or 127.0.0.1:8080
     public void listenHTTP(String host) {
-        context.httpServer.httpHost = HTTPHost.parse(host);
+        context.httpServerConfig.httpHost = HTTPHost.parse(host);
     }
 
     public void listenHTTPS(String host) {
-        context.httpServer.httpsHost = HTTPHost.parse(host);
+        context.httpServerConfig.httpsHost = HTTPHost.parse(host);
     }
 
     public LimitRateConfig limitRate() {
@@ -113,7 +108,7 @@ public final class HTTPConfig extends Config {
     }
 
     public void gzip() {
-        context.httpServer.gzip = true;
+        context.httpServerConfig.gzip = true;
     }
 
     // use backend timeout of cloud lb
@@ -123,6 +118,6 @@ public final class HTTPConfig extends Config {
 
     // to configure max body size for both regular post and multipart upload
     public void maxEntitySize(long maxEntitySize) {
-        context.httpServer.maxEntitySize = maxEntitySize;
+        context.httpServerConfig.maxEntitySize = maxEntitySize;
     }
 }

@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.0.1 (06/02/2022 - 06/17/2022)
+### 8.0.2 (06/02/2022 - 06/17/2022)
 
 * db: redesign db max operations, removed Database.maxOperations(), introduced @DBWarning
   > one service may mix multiple type of workload, some could be async and call db many times while others API needs to be sync and responsive
