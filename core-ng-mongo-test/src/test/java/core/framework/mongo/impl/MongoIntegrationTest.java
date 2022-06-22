@@ -1,9 +1,13 @@
 package core.framework.mongo.impl;
 
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import core.framework.inject.Inject;
+import core.framework.mongo.Aggregate;
 import core.framework.mongo.IntegrationTest;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
@@ -187,6 +191,20 @@ class MongoIntegrationTest extends IntegrationTest {
         List<TestMongoEntity> returnedEntities = new ArrayList<>();
         collection.forEach(new Query(), returnedEntities::add);
         assertThat(returnedEntities).hasSize(2);
+    }
+
+    @Test
+    void aggregate() {
+        collection.bulkInsert(entities());
+
+        Aggregate<TestMongoView> aggregate = new Aggregate<>();
+        aggregate.resultClass = TestMongoView.class;
+        aggregate.pipeline = List.of(Aggregates.sort(Sorts.ascending("string_field")),
+                Aggregates.group("$string_field", Accumulators.first("string_field", "$string_field")));
+        List<TestMongoView> results = collection.aggregate(aggregate);
+        assertThat(results).hasSize(2);
+        assertThat(results.get(0).stringField).isEqualTo("string1");
+        assertThat(results.get(1).stringField).isEqualTo("string2");
     }
 
     private TestMongoEntity entity(String stringField, TestMongoEntity.TestEnum enumField) {

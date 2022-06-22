@@ -1,5 +1,7 @@
 ## Change log
 
+### 8.0.3 (06/22/2022 - )
+
 ### 8.0.2 (06/02/2022 - 06/17/2022)
 
 * db: redesign db max operations, removed Database.maxOperations(), introduced @DBWarning

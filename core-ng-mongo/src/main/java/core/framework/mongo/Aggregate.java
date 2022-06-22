@@ -9,7 +9,8 @@ import java.util.List;
  * @author neo
  */
 public final class Aggregate<T> {
+    // refer to com.mongodb.client.model.Aggregates
+    public List<Bson> pipeline;
     public Class<T> resultClass;
-    public List<Bson> pipeline;     // refer to com.mongodb.client.model.Aggregates
     public ReadPreference readPreference;
 }
