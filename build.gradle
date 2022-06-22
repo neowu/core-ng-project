@@ -65,7 +65,7 @@ project('core-ng-mongo') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        api 'org.mongodb:mongodb-driver-sync:4.5.0'
+        api 'org.mongodb:mongodb-driver-sync:4.6.0'
         testImplementation project(":core-ng-test")
     }
 }
@@ -75,7 +75,7 @@ project('core-ng-mongo-test') {
     dependencies {
         implementation project(':core-ng-test')
         implementation project(':core-ng-mongo')
-        implementation 'de.bwaldvogel:mongo-java-server:1.39.0'
+        implementation 'de.bwaldvogel:mongo-java-server:1.40.0'
     }
 }
 
