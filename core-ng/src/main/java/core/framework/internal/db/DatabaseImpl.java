@@ -10,7 +10,6 @@ import core.framework.db.UncheckedSQLException;
 import core.framework.internal.db.cloud.CloudAuthProvider;
 import core.framework.internal.db.cloud.GCloudAuthProvider;
 import core.framework.internal.log.ActionLog;
-import core.framework.internal.log.LogLevel;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.resource.Pool;
 import core.framework.util.ASCII;
@@ -310,16 +309,9 @@ public final class DatabaseImpl implements Database {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {
             actionLog.stats.compute("db_queries", (k, oldValue) -> (oldValue == null) ? queries : oldValue + queries);
-            int operations = actionLog.track("db", elapsed, readRows, writeRows);
-            // check default max operations first then check if specified action level max operations
-            if (operations > actionLog.warningContext.maxDBOperations && actionLog.result == LogLevel.INFO) {    // only warn once, action hits here typically will call db more ongoing
-                logger.warn(errorCode("TOO_MANY_DB_OPERATIONS"), "too many db operations, operations={}", operations);
-            }
+            actionLog.track("db", elapsed, readRows, writeRows);
             if (elapsed > slowOperationThresholdInNanos) {
                 logger.warn(errorCode("SLOW_DB"), "slow db operation, elapsed={}", Duration.ofNanos(elapsed));
-            }
-            if (readRows > actionLog.warningContext.maxDBRows) {
-                logger.warn(errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", readRows);
             }
         }
     }

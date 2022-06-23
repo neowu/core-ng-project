@@ -43,8 +43,8 @@ public final class ActionLog {
     public List<String> correlationIds;     // with bulk message handler, there will be multiple correlationIds handled by one batch
     public List<String> clients;
     public List<String> refIds;
+    public String errorMessage;
     long maxProcessTimeInNano;
-    String errorMessage;
     long elapsed;
     private String errorCode;
 
@@ -157,6 +157,9 @@ public final class ActionLog {
         stat.readEntries += readEntries;
         stat.writeEntries += writeEntries;
         // not to add event to keep trace log concise
+        if (result == LogLevel.INFO) {  // check IO warnings only if there is no other warning, IO warning could be triggered many times within same action
+            warningContext.validate(operation, stat.count, readEntries, stat.readEntries, stat.writeEntries);
+        }
         return stat.count;
     }
 

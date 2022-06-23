@@ -1,8 +1,10 @@
 ## Change log
 
-### 8.0.3 (06/22/2022 - )
+### 8.0.3-b0 (06/22/2022 - )
 
 * mongo: update driver to 4.6.0
+* warning: removed @DBWarning, replaced with @IOWarning
+  > e.g. @IOWarning(operation="db", maxOperations=2000, maxFetch=2000, maxReads=10_000, maxWrites=10_000)
 
 ### 8.0.2 (06/02/2022 - 06/17/2022)
 
@@ -581,20 +583,20 @@
 
 ```json
 {
-    "ignoreErrors": [
-        {"apps": ["website"], "errorCodes": ["PATH_NOT_FOUND"], "severity": "WARN"}
-    ],
-    "criticalErrors": [
-        {"errorCodes": ["FAILED_TO_START", "POD_FAILURE"]}
-    ],
-    "kibanaURL": "http://kibana:5601",
-    "channels": {
-        "actionWarnChannel": {"severity": "WARN", "indices": ["trace", "stat"]},
-        "actionErrorChannel": {"severity": "ERROR", "indices": ["trace", "stat"]},
-        "eventWarnChannel": {"severity": "WARN", "indices": ["event"]},
-        "eventErrorChannel": {"severity": "ERROR", "indices": ["event"]},
-        "additionalErrorCodeChannel": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}
-    }
+  "ignoreErrors": [
+    {"apps": ["website"], "errorCodes": ["PATH_NOT_FOUND"], "severity": "WARN"}
+  ],
+  "criticalErrors": [
+    {"errorCodes": ["FAILED_TO_START", "POD_FAILURE"]}
+  ],
+  "kibanaURL": "http://kibana:5601",
+  "channels": {
+    "actionWarnChannel": {"severity": "WARN", "indices": ["trace", "stat"]},
+    "actionErrorChannel": {"severity": "ERROR", "indices": ["trace", "stat"]},
+    "eventWarnChannel": {"severity": "WARN", "indices": ["event"]},
+    "eventErrorChannel": {"severity": "ERROR", "indices": ["event"]},
+    "additionalErrorCodeChannel": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}
+  }
 }
 ```    
 

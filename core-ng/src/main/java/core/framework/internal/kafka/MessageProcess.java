@@ -1,13 +1,12 @@
 package core.framework.internal.kafka;
 
-import core.framework.db.DBWarning;
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.validate.Validator;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
+import core.framework.log.IOWarning;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -19,8 +18,7 @@ public class MessageProcess<T> {
     public final BulkMessageHandler<T> bulkHandler;
     public final JSONReader<T> reader;
     public final Validator<T> validator;
-    @Nullable
-    public final DBWarning dbWarning;
+    public final IOWarning[] warnings;
 
     MessageProcess(MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler, Class<T> messageClass) {
         this.handler = handler;
@@ -34,7 +32,7 @@ public class MessageProcess<T> {
             } else {
                 targetMethod = bulkHandler.getClass().getMethod("handle", List.class);
             }
-            dbWarning = targetMethod.getDeclaredAnnotation(DBWarning.class);
+            warnings = targetMethod.getDeclaredAnnotationsByType(IOWarning.class);
         } catch (NoSuchMethodException e) {
             throw new Error(e);
         }

@@ -5,6 +5,7 @@ import core.framework.db.UncheckedSQLException;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogLevel;
 import core.framework.internal.log.LogManager;
+import core.framework.log.IOWarning;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -113,14 +114,14 @@ class DatabaseImplTest {
     @Test
     void validateSQL() {
         assertThatThrownBy(() -> database.select("SELECT * FROM database_test", String.class))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("sql must not contain wildcard(*)");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("sql must not contain wildcard(*)");
         assertThatThrownBy(() -> database.selectOne("SELECT id FROM database_test WHERE string_field = 'value'", Integer.class))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("sql must not contain single quote(')");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("sql must not contain single quote(')");
         assertThatThrownBy(() -> database.execute("UPDATE database_test SET string_value = 'value' WHERE string_field = 'value'", Integer.class))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("sql must not contain single quote(')");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("sql must not contain single quote(')");
     }
 
     @Test
@@ -164,8 +165,8 @@ class DatabaseImplTest {
     @Test
     void batchExecuteWithEmptyParams() {
         assertThatThrownBy(() -> database.batchExecute("UPDATE database_test SET string_field = ? WHERE id = ?", List.of()))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("params must not be empty");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("params must not be empty");
     }
 
     @Test
@@ -174,22 +175,22 @@ class DatabaseImplTest {
 
         database.execute(sql, 1);
         assertThatThrownBy(() -> database.execute(sql, 1))
-            .isInstanceOf(UncheckedSQLException.class)
-            .satisfies(e -> {
-                UncheckedSQLException exception = (UncheckedSQLException) e;
-                assertThat(exception.sqlSate).startsWith("23");
-                assertThat(exception.errorType).isEqualTo(UncheckedSQLException.ErrorType.INTEGRITY_CONSTRAINT_VIOLATION);
-            });
+                .isInstanceOf(UncheckedSQLException.class)
+                .satisfies(e -> {
+                    UncheckedSQLException exception = (UncheckedSQLException) e;
+                    assertThat(exception.sqlSate).startsWith("23");
+                    assertThat(exception.errorType).isEqualTo(UncheckedSQLException.ErrorType.INTEGRITY_CONSTRAINT_VIOLATION);
+                });
 
         // the underlying db is hsql, hsql throws BatchUpdateException directly without SQLIntegrityConstraintViolationException as cause
         Object[] params = {1};
         assertThatThrownBy(() -> database.batchExecute(sql, List.of(params, params)))
-            .isInstanceOf(UncheckedSQLException.class)
-            .satisfies(e -> {
-                UncheckedSQLException exception = (UncheckedSQLException) e;
-                assertThat(exception.sqlSate).startsWith("23");
-                assertThat(exception.errorType).isEqualTo(UncheckedSQLException.ErrorType.INTEGRITY_CONSTRAINT_VIOLATION);
-            });
+                .isInstanceOf(UncheckedSQLException.class)
+                .satisfies(e -> {
+                    UncheckedSQLException exception = (UncheckedSQLException) e;
+                    assertThat(exception.sqlSate).startsWith("23");
+                    assertThat(exception.errorType).isEqualTo(UncheckedSQLException.ErrorType.INTEGRITY_CONSTRAINT_VIOLATION);
+                });
     }
 
     @Test
@@ -221,22 +222,22 @@ class DatabaseImplTest {
     void driverProperties() {
         Properties properties = database.driverProperties("jdbc:mysql://localhost/demo");
         assertThat(properties)
-            .doesNotContainKeys("user", "password")
-            .containsEntry("sslMode", "DISABLED")
-            .containsEntry("characterEncoding", "utf-8");
+                .doesNotContainKeys("user", "password")
+                .containsEntry("sslMode", "DISABLED")
+                .containsEntry("characterEncoding", "utf-8");
 
         properties = database.driverProperties("jdbc:mysql://localhost/demo?sslMode=REQUIRED&characterEncoding=latin1");
         assertThat(properties).doesNotContainKeys("sslMode", "characterEncoding");
 
         properties = database.driverProperties("jdbc:mysql://localhost/demo?sslMode=REQUIRED");
         assertThat(properties)
-            .doesNotContainKeys("sslMode")
-            .containsEntry("characterEncoding", "utf-8");
+                .doesNotContainKeys("sslMode")
+                .containsEntry("characterEncoding", "utf-8");
 
         database.authProvider("gcloud");
         properties = database.driverProperties("jdbc:mysql://localhost/demo");
         assertThat(properties)
-            .containsEntry("sslMode", "PREFERRED");
+                .containsEntry("sslMode", "PREFERRED");
     }
 
     @Test
@@ -252,27 +253,36 @@ class DatabaseImplTest {
     }
 
     @Test
-    void trackWithTooManyDBOperations() {
+    @IOWarning(operation = "db", maxOperations = 5)
+    void trackWithTooManyDBOperations() throws NoSuchMethodException {
+        IOWarning[] warnings = getClass().getDeclaredMethod("trackWithTooManyDBOperations").getDeclaredAnnotationsByType(IOWarning.class); // for convenience of test, not actual usage
+
         var logManager = new LogManager();
         ActionLog actionLog = logManager.begin("begin", null);
-        actionLog.warningContext.maxDBOperations = 5;
+        actionLog.warningContext.initialize(warnings);
         for (int i = 0; i < 10; i++) {
             database.track(100, 0, 1, 20);
         }
         assertThat(actionLog.result).isEqualTo(LogLevel.WARN);
-        assertThat(actionLog.errorCode()).isEqualTo("TOO_MANY_DB_OPERATIONS");
+        assertThat(actionLog.errorCode()).isEqualTo("LARGE_DB_IO");
+        assertThat(actionLog.errorMessage).startsWith("too many operations, operation=db");
         assertThat(actionLog.stats).containsEntry("db_queries", 200.0);
         logManager.end("end");
     }
 
     @Test
-    void trackWithTooManyRowsReturned() {
+    @IOWarning(operation = "db", maxFetch = 50)
+    @IOWarning(operation = "redis", maxFetch = 10)
+    void trackWithFetchTooManyRows() throws NoSuchMethodException {
+        IOWarning[] warnings = getClass().getDeclaredMethod("trackWithFetchTooManyRows").getDeclaredAnnotationsByType(IOWarning.class); // for convenience of test, not actual usage
+
         var logManager = new LogManager();
         ActionLog actionLog = logManager.begin("begin", null);
-        actionLog.warningContext.maxDBRows = 50;
+        actionLog.warningContext.initialize(warnings);
         database.track(100, 100, 1, 20);
         assertThat(actionLog.result).isEqualTo(LogLevel.WARN);
-        assertThat(actionLog.errorCode()).isEqualTo("TOO_MANY_ROWS_RETURNED");
+        assertThat(actionLog.errorCode()).isEqualTo("LARGE_DB_IO");
+        assertThat(actionLog.errorMessage).startsWith("fetched too many entries, operation=db");
         logManager.end("end");
     }
 

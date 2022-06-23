@@ -63,10 +63,6 @@ public class MongoConfig extends Config {
         mongo.slowOperationThreshold(threshold);
     }
 
-    public void tooManyRowsReturnedThreshold(int threshold) {
-        mongo.tooManyRowsReturnedThreshold = threshold;
-    }
-
     public void timeout(Duration timeout) {
         mongo.timeout(timeout);
     }

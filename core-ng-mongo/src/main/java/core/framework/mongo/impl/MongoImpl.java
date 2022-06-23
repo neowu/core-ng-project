@@ -33,7 +33,6 @@ public class MongoImpl implements Mongo {
     private final ConnectionPoolSettings.Builder connectionPoolSettings = ConnectionPoolSettings.builder()
         .maxConnectionIdleTime(Duration.ofMinutes(30).toMillis(), TimeUnit.MILLISECONDS);
     public ConnectionString uri;
-    public int tooManyRowsReturnedThreshold = 2000;
     long timeoutInMs = Duration.ofSeconds(15).toMillis();
     long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     CodecRegistry registry;
