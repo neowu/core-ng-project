@@ -133,8 +133,8 @@ public class ElasticSearchImpl implements ElasticSearch {
             throw searchException(e);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("elasticsearch", elapsed);
             logger.info("refresh index, index={}, elapsed={}", index, elapsed);
+            ActionLogContext.track("elasticsearch", elapsed);
         }
     }
 

@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,14 +20,17 @@ public final class WarningContext {
 
     public void initialize(IOWarning[] warnings) {
         if (warnings.length > 0) {
-            configs = new HashMap<>();
-            for (IOWarning warning : warnings) {
+            @SuppressWarnings({"unchecked", "rawtypes"})
+            Map.Entry<String, WarningConfig>[] entries = new Map.Entry[warnings.length];
+            for (int i = 0; i < warnings.length; i++) {
+                IOWarning warning = warnings[i];
                 int maxOperations = warning.maxOperations() > 0 ? warning.maxOperations() : DEFAULT_CONFIG.maxOperations;
                 int maxRows = warning.maxFetch() > 0 ? warning.maxFetch() : DEFAULT_CONFIG.maxFetch;
                 int maxReads = warning.maxReads() > 0 ? warning.maxReads() : DEFAULT_CONFIG.maxReads;
                 int maxWrites = warning.maxWrites() > 0 ? warning.maxWrites() : DEFAULT_CONFIG.maxWrites;
-                configs.put(warning.operation(), new WarningConfig(maxOperations, maxRows, maxReads, maxWrites));
+                entries[i] = Map.entry(warning.operation(), new WarningConfig(maxOperations, maxRows, maxReads, maxWrites));
             }
+            configs = Map.ofEntries(entries);
         }
     }
 
