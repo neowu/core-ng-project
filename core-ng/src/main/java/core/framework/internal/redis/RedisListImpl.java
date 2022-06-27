@@ -55,9 +55,8 @@ public final class RedisListImpl implements RedisList {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, values.size(), 0);
             logger.debug("lpop, key={}, size={}, returnedValues={}, elapsed={}", key, size, values, elapsed);
-            redis.checkSlowOperation(elapsed);
+            ActionLogContext.track("redis", elapsed, values.size(), 0);
         }
     }
 
@@ -77,9 +76,8 @@ public final class RedisListImpl implements RedisList {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, 0, values.length);
             logger.debug("rpush, key={}, values={}, size={}, elapsed={}", key, new ArrayLogParam(values), values.length, elapsed);
-            redis.checkSlowOperation(elapsed);
+            ActionLogContext.track("redis", elapsed, 0, values.length);
         }
     }
 
@@ -109,9 +107,8 @@ public final class RedisListImpl implements RedisList {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
             logger.debug("lrange, key={}, start={}, stop={}, returnedValues={}, elapsed={}", key, start, stop, values, elapsed);
-            redis.checkSlowOperation(elapsed);
+            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
         }
     }
 
@@ -131,9 +128,8 @@ public final class RedisListImpl implements RedisList {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, 0, 1);
             logger.debug("ltrim, key={}, maxSize={}, elapsed={}", key, maxSize, elapsed);
-            redis.checkSlowOperation(elapsed);
+            ActionLogContext.track("redis", elapsed, 0, 1);
         }
     }
 }

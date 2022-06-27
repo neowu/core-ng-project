@@ -63,9 +63,8 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, 0, added);
             logger.debug("zadd, key={}, values={}, onlyIfAbsent={}, added={}, elapsed={}", key, values, onlyIfAbsent, added, elapsed);
-            redis.checkSlowOperation(elapsed);
+            ActionLogContext.track("redis", elapsed, 0, added);
         }
     }
 
@@ -93,8 +92,8 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
             logger.debug("zrange, key={}, start={}, stop={}, returnedValues={}, elapsed={}", key, start, stop, values, elapsed);
+            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
         }
     }
 
@@ -118,8 +117,8 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
             logger.debug("zrangeByScore, key={}, minScore={}, maxScore={}, limit={}, returnedValues={}, elapsed={}", key, minScore, maxScore, limit, values, elapsed);
+            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
         }
     }
 
@@ -172,9 +171,8 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, fetchedEntries, size);
             logger.debug("popByScore, key={}, minScore={}, maxScore={}, limit={}, returnedValues={}, size={}, elapsed={}", key, minScore, maxScore, limit, values, size, elapsed);
-            redis.checkSlowOperation(elapsed);
+            ActionLogContext.track("redis", elapsed, fetchedEntries, size);
         }
     }
 
@@ -197,8 +195,8 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
             logger.debug("zpopmin, key={}, limit={}, returnedValues={}, elapsed={}", key, limit, values, elapsed);
+            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
         }
     }
 

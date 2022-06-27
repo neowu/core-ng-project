@@ -87,7 +87,7 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
     }
 
     private void linkContext(WebSocketChannel channel, ChannelImpl<?, ?> wrapper, ActionLog actionLog) {
-        actionLog.maxProcessTime(maxProcessTimeInNano);
+        actionLog.warningContext.maxProcessTimeInNano(maxProcessTimeInNano);
         actionLog.context("channel", wrapper.id);
         logger.debug("refId={}", wrapper.refId);
         List<String> refIds = List.of(wrapper.refId);

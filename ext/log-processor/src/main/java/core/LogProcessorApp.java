@@ -92,7 +92,6 @@ public class LogProcessorApp extends App {
         SearchConfig search = config(SearchConfig.class);
         search.host(requiredProperty("sys.elasticsearch.host"));
         search.timeout(Duration.ofSeconds(20)); // use longer timeout/slowES threshold as log indexing can be slower with large batches
-        search.slowOperationThreshold(Duration.ofSeconds(10));
         search.type(ActionDocument.class);
         search.type(TraceDocument.class);
         search.type(StatDocument.class);

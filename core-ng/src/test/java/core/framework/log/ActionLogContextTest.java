@@ -60,7 +60,7 @@ class ActionLogContextTest {
 
         var logManager = new LogManager();
         ActionLog log = logManager.begin("begin", null);
-        log.maxProcessTime(Duration.ofSeconds(30).toNanos());
+        log.warningContext.maxProcessTimeInNano(Duration.ofSeconds(30).toNanos());
         assertThat(ActionLogContext.remainingProcessTime()).isGreaterThan(Duration.ZERO);
         logManager.end("end");
     }

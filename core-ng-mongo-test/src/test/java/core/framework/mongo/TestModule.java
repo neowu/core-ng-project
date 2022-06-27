@@ -18,7 +18,6 @@ public class TestModule extends AbstractTestModule {
         mongo.collection(TestMongoEntity.class);
         mongo.view(TestMongoView.class);
         mongo.poolSize(0, 5);
-        mongo.slowOperationThreshold(Duration.ofSeconds(5));
         mongo.timeout(Duration.ofSeconds(15));
 
         mongo = config(MongoConfig.class, "other");

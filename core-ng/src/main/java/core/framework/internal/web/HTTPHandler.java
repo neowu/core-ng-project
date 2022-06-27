@@ -135,7 +135,7 @@ public class HTTPHandler implements HttpHandler {
         String trace = headers.getFirst(HEADER_TRACE);
         if (trace != null) actionLog.trace = Trace.parse(trace);
 
-        actionLog.maxProcessTime(maxProcessTime(headers.getFirst(HTTPHandler.HEADER_TIMEOUT)));
+        actionLog.warningContext.maxProcessTimeInNano(maxProcessTime(headers.getFirst(HTTPHandler.HEADER_TIMEOUT)));
     }
 
     long maxProcessTime(String timeout) {

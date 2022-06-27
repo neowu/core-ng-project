@@ -17,7 +17,6 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import core.framework.internal.validate.Validator;
 import core.framework.log.ActionLogContext;
-import core.framework.log.Markers;
 import core.framework.mongo.Aggregate;
 import core.framework.mongo.Collection;
 import core.framework.mongo.Count;
@@ -32,7 +31,6 @@ import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +70,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
                     count.readPreference == null ? null : count.readPreference.getName(),
                     elapsed);
             ActionLogContext.track("mongo", elapsed, 1, 0);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -86,7 +83,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             logger.debug("insert, collection={}, elapsed={}", collectionName, elapsed);
             ActionLogContext.track("mongo", elapsed, 0, 1);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -104,7 +100,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             int size = entities.size();
             logger.debug("bulkInsert, collection={}, size={}, elapsed={}", collectionName, size, elapsed);
             ActionLogContext.track("mongo", elapsed, 0, size);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -127,7 +122,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
                     returnedDocs,
                     elapsed);
             ActionLogContext.track("mongo", elapsed, returnedDocs, 0);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -156,7 +150,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
                     returnedDocs,
                     elapsed);
             ActionLogContext.track("mongo", elapsed, returnedDocs, 0);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -182,7 +175,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
                     size,
                     elapsed);
             ActionLogContext.track("mongo", elapsed, size, 0);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -258,7 +250,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             logger.debug("replace, collection={}, id={}, elapsed={}", collectionName, id, elapsed);
             ActionLogContext.track("mongo", elapsed, 0, 1);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -281,7 +272,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             logger.debug("bulkReplace, collection={}, size={}, elapsed={}", collectionName, size, elapsed);
             ActionLogContext.track("mongo", elapsed, 0, size);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -302,7 +292,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
                     updatedRows,
                     elapsed);
             ActionLogContext.track("mongo", elapsed, 0, (int) updatedRows);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -318,7 +307,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             logger.debug("delete, collection={}, id={}, elapsed={}", collectionName, id, elapsed);
             ActionLogContext.track("mongo", elapsed, 0, (int) deletedRows);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -334,7 +322,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             logger.debug("delete, collection={}, filter={}, deletedRows={}, elapsed={}", collectionName, new BsonLogParam(filter, mongo.registry), deletedRows, elapsed);
             ActionLogContext.track("mongo", elapsed, 0, (int) deletedRows);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -355,7 +342,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             logger.debug("bulkDelete, collection={}, ids={}, size={}, deletedRows={}, elapsed={}", collectionName, ids, size, deletedRows, elapsed);
             ActionLogContext.track("mongo", elapsed, 0, deletedRows);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -374,11 +360,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
                 results.add(cursor.next());
             }
         }
-    }
-
-    private void checkSlowOperation(long elapsed) {
-        if (elapsed > mongo.slowOperationThresholdInNanos)
-            logger.warn(Markers.errorCode("SLOW_MONGO"), "slow mongo operation, elapsed={}", Duration.ofNanos(elapsed));
     }
 
     private com.mongodb.client.MongoCollection<T> collection(ReadPreference readPreference) {

@@ -33,14 +33,6 @@ class RedisImplTest {
     }
 
     @Test
-    void slowOperationThreshold() {
-        var threshold = Duration.ofSeconds(5);
-        redis.slowOperationThreshold(threshold);
-
-        assertThat(redis.slowOperationThresholdInNanos).isEqualTo(threshold.toNanos());
-    }
-
-    @Test
     void set() {
         assertThatThrownBy(() -> redis.set("key", "value", Duration.ZERO, true))
             .isInstanceOf(Error.class)

@@ -187,7 +187,7 @@ class MessageListenerThread extends Thread {
 
     private void initAction(ActionLog actionLog, String topic, String handler, IOWarning[] warnings) {
         actionLog.action("topic:" + topic);
-        actionLog.maxProcessTime(listener.maxProcessTimeInNano);
+        actionLog.warningContext.maxProcessTimeInNano(listener.maxProcessTimeInNano);
         actionLog.context.put("topic", List.of(topic));
         actionLog.context.put("handler", List.of(handler));
         logger.debug("topic={}, handler={}", topic, handler);

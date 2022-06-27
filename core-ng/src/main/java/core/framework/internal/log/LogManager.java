@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 
@@ -55,10 +54,8 @@ public class LogManager {
 
     public void end(String message) {
         ActionLog actionLog = CURRENT_ACTION_LOG.get();
-        long elapsed = actionLog.complete();
-        checkSlowProcess(elapsed, actionLog.maxProcessTimeInNano);
         actionLog.end(message);
-        CURRENT_ACTION_LOG.remove();
+        CURRENT_ACTION_LOG.remove();    // actionLog.end(message) may produce more logs
 
         if (appender != null) {
             try {
@@ -66,12 +63,6 @@ public class LogManager {
             } catch (Throwable e) {
                 LOGGER.warn("failed to append action log, error={}", e.getMessage(), e);
             }
-        }
-    }
-
-    void checkSlowProcess(long elapsed, long maxProcessTimeInNano) {
-        if (maxProcessTimeInNano > 0 && elapsed > maxProcessTimeInNano) {
-            LOGGER.warn(Markers.errorCode("SLOW_PROCESS"), "action took longer than of max process time, maxProcessTime={}, elapsed={}", Duration.ofNanos(maxProcessTimeInNano), Duration.ofNanos(elapsed));
         }
     }
 

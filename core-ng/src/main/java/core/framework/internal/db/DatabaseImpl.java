@@ -32,8 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import static core.framework.log.Markers.errorCode;
-
 /**
  * @author neo
  */
@@ -52,7 +50,6 @@ public final class DatabaseImpl implements Database {
 
     public String user;
     public String password;
-    public long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     public IsolationLevel isolationLevel;
 
     private String url;
@@ -310,9 +307,6 @@ public final class DatabaseImpl implements Database {
         if (actionLog != null) {
             actionLog.stats.compute("db_queries", (k, oldValue) -> (oldValue == null) ? queries : oldValue + queries);
             actionLog.track("db", elapsed, readRows, writeRows);
-            if (elapsed > slowOperationThresholdInNanos) {
-                logger.warn(errorCode("SLOW_DB"), "slow db operation, elapsed={}", Duration.ofNanos(elapsed));
-            }
         }
     }
 

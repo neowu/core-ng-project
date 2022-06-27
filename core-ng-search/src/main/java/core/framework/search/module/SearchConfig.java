@@ -1,5 +1,6 @@
 package core.framework.search.module;
 
+import core.framework.internal.log.WarningContext;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
@@ -30,6 +31,8 @@ public class SearchConfig extends Config {
         context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> search.close());
         context.beanFactory.bind(ElasticSearch.class, name, search);
         this.search = search;
+
+        WarningContext.put("elasticsearch", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000);
     }
 
     @Override
@@ -43,10 +46,6 @@ public class SearchConfig extends Config {
     public void host(String host) {
         search.hosts = ElasticSearchHost.parse(host);
         context.probe.urls.add(search.hosts[0].toURI() + "/_cluster/health?local=true");      // in kube env, it's ok to just check first pod of stateful set
-    }
-
-    public void slowOperationThreshold(Duration threshold) {
-        search.slowOperationThreshold = threshold;
     }
 
     // refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-max-result-window

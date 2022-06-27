@@ -59,7 +59,7 @@ public class ExecutorTask<T> implements Callable<T> {
         try {
             ActionLog actionLog = logManager.begin("=== task execution begin ===", actionId);
             actionLog.action(action());
-            actionLog.maxProcessTime(maxProcessTimeInNano);
+            actionLog.warningContext.maxProcessTimeInNano(maxProcessTimeInNano);
             // here it doesn't log task class, is due to task usually is lambda or method reference, it's expensive to inspect, refer to ControllerInspector
             if (rootAction != null) { // if rootAction != null, then all parent info are available
                 actionLog.context("root_action", rootAction);

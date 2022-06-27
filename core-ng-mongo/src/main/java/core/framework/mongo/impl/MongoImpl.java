@@ -34,7 +34,6 @@ public class MongoImpl implements Mongo {
         .maxConnectionIdleTime(Duration.ofMinutes(30).toMillis(), TimeUnit.MILLISECONDS);
     public ConnectionString uri;
     long timeoutInMs = Duration.ofSeconds(15).toMillis();
-    long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     CodecRegistry registry;
     private MongoClient mongoClient;
     private MongoDatabase database;
@@ -145,10 +144,6 @@ public class MongoImpl implements Mongo {
         } finally {
             logger.info("register mongo view, viewClass={}, elapsed={}", viewClass.getCanonicalName(), watch.elapsed());
         }
-    }
-
-    public void slowOperationThreshold(Duration threshold) {
-        slowOperationThresholdInNanos = threshold.toNanos();
     }
 
     <T> com.mongodb.client.MongoCollection<T> mongoCollection(Class<T> entityClass) {

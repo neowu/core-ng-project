@@ -31,7 +31,7 @@ public final class ActionLog {
     public final Instant date;
     public final Map<String, List<String>> context;
     public final Map<String, Double> stats;
-    public final WarningContext warningContext = new WarningContext();
+    public final WarningContext warningContext;
 
     final Map<String, PerformanceStat> performanceStats;
     private final List<LogEvent> events;
@@ -44,7 +44,6 @@ public final class ActionLog {
     public List<String> clients;
     public List<String> refIds;
     public String errorMessage;
-    long maxProcessTimeInNano;
     long elapsed;
     private String errorCode;
 
@@ -61,6 +60,7 @@ public final class ActionLog {
         context = new HashMap<>();  // default capacity is 16, no need to keep insertion order, kibana will sort all keys on display
         stats = new HashMap<>();
         performanceStats = new HashMap<>();
+        warningContext = new WarningContext();
 
         add(event(message));
         add(event("id={}", this.id));
@@ -79,21 +79,23 @@ public final class ActionLog {
         }
     }
 
-    long complete() {
+    void end(String message) {
+        validatePerformanceStats();
+
         double cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
         stats.put("cpu_time", cpuTime);
         elapsed = elapsed();
         add(event("elapsed={}", elapsed));
-        return elapsed;
-    }
+        warningContext.checkMaxProcessTime(elapsed);
 
-    void end(String message) {
         add(event(message));
     }
 
-    public void maxProcessTime(long maxProcessTimeInNano) {
-        this.maxProcessTimeInNano = maxProcessTimeInNano;
-        add(event("maxProcessTime={}", maxProcessTimeInNano));
+    private void validatePerformanceStats() {
+        for (Map.Entry<String, PerformanceStat> entry : performanceStats.entrySet()) {
+            PerformanceStat stat = entry.getValue();
+            warningContext.checkTotalIO(entry.getKey(), stat.count, stat.readEntries, stat.writeEntries);
+        }
     }
 
     public long elapsed() {
@@ -156,10 +158,7 @@ public final class ActionLog {
         stat.totalElapsed += elapsed;
         stat.readEntries += readEntries;
         stat.writeEntries += writeEntries;
-        // not to add event to keep trace log concise
-        if (result == LogLevel.INFO) {  // check IO warnings only if there is no other warning, IO warning could be triggered many times within same action
-            warningContext.validate(operation, stat.count, readEntries, stat.readEntries, stat.writeEntries);
-        }
+        warningContext.checkSingleIO(operation, elapsed, readEntries);
         return stat.count;
     }
 
@@ -179,7 +178,7 @@ public final class ActionLog {
     }
 
     public long remainingProcessTimeInNano() {
-        long remainingTime = maxProcessTimeInNano - elapsed();
+        long remainingTime = warningContext.maxProcessTimeInNano - elapsed();
         if (remainingTime < 0) return 0;
         return remainingTime;
     }

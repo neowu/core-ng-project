@@ -426,7 +426,7 @@ class RetryInterceptorTest {
         var logManager = new LogManager();
         ActionLog actionLog = logManager.begin("begin", null);
 
-        actionLog.maxProcessTime(Duration.ofSeconds(1).toNanos());
+        actionLog.warningContext.maxProcessTimeInNano(Duration.ofSeconds(1).toNanos());
         assertThat(interceptor.withinMaxProcessTime(1)).isTrue();
         assertThat(interceptor.withinMaxProcessTime(2)).isFalse();
 

@@ -37,7 +37,6 @@ import java.util.Map;
 public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
     public Duration timeout = Duration.ofSeconds(10);
-    public Duration slowOperationThreshold = Duration.ofSeconds(5);
     public HttpHost[] hosts;
     public int maxResultWindow = 10000;
     ElasticsearchClient client;

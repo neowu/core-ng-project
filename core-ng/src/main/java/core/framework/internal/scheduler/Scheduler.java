@@ -146,7 +146,7 @@ public final class Scheduler {
                 String name = task.name();
                 actionLog.action("job:" + name);
                 actionLog.trace = trace;
-                actionLog.maxProcessTime(maxProcessTimeInNano);
+                actionLog.warningContext.maxProcessTimeInNano(maxProcessTimeInNano);
                 actionLog.context("trigger", task.trigger());
                 Job job = task.job();
                 actionLog.context("job", name);

@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -64,14 +63,12 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     private final ElasticSearchImpl elasticSearch;
     private final String index;
-    private final long slowOperationThresholdInNanos;
     private final int maxResultWindow;
     private final Validator<T> validator;
     private final Class<T> documentClass;
 
     ElasticSearchTypeImpl(ElasticSearchImpl elasticSearch, Class<T> documentClass) {
         this.elasticSearch = elasticSearch;
-        this.slowOperationThresholdInNanos = elasticSearch.slowOperationThreshold.toNanos();
         this.maxResultWindow = elasticSearch.maxResultWindow;
         this.index = documentClass.getDeclaredAnnotation(Index.class).name();
         this.documentClass = documentClass;
@@ -113,7 +110,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("search, index={}, hits={}, esTook={}, elapsed={}", index, hits, esTook, elapsed);
             ActionLogContext.track("elasticsearch", elapsed, hits, 0);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -151,7 +147,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("complete, index={}, options={}, esTook={}, elapsed={}", index, options, esTook, elapsed);
             ActionLogContext.track("elasticsearch", elapsed, options, 0);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -173,7 +168,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("get, index={}, id={}, elapsed={}", index, request.id, elapsed);
             ActionLogContext.track("elasticsearch", elapsed, hits, 0);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -192,7 +186,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("index, index={}, id={}, elapsed={}", index, request.id, elapsed);
             ActionLogContext.track("elasticsearch", elapsed, 0, 1);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -221,7 +214,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("bulkIndex, index={}, size={}, esTook={}, elapsed={}", index, request.sources.size(), esTook, elapsed);
             ActionLogContext.track("elasticsearch", elapsed, 0, request.sources.size());
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -247,7 +239,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("update, index={}, id={}, script={}, updated={}, elapsed={}", index, request.id, request.script, updated, elapsed);
             ActionLogContext.track("elasticsearch", elapsed, 0, updated ? 1 : 0);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -272,7 +263,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("partialUpdate, index={}, id={}, updated={}, elapsed={}", index, request.id, updated, elapsed);
             ActionLogContext.track("elasticsearch", elapsed, 0, updated ? 1 : 0);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -293,7 +283,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("delete, index={}, id={}, elapsed={}", index, request.id, elapsed);
             ActionLogContext.track("elasticsearch", elapsed, 0, deleted ? 1 : 0);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -322,7 +311,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             int size = request.ids.size();
             logger.debug("bulkDelete, index={}, ids={}, size={}, esTook={}, elapsed={}", index, request.ids, size, esTook, elapsed);
             ActionLogContext.track("elasticsearch", elapsed, 0, size);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -350,7 +338,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("deleteByQuery, index={}, deleted={}, esTook={}, elapsed={}", index, deleted, esTook, elapsed);
             ActionLogContext.track("elasticsearch", elapsed, 0, (int) deleted);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -369,7 +356,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("analyze, index={}, analyzer={}, elapsed={}", index, request.analyzer, elapsed);
             ActionLogContext.track("elasticsearch", elapsed);
-            checkSlowOperation(elapsed);
         }
     }
 
@@ -419,11 +405,5 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     private Refresh refreshValue(Boolean value) {
         if (value == null) return null;
         return Boolean.TRUE.equals(value) ? Refresh.True : Refresh.False;
-    }
-
-    private void checkSlowOperation(long elapsed) {
-        if (elapsed > slowOperationThresholdInNanos) {
-            logger.warn(errorCode("SLOW_ES"), "slow elasticsearch operation, elapsed={}", Duration.ofNanos(elapsed));
-        }
     }
 }
