@@ -3,10 +3,10 @@ package core.framework.internal.kafka;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.PerformanceWarning;
 import core.framework.internal.log.Trace;
 import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.kafka.Message;
-import core.framework.log.IOWarning;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
@@ -135,7 +135,7 @@ class MessageListenerThread extends Thread {
             try {
                 initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), process.warnings);
 
-                actionLog.track("kafka", 0, 1, 0);
+                actionLog.track("kafka", 0, 1, 0, null);
 
                 Headers headers = record.headers();
                 String trace = header(headers, MessageHeaders.HEADER_TRACE);
@@ -185,18 +185,18 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    private void initAction(ActionLog actionLog, String topic, String handler, IOWarning[] warnings) {
+    private void initAction(ActionLog actionLog, String topic, String handler, PerformanceWarning[] warnings) {
         actionLog.action("topic:" + topic);
         actionLog.warningContext.maxProcessTimeInNano(listener.maxProcessTimeInNano);
         actionLog.context.put("topic", List.of(topic));
         actionLog.context.put("handler", List.of(handler));
         logger.debug("topic={}, handler={}", topic, handler);
-        actionLog.warningContext.initialize(warnings);
+        actionLog.initializeWarnings(warnings);
     }
 
     <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONReader<T> reader) throws IOException {
         int size = records.size();
-        actionLog.track("kafka", 0, size, 0);
+        actionLog.track("kafka", 0, size, 0, null);
         List<Message<T>> messages = new ArrayList<>(size);
         Set<String> correlationIds = new HashSet<>();
         Set<String> clients = new HashSet<>();
@@ -221,7 +221,7 @@ class MessageListenerThread extends Thread {
             byte[] value = record.value();
             long timestamp = record.timestamp();
             logger.debug("[message] key={}, value={}, timestamp={}, refId={}, client={}, correlationId={}, trace={}",
-                    key, new BytesLogParam(value), timestamp, refId, client, correlationId, trace);
+                key, new BytesLogParam(value), timestamp, refId, client, correlationId, trace);
 
             if (minTimestamp > timestamp) minTimestamp = timestamp;
 

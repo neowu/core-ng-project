@@ -54,7 +54,7 @@ public final class ActionLogContext {
     public static int track(String operation, long elapsed, int readEntries, int writeEntries) {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog == null) return 1;    // be called without action context
-        return actionLog.track(operation, elapsed, readEntries, writeEntries);
+        return actionLog.track(operation, elapsed, readEntries, writeEntries, null);
     }
 
     public static void triggerTrace(boolean cascade) {

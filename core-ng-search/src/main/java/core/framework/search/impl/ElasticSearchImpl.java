@@ -10,6 +10,9 @@ import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import core.framework.internal.json.JSONMapper;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
+import core.framework.internal.log.PerformanceWarning;
 import core.framework.log.ActionLogContext;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
@@ -36,6 +39,8 @@ import java.util.Map;
  */
 public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
+    private final PerformanceWarning warning = new PerformanceWarning("elasticsearch", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000);
+
     public Duration timeout = Duration.ofSeconds(10);
     public HttpHost[] hosts;
     public int maxResultWindow = 10000;
@@ -201,5 +206,12 @@ public class ElasticSearchImpl implements ElasticSearch {
             builder.append("causedBy: ").append(causedBy.reason());
         }
         return new SearchException(builder.toString(), e);
+    }
+
+    void track(long elapsed, int readEntries, int writeEntries) {
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        if (actionLog != null) {
+            actionLog.track(warning.operation, elapsed, readEntries, writeEntries, warning);
+        }
     }
 }

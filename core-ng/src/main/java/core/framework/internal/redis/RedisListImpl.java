@@ -2,7 +2,6 @@ package core.framework.internal.redis;
 
 import core.framework.internal.log.filter.ArrayLogParam;
 import core.framework.internal.resource.PoolItem;
-import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisList;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
@@ -56,7 +55,7 @@ public final class RedisListImpl implements RedisList {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("lpop, key={}, size={}, returnedValues={}, elapsed={}", key, size, values, elapsed);
-            ActionLogContext.track("redis", elapsed, values.size(), 0);
+            redis.track(elapsed, values.size(), 0);
         }
     }
 
@@ -77,7 +76,7 @@ public final class RedisListImpl implements RedisList {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("rpush, key={}, values={}, size={}, elapsed={}", key, new ArrayLogParam(values), values.length, elapsed);
-            ActionLogContext.track("redis", elapsed, 0, values.length);
+            redis.track(elapsed, 0, values.length);
         }
     }
 
@@ -108,7 +107,7 @@ public final class RedisListImpl implements RedisList {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("lrange, key={}, start={}, stop={}, returnedValues={}, elapsed={}", key, start, stop, values, elapsed);
-            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
+            redis.track(elapsed, values == null ? 0 : values.size(), 0);
         }
     }
 
@@ -129,7 +128,7 @@ public final class RedisListImpl implements RedisList {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("ltrim, key={}, maxSize={}, elapsed={}", key, maxSize, elapsed);
-            ActionLogContext.track("redis", elapsed, 0, 1);
+            redis.track(elapsed, 0, 1);
         }
     }
 }

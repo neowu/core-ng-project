@@ -1,7 +1,6 @@
 package core.framework.mongo.module;
 
 import com.mongodb.ConnectionString;
-import core.framework.internal.log.WarningContext;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
@@ -34,8 +33,6 @@ public class MongoConfig extends Config {
         this.context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> mongo.close());
         context.beanFactory.bind(Mongo.class, name, mongo);
         this.mongo = mongo;
-
-        WarningContext.put("mongo", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000);
     }
 
     @Override

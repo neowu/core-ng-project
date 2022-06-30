@@ -35,7 +35,7 @@ public class MessageListener {
     private final String name;
 
     public int poolSize = Runtime.getRuntime().availableProcessors() * 4;
-    public long longConsumerDelayThresholdInNano = Duration.ofSeconds(60).toNanos();
+    public long longConsumerDelayThresholdInNano = Duration.ofSeconds(30).toNanos();
     public int maxPollRecords = 500;            // default kafka setting, refer to org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
     public int maxPollBytes = 3 * 1024 * 1024;  // get 3M bytes if possible for batching, this is not absolute limit of max bytes to poll, refer to org.apache.kafka.clients.consumer.ConsumerConfig.FETCH_MAX_BYTES_DOC
     public int minPollBytes = 1;                // default kafka setting

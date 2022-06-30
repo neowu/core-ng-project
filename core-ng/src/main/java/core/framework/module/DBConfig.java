@@ -4,7 +4,6 @@ import core.framework.db.Database;
 import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.internal.db.DatabaseImpl;
-import core.framework.internal.log.WarningContext;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
@@ -39,8 +38,6 @@ public class DBConfig extends Config {
         context.collector.metrics.add(new PoolMetrics(database.pool));
         context.beanFactory.bind(Database.class, name, database);
         this.database = database;
-
-        WarningContext.put("db", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000);
     }
 
     @Override

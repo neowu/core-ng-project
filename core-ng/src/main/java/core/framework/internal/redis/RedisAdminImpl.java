@@ -1,7 +1,6 @@
 package core.framework.internal.redis;
 
 import core.framework.internal.resource.PoolItem;
-import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisAdmin;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
@@ -45,7 +44,7 @@ public class RedisAdminImpl implements RedisAdmin {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("info, returnedValue={}, elapsed={}", value, elapsed);
-            ActionLogContext.track("redis", elapsed, 1, 0);
+            redis.track(elapsed, 1, 0);
         }
     }
 

@@ -2,7 +2,6 @@ package core.framework.internal.redis;
 
 import core.framework.internal.log.filter.ArrayLogParam;
 import core.framework.internal.resource.PoolItem;
-import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisSet;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
@@ -53,7 +52,7 @@ public final class RedisSetImpl implements RedisSet {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("sadd, key={}, values={}, size={}, elapsed={}", key, new ArrayLogParam(values), values.length, elapsed);
-            ActionLogContext.track("redis", elapsed, 0, (int) addedValues);
+            redis.track(elapsed, 0, (int) addedValues);
         }
     }
 
@@ -79,7 +78,7 @@ public final class RedisSetImpl implements RedisSet {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("smembers, key={}, returnedValues={}, elapsed={}", key, values, elapsed);
-            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
+            redis.track(elapsed, values == null ? 0 : values.size(), 0);
         }
     }
 
@@ -103,7 +102,7 @@ public final class RedisSetImpl implements RedisSet {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("sismember, key={}, value={}, isMember={}, elapsed={}", key, value, isMember, elapsed);
-            ActionLogContext.track("redis", elapsed, 1, 0);
+            redis.track(elapsed, 1, 0);
         }
     }
 
@@ -127,7 +126,7 @@ public final class RedisSetImpl implements RedisSet {
             long elapsed = watch.elapsed();
             int size = values.length;
             logger.debug("srem, key={}, values={}, size={}, removedValues={}, elapsed={}", key, new ArrayLogParam(values), size, removedValues, elapsed);
-            ActionLogContext.track("redis", elapsed, 0, size);
+            redis.track(elapsed, 0, size);
         }
     }
 
@@ -154,7 +153,7 @@ public final class RedisSetImpl implements RedisSet {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("spop, key={}, count={}, returnedValues={}, elapsed={}", key, count, values, elapsed);
-            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
+            redis.track(elapsed, values == null ? 0 : values.size(), 0);
         }
     }
 
@@ -176,7 +175,7 @@ public final class RedisSetImpl implements RedisSet {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("scard, key={}, size={}, elapsed={}", key, size, elapsed);
-            ActionLogContext.track("redis", elapsed, 1, 0);
+            redis.track(elapsed, 1, 0);
         }
     }
 }

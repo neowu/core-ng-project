@@ -2,6 +2,7 @@ package core.framework.internal.kafka;
 
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONReader;
+import core.framework.internal.log.PerformanceWarning;
 import core.framework.internal.validate.Validator;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
@@ -18,7 +19,7 @@ public class MessageProcess<T> {
     public final BulkMessageHandler<T> bulkHandler;
     public final JSONReader<T> reader;
     public final Validator<T> validator;
-    public final IOWarning[] warnings;
+    public final PerformanceWarning[] warnings;
 
     MessageProcess(MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler, Class<T> messageClass) {
         this.handler = handler;
@@ -32,7 +33,7 @@ public class MessageProcess<T> {
             } else {
                 targetMethod = bulkHandler.getClass().getMethod("handle", List.class);
             }
-            warnings = targetMethod.getDeclaredAnnotationsByType(IOWarning.class);
+            warnings = PerformanceWarning.of(targetMethod.getDeclaredAnnotationsByType(IOWarning.class));
         } catch (NoSuchMethodException e) {
             throw new Error(e);
         }

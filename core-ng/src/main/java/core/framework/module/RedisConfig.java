@@ -1,6 +1,5 @@
 package core.framework.module;
 
-import core.framework.internal.log.WarningContext;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
@@ -28,8 +27,6 @@ public class RedisConfig extends Config {
         this.name = name;
         redis = createRedis();
         context.beanFactory.bind(Redis.class, name, redis);
-
-        WarningContext.put("redis", 2000, Duration.ofMillis(500), 1000, 10_000, 10_000);
     }
 
     @Override

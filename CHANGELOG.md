@@ -5,6 +5,7 @@
 * mongo: update driver to 4.6.0
 * warning: removed @DBWarning, replaced with @IOWarning
   > e.g. @IOWarning(operation="db", maxOperations=2000, maxElapsedInMs=5000, maxReads=2000, maxTotalReads=10_000, maxTotalWrites=10_000)
+* kafka: updated default long consumer delay threshold from 60s to 30s
 
 ### 8.0.2 (06/02/2022 - 06/17/2022)
 

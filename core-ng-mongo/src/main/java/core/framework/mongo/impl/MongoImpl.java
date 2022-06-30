@@ -9,7 +9,9 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.connection.ClusterSettings;
 import com.mongodb.connection.ConnectionPoolSettings;
 import com.mongodb.connection.SocketSettings;
+import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.PerformanceWarning;
 import core.framework.mongo.Collection;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
@@ -32,6 +34,8 @@ public class MongoImpl implements Mongo {
     private final Logger logger = LoggerFactory.getLogger(MongoImpl.class);
     private final ConnectionPoolSettings.Builder connectionPoolSettings = ConnectionPoolSettings.builder()
         .maxConnectionIdleTime(Duration.ofMinutes(30).toMillis(), TimeUnit.MILLISECONDS);
+    private final PerformanceWarning warning = new PerformanceWarning("mongo", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000);
+
     public ConnectionString uri;
     long timeoutInMs = Duration.ofSeconds(15).toMillis();
     CodecRegistry registry;
@@ -149,5 +153,12 @@ public class MongoImpl implements Mongo {
     <T> com.mongodb.client.MongoCollection<T> mongoCollection(Class<T> entityClass) {
         Collection collection = entityClass.getDeclaredAnnotation(Collection.class);
         return database.getCollection(collection.name(), entityClass);
+    }
+
+    void track(long elapsed, int readEntries, int writeEntries) {
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        if (actionLog != null) {
+            actionLog.track(warning.operation, elapsed, readEntries, writeEntries, warning);
+        }
     }
 }
