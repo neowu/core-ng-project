@@ -103,7 +103,7 @@ public class HTTPHandler implements HttpHandler {
             actionLog.action(controller.action);
             actionLog.context.put("controller", List.of(controller.controllerInfo));
             logger.debug("controller={}", controller.controllerInfo);
-            actionLog.warningContext.warnings = controller.warnings;
+            if (controller.warnings != null) actionLog.initializeWarnings(controller.warnings);
 
             request.session = sessionManager.load(request, actionLog);  // load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
 

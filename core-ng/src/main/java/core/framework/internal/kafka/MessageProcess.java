@@ -12,7 +12,6 @@ import core.framework.log.IOWarning;
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author neo
@@ -22,7 +21,8 @@ public class MessageProcess<T> {
     public final BulkMessageHandler<T> bulkHandler;
     public final JSONReader<T> reader;
     public final Validator<T> validator;
-    public final Map<String, PerformanceWarning> warnings;
+    @Nullable
+    public final PerformanceWarning[] warnings;
 
     MessageProcess(MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler, Class<T> messageClass) {
         this.handler = handler;
@@ -33,7 +33,7 @@ public class MessageProcess<T> {
     }
 
     @Nullable
-    private Map<String, PerformanceWarning> warnings(MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
+    private PerformanceWarning[] warnings(MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
         try {
             Method targetMethod;
             if (handler != null) {

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -260,7 +261,7 @@ class DatabaseImplTest {
 
         var logManager = new LogManager();
         ActionLog actionLog = logManager.begin("begin", null);
-        actionLog.warningContext.warnings = WarningContext.warnings(warnings);
+        actionLog.initializeWarnings(requireNonNull(WarningContext.warnings(warnings)));
         for (int i = 0; i < 10; i++) {
             database.track(100, 0, 1, 20);
         }
@@ -280,7 +281,7 @@ class DatabaseImplTest {
 
         var logManager = new LogManager();
         ActionLog actionLog = logManager.begin("begin", null);
-        actionLog.warningContext.warnings = WarningContext.warnings(warnings);
+        actionLog.initializeWarnings(requireNonNull(WarningContext.warnings(warnings)));
         database.track(100, 100, 1, 20);
         assertThat(actionLog.result).isEqualTo(LogLevel.WARN);
         assertThat(actionLog.errorCode()).isEqualTo("HIGH_DB_IO");

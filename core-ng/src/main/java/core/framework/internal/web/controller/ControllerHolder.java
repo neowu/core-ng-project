@@ -5,8 +5,8 @@ import core.framework.internal.log.WarningContext;
 import core.framework.log.IOWarning;
 import core.framework.web.Controller;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
-import java.util.Map;
 
 /**
  * @author neo
@@ -15,7 +15,8 @@ public class ControllerHolder {
     public final String controllerInfo;
     public final Controller controller;
     public final String action;
-    public final Map<String, PerformanceWarning> warnings;
+    @Nullable
+    public final PerformanceWarning[] warnings;
 
     final Method targetMethod;      // targetMethod is used to find associated annotation
     final boolean skipInterceptor;

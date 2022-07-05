@@ -38,6 +38,7 @@ public class ActionLogMessageFactory {
         Map<String, PerformanceStatMessage> messages = Maps.newHashMapWithExpectedSize(stats.size());
         for (Map.Entry<String, PerformanceStat> entry : stats.entrySet()) {
             PerformanceStat value = entry.getValue();
+            if (value.count == 0) continue;     // for IOWarnings, it may initialize warnings not used by current action (e.g. for executor task action)
             var message = new PerformanceStatMessage();
             message.count = value.count;
             message.totalElapsed = value.totalElapsed;

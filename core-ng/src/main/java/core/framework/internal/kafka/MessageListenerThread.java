@@ -185,13 +185,13 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    private void initAction(ActionLog actionLog, String topic, String handler, Map<String, PerformanceWarning> warnings) {
+    private void initAction(ActionLog actionLog, String topic, String handler, PerformanceWarning[] warnings) {
         actionLog.action("topic:" + topic);
         actionLog.warningContext.maxProcessTimeInNano(listener.maxProcessTimeInNano);
         actionLog.context.put("topic", List.of(topic));
         actionLog.context.put("handler", List.of(handler));
         logger.debug("topic={}, handler={}", topic, handler);
-        actionLog.warningContext.warnings = warnings;
+        if (warnings != null) actionLog.initializeWarnings(warnings);
     }
 
     <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONReader<T> reader) throws IOException {
