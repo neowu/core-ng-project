@@ -3,7 +3,6 @@ package core.framework.internal.log;
 import core.framework.log.Markers;
 import core.framework.util.Strings;
 
-import javax.annotation.Nullable;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.text.DecimalFormat;
@@ -81,8 +80,10 @@ public final class ActionLog {
     }
 
     void end(String message) {
-        for (PerformanceStat stat : performanceStats.values()) {
-            stat.checkTotalIO();
+        for (Map.Entry<String, PerformanceStat> entry : performanceStats.entrySet()) {
+            String operation = entry.getKey();
+            PerformanceStat stat = entry.getValue();
+            warningContext.checkTotalIO(operation, stat.count, stat.readEntries, stat.writeEntries);
         }
 
         double cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
@@ -148,29 +149,14 @@ public final class ActionLog {
         add(event("[stat] {}={}", key, format.format(value)));
     }
 
-    public void initializeWarnings(@Nullable PerformanceWarning[] warnings) {
-        if (warnings != null) {
-            for (PerformanceWarning warning : warnings) {
-                var stat = new PerformanceStat();
-                stat.warning = warning;
-                performanceStats.put(warning.operation, stat);
-            }
-        }
-    }
-
-    @Nullable
-    public PerformanceWarning[] warnings() {
-        List<PerformanceWarning> configs = new ArrayList<>(performanceStats.size());
-        for (PerformanceStat stat : performanceStats.values()) {
-            if (stat.warning != null) configs.add(stat.warning);
-        }
-        if (configs.isEmpty()) return null;
-        return configs.toArray(new PerformanceWarning[0]);
-    }
-
-    public int track(String operation, long elapsed, int readEntries, int writeEntries, PerformanceWarning defaultWarning) {
+    public int track(String operation, long elapsed, int readEntries, int writeEntries) {
         PerformanceStat stat = performanceStats.computeIfAbsent(operation, key -> new PerformanceStat());
-        stat.track(elapsed, readEntries, writeEntries, defaultWarning);
+        stat.count += 1;
+        stat.totalElapsed += elapsed;
+        stat.readEntries += readEntries;
+        stat.writeEntries += writeEntries;
+
+        warningContext.checkSingleIO(operation, elapsed, readEntries);
         return stat.count;
     }
 

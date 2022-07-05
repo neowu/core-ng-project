@@ -3,6 +3,7 @@ package core.framework.internal.redis;
 import core.framework.internal.log.filter.ArrayLogParam;
 import core.framework.internal.log.filter.FieldMapLogParam;
 import core.framework.internal.resource.PoolItem;
+import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisHash;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
@@ -53,7 +54,7 @@ public final class RedisHashImpl implements RedisHash {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("hget, key={}, field={}, returnedValue={}, elapsed={}", key, field, value, elapsed);
-            redis.track(elapsed, 1, 0);
+            ActionLogContext.track("redis", elapsed, 1, 0);
         }
     }
 
@@ -80,7 +81,8 @@ public final class RedisHashImpl implements RedisHash {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("hgetAll, key={}, returnedValues={}, elapsed={}", key, values, elapsed);
-            redis.track(elapsed, values == null ? 0 : values.size(), 0);
+            int readEntries = values == null ? 0 : values.size();
+            ActionLogContext.track("redis", elapsed, readEntries, 0);
         }
     }
 
@@ -107,7 +109,7 @@ public final class RedisHashImpl implements RedisHash {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("hset, key={}, field={}, value={}, elapsed={}", key, field, value, elapsed);
-            redis.track(elapsed, 0, 1);
+            ActionLogContext.track("redis", elapsed, 0, 1);
         }
     }
 
@@ -136,7 +138,7 @@ public final class RedisHashImpl implements RedisHash {
             long elapsed = watch.elapsed();
             int size = values.size();
             logger.debug("hmset, key={}, values={}, size={}, elapsed={}", key, new FieldMapLogParam(values), size, elapsed);
-            redis.track(elapsed, 0, size);
+            ActionLogContext.track("redis", elapsed, 0, size);
         }
     }
 
@@ -159,7 +161,7 @@ public final class RedisHashImpl implements RedisHash {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("hincrby, key={}, field={}, increment={}, returnedValue={}, elapsed={}", key, field, increment, value, elapsed);
-            redis.track(elapsed, 0, 1);
+            ActionLogContext.track("redis", elapsed, 0, 1);
         }
     }
 
@@ -182,7 +184,7 @@ public final class RedisHashImpl implements RedisHash {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("hdel, key={}, fields={}, size={}, deletedFields={}, elapsed={}", key, new ArrayLogParam(fields), fields.length, deletedFields, elapsed);
-            redis.track(elapsed, 0, (int) deletedFields);
+            ActionLogContext.track("redis", elapsed, 0, (int) deletedFields);
         }
     }
 }

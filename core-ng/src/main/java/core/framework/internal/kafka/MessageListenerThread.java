@@ -135,7 +135,7 @@ class MessageListenerThread extends Thread {
             try {
                 initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), process.warnings);
 
-                actionLog.track("kafka", 0, 1, 0, null);
+                actionLog.track("kafka", 0, 1, 0);
 
                 Headers headers = record.headers();
                 String trace = header(headers, MessageHeaders.HEADER_TRACE);
@@ -185,18 +185,18 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    private void initAction(ActionLog actionLog, String topic, String handler, PerformanceWarning[] warnings) {
+    private void initAction(ActionLog actionLog, String topic, String handler, Map<String, PerformanceWarning> warnings) {
         actionLog.action("topic:" + topic);
         actionLog.warningContext.maxProcessTimeInNano(listener.maxProcessTimeInNano);
         actionLog.context.put("topic", List.of(topic));
         actionLog.context.put("handler", List.of(handler));
         logger.debug("topic={}, handler={}", topic, handler);
-        actionLog.initializeWarnings(warnings);
+        actionLog.warningContext.warnings = warnings;
     }
 
     <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONReader<T> reader) throws IOException {
         int size = records.size();
-        actionLog.track("kafka", 0, size, 0, null);
+        actionLog.track("kafka", 0, size, 0);
         List<Message<T>> messages = new ArrayList<>(size);
         Set<String> correlationIds = new HashSet<>();
         Set<String> clients = new HashSet<>();

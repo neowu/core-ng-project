@@ -109,7 +109,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("search, index={}, hits={}, esTook={}, elapsed={}", index, hits, esTook, elapsed);
-            elasticSearch.track(elapsed, hits, 0);
+            ActionLogContext.track("elasticsearch", elapsed, hits, 0);
         }
     }
 
@@ -146,7 +146,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("complete, index={}, options={}, esTook={}, elapsed={}", index, options, esTook, elapsed);
-            elasticSearch.track(elapsed, options, 0);
+            ActionLogContext.track("elasticsearch", elapsed, options, 0);
         }
     }
 
@@ -167,7 +167,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("get, index={}, id={}, elapsed={}", index, request.id, elapsed);
-            elasticSearch.track(elapsed, hits, 0);
+            ActionLogContext.track("elasticsearch", elapsed, hits, 0);
         }
     }
 
@@ -185,7 +185,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("index, index={}, id={}, elapsed={}", index, request.id, elapsed);
-            elasticSearch.track(elapsed, 0, 1);
+            ActionLogContext.track("elasticsearch", elapsed, 0, 1);
         }
     }
 
@@ -213,7 +213,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("bulkIndex, index={}, size={}, esTook={}, elapsed={}", index, request.sources.size(), esTook, elapsed);
-            elasticSearch.track(elapsed, 0, request.sources.size());
+            ActionLogContext.track("elasticsearch", elapsed, 0, request.sources.size());
         }
     }
 
@@ -239,7 +239,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("update, index={}, id={}, script={}, updated={}, elapsed={}", index, request.id, request.script, updated, elapsed);
             int writeEntries = updated ? 1 : 0;
-            elasticSearch.track(elapsed, 0, writeEntries);
+            ActionLogContext.track("elasticsearch", elapsed, 0, writeEntries);
         }
     }
 
@@ -264,7 +264,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("partialUpdate, index={}, id={}, updated={}, elapsed={}", index, request.id, updated, elapsed);
             int writeEntries = updated ? 1 : 0;
-            elasticSearch.track(elapsed, 0, writeEntries);
+            ActionLogContext.track("elasticsearch", elapsed, 0, writeEntries);
         }
     }
 
@@ -285,7 +285,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             logger.debug("delete, index={}, id={}, elapsed={}", index, request.id, elapsed);
             int writeEntries = deleted ? 1 : 0;
-            elasticSearch.track(elapsed, 0, writeEntries);
+            ActionLogContext.track("elasticsearch", elapsed, 0, writeEntries);
         }
     }
 
@@ -313,7 +313,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsed = watch.elapsed();
             int size = request.ids.size();
             logger.debug("bulkDelete, index={}, ids={}, size={}, esTook={}, elapsed={}", index, request.ids, size, esTook, elapsed);
-            elasticSearch.track(elapsed, 0, size);
+            ActionLogContext.track("elasticsearch", elapsed, 0, size);
         }
     }
 
@@ -340,7 +340,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("deleteByQuery, index={}, deleted={}, esTook={}, elapsed={}", index, deleted, esTook, elapsed);
-            elasticSearch.track(elapsed, 0, (int) deleted);
+            ActionLogContext.track("elasticsearch", elapsed, 0, (int) deleted);
         }
     }
 

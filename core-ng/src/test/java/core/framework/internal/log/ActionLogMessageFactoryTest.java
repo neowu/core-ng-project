@@ -24,8 +24,8 @@ class ActionLogMessageFactoryTest {
         var log = new ActionLog("begin", null);
         log.action("action");
         log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null));
-        log.track("db", 1000, 1, 2, null);
-        log.track("http", 2000, 0, 0, null);
+        log.track("db", 1000, 1, 2);
+        log.track("http", 2000, 0, 0);
         log.context("order_id", "id1", "id2");
 
         ActionLogMessage message = factory.create(log);

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -28,7 +29,7 @@ public class ExecutorTask<T> implements Callable<T> {
     private final String refId;
     private final String correlationId;
     private final Trace trace;
-    private final PerformanceWarning[] warnings;
+    private final Map<String, PerformanceWarning> warnings;
 
     ExecutorTask(Callable<T> task, LogManager logManager, TaskContext context) {
         this.task = task;
@@ -44,7 +45,7 @@ public class ExecutorTask<T> implements Callable<T> {
             correlationId = parentActionLog.correlationId();
             refId = parentActionLog.id;
             trace = parentActionLog.trace;
-            warnings = parentActionLog.warnings();
+            warnings = parentActionLog.warningContext.warnings;
         } else {
             rootAction = null;
             correlationId = null;
@@ -68,7 +69,7 @@ public class ExecutorTask<T> implements Callable<T> {
                 LOGGER.debug("refId={}", refId);
                 actionLog.refIds = List.of(refId);
                 if (trace == Trace.CASCADE) actionLog.trace = Trace.CASCADE;
-                actionLog.initializeWarnings(warnings);
+                actionLog.warningContext.warnings = warnings;
             }
             LOGGER.debug("taskClass={}", CallableTask.taskClass(task).getName());
             Duration delay = Duration.between(startTime, actionLog.date);

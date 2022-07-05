@@ -1,14 +1,12 @@
 package core.framework.internal.redis;
 
-import core.framework.internal.log.ActionLog;
-import core.framework.internal.log.LogManager;
-import core.framework.internal.log.PerformanceWarning;
 import core.framework.internal.log.filter.ArrayLogParam;
 import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.internal.log.filter.BytesMapLogParam;
 import core.framework.internal.log.filter.FieldMapLogParam;
 import core.framework.internal.resource.Pool;
 import core.framework.internal.resource.PoolItem;
+import core.framework.log.ActionLogContext;
 import core.framework.redis.Redis;
 import core.framework.redis.RedisAdmin;
 import core.framework.redis.RedisHash;
@@ -57,7 +55,6 @@ public class RedisImpl implements Redis {
     private final RedisSortedSet redisSortedSet = new RedisSortedSetImpl(this);
     private final RedisHyperLogLog redisHyperLogLog = new RedisHyperLogLogImpl(this);
     private final RedisAdmin redisAdmin = new RedisAdminImpl(this);
-    private final PerformanceWarning warning = new PerformanceWarning("redis", 2000, Duration.ofMillis(500), 1000, 10_000, 10_000);
     private final String name;
     public Pool<RedisConnection> pool;
 
@@ -109,7 +106,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("get, key={}, returnedValue={}, elapsed={}", key, new BytesLogParam(value), elapsed);
-            track(elapsed, 1, 0);
+            ActionLogContext.track("redis", elapsed, 1, 0);
         }
     }
 
@@ -153,7 +150,8 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("set, key={}, value={}, expiration={}, onlyIfAbsent={}, updated={}, elapsed={}", key, new BytesLogParam(value), expiration, onlyIfAbsent, updated, elapsed);
-            track(elapsed, 0, updated ? 1 : 0);
+            int writeEntries = updated ? 1 : 0;
+            ActionLogContext.track("redis", elapsed, 0, writeEntries);
         }
     }
 
@@ -173,7 +171,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("pexpire, key={}, expiration={}, elapsed={}", key, expiration, elapsed);
-            track(elapsed, 0, 1);
+            ActionLogContext.track("redis", elapsed, 0, 1);
         }
     }
 
@@ -195,7 +193,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("del, keys={}, size={}, deletedKeys={}, elapsed={}", new ArrayLogParam(keys), keys.length, deletedKeys, elapsed);
-            track(elapsed, 0, (int) deletedKeys);
+            ActionLogContext.track("redis", elapsed, 0, (int) deletedKeys);
         }
     }
 
@@ -217,7 +215,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("incrby, key={}, increment={}, returnedValue={}, elapsed={}", key, increment, value, elapsed);
-            track(elapsed, 0, 1);
+            ActionLogContext.track("redis", elapsed, 0, 1);
         }
     }
 
@@ -252,7 +250,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("mget, keys={}, size={}, returnedValues={}, elapsed={}", new ArrayLogParam(keys), keys.length, new BytesMapLogParam(values), elapsed);
-            track(elapsed, values.size(), 0);
+            ActionLogContext.track("redis", elapsed, values.size(), 0);
         }
     }
 
@@ -279,7 +277,7 @@ public class RedisImpl implements Redis {
             long elapsed = watch.elapsed();
             int size = values.size();
             logger.debug("mset, values={}, size={}, elapsed={}", new FieldMapLogParam(values), size, elapsed);
-            track(elapsed, 0, size);
+            ActionLogContext.track("redis", elapsed, 0, size);
         }
     }
 
@@ -308,7 +306,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("set, values={}, size={}, expiration={}, elapsed={}", new BytesMapLogParam(values), size, expiration, elapsed);
-            track(elapsed, 0, size);
+            ActionLogContext.track("redis", elapsed, 0, size);
         }
     }
 
@@ -365,7 +363,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("scan, pattern={}, returnedKeys={}, redisTook={}, elapsed={}", pattern, returnedKeys, redisTook, elapsed);
-            track(redisTook, returnedKeys, 0);
+            ActionLogContext.track("redis", redisTook, returnedKeys, 0);
         }
     }
 
@@ -406,7 +404,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("pttl,  keys={}, size={}, returnedValues={}, elapsed={}", new ArrayLogParam(keys), size, expirationTimes, elapsed);
-            track(elapsed, size, 0);
+            ActionLogContext.track("redis", elapsed, size, 0);
         }
     }
 
@@ -414,12 +412,5 @@ public class RedisImpl implements Redis {
         long expirationTime = expiration.toMillis();
         if (expirationTime <= 0) throw new Error("expiration time must be longer than 0ms");
         return encode(expirationTime);
-    }
-
-    void track(long elapsed, int readEntries, int writeEntries) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
-        if (actionLog != null) {
-            actionLog.track(warning.operation, elapsed, readEntries, writeEntries, warning);
-        }
     }
 }

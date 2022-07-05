@@ -11,7 +11,6 @@ import core.framework.internal.db.cloud.CloudAuthProvider;
 import core.framework.internal.db.cloud.GCloudAuthProvider;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
-import core.framework.internal.log.PerformanceWarning;
 import core.framework.internal.resource.Pool;
 import core.framework.util.ASCII;
 import core.framework.util.StopWatch;
@@ -48,7 +47,6 @@ public final class DatabaseImpl implements Database {
     public final DatabaseOperation operation;
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
     private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
-    private final PerformanceWarning warning = new PerformanceWarning("db", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000);
 
     public String user;
     public String password;
@@ -308,7 +306,7 @@ public final class DatabaseImpl implements Database {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {
             actionLog.stats.compute("db_queries", (k, oldValue) -> (oldValue == null) ? queries : oldValue + queries);
-            actionLog.track(warning.operation, elapsed, readRows, writeRows, warning);
+            actionLog.track("db", elapsed, readRows, writeRows);
         }
     }
 

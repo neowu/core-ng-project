@@ -2,6 +2,7 @@ package core.framework.internal.redis;
 
 import core.framework.internal.log.filter.ArrayLogParam;
 import core.framework.internal.resource.PoolItem;
+import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisHyperLogLog;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public class RedisHyperLogLogImpl implements RedisHyperLogLog {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("pfadd, key={}, values={}, size={}, elapsed={}", key, new ArrayLogParam(values), values.length, elapsed);
-            redis.track(elapsed, 0, values.length);
+            ActionLogContext.track("redis", elapsed, 0, values.length);
         }
     }
 
@@ -64,7 +65,7 @@ public class RedisHyperLogLogImpl implements RedisHyperLogLog {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             logger.debug("pfcount, keys={}, returnedValue={}, elapsed={}", keys, count, elapsed);
-            redis.track(elapsed, 1, 0);
+            ActionLogContext.track("redis", elapsed, 1, 0);
         }
     }
 

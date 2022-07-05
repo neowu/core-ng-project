@@ -43,7 +43,7 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
 
             String data = textMessage.getData();
             logger.debug("[channel] message={}", data);     // not mask, assume ws message not containing sensitive info, the data can be json or plain text
-            actionLog.track("ws", 0, 1, 0, null);
+            actionLog.track("ws", 0, 1, 0);
 
             validateRate(wrapper);
 
@@ -76,7 +76,7 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
             String reason = message.getReason();
             actionLog.context("code", code);
             logger.debug("[channel] reason={}", reason);
-            actionLog.track("ws", 0, 1, 0, null);
+            actionLog.track("ws", 0, 1, 0);
 
             wrapper.handler.listener.onClose(wrapper, code, reason);
         } catch (Throwable e) {
