@@ -15,7 +15,7 @@ import static core.framework.log.Markers.errorCode;
 public final class WarningContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(WarningContext.class);
     // use static constant mapping for both performance and simplicity
-    private static final PerformanceWarning[] DEFAULT_WARNINGS = new PerformanceWarning[]{
+    private static final PerformanceWarning[] DEFAULT_WARNINGS = {
         new PerformanceWarning("db", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000),
         new PerformanceWarning("redis", 2000, Duration.ofMillis(500), 1000, 10_000, 10_000),
         new PerformanceWarning("elasticsearch", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000),
