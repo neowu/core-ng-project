@@ -11,10 +11,11 @@
     "$numberLong": "325"
   },
   "boolean_field": true,
-  "date_field": null,
+  "date_time_field": null,
   "zoned_date_time_field": {
     "$date": "2016-09-01T15:00:00Z"
   },
+  "date_field": "2022-07-06",
   "string_field": "string",
   "list_field": [
     "V1",

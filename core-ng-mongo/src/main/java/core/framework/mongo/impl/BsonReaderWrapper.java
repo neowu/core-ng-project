@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -133,6 +134,10 @@ public final class BsonReaderWrapper {      // used by generated entity decoder
         return ZonedDateTimeCodec.read(reader, field);
     }
 
+    public LocalDate readLocalDate(String field) {
+        return LocalDateCodec.read(reader, field);
+    }
+
     public List<?> startReadList(String field) {
         BsonType currentType = reader.getCurrentBsonType();
         if (currentType == BsonType.NULL) {
@@ -163,7 +168,7 @@ public final class BsonReaderWrapper {      // used by generated entity decoder
 
     public boolean startReadEntity(String field) {
         BsonType currentType = reader.getCurrentBsonType();
-        if (currentType != null && currentType == BsonType.NULL) {
+        if (currentType == BsonType.NULL) {
             reader.readNull();
             return false;
         }

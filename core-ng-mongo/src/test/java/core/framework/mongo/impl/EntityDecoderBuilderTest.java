@@ -43,6 +43,7 @@ class EntityDecoderBuilderTest {
         assertThat(entity.longField).isEqualTo(325);
         assertThat(entity.bigDecimalField).isEqualTo("12.34");
         assertThat(entity.zonedDateTimeField).isEqualTo("2016-09-01T15:00:00Z");
+        assertThat(entity.dateField).isEqualTo("2022-07-06");
         assertThat(entity.child.enumField).isEqualTo(TestEnum.ITEM1);
         assertThat(entity.listField).containsExactly("V1", "V2");
         assertThat(entity.nullChild).isNull();

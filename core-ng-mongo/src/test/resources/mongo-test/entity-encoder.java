@@ -107,10 +107,12 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
         wrapper.write(entity.longField);
         writer.writeName("boolean_field");
         wrapper.write(entity.booleanField);
-        writer.writeName("date_field");
-        wrapper.write(entity.dateField);
+        writer.writeName("date_time_field");
+        wrapper.write(entity.dateTimeField);
         writer.writeName("zoned_date_time_field");
         wrapper.write(entity.zonedDateTimeField);
+        writer.writeName("date_field");
+        wrapper.write(entity.dateField);
         writer.writeName("string_field");
         wrapper.write(entity.stringField);
         writer.writeName("list_field");

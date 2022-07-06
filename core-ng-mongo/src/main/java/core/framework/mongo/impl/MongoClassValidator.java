@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -35,7 +36,7 @@ public final class MongoClassValidator implements ClassVisitor {
         validator = new ClassValidator(entityClass);
         validator.allowedValueClasses = Set.of(ObjectId.class, String.class, Boolean.class,
             Integer.class, Long.class, Double.class, BigDecimal.class,
-            LocalDateTime.class, ZonedDateTime.class);
+            LocalDateTime.class, ZonedDateTime.class, LocalDate.class);
         validator.allowChild = true;
         validator.visitor = this;
     }

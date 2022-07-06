@@ -7,6 +7,7 @@ import core.framework.mongo.Id;
 import org.bson.types.ObjectId;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -38,11 +39,14 @@ public class TestEntity {
     @Field(name = "boolean_field")
     public Boolean booleanField;
 
-    @Field(name = "date_field")
-    public LocalDateTime dateField;
+    @Field(name = "date_time_field")
+    public LocalDateTime dateTimeField;
 
     @Field(name = "zoned_date_time_field")
     public ZonedDateTime zonedDateTimeField;
+
+    @Field(name = "date_field")
+    public LocalDate dateField;
 
     @Field(name = "string_field")
     public String stringField;

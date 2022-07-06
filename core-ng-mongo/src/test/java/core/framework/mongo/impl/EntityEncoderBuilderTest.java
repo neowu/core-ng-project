@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -49,6 +50,7 @@ class EntityEncoderBuilderTest {
         entity.bigDecimalField = new BigDecimal("12.34");
         entity.stringField = "string";
         entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(2016, 9, 1, 11, 0, 0), ZoneId.of("America/New_York"));
+        entity.dateField = LocalDate.of(2022, 7, 6);
         entity.child = new TestChildEntity();
         entity.child.enumField = TestEnum.ITEM1;
         entity.child.enumListField = List.of(TestEnum.ITEM2);

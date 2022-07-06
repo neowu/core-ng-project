@@ -5,6 +5,7 @@ import org.bson.types.Decimal128;
 import org.bson.types.ObjectId;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
@@ -59,5 +60,9 @@ public final class BsonWriterWrapper {   // used by generated entity encoder
 
     public void write(ZonedDateTime value) {
         ZonedDateTimeCodec.write(writer, value);
+    }
+
+    public void write(LocalDate value) {
+        LocalDateCodec.write(writer, value);
     }
 }

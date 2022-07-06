@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -168,6 +169,8 @@ final class EntityDecoderBuilder<T> {
             builder.append("java.time.LocalDateTime {} = wrapper.readLocalDateTime(fieldPath);\n", variable);
         } else if (ZonedDateTime.class.equals(valueType)) {
             builder.append("java.time.ZonedDateTime {} = wrapper.readZonedDateTime(fieldPath);\n", variable);
+        } else if (LocalDate.class.equals(valueType)) {
+            builder.append("java.time.LocalDate {} = wrapper.readLocalDate(fieldPath);\n", variable);
         } else if (GenericTypes.rawClass(valueType).isEnum()) {
             Class<?> valueClass = GenericTypes.rawClass(valueType);
             String enumCodecVariable = registerEnumCodec(valueClass);

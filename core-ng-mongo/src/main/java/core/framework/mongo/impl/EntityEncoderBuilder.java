@@ -10,6 +10,7 @@ import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -137,6 +138,7 @@ final class EntityEncoderBuilder<T> {
             || Number.class.isAssignableFrom(fieldClass)
             || LocalDateTime.class.equals(fieldClass)
             || ZonedDateTime.class.equals(fieldClass)
+            || LocalDate.class.equals(fieldClass)
             || Boolean.class.equals(fieldClass)
             || ObjectId.class.equals(fieldClass)) {
             builder.indent(indent).append("wrapper.write({});\n", fieldVariable);
