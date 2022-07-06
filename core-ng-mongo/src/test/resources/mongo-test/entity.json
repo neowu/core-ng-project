@@ -4,6 +4,9 @@
   },
   "int_field": null,
   "double_field": null,
+  "big_decimal_field": {
+    "$numberDecimal": "12.34"
+  },
   "long_field": {
     "$numberLong": "325"
   },

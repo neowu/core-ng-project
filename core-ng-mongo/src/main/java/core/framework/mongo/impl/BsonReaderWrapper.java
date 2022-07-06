@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -89,6 +90,20 @@ public final class BsonReaderWrapper {      // used by generated entity decoder
             return null;
         } else if (currentType == BsonType.DOUBLE) {
             return reader.readDouble();
+        } else {
+            logger.warn("unexpected field type, field={}, type={}", field, currentType);
+            reader.skipValue();
+            return null;
+        }
+    }
+
+    public BigDecimal readBigDecimal(String field) {
+        BsonType currentType = reader.getCurrentBsonType();
+        if (currentType == BsonType.NULL) {
+            reader.readNull();
+            return null;
+        } else if (currentType == BsonType.DECIMAL128) {
+            return reader.readDecimal128().bigDecimalValue();
         } else {
             logger.warn("unexpected field type, field={}, type={}", field, currentType);
             reader.skipValue();

@@ -1,8 +1,10 @@
 package core.framework.mongo.impl;
 
 import org.bson.BsonWriter;
+import org.bson.types.Decimal128;
 import org.bson.types.ObjectId;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
@@ -39,6 +41,11 @@ public final class BsonWriterWrapper {   // used by generated entity encoder
     public void write(Double value) {
         if (value == null) writer.writeNull();
         else writer.writeDouble(value);
+    }
+
+    public void write(BigDecimal value) {
+        if (value == null) writer.writeNull();
+        else writer.writeDecimal128(new Decimal128(value));
     }
 
     public void write(Boolean value) {

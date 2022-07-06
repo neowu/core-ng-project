@@ -13,6 +13,7 @@ import core.framework.util.Sets;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -33,8 +34,8 @@ public final class MongoClassValidator implements ClassVisitor {
     MongoClassValidator(Class<?> entityClass) {
         validator = new ClassValidator(entityClass);
         validator.allowedValueClasses = Set.of(ObjectId.class, String.class, Boolean.class,
-                Integer.class, Long.class, Double.class,
-                LocalDateTime.class, ZonedDateTime.class);
+            Integer.class, Long.class, Double.class, BigDecimal.class,
+            LocalDateTime.class, ZonedDateTime.class);
         validator.allowChild = true;
         validator.visitor = this;
     }

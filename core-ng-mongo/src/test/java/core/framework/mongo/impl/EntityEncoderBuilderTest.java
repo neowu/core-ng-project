@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -41,10 +42,11 @@ class EntityEncoderBuilderTest {
     void encode() {
         assertThat(builder.enumCodecFields.keySet()).containsExactly(TestEnum.class);
 
-        TestEntity entity = new TestEntity();
+        var entity = new TestEntity();
         entity.id = new ObjectId("5627b47d54b92d03adb9e9cf");
         entity.booleanField = Boolean.TRUE;
         entity.longField = 325L;
+        entity.bigDecimalField = new BigDecimal("12.34");
         entity.stringField = "string";
         entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(2016, 9, 1, 11, 0, 0), ZoneId.of("America/New_York"));
         entity.child = new TestChildEntity();

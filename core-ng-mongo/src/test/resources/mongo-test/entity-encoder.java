@@ -101,6 +101,8 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
         wrapper.write(entity.intField);
         writer.writeName("double_field");
         wrapper.write(entity.doubleField);
+        writer.writeName("big_decimal_field");
+        wrapper.write(entity.bigDecimalField);
         writer.writeName("long_field");
         wrapper.write(entity.longField);
         writer.writeName("boolean_field");

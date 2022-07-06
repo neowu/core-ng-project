@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -173,6 +174,8 @@ final class EntityDecoderBuilder<T> {
             builder.append("{} {} = ({}) {}.read(reader, fieldPath);\n", type(valueClass), variable, type(valueClass), enumCodecVariable);
         } else if (Double.class.equals(valueType)) {
             builder.append("java.lang.Double {} = wrapper.readDouble(fieldPath);\n", variable);
+        } else if (BigDecimal.class.equals(valueType)) {
+            builder.append("java.math.BigDecimal {} = wrapper.readBigDecimal(fieldPath);\n", variable);
         } else if (ObjectId.class.equals(valueType)) {
             builder.append("org.bson.types.ObjectId {} = wrapper.readObjectId(fieldPath);\n", variable);
         } else if (Boolean.class.equals(valueType)) {
