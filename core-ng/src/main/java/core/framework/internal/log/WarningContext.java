@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
-import java.util.Map;
 
 import static core.framework.log.Markers.errorCode;
 
@@ -14,15 +13,14 @@ import static core.framework.log.Markers.errorCode;
  * @author neo
  */
 public final class WarningContext {
-    // use static constant mapping for both performance and simplicity
-    static final Map<String, PerformanceWarning> DEFAULT_WARNINGS = Map.of(
-        "db", new PerformanceWarning("db", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000),
-        "redis", new PerformanceWarning("redis", 2000, Duration.ofMillis(500), 1000, 10_000, 10_000),
-        "elasticsearch", new PerformanceWarning("elasticsearch", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000),
-        "mongo", new PerformanceWarning("mongo", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000)
-    );
-
     private static final Logger LOGGER = LoggerFactory.getLogger(WarningContext.class);
+    // use static constant mapping for both performance and simplicity
+    private static final PerformanceWarning[] DEFAULT_WARNINGS = new PerformanceWarning[]{
+        new PerformanceWarning("db", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000),
+        new PerformanceWarning("redis", 2000, Duration.ofMillis(500), 1000, 10_000, 10_000),
+        new PerformanceWarning("elasticsearch", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000),
+        new PerformanceWarning("mongo", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000)
+    };
 
     @Nullable
     public static PerformanceWarning[] warnings(IOWarning[] warnings) {
@@ -31,7 +29,7 @@ public final class WarningContext {
         for (int i = 0; i < warnings.length; i++) {
             IOWarning warning = warnings[i];
             String operation = warning.operation();
-            PerformanceWarning defaultWarning = DEFAULT_WARNINGS.get(operation);
+            PerformanceWarning defaultWarning = defaultWarning(operation);
 
             int maxOperations = warning.maxOperations();
             if (maxOperations < 0 && defaultWarning != null) maxOperations = defaultWarning.maxOperations;
@@ -51,6 +49,16 @@ public final class WarningContext {
             results[i] = new PerformanceWarning(operation, maxOperations, maxElapsed, maxReads, maxTotalReads, maxTotalWrites);
         }
         return results;
+    }
+
+    static PerformanceWarning defaultWarning(String operation) {
+        return switch (operation) {
+            case "db" -> DEFAULT_WARNINGS[0];
+            case "redis" -> DEFAULT_WARNINGS[1];
+            case "elasticsearch" -> DEFAULT_WARNINGS[2];
+            case "mongo" -> DEFAULT_WARNINGS[3];
+            default -> null;
+        };
     }
 
     public boolean suppressSlowSQLWarning;

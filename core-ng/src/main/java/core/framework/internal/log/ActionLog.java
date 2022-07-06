@@ -155,7 +155,7 @@ public final class ActionLog {
     }
 
     public int track(String operation, long elapsed, int readEntries, int writeEntries) {
-        PerformanceStat stat = performanceStats.computeIfAbsent(operation, key -> new PerformanceStat(WarningContext.DEFAULT_WARNINGS.get(key)));
+        PerformanceStat stat = performanceStats.computeIfAbsent(operation, key -> new PerformanceStat(WarningContext.defaultWarning(key)));
         stat.track(elapsed, readEntries, writeEntries);
         return stat.count;
     }
