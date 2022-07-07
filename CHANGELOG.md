@@ -8,6 +8,8 @@
 * kafka: updated default long consumer delay threshold from 60s to 30s
 * mongo: supports BigDecimal (map to mongo Decimal128 type)
 * mongo: supports LocalDate (map to String)
+* monitor: for critical errors, use 1 min as timespan (means send one alert per min for same kind)
+  > in reality, ongoing critical error may flush slack channel, 1 min timespan is good enough to bring attention, and with lesser messages
 
 ### 8.0.2 (06/02/2022 - 06/17/2022)
 

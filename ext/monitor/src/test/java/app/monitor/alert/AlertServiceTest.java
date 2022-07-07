@@ -98,9 +98,6 @@ class AlertServiceTest {
 
     @Test
     void check() {
-        assertThat(service.check(alert(Severity.ERROR, "CRITICAL_ERROR", "trace")).notify).isTrue();
-        assertThat(service.check(alert(Severity.WARN, "SLOW_SQL", "trace")).notify).isTrue();
-
         Alert alert = alert(Severity.ERROR, "ERROR", "trace");
         AlertService.Result result = service.check(alert);
         assertThat(result).matches(r -> r.notify && r.alertCountSinceLastSent == -1);
@@ -110,6 +107,21 @@ class AlertServiceTest {
         assertThat(result).matches(r -> !r.notify);
 
         alert.date = alert.date.plusMinutes(210);
+        result = service.check(alert);
+        assertThat(result).matches(r -> r.notify && r.alertCountSinceLastSent == 1);
+    }
+
+    @Test
+    void checkWithCriticalError() {
+        Alert alert = alert(Severity.ERROR, "CRITICAL_ERROR", "trace");
+        AlertService.Result result = service.check(alert);
+        assertThat(result).matches(r -> r.notify && r.alertCountSinceLastSent == -1);
+
+        alert.date = alert.date.plusSeconds(30);
+        result = service.check(alert);
+        assertThat(result).matches(r -> !r.notify);
+
+        alert.date = alert.date.plusMinutes(1);
         result = service.check(alert);
         assertThat(result).matches(r -> r.notify && r.alertCountSinceLastSent == 1);
     }

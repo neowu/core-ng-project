@@ -55,8 +55,6 @@ public class AlertService {
     Result check(Alert alert) {
         if (ignoredErrors.match(alert))
             return new Result(false, -1);
-        if (criticalErrors.match(alert))
-            return new Result(true, -1);
 
         String key = alertKey(alert);
         synchronized (stats) {
@@ -64,7 +62,9 @@ public class AlertService {
             if (stat == null) {
                 stats.put(key, new AlertStat(alert.date));
                 return new Result(true, -1);
-            } else if (Duration.between(stat.lastSentDate, alert.date).toMinutes() >= timespanInMinutes) {
+            }
+            int timespanInMinutes = criticalErrors.match(alert) ? 1 : this.timespanInMinutes;
+            if (Duration.between(stat.lastSentDate, alert.date).toMinutes() >= timespanInMinutes) {
                 stats.put(key, new AlertStat(alert.date));
                 return new Result(true, stat.alertCountSinceLastSent);
             } else {
