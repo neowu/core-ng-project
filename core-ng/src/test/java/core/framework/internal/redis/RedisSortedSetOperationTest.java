@@ -79,4 +79,13 @@ class RedisSortedSetOperationTest extends AbstractRedisOperationTest {
         assertThat(value).isEqualTo("one");
         assertRequestEquals("*3\r\n$7\r\nZPOPMIN\r\n$3\r\nkey\r\n$1\r\n1\r\n");
     }
+
+    @Test
+    void remove() {
+        response(":1\r\n");
+        long removed = redis.sortedSet().remove("key", "item1");
+
+        assertThat(removed).isEqualTo(1);
+        assertRequestEquals("*3\r\n$4\r\nZREM\r\n$3\r\nkey\r\n$5\r\nitem1\r\n");
+    }
 }

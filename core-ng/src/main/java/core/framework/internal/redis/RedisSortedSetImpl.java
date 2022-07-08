@@ -1,5 +1,6 @@
 package core.framework.internal.redis;
 
+import core.framework.internal.log.filter.ArrayLogParam;
 import core.framework.internal.resource.PoolItem;
 import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisSortedSet;
@@ -200,6 +201,30 @@ public class RedisSortedSetImpl implements RedisSortedSet {
             logger.debug("zpopmin, key={}, limit={}, returnedValues={}, elapsed={}", key, limit, values, elapsed);
             int readEntries = values == null ? 0 : values.size();
             ActionLogContext.track("redis", elapsed, readEntries, 0);
+        }
+    }
+
+    @Override
+    public long remove(String key, String... values) {
+        var watch = new StopWatch();
+        validate("key", key);
+        validate("values", values);
+        long removedValues = 0;
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.writeKeyArgumentsCommand(ZREM, key, values);
+            removedValues = connection.readLong();
+            return removedValues;
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            int size = values.length;
+            logger.debug("zrem, key={}, values={}, size={}, removedValues={}, elapsed={}", key, new ArrayLogParam(values), size, removedValues, elapsed);
+            ActionLogContext.track("redis", elapsed, 0, size);
         }
     }
 

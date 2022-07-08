@@ -1,5 +1,6 @@
 package core.framework.redis;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ public interface RedisSortedSet {
 
     Map<String, Long> popByScore(String key, long minScore, long maxScore, long limit);
 
+    @Nullable
     default String popMin(String key) {
         Map<String, Long> values = popMin(key, 1);
         Iterator<String> iterator = values.keySet().iterator();
@@ -40,4 +42,6 @@ public interface RedisSortedSet {
     }
 
     Map<String, Long> popMin(String key, long limit);
+
+    long remove(String key, String... values);
 }

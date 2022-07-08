@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author tempo
  */
@@ -86,5 +88,18 @@ public class MockRedisSortedSet implements RedisSortedSet {
             .limit(limit)
             .peek(entry -> sortedSet.remove(entry.getKey()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (key1, key2) -> key2, LinkedHashMap::new));
+    }
+
+    @Override
+    public long remove(String key, String... values) {
+        assertThat(values).isNotEmpty().doesNotContainNull();
+        var redisValue = store.get(key);
+        if (redisValue == null) return 0;
+        var set = redisValue.sortedSet();
+        long removedValues = 0;
+        for (String value : values) {
+            if (set.remove(value) != null) removedValues++;
+        }
+        return removedValues;
     }
 }

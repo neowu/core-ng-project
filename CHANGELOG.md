@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.0.3-b1 (06/22/2022 - )
+### 8.0.3 (06/22/2022 - 07/08/2022)
 
 * mongo: update driver to 4.6.0
 * warning: removed @DBWarning, replaced with @IOWarning
@@ -8,8 +8,9 @@
 * kafka: updated default long consumer delay threshold from 60s to 30s
 * mongo: supports BigDecimal (map to mongo Decimal128 type)
 * mongo: supports LocalDate (map to String)
-* monitor: for critical errors, use 1 min as timespan (means send one alert per min for same kind)
+* monitor: for critical errors, use 1 min as timespan (only send one alert message per min for same kind error)
   > in reality, ongoing critical error may flush slack channel, 1 min timespan is good enough to bring attention, and with lesser messages
+* redis: supports SortedSet.remove()
 
 ### 8.0.2 (06/02/2022 - 06/17/2022)
 
@@ -588,20 +589,20 @@
 
 ```json
 {
-  "ignoreErrors": [
-    {"apps": ["website"], "errorCodes": ["PATH_NOT_FOUND"], "severity": "WARN"}
-  ],
-  "criticalErrors": [
-    {"errorCodes": ["FAILED_TO_START", "POD_FAILURE"]}
-  ],
-  "kibanaURL": "http://kibana:5601",
-  "channels": {
-    "actionWarnChannel": {"severity": "WARN", "indices": ["trace", "stat"]},
-    "actionErrorChannel": {"severity": "ERROR", "indices": ["trace", "stat"]},
-    "eventWarnChannel": {"severity": "WARN", "indices": ["event"]},
-    "eventErrorChannel": {"severity": "ERROR", "indices": ["event"]},
-    "additionalErrorCodeChannel": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}
-  }
+    "ignoreErrors": [
+        {"apps": ["website"], "errorCodes": ["PATH_NOT_FOUND"], "severity": "WARN"}
+    ],
+    "criticalErrors": [
+        {"errorCodes": ["FAILED_TO_START", "POD_FAILURE"]}
+    ],
+    "kibanaURL": "http://kibana:5601",
+    "channels": {
+        "actionWarnChannel": {"severity": "WARN", "indices": ["trace", "stat"]},
+        "actionErrorChannel": {"severity": "ERROR", "indices": ["trace", "stat"]},
+        "eventWarnChannel": {"severity": "WARN", "indices": ["event"]},
+        "eventErrorChannel": {"severity": "ERROR", "indices": ["event"]},
+        "additionalErrorCodeChannel": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}
+    }
 }
 ```    
 
