@@ -1,5 +1,7 @@
 ## Change log
 
+### 8.0.4 (07/10/2022 - )
+
 ### 8.0.3 (06/22/2022 - 07/08/2022)
 
 * mongo: update driver to 4.6.0
@@ -12,7 +14,7 @@
   > in reality, ongoing critical error may flush slack channel, 1 min timespan is good enough to bring attention, and with lesser messages
 * redis: supports SortedSet.remove()
 
-### 8.0.2 (06/02/2022 - 06/17/2022)
+### 8.0.2 (06/02/2022 - 06/17/2022) !!! @DBWarning is replaced with @IOWarning on 8.0.3, better upgrade to next version
 
 * db: redesign db max operations, removed Database.maxOperations(), introduced @DBWarning
   > one service may mix multiple type of workload, some could be async and call db many times while others API needs to be sync and responsive

@@ -27,7 +27,7 @@ public class SendEventRequestValidator {
         if (event.result == SendEventRequest.Result.OK && event.action == null)
             throw new BadRequestException("action must not be null if result is OK");
         if ((event.result == SendEventRequest.Result.WARN || event.result == SendEventRequest.Result.ERROR)
-                && event.errorCode == null)
+            && event.errorCode == null)
             throw new BadRequestException("errorCode must not be null if result is WARN/ERROR");
 
         validateContext(event.context, MAX_CONTEXT_VALUE_LENGTH);
@@ -39,6 +39,7 @@ public class SendEventRequestValidator {
         for (Map.Entry<String, String> entry : context.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
+            if (value == null) throw new BadRequestException("context value must not be null, key=" + key);
             if (value.length() > maxContextValueLength)
                 throw new BadRequestException(format("context value is too long, key={}, value={}...(truncated)", key, Strings.truncate(value, 200)), "EVENT_TOO_LARGE");
         }
@@ -47,8 +48,11 @@ public class SendEventRequestValidator {
     void validateInfo(Map<String, String> info, int maxInfoLength) {
         int infoLength = 0;
         for (Map.Entry<String, String> entry : info.entrySet()) {
-            infoLength += entry.getKey().length();
-            infoLength += entry.getValue().length();
+            String key = entry.getKey();
+            infoLength += key.length();
+            String value = entry.getValue();
+            if (value == null) throw new BadRequestException("info value must not be null, key=" + key);
+            infoLength += value.length();
         }
         if (infoLength > maxInfoLength) {
             throw new BadRequestException("info is too long, length=" + infoLength, "EVENT_TOO_LARGE");

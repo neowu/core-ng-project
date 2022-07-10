@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -23,12 +24,12 @@ class SendEventRequestValidatorTest {
     @Test
     void validate() {
         assertThatThrownBy(() -> validator.validate(request(SendEventRequest.Result.OK, null, null)))
-                .isInstanceOf(BadRequestException.class);
+            .isInstanceOf(BadRequestException.class);
 
         assertThatThrownBy(() -> validator.validate(request(SendEventRequest.Result.WARN, null, null)))
-                .isInstanceOf(BadRequestException.class);
+            .isInstanceOf(BadRequestException.class);
         assertThatThrownBy(() -> validator.validate(request(SendEventRequest.Result.ERROR, null, null)))
-                .isInstanceOf(BadRequestException.class);
+            .isInstanceOf(BadRequestException.class);
 
         validator.validate(request(SendEventRequest.Result.OK, "action", null));
         validator.validate(request(SendEventRequest.Result.WARN, null, "ERROR_CODE"));
@@ -38,15 +39,27 @@ class SendEventRequestValidatorTest {
     @Test
     void validateContext() {
         assertThatThrownBy(() -> validator.validateContext(Map.of("context", "12345"), 3))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("too long");
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("too long");
+
+        Map<String, String> context = new HashMap<>();
+        context.put("session_id", null);
+        assertThatThrownBy(() -> validator.validateContext(context, 10))
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("context value must not be null, key=session_id");
     }
 
     @Test
     void validateInfo() {
         assertThatThrownBy(() -> validator.validateInfo(Map.of("key", "value"), 7))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("too long");
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("too long");
+
+        Map<String, String> info = new HashMap<>();
+        info.put("history", null);
+        assertThatThrownBy(() -> validator.validateInfo(info, 10))
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("info value must not be null, key=history");
     }
 
     private SendEventRequest request(SendEventRequest.Result result, String action, String errorCode) {
