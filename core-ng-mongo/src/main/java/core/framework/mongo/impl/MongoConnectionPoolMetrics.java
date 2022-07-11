@@ -19,7 +19,7 @@ public class MongoConnectionPoolMetrics implements ConnectionPoolListener, Metri
     private final String statPrefix;
 
     public MongoConnectionPoolMetrics(String name) {
-        statPrefix = "pool_mongo" + (name == null ? "" : ('-' + name));
+        statPrefix = "pool_mongo" + (name == null ? "" : '-' + name);
     }
 
     @Override
