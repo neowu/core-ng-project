@@ -1,7 +1,6 @@
 ### ideas
 
 * template, use ByteBuffer[] for performance?
-* mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * mongo: update entity decoder to use switch(fieldName) to replace if statement? (optimization)
 * framework error (queue listener, background task error, custom scheduler trigger) forward to kafka?
 * change gradle to kotlin? (it's worse if not use plugins block)

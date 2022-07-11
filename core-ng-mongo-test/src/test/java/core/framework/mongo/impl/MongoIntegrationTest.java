@@ -75,13 +75,13 @@ class MongoIntegrationTest extends IntegrationTest {
         collection.replace(entity);
 
         assertThat(collection.get(entity.id)).get()
-                .usingRecursiveComparison().isEqualTo(entity);
+            .usingRecursiveComparison().isEqualTo(entity);
 
         entity.stringField = "value2";
         collection.replace(entity);
 
         assertThat(collection.get(entity.id)).get()
-                .usingRecursiveComparison().isEqualTo(entity);
+            .usingRecursiveComparison().isEqualTo(entity);
     }
 
     @Test
@@ -90,7 +90,7 @@ class MongoIntegrationTest extends IntegrationTest {
 
         List<TestMongoEntity> entities = collection.find(Filters.eq("string_field", "value2"));
         assertThat(entities).hasSize(1).first()
-                .usingRecursiveComparison().isEqualTo(entity);
+            .usingRecursiveComparison().isEqualTo(entity);
     }
 
     @Test
@@ -99,7 +99,7 @@ class MongoIntegrationTest extends IntegrationTest {
 
         List<TestMongoEntity> entities = collection.find(Filters.eq("enum_field", TestMongoEntity.TestEnum.VALUE1));
         assertThat(entities).hasSize(1).first()
-                .usingRecursiveComparison().isEqualTo(entity);
+            .usingRecursiveComparison().isEqualTo(entity);
     }
 
     @Test
@@ -107,7 +107,7 @@ class MongoIntegrationTest extends IntegrationTest {
         TestMongoEntity entity = entity("value3", TestMongoEntity.TestEnum.VALUE1);
 
         assertThat(collection.findOne(Filters.eq("string_field", "value3"))).get()
-                .usingRecursiveComparison().isEqualTo(entity);
+            .usingRecursiveComparison().isEqualTo(entity);
     }
 
     @Test
@@ -125,7 +125,7 @@ class MongoIntegrationTest extends IntegrationTest {
         for (TestMongoEntity entity : entities) {
             assertThat(entity.id).isNotNull();
             assertThat(collection.get(entity.id)).get()
-                    .usingRecursiveComparison().isEqualTo(entity);
+                .usingRecursiveComparison().isEqualTo(entity);
         }
     }
 
@@ -136,14 +136,14 @@ class MongoIntegrationTest extends IntegrationTest {
         collection.bulkReplace(entities);
 
         entities.forEach(entity -> assertThat(collection.get(entity.id)).get()
-                .usingRecursiveComparison().isEqualTo(entity));
+            .usingRecursiveComparison().isEqualTo(entity));
 
         entities.get(0).stringField = "string1-updated";
         entities.get(1).stringField = "string2-updated";
         collection.bulkReplace(entities);
 
         entities.forEach(entity -> assertThat(collection.get(entity.id)).get()
-                .usingRecursiveComparison().isEqualTo(entity));
+            .usingRecursiveComparison().isEqualTo(entity));
     }
 
     @Test
@@ -200,7 +200,7 @@ class MongoIntegrationTest extends IntegrationTest {
         Aggregate<TestMongoView> aggregate = new Aggregate<>();
         aggregate.resultClass = TestMongoView.class;
         aggregate.pipeline = List.of(Aggregates.sort(Sorts.ascending("string_field")),
-                Aggregates.group("$string_field", Accumulators.first("string_field", "$string_field")));
+            Aggregates.group("$string_field", Accumulators.first("string_field", "$string_field")));
         List<TestMongoView> results = collection.aggregate(aggregate);
         assertThat(results).hasSize(2);
         assertThat(results.get(0).stringField).isEqualTo("string1");

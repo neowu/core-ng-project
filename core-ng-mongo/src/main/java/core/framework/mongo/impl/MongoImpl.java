@@ -34,6 +34,8 @@ public class MongoImpl implements Mongo {
         .maxConnectionIdleTime(Duration.ofMinutes(30).toMillis(), TimeUnit.MILLISECONDS);
 
     public ConnectionString uri;
+    public MongoConnectionPoolMetrics metrics;
+
     long timeoutInMs = Duration.ofSeconds(15).toMillis();
     CodecRegistry registry;
     private MongoClient mongoClient;
@@ -57,6 +59,7 @@ public class MongoImpl implements Mongo {
         var watch = new StopWatch();
         try {
             connectionPoolSettings.maxWaitTime(timeoutInMs, TimeUnit.MILLISECONDS); // pool checkout timeout
+            if (metrics != null) connectionPoolSettings.addConnectionPoolListener(metrics);
             var socketSettings = SocketSettings.builder()
                 .connectTimeout((int) timeoutInMs, TimeUnit.MILLISECONDS)
                 .readTimeout((int) timeoutInMs, TimeUnit.MILLISECONDS)

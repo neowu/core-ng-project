@@ -6,6 +6,7 @@ import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
+import core.framework.mongo.impl.MongoConnectionPoolMetrics;
 import core.framework.mongo.impl.MongoImpl;
 import core.framework.util.Types;
 
@@ -29,8 +30,10 @@ public class MongoConfig extends Config {
         this.name = name;
 
         var mongo = new MongoImpl();
+        mongo.metrics = new MongoConnectionPoolMetrics(name);
         this.context.startupHook.initialize.add(mongo::initialize);
         this.context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> mongo.close());
+        context.collector.metrics.add(mongo.metrics);
         context.beanFactory.bind(Mongo.class, name, mongo);
         this.mongo = mongo;
     }

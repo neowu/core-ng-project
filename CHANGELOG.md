@@ -2,6 +2,9 @@
 
 ### 8.0.4 (07/10/2022 - )
 
+* log-collector: stricter request validation
+* mongo: add connection pool stats metrics
+
 ### 8.0.3 (06/22/2022 - 07/08/2022)
 
 * mongo: update driver to 4.6.0
