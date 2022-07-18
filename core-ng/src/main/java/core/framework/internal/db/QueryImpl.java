@@ -79,14 +79,14 @@ public class QueryImpl<T> implements Query<T> {
 
     @Override
     public <P> List<P> project(String projection, Class<P> viewClass) {
-        String sql = selectQuery.projectionSQL(projection, whereClause, groupBy, sort, skip, limit);
+        String sql = selectQuery.sql(projection, whereClause, groupBy, sort, skip, limit);
         Object[] params = selectQuery.params(this.params, skip, limit);
         return database.select(sql, viewClass, params);
     }
 
     @Override
     public <P> Optional<P> projectOne(String projection, Class<P> viewClass) {
-        String sql = selectQuery.projectionSQL(projection, whereClause, groupBy, sort, skip, limit);
+        String sql = selectQuery.sql(projection, whereClause, groupBy, sort, skip, limit);
         Object[] params = selectQuery.params(this.params, skip, limit);
         return database.selectOne(sql, viewClass, params);
     }

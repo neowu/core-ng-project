@@ -57,6 +57,7 @@ public final class DatabaseImpl implements Database {
     private CloudAuthProvider authProvider;
     private Duration timeout;
     private Driver driver;
+    private Dialect dialect;
 
     public DatabaseImpl(String name) {
         initializeRowMappers();
@@ -141,6 +142,10 @@ public final class DatabaseImpl implements Database {
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-charsets.html
             if (index == -1 || url.indexOf("characterEncoding=", index + 1) == -1)
                 properties.setProperty(PropertyKey.characterEncoding.getKeyName(), "utf-8");
+        } else if (url.startsWith("jdbc:postgresql:")) {
+            // refer to org.postgresql.PGProperty
+            properties.setProperty("connectTimeout", String.valueOf(timeout.toSeconds()));
+            properties.setProperty("socketTimeout", String.valueOf(timeout.toSeconds()));
         }
         return properties;
     }
@@ -174,8 +179,13 @@ public final class DatabaseImpl implements Database {
 
     private Driver driver(String url) {
         if (url.startsWith("jdbc:mysql:")) {
+            dialect = Dialect.MYSQL;
             return createDriver("com.mysql.cj.jdbc.Driver");
+        } else if (url.startsWith("jdbc:postgresql:")) {
+            dialect = Dialect.POSTGRESQL;
+            return createDriver("org.postgresql.Driver");
         } else if (url.startsWith("jdbc:hsqldb:")) {
+            dialect = Dialect.MYSQL;    // unit test use mysql dialect
             return createDriver("org.hsqldb.jdbc.JDBCDriver");
         } else {
             throw new Error("not supported database, url=" + url);
@@ -205,7 +215,7 @@ public final class DatabaseImpl implements Database {
         try {
             new DatabaseClassValidator(entityClass).validateEntityClass();
             registerViewClass(entityClass);
-            return new RepositoryImpl<>(this, entityClass);
+            return new RepositoryImpl<>(this, entityClass, dialect);
         } finally {
             logger.info("register db entity, entityClass={}, elapsed={}", entityClass.getCanonicalName(), watch.elapsed());
         }

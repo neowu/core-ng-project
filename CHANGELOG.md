@@ -4,6 +4,9 @@
 
 * log-collector: stricter request validation
 * mongo: add connection pool stats metrics
+* db: add experimental postgresql support
+  > many new db products use postgres compatible driver, e.g. GCloud AlloyDB, CockroachDB
+  > PostgreSQL lacks of many features we are using with MySQL, 1. affected rows, 2. QueryInterceptor to track no index used sql
 
 ### 8.0.3 (06/22/2022 - 07/08/2022)
 

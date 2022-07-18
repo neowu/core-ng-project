@@ -30,11 +30,11 @@ public final class RepositoryImpl<T> implements Repository<T> {
     private final String deleteSQL;
     private final Class<T> entityClass;
 
-    RepositoryImpl(DatabaseImpl database, Class<T> entityClass) {
+    RepositoryImpl(DatabaseImpl database, Class<T> entityClass, Dialect dialect) {
         this.database = database;
         validator = Validator.of(entityClass);
-        insertQuery = new InsertQueryBuilder<>(entityClass).build();
-        selectQuery = new SelectQuery<>(entityClass);
+        insertQuery = new InsertQueryBuilder<>(entityClass, dialect).build();
+        selectQuery = new SelectQuery<>(entityClass, dialect);
         updateQuery = new UpdateQueryBuilder<>(entityClass).build();
         deleteSQL = DeleteQueryBuilder.build(entityClass);
         this.entityClass = entityClass;
@@ -56,7 +56,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     public OptionalLong insert(T entity) {
         var watch = new StopWatch();
         validator.validate(entity, false);
-        String sql = insertQuery.sql;
+        String sql = insertQuery.insertSQL;
         Object[] params = insertQuery.params(entity);
         try {
             return database.operation.insert(sql, params, insertQuery.generatedColumn);
@@ -73,7 +73,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         if (insertQuery.generatedColumn != null) throw new Error("entity must not have auto increment primary key, entityClass=" + entityClass.getCanonicalName());
         validator.validate(entity, false);
         int insertedRows = 0;
-        String sql = insertQuery.insertIgnoreSQL();
+        String sql = insertQuery.insertIgnoreSQL;
         Object[] params = insertQuery.params(entity);
         try {
             insertedRows = database.operation.update(sql, params);
@@ -91,7 +91,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         if (insertQuery.generatedColumn != null) throw new Error("entity must not have auto increment primary key, entityClass=" + entityClass.getCanonicalName());
         validator.validate(entity, false);
         int affectedRows = 0;
-        String sql = insertQuery.upsertSQL();
+        String sql = insertQuery.upsertSQL;
         Object[] params = insertQuery.params(entity);
         try {
             affectedRows = database.operation.update(sql, params);
@@ -160,7 +160,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     public Optional<long[]> batchInsert(List<T> entities) {
         var watch = new StopWatch();
         if (entities.isEmpty()) throw new Error("entities must not be empty");
-        String sql = insertQuery.sql;
+        String sql = insertQuery.insertSQL;
         List<Object[]> params = new ArrayList<>(entities.size());
         for (T entity : entities) {
             validator.validate(entity, false);
@@ -181,7 +181,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         var watch = new StopWatch();
         if (entities.isEmpty()) throw new Error("entities must not be empty");
         if (insertQuery.generatedColumn != null) throw new Error("entity must not have auto increment primary key, entityClass=" + entityClass.getCanonicalName());
-        String sql = insertQuery.insertIgnoreSQL();
+        String sql = insertQuery.insertIgnoreSQL;
         List<Object[]> params = new ArrayList<>(entities.size());
         for (T entity : entities) {
             validator.validate(entity, false);
@@ -205,7 +205,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         var watch = new StopWatch();
         if (entities.isEmpty()) throw new Error("entities must not be empty");
         if (insertQuery.generatedColumn != null) throw new Error("entity must not have auto increment primary key, entityClass=" + entityClass.getCanonicalName());
-        String sql = insertQuery.upsertSQL();
+        String sql = insertQuery.upsertSQL;
         List<Object[]> params = new ArrayList<>(entities.size());
         for (T entity : entities) {
             validator.validate(entity, false);

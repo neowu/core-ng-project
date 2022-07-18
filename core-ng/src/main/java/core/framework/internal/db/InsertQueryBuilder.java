@@ -25,11 +25,14 @@ class InsertQueryBuilder<T> {
 
     private String generatedColumn;
     private List<String> paramFieldNames;
-    private String sql;
-    private String upsertClause;
+    private String insertSQL;
+    private String insertIgnoreSQL;
+    private String upsertSQL;
+    private Dialect dialect;
 
-    InsertQueryBuilder(Class<T> entityClass) {
+    InsertQueryBuilder(Class<T> entityClass, Dialect dialect) {
         this.entityClass = entityClass;
+        this.dialect = dialect;
         builder = new DynamicInstanceBuilder<>(InsertQueryParamBuilder.class, entityClass.getSimpleName());
     }
 
@@ -37,7 +40,7 @@ class InsertQueryBuilder<T> {
         buildSQL();
         builder.addMethod(applyMethod());
         InsertQueryParamBuilder<T> paramBuilder = builder.build();
-        return new InsertQuery<>(sql, upsertClause, generatedColumn, paramBuilder);
+        return new InsertQuery<>(insertSQL, insertIgnoreSQL, upsertSQL, generatedColumn, paramBuilder);
     }
 
     private void buildSQL() {
@@ -57,8 +60,12 @@ class InsertQueryBuilder<T> {
                 }
                 primaryKeyFieldNames.add(field.getName());    // pk fields is only needed for assigned id
             } else {
-                // since MySQL 8.0.20, VALUES(column) syntax is deprecated, currently gcloud MySQL is still on 8.0.18
-                updates.add(Strings.format("{} = VALUES({})", column, column));
+                if (dialect == Dialect.MYSQL) {
+                    // since MySQL 8.0.20, VALUES(column) syntax is deprecated, currently gcloud MySQL is still on 8.0.18
+                    updates.add(Strings.format("{} = VALUES({})", column, column));
+                } else if (dialect == Dialect.POSTGRESQL) {
+                    updates.add(Strings.format("{} = EXCLUDED.{}", column, column));
+                }
             }
             paramFieldNames.add(field.getName());
             columns.add(column);
@@ -71,12 +78,22 @@ class InsertQueryBuilder<T> {
             .append(") VALUES (")
             .appendCommaSeparatedValues(params)
             .append(')');
-        sql = builder.build();
+        insertSQL = builder.build();
 
-        var upsertBuilder = new CodeBuilder()
-            .append(" ON DUPLICATE KEY UPDATE ")
-            .appendCommaSeparatedValues(updates);
-        upsertClause = upsertBuilder.build();
+        if (dialect == Dialect.MYSQL) {
+            insertIgnoreSQL = new StringBuilder(insertSQL).insert(6, " IGNORE").toString();
+        } else if (dialect == Dialect.POSTGRESQL) {
+            insertIgnoreSQL = insertSQL + " ON CONFLICT DO NOTHING";
+        }
+
+        if (dialect == Dialect.MYSQL) {
+            builder.append(" ON DUPLICATE KEY UPDATE ")
+                .appendCommaSeparatedValues(updates);
+        } else {
+            builder.append(" ON CONFLICT (").appendCommaSeparatedValues(primaryKeyFieldNames).append(") DO UPDATE SET ")
+                .appendCommaSeparatedValues(updates);
+        }
+        upsertSQL = builder.build();
     }
 
     private String applyMethod() {
