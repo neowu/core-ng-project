@@ -32,7 +32,7 @@ public final class StaticDirectoryController implements StaticContentController 
         logger.debug("requestFile={}", filePath);
 
         if (!Files.isRegularFile(filePath, LinkOption.NOFOLLOW_LINKS) || !filePath.startsWith(contentDirectory))
-            throw new NotFoundException("not found, path=" + request.path());
+            throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
 
         Response response = Response.file(filePath);
         ContentType contentType = MimeTypes.get(String.valueOf(filePath.getFileName()));
