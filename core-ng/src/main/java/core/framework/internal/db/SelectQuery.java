@@ -60,10 +60,12 @@ final class SelectQuery<T> {
         if (where.length() > 0) builder.append(" WHERE ").append(where);
         if (groupBy != null) builder.append(" GROUP BY ").append(groupBy);
         if (sort != null) builder.append(" ORDER BY ").append(sort);
-        if (dialect == Dialect.MYSQL) {
-            if (skip != null || limit != null) builder.append(" LIMIT ?,?");
-        } else if (dialect == Dialect.POSTGRESQL) {
-            if (skip != null || limit != null) builder.append(" OFFSET ? LIMIT ?");
+        if (skip != null || limit != null) {
+            if (dialect == Dialect.MYSQL) {
+                builder.append(" LIMIT ?,?");
+            } else if (dialect == Dialect.POSTGRESQL) {
+                builder.append(" OFFSET ? LIMIT ?");
+            }
         }
         return builder.toString();
     }

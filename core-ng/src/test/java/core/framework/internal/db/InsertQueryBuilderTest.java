@@ -43,8 +43,8 @@ class InsertQueryBuilderTest {
         assertThat(builder.builder.sourceCode()).isEqualTo(ClasspathResources.text("db-test/insert-query-param-builder-auto-increment-id.java"));
 
         assertThat(query.insertSQL).isEqualTo("INSERT INTO auto_increment_id_entity (string_field, double_field, enum_field, date_time_field, zoned_date_time_field) VALUES (?, ?, ?, ?, ?)");
-        assertThat(query.insertIgnoreSQL).isEqualTo("INSERT IGNORE INTO auto_increment_id_entity (string_field, double_field, enum_field, date_time_field, zoned_date_time_field) VALUES (?, ?, ?, ?, ?)");
-        assertThat(query.upsertSQL).isEqualTo("INSERT INTO auto_increment_id_entity (string_field, double_field, enum_field, date_time_field, zoned_date_time_field) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE string_field = VALUES(string_field), double_field = VALUES(double_field), enum_field = VALUES(enum_field), date_time_field = VALUES(date_time_field), zoned_date_time_field = VALUES(zoned_date_time_field)");
+        assertThat(query.insertIgnoreSQL).isNull();
+        assertThat(query.upsertSQL).isNull();
         assertThat(query.generatedColumn).isEqualTo("id");
     }
 }

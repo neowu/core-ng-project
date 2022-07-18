@@ -21,6 +21,7 @@ import static core.framework.internal.asm.Literal.type;
 class InsertQueryBuilder<T> {
     final DynamicInstanceBuilder<InsertQueryParamBuilder<T>> builder;
     private final Class<T> entityClass;
+    private final Dialect dialect;
     private final List<String> primaryKeyFieldNames = Lists.newArrayList();
 
     private String generatedColumn;
@@ -28,7 +29,6 @@ class InsertQueryBuilder<T> {
     private String insertSQL;
     private String insertIgnoreSQL;
     private String upsertSQL;
-    private Dialect dialect;
 
     InsertQueryBuilder(Class<T> entityClass, Dialect dialect) {
         this.entityClass = entityClass;
@@ -79,6 +79,8 @@ class InsertQueryBuilder<T> {
             .appendCommaSeparatedValues(params)
             .append(')');
         insertSQL = builder.build();
+
+        if (generatedColumn != null) return;  // auto-increment entity doesn't need insert ignore and upsert, refer to core.framework.internal.db.RepositoryImpl.insertIgnore
 
         if (dialect == Dialect.MYSQL) {
             insertIgnoreSQL = new StringBuilder(insertSQL).insert(6, " IGNORE").toString();
