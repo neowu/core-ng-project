@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author neo
@@ -23,6 +26,7 @@ public class ElasticSearchForEach<T> {
     private final String index;
     private final ForEach<T> forEach;
     private final Time keepAlive;
+    private final Set<String> scrollIds = new HashSet<>();
     private String scrollId;
 
     public ElasticSearchForEach(ForEach<T> forEach, String index, Class<T> documentClass, ElasticSearchImpl elasticSearch) {
@@ -48,6 +52,7 @@ public class ElasticSearchForEach<T> {
                 .sort(s -> s.field(f -> f.field("_doc")))
                 .size(forEach.batchSize), documentClass);
             scrollId = response.scrollId();
+            scrollIds.add(scrollId);
             while (true) {
                 esServerTook += response.took() * 1_000_000;
 
@@ -63,15 +68,25 @@ public class ElasticSearchForEach<T> {
                 start = System.nanoTime();
                 response = elasticSearch.client.scroll(builder -> builder.scrollId(scrollId).scroll(keepAlive), documentClass);
                 scrollId = response.scrollId();
+                scrollIds.add(scrollId);
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
             throw elasticSearch.searchException(e);
         } finally {
+            clearScrolls();
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, totalHits, 0);
             LOGGER.debug("forEach, totalHits={}, esServerTook={}, esClientTook={}, elapsed={}", totalHits, esServerTook, esClientTook, elapsed);
+        }
+    }
+
+    private void clearScrolls() {
+        try {
+            elasticSearch.client.clearScroll(builder -> builder.scrollId(new ArrayList<>(scrollIds)));
+        } catch (IOException e) {
+            LOGGER.warn("failed to clear scrolls, error={}", e.getMessage(), e);
         }
     }
 
