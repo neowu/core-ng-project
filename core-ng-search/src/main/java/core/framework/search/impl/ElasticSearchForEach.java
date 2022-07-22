@@ -46,7 +46,7 @@ public class ElasticSearchForEach<T> {
                 .scroll(keepAlive)
                 .query(forEach.query)
                 .sort(s -> s.field(f -> f.field("_doc")))
-                .size(forEach.limit), documentClass);
+                .size(forEach.batchSize), documentClass);
             scrollId = response.scrollId();
             while (true) {
                 esServerTook += response.took() * 1_000_000;
@@ -79,6 +79,6 @@ public class ElasticSearchForEach<T> {
         if (forEach.consumer == null) throw new Error("forEach.consumer must not be null");
         if (forEach.query == null) throw new Error("forEach.query must not be null");
         if (forEach.scrollTimeout == null) throw new Error("forEach.scrollTimeout must not be null");
-        if (forEach.limit == null || forEach.limit <= 0) throw new Error("forEach.limit must not be null or less than one");
+        if (forEach.batchSize == null || forEach.batchSize <= 0) throw new Error("forEach.batchSize must not be null or less than one");
     }
 }

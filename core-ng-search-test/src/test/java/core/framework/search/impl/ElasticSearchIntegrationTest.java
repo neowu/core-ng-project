@@ -92,7 +92,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
         ForEach<TestDocument> forEach = new ForEach<>();
         forEach.query = new Query.Builder().matchAll(m -> m).build();
-        forEach.limit = 7;
+        forEach.batchSize = 7;
         forEach.consumer = results::add;
 
         documentType.forEach(forEach);

@@ -14,6 +14,6 @@ public class ForEach<T> {
     public String index;
     public Query query = new Query.Builder().matchAll(m -> m).build();
     public Duration scrollTimeout = Duration.ofMinutes(1);
-    public Integer limit = 1000;
+    public Integer batchSize = 1000;
     public Consumer<T> consumer;
 }
