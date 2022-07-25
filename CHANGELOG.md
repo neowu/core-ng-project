@@ -8,6 +8,7 @@
   > many new db products use postgres compatible driver, e.g. GCloud AlloyDB, CockroachDB
   > PostgreSQL lacks of many features we are using with MySQL, 1. affected rows, 2. QueryInterceptor to track no index used sql
 * search: clear ForEach scroll once process done
+* http: update undertow to 2.2.18
 
 ### 8.0.3 (06/22/2022 - 07/08/2022)
 
