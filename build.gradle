@@ -14,12 +14,12 @@ subprojects {
     }
 }
 
-def elasticVersion = '8.2.0'
+def elasticVersion = '8.3.2'
 def kafkaVersion = '3.2.0'
-def jacksonVersion = '2.13.1'
+def jacksonVersion = '2.13.3'
 def junitVersion = '5.8.2'
-def mockitoVersion = '4.5.1'
-def assertjVersion = '3.22.0'
+def mockitoVersion = '4.6.1'
+def assertjVersion = '3.23.1'
 def mysqlVersion = '8.0.29'
 
 project('core-ng-api') {
@@ -34,7 +34,7 @@ project('core-ng') {
         implementation 'org.javassist:javassist:3.28.0-GA'
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-        implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+        implementation 'com.squareup.okhttp3:okhttp:4.10.0'
         implementation 'io.undertow:undertow-core:2.2.18.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.8.4'      // used by kafka message compression
@@ -99,7 +99,7 @@ project('core-ng-search-test') {
         implementation "core.framework.elasticsearch.module:mapper-extras:${elasticVersion}"    // used by elasticsearch scaled_float
         implementation "core.framework.elasticsearch.module:lang-painless:${elasticVersion}"
         implementation "core.framework.elasticsearch.module:analysis-common:${elasticVersion}"  // used by elasticsearch stemmer
-        implementation "core.framework.elasticsearch.module:reindex:${elasticVersion}"  // used by elasticsearch deleteByQuery
+        implementation "core.framework.elasticsearch.module:reindex:${elasticVersion}"          // used by elasticsearch deleteByQuery
         implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"              // override transitive jackson dependencies of elasticsearch, only for intellij, gradle woks fine
     }
 }
