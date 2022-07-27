@@ -53,7 +53,7 @@ public final class MockRedisList implements RedisList {
         if (value == null) return List.of();
         List<String> list = value.list();
         int size = list.size();
-        int startIndex = start < 0 ? 0 : (int) start;
+        int startIndex = start < 0 ? (int) start + size : (int) start;
         if (startIndex > size) startIndex = size;
         int endIndex = stop < 0 ? (int) stop + size : (int) stop;
         if (endIndex >= size) endIndex = size - 1;
