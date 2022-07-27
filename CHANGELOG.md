@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.0.4-b0 (07/10/2022 - )
+### 8.0.4 (07/10/2022 - 07/27/2022)
 
 * log-collector: stricter request validation
 * mongo: add connection pool stats metrics
