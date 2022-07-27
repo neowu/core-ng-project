@@ -10,6 +10,9 @@
 * search: clear ForEach scroll once process done
 * http: update undertow to 2.2.18
 * search: update es to 8.3.2
+* kafka: mark LONG_CONSUMER_DELAY as error if delay is longer than 15 mins
+  > currently MAX_POLL_INTERVAL_MS_CONFIG = 30 mins, larger delay will trigger rebalance and message resending
+  > system should be designed to process polling messages fast
 
 ### 8.0.3 (06/22/2022 - 07/08/2022)
 

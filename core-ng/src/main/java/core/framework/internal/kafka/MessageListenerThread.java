@@ -252,7 +252,11 @@ class MessageListenerThread extends Thread {
         long delay = (actionLog.date.toEpochMilli() - timestamp) * 1_000_000;     // convert to nanoseconds
         logger.debug("consumerDelay={}", Duration.ofNanos(delay));
         actionLog.stats.put("consumer_delay", (double) delay);
-        if (delay > longConsumerDelayThresholdInNano) {
+        // refer to core.framework.internal.kafka.MessageListener.createConsumer, MAX_POLL_INTERVAL_MS_CONFIG = 30 mins
+        // log as error if delay > 15 mins
+        if (delay > 900_000_000_000L) {
+            logger.error(errorCode("LONG_CONSUMER_DELAY"), "consumer delay is too long, delay={}", Duration.ofNanos(delay));
+        } else if (delay > longConsumerDelayThresholdInNano) {
             logger.warn(errorCode("LONG_CONSUMER_DELAY"), "consumer delay is too long, delay={}", Duration.ofNanos(delay));
         }
     }

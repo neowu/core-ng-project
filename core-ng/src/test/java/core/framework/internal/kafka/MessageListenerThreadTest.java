@@ -2,6 +2,7 @@ package core.framework.internal.kafka;
 
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogLevel;
 import core.framework.internal.log.LogManager;
 import core.framework.json.JSON;
 import core.framework.kafka.BulkMessageHandler;
@@ -77,6 +78,13 @@ class MessageListenerThreadTest {
         var actionLog = logManager.begin(null, null);
         thread.checkConsumerDelay(actionLog, actionLog.date.minusSeconds(5).toEpochMilli(), Duration.ofSeconds(3).toNanos());
         assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofSeconds(5).toNanos());
+        assertThat(actionLog.result).isEqualTo(LogLevel.WARN);
+        assertThat(actionLog.errorCode()).isEqualTo("LONG_CONSUMER_DELAY");
+
+        actionLog = logManager.begin(null, null);
+        thread.checkConsumerDelay(actionLog, actionLog.date.minus(Duration.ofMinutes(16)).toEpochMilli(), Duration.ofSeconds(30).toNanos());
+        assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofMinutes(16).toNanos());
+        assertThat(actionLog.result).isEqualTo(LogLevel.ERROR);
         assertThat(actionLog.errorCode()).isEqualTo("LONG_CONSUMER_DELAY");
 
         actionLog = logManager.begin(null, null);
