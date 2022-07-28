@@ -1,5 +1,11 @@
 ## Change log
 
+### 8.0.5 (07/28/2022 - )
+
+* mock: fixed MockRedis.list().range(), with negative start or stop
+
+> only impact unit test
+
 ### 8.0.4 (07/10/2022 - 07/27/2022)
 
 * log-collector: stricter request validation

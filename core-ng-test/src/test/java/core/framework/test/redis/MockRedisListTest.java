@@ -47,6 +47,11 @@ class MockRedisListTest {
         assertThat(redis.list().range("key2", 1, 2)).containsExactly("v2", "v3");
         assertThat(redis.list().range("key2", -1, 5)).containsExactly("v3");
         assertThat(redis.list().range("key2", 9, 10)).isEmpty();
+        assertThat(redis.list().range("key2", -2, -1)).containsExactly("v2", "v3");
+        assertThat(redis.list().range("key2", -3, 2)).containsExactly("v1", "v2", "v3");
+        assertThat(redis.list().range("key2", -100, 100)).containsExactly("v1", "v2", "v3");
+        assertThat(redis.list().range("key2", -100, -100)).isEmpty();
+        assertThat(redis.list().range("key2", -2, 0)).isEmpty();
     }
 
     @Test
