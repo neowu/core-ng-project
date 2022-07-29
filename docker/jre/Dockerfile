@@ -1,4 +1,4 @@
-FROM        eclipse-temurin:17.0.3_7-jdk-alpine as build
+FROM        eclipse-temurin:17.0.4_8-jdk-alpine as build
 RUN         jlink --add-modules java.base,java.compiler,java.desktop,java.instrument,java.logging,java.management.rmi,java.naming,java.security.jgss,java.security.sasl,java.sql,java.xml \
                   --add-modules jdk.charsets,jdk.crypto.cryptoki,jdk.jdi,jdk.localedata,jdk.management.jfr,jdk.naming.dns,jdk.naming.rmi,jdk.net,jdk.unsupported \
                   --output /opt/jre --strip-java-debug-attributes --no-man-pages --no-header-files --compress=2
