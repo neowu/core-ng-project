@@ -1,4 +1,4 @@
-FROM        neowu/jre:17.0.2
+FROM        neowu/jre:17.0.4
 LABEL       app=monitor
 RUN         addgroup --system app && adduser --system --no-create-home --ingroup app app
 USER        app
