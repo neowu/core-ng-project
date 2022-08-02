@@ -84,7 +84,6 @@ project('core-ng-search') {
     dependencies {
         api project(':core-ng')
         api "co.elastic.clients:elasticsearch-java:${elasticVersion}"
-        implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
         testImplementation project(':core-ng-test')
     }
 }
@@ -100,7 +99,6 @@ project('core-ng-search-test') {
         implementation "core.framework.elasticsearch.module:lang-painless:${elasticVersion}"
         implementation "core.framework.elasticsearch.module:analysis-common:${elasticVersion}"  // used by elasticsearch stemmer
         implementation "core.framework.elasticsearch.module:reindex:${elasticVersion}"          // used by elasticsearch deleteByQuery
-        implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"              // override transitive jackson dependencies of elasticsearch, only for intellij, gradle woks fine
     }
 }
 
