@@ -56,7 +56,6 @@ project('core-ng-test') {
         api "org.assertj:assertj-core:${assertjVersion}"
         implementation project(":core-ng")
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-        implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         testRuntimeOnly 'org.hsqldb:hsqldb:2.6.0'
     }
 }
@@ -84,6 +83,7 @@ project('core-ng-search') {
     dependencies {
         api project(':core-ng')
         api "co.elastic.clients:elasticsearch-java:${elasticVersion}"
+        implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
         testImplementation project(':core-ng-test')
     }
 }
