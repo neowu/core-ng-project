@@ -44,7 +44,7 @@ project('core-ng') {
         testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-        testRuntimeOnly 'org.hsqldb:hsqldb:2.6.0'
+        testRuntimeOnly 'org.hsqldb:hsqldb:2.7.0'
     }
 }
 
@@ -56,7 +56,7 @@ project('core-ng-test') {
         api "org.assertj:assertj-core:${assertjVersion}"
         implementation project(":core-ng")
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-        testRuntimeOnly 'org.hsqldb:hsqldb:2.6.0'
+        testRuntimeOnly 'org.hsqldb:hsqldb:2.7.0'
     }
 }
 
@@ -64,7 +64,7 @@ project('core-ng-mongo') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        api 'org.mongodb:mongodb-driver-sync:4.6.0'
+        api 'org.mongodb:mongodb-driver-sync:4.7.1'
         testImplementation project(":core-ng-test")
     }
 }

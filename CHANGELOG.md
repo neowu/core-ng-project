@@ -4,6 +4,7 @@
 
 * mock: fixed MockRedis.list().range(), with negative start or stop
   > only impact unit test
+* mongo: update driver to 4.7.1
 
 ### 8.0.4 (07/10/2022 - 07/27/2022)
 
