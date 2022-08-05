@@ -17,7 +17,7 @@ subprojects {
 def elasticVersion = '8.3.2'
 def kafkaVersion = '3.2.1'
 def jacksonVersion = '2.13.3'
-def junitVersion = '5.8.2'
+def junitVersion = '5.9.0'
 def mockitoVersion = '4.6.1'
 def assertjVersion = '3.23.1'
 def mysqlVersion = '8.0.29'
@@ -42,6 +42,7 @@ project('core-ng') {
         compileOnly 'org.jboss.logging:jboss-logging-annotations:2.2.1.Final'
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+        testImplementation "org.mockito:mockito-inline:${mockitoVersion}"
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         testRuntimeOnly 'org.hsqldb:hsqldb:2.7.0'
@@ -53,6 +54,7 @@ project('core-ng-test') {
     dependencies {
         api "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         api "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+        api "org.mockito:mockito-inline:${mockitoVersion}"
         api "org.assertj:assertj-core:${assertjVersion}"
         implementation project(":core-ng")
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
