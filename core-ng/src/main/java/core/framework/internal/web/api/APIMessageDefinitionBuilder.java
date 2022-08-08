@@ -25,8 +25,8 @@ public class APIMessageDefinitionBuilder {
         response.topics = new ArrayList<>(messages.size());
         for (APIController.MessagePublish publish : messages) {
             var topic = new APIMessageDefinitionResponse.Topic();
-            topic.name = publish.topic;
-            topic.messageType = parser.parseBeanType(publish.messageClass);
+            topic.name = publish.topic();
+            topic.messageType = parser.parseBeanType(publish.messageClass());
             response.topics.add(topic);
         }
         response.types = parser.types();

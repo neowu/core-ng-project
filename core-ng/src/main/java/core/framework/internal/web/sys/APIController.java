@@ -68,13 +68,9 @@ public class APIController {
         }
     }
 
-    public static class MessagePublish {
-        public final String topic;  // topic can be null, for dynamic topic message publish
-        public final Class<?> messageClass;
-
-        public MessagePublish(String topic, Class<?> messageClass) {
-            this.topic = topic;
-            this.messageClass = messageClass;
-        }
+    /**
+     * @param topic topic can be null, for dynamic topic message publish
+     */
+    public record MessagePublish(String topic, Class<?> messageClass) {
     }
 }
