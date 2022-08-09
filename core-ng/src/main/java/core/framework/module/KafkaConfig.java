@@ -58,6 +58,7 @@ public class KafkaConfig extends Config {
         context.probe.hostURIs.add(this.uri.bootstrapURIs.get(0));
     }
 
+    // to make IoC simpler, each topic should have its own message class
     public <T> MessagePublisher<T> publish(String topic, Class<T> messageClass) {
         if (topic == null) throw new Error("topic must not be null");
         logger.info("publish, topic={}, messageClass={}, name={}", topic, messageClass.getTypeName(), name);

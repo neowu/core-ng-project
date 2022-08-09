@@ -13,7 +13,6 @@ import java.util.Set;
  */
 public class EventForwarder {
     private final MessagePublisher<EventMessage> publisher;
-    private final String topic;
     private final Set<String> apps;
     private final Set<String> results;
     private final Set<String> ignoreActions;
@@ -21,7 +20,6 @@ public class EventForwarder {
 
     public EventForwarder(MessagePublisher<EventMessage> publisher, LogForwardConfig.Forward forward) {
         this.publisher = publisher;
-        topic = forward.topic;
         apps = new HashSet<>(forward.apps);
         results = new HashSet<>(forward.results);
         ignoreActions = new HashSet<>(forward.ignoreActions);
@@ -34,7 +32,7 @@ public class EventForwarder {
                 && (results.isEmpty() || results.contains(message.result))
                 && !ignoreActions.contains(message.action)
                 && !ignoreErrorCodes.contains(message.errorCode)) {
-                publisher.publish(topic, null, message);
+                publisher.publish(message);
             }
         }
     }

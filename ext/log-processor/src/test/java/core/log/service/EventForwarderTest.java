@@ -38,7 +38,7 @@ class EventForwarderTest {
         message.app = "website";
         forwarder.forward(List.of(message));
 
-        verify(publisher).publish("event", null, message);
+        verify(publisher).publish(message);
     }
 
     @Test

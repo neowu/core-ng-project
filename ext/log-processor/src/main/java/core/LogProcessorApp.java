@@ -8,6 +8,7 @@ import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.log.message.StatMessage;
 import core.framework.module.App;
+import core.framework.module.KafkaConfig;
 import core.framework.search.module.SearchConfig;
 import core.log.LogForwardConfig;
 import core.log.domain.ActionDocument;
@@ -116,16 +117,15 @@ public class LogProcessorApp extends App {
         if (configValue != null) {
             Bean.register(LogForwardConfig.class);
             LogForwardConfig config = Bean.fromJSON(LogForwardConfig.class, configValue);
-            kafka("forward").uri(config.kafkaURI);
-            LogForwardConfig.Forward actionConfig = config.action;
-            if (actionConfig != null) {
-                MessagePublisher<ActionLogMessage> publisher = kafka("forward").publish(ActionLogMessage.class);
-                forwarders.action = new ActionLogForwarder(publisher, actionConfig);
+            KafkaConfig kafka = kafka("forward");
+            kafka.uri(config.kafkaURI);
+            if (config.action != null) {
+                MessagePublisher<ActionLogMessage> publisher = kafka.publish(config.action.topic, ActionLogMessage.class);
+                forwarders.action = new ActionLogForwarder(publisher, config.action);
             }
-            LogForwardConfig.Forward eventConfig = config.event;
-            if (eventConfig != null) {
-                MessagePublisher<EventMessage> publisher = kafka("forward").publish(EventMessage.class);
-                forwarders.event = new EventForwarder(publisher, eventConfig);
+            if (config.event != null) {
+                MessagePublisher<EventMessage> publisher = kafka.publish(config.event.topic, EventMessage.class);
+                forwarders.event = new EventForwarder(publisher, config.event);
             }
         }
         return forwarders;

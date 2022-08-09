@@ -29,7 +29,7 @@ class ActionLogForwarderTest {
         message.app = "website";
         message.traceLog = "trace";
         forwarder.forward(List.of(message));
-        verify(publisher).publish("action", null, message);
+        verify(publisher).publish(message);
     }
 
     @Test
@@ -41,7 +41,7 @@ class ActionLogForwarderTest {
         message.result = "OK";
         message.traceLog = "trace";
         forwarder.forward(List.of(message));
-        verify(publisher).publish("action", null, message);
+        verify(publisher).publish(message);
     }
 
     @Test
