@@ -12,6 +12,4 @@ public interface MessagePublisher<T> {
     }
 
     void publish(@Nullable String key, T value);
-
-    void publish(String topic, @Nullable String key, T value);
 }

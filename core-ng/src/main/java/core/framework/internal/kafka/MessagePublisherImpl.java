@@ -37,13 +37,6 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
 
     @Override
     public void publish(@Nullable String key, T value) {
-        publish(topic, key, value);
-    }
-
-    @Override
-    public void publish(String topic, @Nullable String key, T value) {
-        if (topic == null) throw new Error("topic must not be null");
-
         var watch = new StopWatch();
         byte[] keyBytes = key == null ? null : Strings.bytes(key);
         validator.validate(value, false);

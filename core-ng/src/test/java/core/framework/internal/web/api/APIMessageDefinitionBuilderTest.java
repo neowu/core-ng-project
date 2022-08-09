@@ -1,13 +1,12 @@
 package core.framework.internal.web.api;
 
 import core.framework.internal.kafka.TestMessage;
-import core.framework.internal.web.sys.APIController;
 import core.framework.json.JSON;
 import core.framework.util.ClasspathResources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,9 +18,7 @@ class APIMessageDefinitionBuilderTest {
 
     @BeforeEach
     void createAPIDefinitionBuilder() {
-        var messages = new ArrayList<APIController.MessagePublish>();
-        messages.add(new APIController.MessagePublish("topic", TestMessage.class));
-        builder = new APIMessageDefinitionBuilder(messages);
+        builder = new APIMessageDefinitionBuilder(Map.of("topic", TestMessage.class));
     }
 
     @Test

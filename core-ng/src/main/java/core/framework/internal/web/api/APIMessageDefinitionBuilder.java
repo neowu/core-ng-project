@@ -1,32 +1,31 @@
 package core.framework.internal.web.api;
 
 import core.framework.internal.log.LogManager;
-import core.framework.internal.web.sys.APIController;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * @author neo
  */
 public class APIMessageDefinitionBuilder {
-    private final List<APIController.MessagePublish> messages;
+    private final Map<String, Class<?>> topics;
     private final APITypeParser parser = new APITypeParser();
 
-    public APIMessageDefinitionBuilder(List<APIController.MessagePublish> messages) {
-        this.messages = messages;
+    public APIMessageDefinitionBuilder(Map<String, Class<?>> topics) {
+        this.topics = topics;
     }
 
     public APIMessageDefinitionResponse build() {
         var response = new APIMessageDefinitionResponse();
         response.app = LogManager.APP_NAME;
         response.version = UUID.randomUUID().toString();
-        response.topics = new ArrayList<>(messages.size());
-        for (APIController.MessagePublish publish : messages) {
+        response.topics = new ArrayList<>(topics.size());
+        for (Map.Entry<String, Class<?>> entry : topics.entrySet()) {
             var topic = new APIMessageDefinitionResponse.Topic();
-            topic.name = publish.topic();
-            topic.messageType = parser.parseBeanType(publish.messageClass());
+            topic.name = entry.getKey();
+            topic.messageType = parser.parseBeanType(entry.getValue());
             response.topics.add(topic);
         }
         response.types = parser.types();

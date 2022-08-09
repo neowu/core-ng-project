@@ -9,7 +9,6 @@ import core.framework.internal.kafka.MessagePublisherImpl;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
-import core.framework.internal.web.sys.APIController;
 import core.framework.internal.web.sys.KafkaController;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
@@ -59,18 +58,14 @@ public class KafkaConfig extends Config {
         context.probe.hostURIs.add(this.uri.bootstrapURIs.get(0));
     }
 
-    // for use case as replying message back to publisher, so the topic can be dynamic (different services (consumer group) expect to receive reply in their own topic)
-    public <T> MessagePublisher<T> publish(Class<T> messageClass) {
-        return publish(null, messageClass);
-    }
-
     public <T> MessagePublisher<T> publish(String topic, Class<T> messageClass) {
+        if (topic == null) throw new Error("topic must not be null");
         logger.info("publish, topic={}, messageClass={}, name={}", topic, messageClass.getTypeName(), name);
         if (uri == null) throw new Error("kafka uri must be configured first, name=" + name);
         context.beanClassValidator.validate(messageClass);
         MessagePublisher<T> publisher = createMessagePublisher(topic, messageClass);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), name, publisher);
-        context.apiController.messages.add(new APIController.MessagePublish(topic, messageClass));
+        context.apiController.topics.put(topic, messageClass);
         handlerAdded = true;
         return publisher;
     }

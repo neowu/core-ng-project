@@ -37,6 +37,6 @@ class APIControllerTest {
     void messageDefinition() {
         APIMessageDefinitionResponse response = controller.messageDefinition();
         assertThat(response).isNotNull();
-        assertThat(controller.messages).isNull();
+        assertThat(controller.topics).isNull();
     }
 }

@@ -6,6 +6,9 @@
   > only impact unit test
 * mongo: update driver to 4.7.1
 * kafka: update to 3.2.1
+* kafka: removed KafkaConfig.publish(messageClass) without topic support
+  > it proved not useful to support dynamic topic, topic better be designed like table, prefer static naming / typing over dynamic
+  > if really need something like request/replay, fan-in / fan-out pattern, still can be implemented in explicit way
 
 ### 8.0.4 (07/10/2022 - 07/27/2022)
 

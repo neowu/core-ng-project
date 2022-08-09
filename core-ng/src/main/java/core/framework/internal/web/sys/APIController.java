@@ -11,9 +11,9 @@ import core.framework.json.JSON;
 import core.framework.web.Request;
 import core.framework.web.Response;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,7 +24,7 @@ public class APIController {
 
     public Set<Class<?>> serviceInterfaces = new LinkedHashSet<>();
     public Set<Class<?>> beanClasses = new LinkedHashSet<>();  // custom bean classes not referred by service interfaces
-    public List<MessagePublish> messages = new ArrayList<>();
+    public Map<String, Class<?>> topics = new LinkedHashMap<>();   // topic -> messageClass
 
     private APIDefinitionResponse serviceDefinition;
     private APIMessageDefinitionResponse messageDefinition;
@@ -60,17 +60,11 @@ public class APIController {
     APIMessageDefinitionResponse messageDefinition() {
         synchronized (this) {
             if (messageDefinition == null) {
-                var builder = new APIMessageDefinitionBuilder(messages);
+                var builder = new APIMessageDefinitionBuilder(topics);
                 messageDefinition = builder.build();
-                messages = null;    // release memory
+                topics = null;    // release memory
             }
             return messageDefinition;
         }
-    }
-
-    /**
-     * @param topic topic can be null, for dynamic topic message publish
-     */
-    public record MessagePublish(String topic, Class<?> messageClass) {
     }
 }

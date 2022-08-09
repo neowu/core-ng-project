@@ -12,6 +12,6 @@ public class TestKafkaConfig extends KafkaConfig {
     <T> MessagePublisher<T> createMessagePublisher(String topic, Class<T> messageClass) {
         // create custom mock message publisher to do validation check on integration test
         // as well as leveraging mockito feature on test
-        return Mockito.spy(new MockMessagePublisher<>(topic, messageClass));
+        return Mockito.spy(new MockMessagePublisher<>(messageClass));
     }
 }

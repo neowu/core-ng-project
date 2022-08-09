@@ -52,7 +52,7 @@ class MessagePublisherImplTest {
             return true;
         }));
 
-        publisher.publish("topic", "key", message);
+        publisher.publish("key", message);
         verify(producer).send(argThat(record -> Arrays.equals(Strings.bytes("key"), record.key()) && "topic".equals(record.topic())));
 
         logManager.end("end");
