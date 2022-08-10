@@ -25,8 +25,8 @@ public class CodeBuilder {
         return this;
     }
 
-    public CodeBuilder append(String pattern, Object... argument) {
-        builder.append(Strings.format(pattern, argument));
+    public CodeBuilder append(String pattern, Object... params) {
+        builder.append(Strings.format(pattern, params));
         return this;
     }
 

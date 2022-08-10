@@ -10,7 +10,5 @@
 * redis using ping/pong to validate connection? for zero downtime upgrading e.g. with gcloud memory store
 * websocket, replace AbstractReceiveListener, so it can include IO/error handling within action lifecycle?
 
-* monitor: alert on kafka message api_changed? always publish api, not only for frontend?
 * use adminClient to check kafka ready? or retry sending message?
-
 * mongo: monitor thru mongo command, db.stats()?

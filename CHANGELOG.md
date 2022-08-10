@@ -9,6 +9,7 @@
 * kafka: removed KafkaConfig.publish(messageClass) without topic support
   > it proved not useful to support dynamic topic, topic better be designed like table, prefer static naming / typing over dynamic
   > if really need something like request/replay, fan-in / fan-out pattern, still can be implemented in explicit way
+* monitor: monitoring kafka topic/message type changes
 
 ### 8.0.4 (07/10/2022 - 07/27/2022)
 

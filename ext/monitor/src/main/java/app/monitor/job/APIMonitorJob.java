@@ -7,6 +7,7 @@ import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.web.api.APIDefinitionResponse;
+import core.framework.internal.web.api.APIMessageDefinitionResponse;
 import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
@@ -29,7 +30,8 @@ public class APIMonitorJob implements Job {
     private final HTTPClient httpClient;
     private final List<String> serviceURLs;
     private final MessagePublisher<StatMessage> publisher;
-    private final Map<String, APIDefinitionResponse> previousDefinitions = Maps.newConcurrentHashMap();
+    private final Map<String, APIDefinitionResponse> previousAPIDefinitions = Maps.newConcurrentHashMap();
+    private final Map<String, APIMessageDefinitionResponse> previousMessageDefinitions = Maps.newConcurrentHashMap();
 
     public APIMonitorJob(HTTPClient httpClient, List<String> serviceURLs, MessagePublisher<StatMessage> publisher) {
         this.httpClient = httpClient;
@@ -42,6 +44,7 @@ public class APIMonitorJob implements Job {
         for (String serviceURL : serviceURLs) {
             try {
                 checkAPI(serviceURL);
+                checkMessage(serviceURL);
             } catch (Throwable e) {
                 logger.error(e.getMessage(), e);
                 publisher.publish(StatMessageFactory.failedToCollect(LogManager.APP_NAME, null, e));
@@ -55,29 +58,52 @@ public class APIMonitorJob implements Job {
             throw new Error("failed to call sys api, statusCode=" + response.statusCode + ", message=" + response.text());
         }
         APIDefinitionResponse currentDefinition = JSON.fromJSON(APIDefinitionResponse.class, response.text());
-        APIDefinitionResponse previousDefinition = previousDefinitions.get(currentDefinition.app);
+        APIDefinitionResponse previousDefinition = previousAPIDefinitions.get(currentDefinition.app);
         if (previousDefinition != null && !Strings.equals(previousDefinition.version, currentDefinition.version)) {
             checkAPI(previousDefinition, currentDefinition);
         }
-        previousDefinitions.put(currentDefinition.app, currentDefinition);
+        previousAPIDefinitions.put(currentDefinition.app, currentDefinition);
     }
 
     private void checkAPI(APIDefinitionResponse previous, APIDefinitionResponse current) {
         var validator = new APIValidator(previous, current);
-        String result = validator.validate();
+        APIWarnings warnings = validator.validate();
+        String result = warnings.result();
         if (result != null) {
-            publishAPIChanged(current.app, result, validator.errorMessage());
+            publishStatMessage(current.app, result, "API_CHANGED", warnings.errorMessage());
         }
     }
 
-    private void publishAPIChanged(String app, String result, String errorMessage) {
+    private void checkMessage(String serviceURL) {
+        HTTPResponse response = httpClient.execute(new HTTPRequest(HTTPMethod.GET, serviceURL + "/_sys/api/message"));
+        if (response.statusCode != HTTPStatus.OK.code) {
+            throw new Error("failed to call sys api, statusCode=" + response.statusCode + ", message=" + response.text());
+        }
+        APIMessageDefinitionResponse currentDefinition = JSON.fromJSON(APIMessageDefinitionResponse.class, response.text());
+        APIMessageDefinitionResponse previousDefinition = previousMessageDefinitions.get(currentDefinition.app);
+        if (previousDefinition != null && !Strings.equals(previousDefinition.version, currentDefinition.version)) {
+            checkMessage(previousDefinition, currentDefinition);
+        }
+        previousMessageDefinitions.put(currentDefinition.app, currentDefinition);
+    }
+
+    private void checkMessage(APIMessageDefinitionResponse previous, APIMessageDefinitionResponse current) {
+        var validator = new APIMessageValidator(previous, current);
+        APIWarnings warnings = validator.validate();
+        String result = warnings.result();
+        if (result != null) {
+            publishStatMessage(current.app, result, "MESSAGE_CHANGED", warnings.errorMessage());
+        }
+    }
+
+    private void publishStatMessage(String app, String result, String errorCode, String errorMessage) {
         var now = Instant.now();
         var message = new StatMessage();
         message.id = LogManager.ID_GENERATOR.next(now);
         message.date = now;
         message.result = result;
         message.app = app;
-        message.errorCode = "API_CHANGED";
+        message.errorCode = errorCode;
         message.errorMessage = errorMessage;
         publisher.publish(message);
     }
