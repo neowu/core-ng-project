@@ -1,4 +1,4 @@
-package app.monitor.job;
+package app.monitor.api;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

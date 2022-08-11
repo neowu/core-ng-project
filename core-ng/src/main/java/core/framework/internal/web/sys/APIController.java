@@ -3,8 +3,8 @@ package core.framework.internal.web.sys;
 import core.framework.http.ContentType;
 import core.framework.internal.web.api.APIDefinitionBuilder;
 import core.framework.internal.web.api.APIDefinitionResponse;
-import core.framework.internal.web.api.APIMessageDefinitionBuilder;
-import core.framework.internal.web.api.APIMessageDefinitionResponse;
+import core.framework.internal.web.api.MessageAPIDefinitionBuilder;
+import core.framework.internal.web.api.MessageAPIDefinitionResponse;
 import core.framework.internal.web.http.IPv4AccessControl;
 import core.framework.internal.web.service.ErrorResponse;
 import core.framework.json.JSON;
@@ -27,7 +27,7 @@ public class APIController {
     public Map<String, Class<?>> topics = new LinkedHashMap<>();   // topic -> messageClass
 
     private APIDefinitionResponse serviceDefinition;
-    private APIMessageDefinitionResponse messageDefinition;
+    private MessageAPIDefinitionResponse messageDefinition;
 
     public APIController() {
         beanClasses.add(ErrorResponse.class);   // publish default error response
@@ -41,7 +41,7 @@ public class APIController {
 
     public Response message(Request request) {
         accessControl.validate(request.clientIP());
-        APIMessageDefinitionResponse response = messageDefinition();
+        MessageAPIDefinitionResponse response = messageDefinition();
         return Response.text(JSON.toJSON(response)).contentType(ContentType.APPLICATION_JSON);
     }
 
@@ -57,10 +57,10 @@ public class APIController {
         }
     }
 
-    APIMessageDefinitionResponse messageDefinition() {
+    MessageAPIDefinitionResponse messageDefinition() {
         synchronized (this) {
             if (messageDefinition == null) {
-                var builder = new APIMessageDefinitionBuilder(topics);
+                var builder = new MessageAPIDefinitionBuilder(topics);
                 messageDefinition = builder.build();
                 topics = null;    // release memory
             }

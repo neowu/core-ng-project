@@ -1,7 +1,7 @@
 package core.framework.internal.web.sys;
 
 import core.framework.internal.web.api.APIDefinitionResponse;
-import core.framework.internal.web.api.APIMessageDefinitionResponse;
+import core.framework.internal.web.api.MessageAPIDefinitionResponse;
 import core.framework.internal.web.service.ErrorResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class APIControllerTest {
 
     @Test
     void messageDefinition() {
-        APIMessageDefinitionResponse response = controller.messageDefinition();
+        MessageAPIDefinitionResponse response = controller.messageDefinition();
         assertThat(response).isNotNull();
         assertThat(controller.topics).isNull();
     }

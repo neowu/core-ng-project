@@ -1,4 +1,4 @@
-package app.monitor.job;
+package app.monitor.api;
 
 import core.framework.internal.web.api.APIDefinitionResponse;
 import core.framework.json.JSON;
@@ -114,8 +114,9 @@ class APIValidatorTest {
         APIWarnings warnings = validator.validate();
         assertThat(warnings.result()).isEqualTo("ERROR");
         assertThat(warnings.errors)
-            .containsExactly("removed enum value ErrorCode.ERROR_1",
-                "added enum value ErrorCode.ERROR_2");
+            .containsExactly("changed enum value of ErrorCode.ERROR_1 from ERROR_1 to ERROR_1_CHANGED",
+                "removed enum value ErrorCode.ERROR_2",
+                "added enum value ErrorCode.ERROR_3");
     }
 
     @Test

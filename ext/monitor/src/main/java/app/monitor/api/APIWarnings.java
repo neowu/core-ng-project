@@ -1,4 +1,4 @@
-package app.monitor.job;
+package app.monitor.api;
 
 import core.framework.util.Strings;
 
@@ -29,7 +29,7 @@ public class APIWarnings {
         warnings.removeAll(errors);   // remove warnings if there is same error, e.g. one change is referred by both request/response bean
     }
 
-    String result() {
+    public String result() {
         if (!errors.isEmpty()) return "ERROR";
         if (!warnings.isEmpty()) return "WARN";
         return null;

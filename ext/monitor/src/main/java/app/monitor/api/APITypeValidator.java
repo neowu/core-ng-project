@@ -1,4 +1,4 @@
-package app.monitor.job;
+package app.monitor.api;
 
 import core.framework.internal.web.api.APIType;
 import core.framework.log.Severity;

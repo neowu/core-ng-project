@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public class APIMessageDefinitionResponse {
+public class MessageAPIDefinitionResponse {
     @Property(name = "app")
     public String app;
 

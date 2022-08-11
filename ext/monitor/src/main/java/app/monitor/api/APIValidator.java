@@ -1,4 +1,4 @@
-package app.monitor.job;
+package app.monitor.api;
 
 import core.framework.internal.web.api.APIDefinitionResponse;
 import core.framework.internal.web.api.APIType;
@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 /**
  * @author neo
  */
-class APIValidator {
+public class APIValidator {
     private final Map<String, Operation> previousOperations;
     private final Map<String, Operation> currentOperations;
     private final APITypeValidator typeValidator;
     private final APIWarnings warnings = new APIWarnings();
 
-    APIValidator(APIDefinitionResponse previous, APIDefinitionResponse current) {
+    public APIValidator(APIDefinitionResponse previous, APIDefinitionResponse current) {
         previousOperations = operations(previous);
         currentOperations = operations(current);
         Map<String, APIType> previousTypes = previous.types.stream().collect(Collectors.toMap(type -> type.name, Function.identity()));
@@ -27,7 +27,7 @@ class APIValidator {
         typeValidator = new APITypeValidator(previousTypes, currentTypes, warnings);
     }
 
-    APIWarnings validate() {
+    public APIWarnings validate() {
         validateOperations();
         typeValidator.validateTypes();
         warnings.removeDuplicateWarnings();
