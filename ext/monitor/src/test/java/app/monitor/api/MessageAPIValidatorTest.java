@@ -42,6 +42,17 @@ class MessageAPIValidatorTest {
     }
 
     @Test
+    void addNotNullField() {
+        var validator = new MessageAPIValidator(response("message-api-validator-test/previous.json"),
+            response("message-api-validator-test/add-not-null-field.json"));
+        APIWarnings warnings = validator.validate();
+        assertThat(warnings.result()).isEqualTo("WARN");
+        assertThat(warnings.warnings)
+            .containsExactly("added @NotNull to field CustomerUpdatedMessage.address",
+                "added field CustomerUpdatedMessage.other");
+    }
+
+    @Test
     void renameTopic() {
         var validator = new MessageAPIValidator(response("message-api-validator-test/previous.json"),
             response("message-api-validator-test/rename-topic.json"));
@@ -53,14 +64,15 @@ class MessageAPIValidatorTest {
     }
 
     @Test
-    void addNotNullField() {
+    void removeTopic() {
         var validator = new MessageAPIValidator(response("message-api-validator-test/previous.json"),
-            response("message-api-validator-test/add-not-null-field.json"));
+            response("message-api-validator-test/remove-topic.json"));
         APIWarnings warnings = validator.validate();
         assertThat(warnings.result()).isEqualTo("WARN");
         assertThat(warnings.warnings)
-            .containsExactly("added @NotNull to field CustomerUpdatedMessage.address",
-                "added field CustomerUpdatedMessage.other");
+            .containsExactly("removed message publisher, topic=customer-updated",
+                "removed type Address",
+                "removed type CustomerUpdatedMessage");
     }
 
     private MessageAPIDefinitionResponse response(String path) {
