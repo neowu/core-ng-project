@@ -31,11 +31,11 @@ public class MessageAPIValidator {
     public APIWarnings validate() {
         for (Map.Entry<String, String> entry : previousTopics.entrySet()) {
             String previousTopic = entry.getKey();
-            String previousMessageClass = entry.getValue();
             String currentMessageClass = currentTopics.remove(previousTopic);
             if (currentMessageClass == null) {
                 warnings.add(true, "removed message publisher, topic=" + previousTopic);
             } else {
+                String previousMessageClass = entry.getValue();
                 if (!Strings.equals(previousMessageClass, currentMessageClass)) {
                     warnings.add(true, "renamed message type of {} from {} to {}", previousTopic, previousMessageClass, currentMessageClass);
                 }
