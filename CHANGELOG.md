@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.0.5 (07/28/2022 - )
+### 8.0.5 (07/28/2022 - 08/15/2022)
 
 * mock: fixed MockRedis.list().range(), with negative start or stop
   > only impact unit test
