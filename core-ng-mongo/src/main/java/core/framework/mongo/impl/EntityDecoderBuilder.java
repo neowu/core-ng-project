@@ -63,15 +63,17 @@ final class EntityDecoderBuilder<T> {
             .indent(2).append("String fieldName = reader.readName();\n")
             .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
 
+        builder.indent(2).append("switch (fieldName) {\n");
         for (Field field : Classes.instanceFields(entityClass)) {
-            builder.indent(2).append("if ({}.equals(fieldName)) {\n", variable(mongoField(field)));
+            builder.indent(3).append("case {}: {\n", variable(mongoField(field)));
 
-            String variable = decodeValue(builder, field.getGenericType(), 3);
-            builder.indent(3).append("entity.{} = {};\n", field.getName(), variable);
+            String variable = decodeValue(builder, field.getGenericType(), 4);
+            builder.indent(4).append("entity.{} = {};\n", field.getName(), variable);
 
-            builder.indent(3).append("continue;\n")
-                .indent(2).append("}\n");
+            builder.indent(4).append("continue;\n")
+                .indent(3).append("}\n");
         }
+        builder.indent(2).append("}\n");    // not generate default branch to ignore unmatched field from mongo (to keep backward compatible, e.g. cleanup field)
 
         builder.indent(2).append("logger.warn({}, fieldPath, reader.getCurrentBsonType());\n", variable("undefined field, field={}, type={}"));
         builder.indent(2).append("reader.skipValue();\n");
