@@ -31,7 +31,7 @@ project('core-ng') {
     dependencies {
         api project(':core-ng-api')
         api 'org.slf4j:slf4j-api:1.8.0-beta4'
-        implementation 'org.javassist:javassist:3.28.0-GA'
+        implementation 'org.javassist:javassist:3.29.1-GA'
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'com.squareup.okhttp3:okhttp:4.10.0'
