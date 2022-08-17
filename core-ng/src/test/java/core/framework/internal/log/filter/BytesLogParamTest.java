@@ -47,7 +47,7 @@ class BytesLogParamTest {
         var builder = new StringBuilder();
         param.append(builder, Set.of("password", "passwordConfirm"), 50);
         assertThat(builder.toString())
-                .isEqualTo("{\"field1\":\"value1\",\"password\":\"******\",\"field2\":\"...(truncated)");
+            .isEqualTo("{\"field1\":\"value1\",\"password\":\"******\",\"field2\":\"...(truncated)");
     }
 
     @Test
@@ -63,19 +63,28 @@ class BytesLogParamTest {
         // language=json
         var value = "{\"field1\": \"value1\",\n  \"password\" : \"pass123\",\n  \"field2\": \"value2\"\n}";
         assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
-                .isEqualTo("{\"field1\": \"value1\",\n  \"password\" : \"******\",\n  \"field2\": \"value2\"\n}");
+            .isEqualTo("{\"field1\": \"value1\",\n  \"password\" : \"******\",\n  \"field2\": \"value2\"\n}");
 
         value = "{\"field1\": \"value1\", \"password\": null, \"field2\": null, \"field3\": null}";
         assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
-                .isEqualTo(value);
+            .isEqualTo(value);
 
         value = "{\"field1\": \"value1\", \"password\": {\"field2\": null}}";
         assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
-                .isEqualTo(value);
+            .isEqualTo(value);
 
         value = "{\"field1\": [\"secret1\", \"secret2\", \"secret3\"], \"field2\": \"value\"}";
         assertThat(param.filter(value, Set.of("secret1", "secret2", "secret3")).toString())
-                .isEqualTo(value);
+            .isEqualTo(value);
+    }
+
+    @Test
+    void filterJSONWithNull() {
+        var param = new BytesLogParam(null, null);
+        // language=json
+        var value = "{\"field1\": \"value1\", \"password\": null, \"field2\": \"value2\"}";
+        assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
+            .isEqualTo("{\"field1\": \"value1\", \"password\": null, \"field2\": \"value2\"}");
     }
 
     @Test
@@ -83,7 +92,7 @@ class BytesLogParamTest {
         var param = new BytesLogParam(null, null);
         var value = "{\"field1\": \"value1\", \"password\": \"pass123\", \"passwordConfirm\": \"pass123\", \"field2\": \"value2\", \"nested\": {\"password\": \"pass\\\"123\", \"passwordConfirm\": \"pass123\"}}";
         assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
-                .isEqualTo("{\"field1\": \"value1\", \"password\": \"******\", \"passwordConfirm\": \"******\", \"field2\": \"value2\", \"nested\": {\"password\": \"******\", \"passwordConfirm\": \"******\"}}");
+            .isEqualTo("{\"field1\": \"value1\", \"password\": \"******\", \"passwordConfirm\": \"******\", \"field2\": \"value2\", \"nested\": {\"password\": \"******\", \"passwordConfirm\": \"******\"}}");
     }
 
     @Test
@@ -97,6 +106,6 @@ class BytesLogParamTest {
 
         value = "{\"field1\": \"value1\", \"password\": \"pass123";
         assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
-                .isEqualTo("{\"field1\": \"value1\", \"password\": \"******");
+            .isEqualTo("{\"field1\": \"value1\", \"password\": \"******");
     }
 }
