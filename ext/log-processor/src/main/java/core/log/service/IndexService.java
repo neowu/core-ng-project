@@ -28,7 +28,7 @@ public class IndexService {
         search.putIndexTemplate("event", template("index/event-index-template.json"));
     }
 
-    String indexName(String name, LocalDate now) {
+    public String indexName(String name, LocalDate now) {
         return name + "-" + now.format(indexDateFormatter);
     }
 

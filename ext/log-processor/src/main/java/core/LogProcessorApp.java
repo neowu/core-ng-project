@@ -20,14 +20,11 @@ import core.log.kafka.ActionLogMessageHandler;
 import core.log.kafka.EventMessageHandler;
 import core.log.kafka.StatMessageHandler;
 import core.log.service.ActionLogForwarder;
-import core.log.service.ActionService;
 import core.log.service.EventForwarder;
-import core.log.service.EventService;
 import core.log.service.IndexOption;
 import core.log.service.IndexService;
 import core.log.service.JobConfig;
 import core.log.service.KibanaService;
-import core.log.service.StatService;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -47,10 +44,6 @@ public class LogProcessorApp extends App {
 
         configureIndexOption();
         IndexService indexService = bind(IndexService.class);
-        bind(ActionService.class);
-        bind(StatService.class);
-        bind(EventService.class);
-
         onStartup(indexService::createIndexTemplates);
 
         configureKibanaService();

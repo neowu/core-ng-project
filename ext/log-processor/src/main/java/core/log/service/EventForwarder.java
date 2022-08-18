@@ -1,5 +1,6 @@
 package core.log.service;
 
+import core.framework.kafka.Message;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.EventMessage;
 import core.log.LogForwardConfig;
@@ -26,13 +27,14 @@ public class EventForwarder {
         ignoreErrorCodes = new HashSet<>(forward.ignoreErrorCodes);
     }
 
-    public void forward(List<EventMessage> messages) {
-        for (EventMessage message : messages) {
-            if (apps.contains(message.app)
-                && (results.isEmpty() || results.contains(message.result))
-                && !ignoreActions.contains(message.action)
-                && !ignoreErrorCodes.contains(message.errorCode)) {
-                publisher.publish(message);
+    public void forward(List<Message<EventMessage>> messages) {
+        for (Message<EventMessage> message : messages) {
+            EventMessage value = message.value;
+            if (apps.contains(value.app)
+                && (results.isEmpty() || results.contains(value.result))
+                && !ignoreActions.contains(value.action)
+                && !ignoreErrorCodes.contains(value.errorCode)) {
+                publisher.publish(value);
             }
         }
     }

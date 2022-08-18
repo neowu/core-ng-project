@@ -72,7 +72,7 @@ class MessageListenerThread extends Thread {
                 processRecords(records);
             } catch (Throwable e) {
                 if (!listener.shutdown) {
-                    logger.error("failed to pull message, retry in 10 seconds", e);
+                    logger.error("failed to pull messages, retry in 10 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(10));
                 }
             }
@@ -125,7 +125,7 @@ class MessageListenerThread extends Thread {
             }
         } finally {
             consumer.commitAsync();
-            logger.info("process kafka records, count={}, size={}, elapsed={}", count, size, watch.elapsed());
+            logger.info("process kafka messages, count={}, size={}, elapsed={}", count, size, watch.elapsed());
         }
     }
 

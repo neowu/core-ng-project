@@ -1,5 +1,6 @@
 package core.log.service;
 
+import core.framework.kafka.Message;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.EventMessage;
 import core.log.LogForwardConfig;
@@ -36,7 +37,7 @@ class EventForwarderTest {
     void forward() {
         var message = new EventMessage();
         message.app = "website";
-        forwarder.forward(List.of(message));
+        forwarder.forward(List.of(new Message<>("k1", message)));
 
         verify(publisher).publish(message);
     }
@@ -46,7 +47,7 @@ class EventForwarderTest {
         var message = new EventMessage();
         message.app = "website";
         message.errorCode = "NOT_FOUND";
-        forwarder.forward(List.of(message));
+        forwarder.forward(List.of(new Message<>("k1", message)));
 
         verifyNoInteractions(publisher);
     }

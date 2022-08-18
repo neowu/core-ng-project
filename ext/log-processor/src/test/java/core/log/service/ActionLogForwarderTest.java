@@ -1,5 +1,6 @@
 package core.log.service;
 
+import core.framework.kafka.Message;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.ActionLogMessage;
 import core.log.LogForwardConfig;
@@ -28,7 +29,7 @@ class ActionLogForwarderTest {
         var message = new ActionLogMessage();
         message.app = "website";
         message.traceLog = "trace";
-        forwarder.forward(List.of(message));
+        forwarder.forward(List.of(new Message<>("k1", message)));
         verify(publisher).publish(message);
     }
 
@@ -40,7 +41,7 @@ class ActionLogForwarderTest {
         message.app = "website";
         message.result = "OK";
         message.traceLog = "trace";
-        forwarder.forward(List.of(message));
+        forwarder.forward(List.of(new Message<>("k1", message)));
         verify(publisher).publish(message);
     }
 
@@ -51,7 +52,7 @@ class ActionLogForwarderTest {
         var message = new ActionLogMessage();
         message.app = "website";
         message.result = "WARN";
-        forwarder.forward(List.of(message));
+        forwarder.forward(List.of(new Message<>("k1", message)));
         verifyNoInteractions(publisher);
     }
 
@@ -63,7 +64,7 @@ class ActionLogForwarderTest {
         message.app = "website";
         message.result = "WARN";
         message.errorCode = "NOT_FOUND";
-        forwarder.forward(List.of(message));
+        forwarder.forward(List.of(new Message<>("k1", message)));
         verifyNoInteractions(publisher);
     }
 
@@ -77,7 +78,7 @@ class ActionLogForwarderTest {
         message.app = "website";
         message.result = "OK";
         message.action = "api:get:/ajax/current-customer";
-        forwarder.forward(List.of(message));
+        forwarder.forward(List.of(new Message<>("k1", message)));
         verifyNoInteractions(publisher);
     }
 
