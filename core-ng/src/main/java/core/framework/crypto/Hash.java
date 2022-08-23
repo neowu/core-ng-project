@@ -36,6 +36,14 @@ public final class Hash {
         return sha256Hex(Strings.bytes(value));
     }
 
+    public static String sha512Hex(byte[] value) {
+        return hash(value, "SHA-512");
+    }
+
+    public static String sha512Hex(String value) {
+        return sha512Hex(Strings.bytes(value));
+    }
+
     private static String hash(byte[] value, String algorithm) {
         try {
             MessageDigest md = MessageDigest.getInstance(algorithm);    // lgtm[java/weak-cryptographic-algorithm]

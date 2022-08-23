@@ -5,6 +5,7 @@
 * log-processor: always use bulk index, to simplify
   > ES already unified bulk index / single index thread pool, there is only one "write" pool
   > refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-threadpool.html
+* http: update undertow to 2.2.19
 
 ### 8.0.5 (07/28/2022 - 08/15/2022)
 
