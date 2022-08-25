@@ -1,10 +1,8 @@
 version: "3.1"
 services:
   mongo:
-    image: mongo
-    command: [ "mongod", "--config", "/etc/mongod.conf" ]
-    volumes:
-    - ./mongod.conf:/etc/mongod.conf
+    image: mongo:6
+    command: [ "--dbpath", "/data/db", "--enableFreeMonitoring", "off", "--timeStampFormat", "iso8601-utc" ]
     ports:
     - "27017:27017"
 
