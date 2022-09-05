@@ -5,6 +5,7 @@ import core.framework.util.Exceptions;
 import core.framework.util.Network;
 import org.slf4j.Marker;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
@@ -38,6 +39,7 @@ final class LogEvent {
         return builder.toString();
     }
 
+    @Nullable
     String errorCode() {
         if (marker instanceof ErrorCodeMarker) return marker.getName();
         return null;
@@ -47,11 +49,11 @@ final class LogEvent {
         var now = Instant.now();
         var builder = new StringBuilder(256);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(now))
-               .append(" [").append(Network.LOCAL_HOST_NAME).append("] [").append(Thread.currentThread().getName()).append("] ")
-               .append(level.name())
-               .append(' ')
-               .append(logger)
-               .append(" - ");
+            .append(" [").append(Network.LOCAL_HOST_NAME).append("] [").append(Thread.currentThread().getName()).append("] ")
+            .append(level.name())
+            .append(' ')
+            .append(logger)
+            .append(" - ");
         if (marker != null) builder.append('[').append(marker.getName()).append("] ");
         LogManager.FILTER.append(builder, message, arguments);
         builder.append(System.lineSeparator());
@@ -63,8 +65,7 @@ final class LogEvent {
         appendDuration(builder, time - startTime);
         builder.append(' ');
         if (level != LogLevel.DEBUG) builder.append(level.name()).append(' ');
-        builder.append(logger)
-               .append(" - ");
+        builder.append(logger).append(" - ");
         if (marker != null) builder.append('[').append(marker.getName()).append("] ");
         LogManager.FILTER.append(builder, message, arguments);
         builder.append(System.lineSeparator());

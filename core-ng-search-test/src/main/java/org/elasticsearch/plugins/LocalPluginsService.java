@@ -31,8 +31,8 @@ public class LocalPluginsService extends PluginsService {
                 null,
                 List.of(),
                 false,
-                PluginType.ISOLATED,
-                null,
+                false,
+                false,
                 false);
             plugins.add(new LoadedPlugin(descriptor, plugin, Thread.currentThread().getContextClassLoader(), ModuleLayer.boot()));
         }
