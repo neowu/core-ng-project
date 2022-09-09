@@ -146,6 +146,7 @@ public final class DatabaseImpl implements Database {
             // refer to org.postgresql.PGProperty
             properties.setProperty("connectTimeout", String.valueOf(timeout.toSeconds()));
             properties.setProperty("socketTimeout", String.valueOf(timeout.toSeconds()));
+            properties.setProperty("reWriteBatchedInserts", "true");
         }
         return properties;
     }
