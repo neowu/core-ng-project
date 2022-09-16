@@ -1,0 +1,11 @@
+version: "3"
+services:
+  roach1:
+    image: cockroachdb/cockroach:v22.1.7
+    ports:
+    - 26257:26257
+    - 8080:8080
+    command: [ "start", "--insecure", "--listen-addr=0.0.0.0", "--accept-sql-without-tls", "--join=roach1,roach2,roach3", "--cache=30%" ]
+  roach2:
+    image: cockroachdb/cockroach:v22.1.7
+    command: [ "start", "--insecure", "--listen-addr=0.0.0.0", "--accept-sql-without-tls", "--join=roach1,roach2,roach3", "--cache=30%" ]
