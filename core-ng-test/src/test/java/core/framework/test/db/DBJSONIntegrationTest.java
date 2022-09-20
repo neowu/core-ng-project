@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author neo
  */
-public class DBJSONIntegrationTest extends IntegrationTest {
+class DBJSONIntegrationTest extends IntegrationTest {
     @Inject
     Database database;
     @Inject
