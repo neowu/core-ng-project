@@ -204,7 +204,7 @@ public final class DatabaseImpl implements Database {
     public <T> void view(Class<T> viewClass) {
         var watch = new StopWatch();
         try {
-            new DatabaseClassValidator(viewClass).validateViewClass();
+            new DatabaseClassValidator(viewClass, true).validate();
             registerViewClass(viewClass);
         } finally {
             logger.info("register db view, viewClass={}, elapsed={}", viewClass.getCanonicalName(), watch.elapsed());
@@ -214,7 +214,7 @@ public final class DatabaseImpl implements Database {
     public <T> Repository<T> repository(Class<T> entityClass) {
         var watch = new StopWatch();
         try {
-            new DatabaseClassValidator(entityClass).validateEntityClass();
+            new DatabaseClassValidator(entityClass, false).validate();
             registerViewClass(entityClass);
             return new RepositoryImpl<>(this, entityClass, dialect);
         } finally {

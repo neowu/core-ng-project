@@ -13,4 +13,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface Column {
     String name();
+
+    boolean json() default false;
 }

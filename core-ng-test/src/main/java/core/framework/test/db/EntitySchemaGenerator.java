@@ -50,7 +50,7 @@ public final class EntitySchemaGenerator {
         List<String> statements = Lists.newArrayList();
 
         var builder = new CodeBuilder()
-                .append("CREATE TABLE ");
+            .append("CREATE TABLE ");
         Table table = entityClass.getDeclaredAnnotation(Table.class);
         builder.append(table.name()).append(" (");
 
@@ -61,7 +61,7 @@ public final class EntitySchemaGenerator {
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
 
             builder.append(column.name()).append(' ');
-            builder.append(columnType(field.getType(), field.getDeclaredAnnotation(Size.class)));
+            builder.append(columnType(field.getType(), field.getDeclaredAnnotation(Size.class), column.json()));
 
             if (primaryKey != null) {
                 if (primaryKey.autoIncrement()) builder.append(" AUTO_INCREMENT");
@@ -83,7 +83,8 @@ public final class EntitySchemaGenerator {
     }
 
     // http://dev.mysql.com/doc/connector-j/en/connector-j-reference-type-conversions.html
-    private String columnType(Class<?> fieldClass, Size size) {
+    private String columnType(Class<?> fieldClass, Size size, boolean json) {
+        if (json) return "LONGVARCHAR";
         if (Integer.class.equals(fieldClass)) return "INT";
         if (Long.class.equals(fieldClass)) return "BIGINT";
         if (String.class.equals(fieldClass)) {

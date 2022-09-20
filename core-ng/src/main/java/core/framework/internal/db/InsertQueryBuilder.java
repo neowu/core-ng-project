@@ -25,7 +25,7 @@ class InsertQueryBuilder<T> {
     private final List<String> primaryKeyFieldNames = Lists.newArrayList();
 
     private String generatedColumn;
-    private List<String> paramFieldNames;
+    private List<ParamField> paramFields;
     private String insertSQL;
     private String insertIgnoreSQL;
     private String upsertSQL;
@@ -46,29 +46,31 @@ class InsertQueryBuilder<T> {
     private void buildSQL() {
         List<Field> fields = Classes.instanceFields(entityClass);
         int size = fields.size();
-        paramFieldNames = new ArrayList<>(size);
+        paramFields = new ArrayList<>(size);
         List<String> columns = new ArrayList<>(size);
         List<String> params = new ArrayList<>(size);
         List<String> updates = new ArrayList<>(size);
         for (Field field : fields) {
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
-            String column = field.getDeclaredAnnotation(Column.class).name();
+            Column column = field.getDeclaredAnnotation(Column.class);
+            String columnName = column.name();
             if (primaryKey != null) {
                 if (primaryKey.autoIncrement()) {
-                    generatedColumn = column;
+                    generatedColumn = columnName;
                     continue;
                 }
                 primaryKeyFieldNames.add(field.getName());    // pk fields is only needed for assigned id
             } else {
                 if (dialect == Dialect.MYSQL) {
-                    // since MySQL 8.0.20, VALUES(column) syntax is deprecated, currently gcloud MySQL is still on 8.0.18
-                    updates.add(Strings.format("{} = VALUES({})", column, column));
+                    // VALUES(column) syntax is deprecated since MySQL 8.0.20, this is to keep compatible with old MySQL (gcloud still has 8.0.18)
+                    // will update to new syntax in future
+                    updates.add(Strings.format("{} = VALUES({})", columnName, columnName));
                 } else if (dialect == Dialect.POSTGRESQL) {
-                    updates.add(Strings.format("{} = EXCLUDED.{}", column, column));
+                    updates.add(Strings.format("{} = EXCLUDED.{}", columnName, columnName));
                 }
             }
-            paramFieldNames.add(field.getName());
-            columns.add(column);
+            paramFields.add(new ParamField(field.getName(), column.json()));
+            columns.add(columnName);
             params.add("?");
         }
 
@@ -111,10 +113,14 @@ class InsertQueryBuilder<T> {
             }
         }
 
-        builder.indent(1).append("Object[] params = new Object[{}];\n", paramFieldNames.size());
+        builder.indent(1).append("Object[] params = new Object[{}];\n", paramFields.size());
         int index = 0;
-        for (String name : paramFieldNames) {
-            builder.indent(1).append("params[{}] = entity.{};\n", index, name);
+        for (ParamField field : paramFields) {
+            if (field.json) {
+                builder.indent(1).append("params[{}] = {}.toJSON(entity.{});\n", index, type(DBJSONMapper.class), field.name);
+            } else {
+                builder.indent(1).append("params[{}] = entity.{};\n", index, field.name);
+            }
             index++;
         }
 
@@ -122,5 +128,8 @@ class InsertQueryBuilder<T> {
             .append("}");
 
         return builder.build();
+    }
+
+    private record ParamField(String name, boolean json) {
     }
 }

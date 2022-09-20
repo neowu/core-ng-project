@@ -5,6 +5,7 @@ import core.framework.http.HTTPClient;
 import core.framework.kafka.Message;
 import core.framework.scheduler.Job;
 import core.framework.test.db.TestDBEntity;
+import core.framework.test.db.TestDBEntityWithJSON;
 import core.framework.test.db.TestDBProjection;
 import core.framework.test.db.TestDBView;
 import core.framework.test.inject.TestBean;
@@ -119,6 +120,7 @@ public class TestModule extends AbstractTestModule {
         db().timeout(Duration.ofSeconds(10));
         db().longTransactionThreshold(Duration.ofSeconds(5));
         db().repository(TestDBEntity.class);
+        db().repository(TestDBEntityWithJSON.class);
         db().view(TestDBView.class);
         db().view(TestDBProjection.class);
         initDB().createSchema();

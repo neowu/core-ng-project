@@ -18,6 +18,40 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 public class ClassValidator {
+    public static void validateClass(Class<?> objectClass) {
+        if (objectClass.isPrimitive() || objectClass.getPackageName().startsWith("java") || objectClass.isEnum())
+            throw new Error("class must be bean class, class=" + objectClass.getCanonicalName());
+        if (objectClass.isMemberClass() && !Modifier.isStatic(objectClass.getModifiers()))
+            throw new Error("class must be static, class=" + objectClass.getCanonicalName());
+        if (objectClass.isInterface() || Modifier.isAbstract(objectClass.getModifiers()) || !Modifier.isPublic(objectClass.getModifiers()))
+            throw new Error("class must be public concrete, class=" + objectClass.getCanonicalName());
+        if (!Object.class.equals(objectClass.getSuperclass()))
+            throw new Error("class must not have super class, class=" + objectClass.getCanonicalName());
+
+        Constructor<?>[] constructors = objectClass.getDeclaredConstructors();
+        if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {
+            throw new Error(format("class must have only one public default constructor, class={}, constructors={}", objectClass.getCanonicalName(), Arrays.toString(constructors)));
+        }
+    }
+
+    public static void validateField(Field field) {
+        int modifiers = field.getModifiers();
+        if (!Modifier.isPublic(modifiers))
+            throw new Error("field must be public, field=" + Fields.path(field));
+        if (Modifier.isTransient(modifiers))
+            throw new Error("field must not be transient, field=" + Fields.path(field));
+        if (Modifier.isStatic(modifiers))
+            throw new Error("field must not be static, field=" + Fields.path(field));
+        if (Modifier.isFinal(modifiers))
+            throw new Error("field must not be final, field=" + Fields.path(field));
+
+        Class<?> fieldClass = field.getType();
+        if (Date.class.isAssignableFrom(fieldClass))
+            throw new Error("java.util.Date is not supported, please use java.time instead, field=" + Fields.path(field));
+        if (fieldClass.isPrimitive())
+            throw new Error(format("primitive class is not supported, please use object type, class={}, field={}", fieldClass.getCanonicalName(), Fields.path(field)));
+    }
+
     public final Class<?> instanceClass;
     private final Set<Class<?>> visitedClasses = Sets.newHashSet();
     public Set<Class<?>> allowedValueClasses = Set.of();
@@ -68,12 +102,6 @@ public class ClassValidator {
     }
 
     private void visitValue(Class<?> valueClass, Field owner, String path) {
-        if (Date.class.isAssignableFrom(valueClass))
-            throw new Error("java.util.Date is not supported, please use java.time.LocalDateTime/ZonedDateTime instead, field=" + Fields.path(owner));
-
-        if (valueClass.isPrimitive())
-            throw new Error(format("primitive class is not supported, please use object type, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner)));
-
         if (valueClass.isEnum()) {
             if (visitor != null) visitor.visitEnum(valueClass);
             return; // enum is allowed value type
@@ -120,34 +148,6 @@ public class ClassValidator {
 
         Class<?> valueClass = GenericTypes.listValueClass(listType);
         visitValue(valueClass, owner, path);
-    }
-
-    private void validateClass(Class<?> objectClass) {
-        if (objectClass.isPrimitive() || objectClass.getPackageName().startsWith("java") || objectClass.isEnum())
-            throw new Error("class must be bean class, class=" + objectClass.getCanonicalName());
-        if (objectClass.isMemberClass() && !Modifier.isStatic(objectClass.getModifiers()))
-            throw new Error("class must be static, class=" + objectClass.getCanonicalName());
-        if (objectClass.isInterface() || Modifier.isAbstract(objectClass.getModifiers()) || !Modifier.isPublic(objectClass.getModifiers()))
-            throw new Error("class must be public concrete, class=" + objectClass.getCanonicalName());
-        if (!Object.class.equals(objectClass.getSuperclass()))
-            throw new Error("class must not have super class, class=" + objectClass.getCanonicalName());
-
-        Constructor<?>[] constructors = objectClass.getDeclaredConstructors();
-        if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {
-            throw new Error(format("class must have only one public default constructor, class={}, constructors={}", objectClass.getCanonicalName(), Arrays.toString(constructors)));
-        }
-    }
-
-    private void validateField(Field field) {
-        int modifiers = field.getModifiers();
-        if (!Modifier.isPublic(modifiers))
-            throw new Error("field must be public, field=" + Fields.path(field));
-        if (Modifier.isTransient(modifiers))
-            throw new Error("field must not be transient, field=" + Fields.path(field));
-        if (Modifier.isStatic(modifiers))
-            throw new Error("field must not be static, field=" + Fields.path(field));
-        if (Modifier.isFinal(modifiers))
-            throw new Error("field must not be final, field=" + Fields.path(field));
     }
 
     private String path(String parent, String field) {

@@ -11,5 +11,3 @@
 
 * use adminClient to check kafka ready? or retry sending message?
 * mongo: monitor thru mongo command, db.stats()?
-
-* db: support json column (syntax sugar of String<->JSON)
