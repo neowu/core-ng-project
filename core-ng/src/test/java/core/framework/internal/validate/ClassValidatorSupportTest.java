@@ -51,9 +51,15 @@ class ClassValidatorSupportTest {
     }
 
     public static class TestBean {
-        public static String staticField;
-        public final String finalField = "value";
+        @SuppressWarnings("PMD.MutableStaticState")
+        static String staticField;
 
+        static void setStaticField(String staticField) {
+            TestBean.staticField = staticField;
+        }
+
+        @SuppressWarnings("PMD.FinalFieldCouldBeStatic")
+        public final String finalField = "value";
         public int intField;
         public transient String transientField;
         String nonPublicField;
@@ -63,7 +69,10 @@ class ClassValidatorSupportTest {
     }
 
     public static class TestClassWithoutDefaultConstructor {
-        public TestClassWithoutDefaultConstructor(String value) {
+        final String value;
+
+        TestClassWithoutDefaultConstructor(String value) {
+            this.value = value;
         }
     }
 }

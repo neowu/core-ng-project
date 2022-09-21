@@ -49,12 +49,12 @@ public final class ClassValidatorSupport {
 
     void validateField(Field field) {
         int modifiers = field.getModifiers();
+        if (Modifier.isStatic(modifiers))
+            throw new Error("field must not be static, field=" + Fields.path(field));
         if (!Modifier.isPublic(modifiers))
             throw new Error("field must be public, field=" + Fields.path(field));
         if (Modifier.isTransient(modifiers))
             throw new Error("field must not be transient, field=" + Fields.path(field));
-        if (Modifier.isStatic(modifiers))
-            throw new Error("field must not be static, field=" + Fields.path(field));
         if (Modifier.isFinal(modifiers))
             throw new Error("field must not be final, field=" + Fields.path(field));
 
