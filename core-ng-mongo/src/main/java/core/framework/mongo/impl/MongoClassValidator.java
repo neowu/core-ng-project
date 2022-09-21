@@ -37,7 +37,6 @@ public final class MongoClassValidator implements ClassVisitor {
         validator.allowedValueClasses = Set.of(ObjectId.class, String.class, Boolean.class,
             Integer.class, Long.class, Double.class, BigDecimal.class,
             LocalDateTime.class, ZonedDateTime.class, LocalDate.class);
-        validator.allowChild = true;
         validator.visitor = this;
     }
 

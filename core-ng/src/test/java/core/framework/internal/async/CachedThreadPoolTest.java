@@ -32,14 +32,15 @@ class CachedThreadPoolTest {
 
     @Test
     void threadName() throws ExecutionException, InterruptedException {
-        Future<?> future = pool.submit(() -> assertThat(Thread.currentThread().getName()).isEqualTo("test-cached-pool-1"));
-        future.get();
+        pool.submit(() -> assertThat(Thread.currentThread().getName()).isEqualTo("test-cached-pool-1"))
+            .get();
+
         List<Future<Object>> futures = unlimitedPool.invokeAll(List.of(
-            () -> assertThat(Thread.currentThread().getName()).isEqualTo("test-unlimited-cached-pool-1"),
-            () -> assertThat(Thread.currentThread().getName()).isEqualTo("test-unlimited-cached-pool-2")
+            () -> assertThat(Thread.currentThread().getName()).startsWith("test-unlimited-cached-pool-"),
+            () -> assertThat(Thread.currentThread().getName()).startsWith("test-unlimited-cached-pool-")
         ));
-        for (Future<?> result : futures) {
-            result.get();
+        for (Future<?> future : futures) {
+            future.get();
         }
     }
 }

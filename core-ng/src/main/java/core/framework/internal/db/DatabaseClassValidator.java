@@ -10,11 +10,10 @@ import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.reflect.Classes;
 import core.framework.internal.reflect.Fields;
 import core.framework.internal.reflect.GenericTypes;
-import core.framework.internal.validate.ClassValidator;
+import core.framework.internal.validate.ClassValidatorSupport;
 import core.framework.util.Sets;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,6 +28,7 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 final class DatabaseClassValidator {
+    private final ClassValidatorSupport support = new ClassValidatorSupport();
     private final Class<?> entityClass;
     private final Set<Class<?>> allowedValueClasses = Set.of(String.class, Boolean.class,
         Integer.class, Long.class, Double.class, BigDecimal.class,
@@ -37,7 +37,7 @@ final class DatabaseClassValidator {
     private final boolean isView;
     private boolean foundPrimaryKey;
     private boolean foundAutoIncrementalPrimaryKey;
-    private Object entityWithDefaultValue;
+    private Object defaultObject;
 
     DatabaseClassValidator(Class<?> entityClass, boolean isView) {
         this.entityClass = entityClass;
@@ -45,7 +45,7 @@ final class DatabaseClassValidator {
     }
 
     void validate() {
-        ClassValidator.validateClass(entityClass);
+        support.validateClass(entityClass);
 
         boolean foundTable = entityClass.isAnnotationPresent(Table.class);
         if (isView && foundTable)
@@ -53,25 +53,24 @@ final class DatabaseClassValidator {
         else if (!isView && !foundTable)
             throw new Error("db entity class must have @Table, class=" + entityClass.getCanonicalName());
 
-        try {
-            entityWithDefaultValue = entityClass.getDeclaredConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new Error(e);
-        }
+        initializeDefaultObject();
 
-        validateClass();
+        validateFields();
 
         if (!isView && !foundPrimaryKey)
             throw new Error("db entity class must have @PrimaryKey, class=" + entityClass.getCanonicalName());
     }
 
-    private void validateClass() {
-        Field[] fields = entityClass.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.isSynthetic()) continue;  // ignore dynamic/generated field, e.g. jacoco
-            if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers())) continue;  // ignore all static final field
+    private void initializeDefaultObject() {
+        try {
+            defaultObject = entityClass.getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw new Error(e);
+        }
+    }
 
-            ClassValidator.validateField(field);
+    private void validateFields() {
+        for (Field field : support.declaredFields(entityClass)) {
             Column column = validateAnnotations(field);
             if (column.json()) {
                 validateJSONField(field);
@@ -81,7 +80,7 @@ final class DatabaseClassValidator {
 
             try {
                 // entity constructed by "new" with default value will break partialUpdate accidentally, due to fields are not null will be updated to db
-                if (!isView && field.get(entityWithDefaultValue) != null)
+                if (!isView && field.get(defaultObject) != null)
                     throw new Error("db entity field must not have default value, field=" + Fields.path(field));
             } catch (ReflectiveOperationException e) {
                 throw new Error(e);

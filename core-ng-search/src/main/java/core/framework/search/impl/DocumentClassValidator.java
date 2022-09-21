@@ -33,7 +33,7 @@ final class DocumentClassValidator extends JSONClassValidator {
 
         try {
             Object defaultObject = defaultObject(field);
-            // document constructed by "new" with default value will break partialUpdate accidentally, due to fields are not null will be updated to db
+            // document constructed by "new" with default value will break partialUpdate accidentally, due to fields are not null will be updated to es
             if (field.get(defaultObject) != null)
                 throw new Error("document field must not have default value, field=" + Fields.path(field));
         } catch (ReflectiveOperationException e) {

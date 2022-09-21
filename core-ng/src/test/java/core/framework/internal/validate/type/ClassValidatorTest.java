@@ -33,7 +33,6 @@ class ClassValidatorTest {
     void validate() {
         var validator = new ClassValidator(TestBean.class);
         validator.allowedValueClasses = Set.of(String.class, Integer.class);
-        validator.allowChild = true;
         validator.validate();
     }
 
@@ -41,7 +40,6 @@ class ClassValidatorTest {
     void validateMapList() {
         var validator = new ClassValidator(TestBean.class);
         validator.allowedValueClasses = Set.of(String.class);
-        validator.allowChild = true;
         assertThatThrownBy(validator::validate)
             .isInstanceOf(Error.class)
             .hasMessageContaining("map list value class is not supported");
