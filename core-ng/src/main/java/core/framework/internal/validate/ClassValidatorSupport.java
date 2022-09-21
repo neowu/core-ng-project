@@ -27,8 +27,8 @@ public final class ClassValidatorSupport {
             throw new Error("class must not have super class, class=" + objectClass.getCanonicalName());
 
         Constructor<?>[] constructors = objectClass.getDeclaredConstructors();
-        if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {
-            throw new Error(format("class must have only one public default constructor, class={}, constructors={}", objectClass.getCanonicalName(), Arrays.toString(constructors)));
+        if (constructors.length > 1 || constructors[0].getParameterCount() > 0 || !Modifier.isPublic(constructors[0].getModifiers())) {
+            throw new Error(format("class must only have public default constructor, class={}, constructors={}", objectClass.getCanonicalName(), Arrays.toString(constructors)));
         }
     }
 
@@ -47,7 +47,7 @@ public final class ClassValidatorSupport {
         return results;
     }
 
-    private void validateField(Field field) {
+    void validateField(Field field) {
         int modifiers = field.getModifiers();
         if (!Modifier.isPublic(modifiers))
             throw new Error("field must be public, field=" + Fields.path(field));
