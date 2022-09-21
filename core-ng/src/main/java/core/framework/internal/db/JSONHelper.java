@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 /**
  * @author neo
  */
-public final class DBJSONMapper {
+public final class JSONHelper {
     // support null, doesn't need validator, validation will be done by EntityClass validator (validator checks all cascaded fields)
 
     // used by core.framework.internal.db.InsertQueryBuilder

@@ -67,7 +67,7 @@ final class RowMapperBuilder<T> {
             } else if (BigDecimal.class.equals(fieldClass)) {
                 builder.indent(1).append("entity.{} = resultSet.getBigDecimal(\"{}\");\n", fieldName, columnName);
             } else if (column.json()) {
-                builder.indent(1).append("entity.{} = ({}) {}.fromJSON(resultSet.getString(\"{}\"), {});\n", fieldName, type(field.getType()), type(DBJSONMapper.class), columnName, variable(field.getGenericType()));
+                builder.indent(1).append("entity.{} = ({}) {}.fromJSON(resultSet.getString(\"{}\"), {});\n", fieldName, type(field.getType()), type(JSONHelper.class), columnName, variable(field.getGenericType()));
             }
         }
         builder.indent(1).append("return entity;\n");

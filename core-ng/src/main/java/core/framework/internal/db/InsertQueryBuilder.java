@@ -117,7 +117,7 @@ class InsertQueryBuilder<T> {
         int index = 0;
         for (ParamField field : paramFields) {
             if (field.json) {
-                builder.indent(1).append("params[{}] = {}.toJSON(entity.{});\n", index, type(DBJSONMapper.class), field.name);
+                builder.indent(1).append("params[{}] = {}.toJSON(entity.{});\n", index, type(JSONHelper.class), field.name);
             } else {
                 builder.indent(1).append("params[{}] = entity.{};\n", index, field.name);
             }

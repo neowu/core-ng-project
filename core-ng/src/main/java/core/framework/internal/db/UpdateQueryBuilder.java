@@ -60,7 +60,7 @@ class UpdateQueryBuilder<T> {
                 .indent(2).append("sql.append(\"{} = ?\");\n", column.name());
 
             if (column.json()) {
-                builder.indent(2).append("params.add({}.toJSON(entity.{}));\n", type(DBJSONMapper.class), field.getName());
+                builder.indent(2).append("params.add({}.toJSON(entity.{}));\n", type(JSONHelper.class), field.getName());
             } else {
                 builder.indent(2).append("params.add(entity.{});\n", field.getName());
             }
