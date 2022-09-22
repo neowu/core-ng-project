@@ -10,6 +10,8 @@
 * db: support json column via @Column(json=true)
   > syntax sugar to simplify custom getter and setter to convert between String column and Bean
 * kafka: update to 3.2.3
+* mongo: json @Property should not be used on mongo entity class
+  > same like db, view and entity should be separated
 
 ### 8.0.5 (07/28/2022 - 08/15/2022)
 

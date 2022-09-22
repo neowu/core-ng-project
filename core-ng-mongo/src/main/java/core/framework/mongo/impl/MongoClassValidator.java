@@ -67,9 +67,13 @@ public final class MongoClassValidator implements ClassVisitor {
             core.framework.mongo.Field mongoField = field.getDeclaredAnnotation(core.framework.mongo.Field.class);
             if (mongoField == null)
                 throw new Error("mongo entity field must have @Field, field=" + Fields.path(field));
-            String mongoFieldName = mongoField.name();
+
+            Property property = field.getDeclaredAnnotation(Property.class);
+            if (property != null)
+                throw new Error("mongo entity field must not have json annotation, please separate view and entity, field=" + Fields.path(field));
 
             Set<String> fields = this.fields.computeIfAbsent(parentPath, key -> Sets.newHashSet());
+            String mongoFieldName = mongoField.name();
             if (fields.contains(mongoFieldName)) {
                 throw new Error(format("found duplicate field, field={}, mongoField={}", Fields.path(field), mongoFieldName));
             }
