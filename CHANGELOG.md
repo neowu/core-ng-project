@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.0.6-b1 (08/16/2022 - )
+### 8.0.6 (08/16/2022 - 09/23/2022)
 
 * log-processor: always use bulk index, to simplify
   > ES already unified bulk index / single index thread pool, there is only one "write" pool
@@ -12,6 +12,7 @@
 * kafka: update to 3.2.3
 * mongo: json @Property should not be used on mongo entity class
   > same like db, view and entity should be separated
+* db: mysql jdbc driver updated to 8.0.30
 
 ### 8.0.5 (07/28/2022 - 08/15/2022)
 

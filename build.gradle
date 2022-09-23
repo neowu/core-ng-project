@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '8.0.6-b1'
+    version = '8.0.6'
 
     repositories {
         maven {
@@ -16,11 +16,11 @@ subprojects {
 
 def elasticVersion = '8.4.1'
 def kafkaVersion = '3.2.3'
-def jacksonVersion = '2.13.3'
+def jacksonVersion = '2.13.4'
 def junitVersion = '5.9.0'
-def mockitoVersion = '4.6.1'
+def mockitoVersion = '4.8.0'
 def assertjVersion = '3.23.1'
-def mysqlVersion = '8.0.29'
+def mysqlVersion = '8.0.30'
 
 project('core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
