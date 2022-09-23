@@ -1,5 +1,10 @@
 ## Change log
 
+### 8.0.7 (09/23/2022 - )
+
+* ext: updated dockerfile for security compliance
+  > in order to enable kube "securityContext.runAsNonRoot: true", docker image should use numeric user (UID)
+
 ### 8.0.6 (08/16/2022 - 09/23/2022)
 
 * log-processor: always use bulk index, to simplify
