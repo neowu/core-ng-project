@@ -1,7 +1,7 @@
 version: "3"
 services:
   kafka:
-    image: neowu/kafka:3.2.0-kraft
+    image: neowu/kafka:3.2.3-kraft
     ports:
     - 9092:9092
     - 1099:1099
@@ -23,13 +23,13 @@ services:
 #    - ZOO_DATA_LOG_DIR=/datalog
 #    - ZOO_ADMINSERVER_ENABLED=false
 #  kafka:
-#    image: neowu/kafka:3.2.0
+#    image: neowu/kafka:3.2.3
 #    ports:
 #    - 9092:9092
 #    - 1099:1099
 #    environment:
 #    - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.rmi.port=1099 -Djava.rmi.server.hostname=kafka
 #    - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
-#    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://localhost:9092 --override num.partitions=3
+#    - KAFKA_ARGS=--override zookeeper.connect=zookeeper:2181 --override advertised.listeners=PLAINTEXT://kafka:9092 --override num.partitions=3
 #    depends_on:
 #    - zookeeper

@@ -327,6 +327,8 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
 
     @Override
     public long bulkDelete(List<?> ids) {
+        if (ids == null || ids.isEmpty()) throw new Error("ids must not be empty");
+
         var watch = new StopWatch();
         int size = ids.size();
         int deletedRows = 0;
