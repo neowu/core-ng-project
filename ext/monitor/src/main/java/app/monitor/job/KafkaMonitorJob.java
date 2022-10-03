@@ -95,7 +95,7 @@ public class KafkaMonitorJob implements Job {
             diskUsed += size;
         }
         stats.put("kafka_disk_used", diskUsed);
-        boolean highUsage = stats.checkHighUsage(diskUsed, highDiskSizeThreshold, "disk");
+        boolean highUsage = stats.checkHighUsage((double) diskUsed / highDiskSizeThreshold, 1.0, "disk");
         if (highUsage) {
             stats.severity = Severity.ERROR;
         }

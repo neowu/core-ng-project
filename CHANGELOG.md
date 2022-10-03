@@ -4,6 +4,8 @@
 
 * ext: updated dockerfile for security compliance
   > in order to enable kube "securityContext.runAsNonRoot: true", docker image should use numeric user (UID)
+* monitor: fixed kafka high disk alert message
+  > kafka disk usage uses size as threshold, alert message should convert to percentage
 
 ### 8.0.6 (08/16/2022 - 09/23/2022)
 

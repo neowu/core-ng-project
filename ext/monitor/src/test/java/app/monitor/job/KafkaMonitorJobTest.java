@@ -39,6 +39,7 @@ class KafkaMonitorJobTest {
     @BeforeEach
     void createKafkaMonitorJob() {
         job = new KafkaMonitorJob(jmxClient, "kafka", "localhost", publisher);
+        job.highDiskSizeThreshold = 10_000_000;
     }
 
     @Test
@@ -56,14 +57,17 @@ class KafkaMonitorJobTest {
         when(connection.getAttribute(KafkaMonitorJob.BYTES_IN_RATE_BEAN, "OneMinuteRate")).thenReturn(10D);
         ObjectName sizeBean = objectName("kafka.log:type=Log,name=Size,topic=product-updated,partition=0");
         when(connection.queryNames(KafkaMonitorJob.LOG_SIZE_BEAN, null)).thenReturn(Set.of(sizeBean));
-        when(connection.getAttribute(sizeBean, "Value")).thenReturn(1000L);
+        when(connection.getAttribute(sizeBean, "Value")).thenReturn(12_000_000L);
 
         Stats stats = job.collect(connection);
         assertThat(stats.stats).containsKeys("kafka_heap_used", "kafka_heap_max", "kafka_non_heap_used",
-            "kafka_gc_young_count", "kafka_gc_young_elapsed",
-            "kafka_gc_old_count", "kafka_gc_old_elapsed",
-            "kafka_bytes_out_rate", "kafka_bytes_in_rate")
-            .containsEntry("kafka_disk_used", 1000.0);
+                "kafka_gc_young_count", "kafka_gc_young_elapsed",
+                "kafka_gc_old_count", "kafka_gc_old_elapsed",
+                "kafka_bytes_out_rate", "kafka_bytes_in_rate")
+            .containsEntry("kafka_disk_used", 12_000_000.0);
+
+        assertThat(stats.errorCode).isEqualTo("HIGH_DISK_USAGE");
+        assertThat(stats.errorMessage).isEqualTo("disk usage is too high, usage=120%");
     }
 
     @Test
