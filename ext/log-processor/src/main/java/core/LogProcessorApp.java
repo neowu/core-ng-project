@@ -10,12 +10,14 @@ import core.framework.log.message.StatMessage;
 import core.framework.module.App;
 import core.framework.module.KafkaConfig;
 import core.framework.search.module.SearchConfig;
+import core.log.LogFilterConfig;
 import core.log.LogForwardConfig;
 import core.log.domain.ActionDocument;
 import core.log.domain.EventDocument;
 import core.log.domain.StatDocument;
 import core.log.domain.TraceDocument;
 import core.log.job.CleanupOldIndexJob;
+import core.log.kafka.ActionFilter;
 import core.log.kafka.ActionLogMessageHandler;
 import core.log.kafka.EventMessageHandler;
 import core.log.kafka.StatMessageHandler;
@@ -48,7 +50,8 @@ public class LogProcessorApp extends App {
 
         configureKibanaService();
         Forwarders forwarders = configureLogForwarders();
-        configureKafka(forwarders);
+        ActionFilter actionFilter = configureActionFilter();
+        configureKafka(forwarders, actionFilter);
         configureJob();
 
         load(new DiagramModule());
@@ -71,13 +74,13 @@ public class LogProcessorApp extends App {
         bind(option);
     }
 
-    private void configureKafka(Forwarders forwarders) {
+    private void configureKafka(Forwarders forwarders, ActionFilter filter) {
         kafka().uri(requiredProperty("sys.kafka.uri"));
         kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get at least 1M message
         kafka().maxPoll(2000, 3 * 1024 * 1024);     // get 3M message at max
 
-        kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(new ActionLogMessageHandler(forwarders.action)));
+        kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(new ActionLogMessageHandler(forwarders.action, filter)));
         kafka().subscribe(LogTopics.TOPIC_STAT, StatMessage.class, bind(StatMessageHandler.class));
         kafka().subscribe(LogTopics.TOPIC_EVENT, EventMessage.class, bind(new EventMessageHandler(forwarders.event)));
     }
@@ -122,6 +125,16 @@ public class LogProcessorApp extends App {
             }
         }
         return forwarders;
+    }
+
+    private ActionFilter configureActionFilter() {
+        String configValue = property("app.log.filter.config").orElse(null);
+        if (configValue != null) {
+            Bean.register(LogFilterConfig.class);
+            LogFilterConfig config = Bean.fromJSON(LogFilterConfig.class, configValue);
+            if (config.action != null) return new ActionFilter(config.action);
+        }
+        return null;
     }
 
     static class Forwarders {

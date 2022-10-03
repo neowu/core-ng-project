@@ -1,0 +1,7 @@
+{
+  "action": {
+    "ignoreTrace": [
+      {"apps": ["website"], "errorCodes": ["REQUEST_BLOCKED"]}
+    ]
+  }
+}

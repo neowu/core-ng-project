@@ -12,6 +12,7 @@ import core.log.domain.TraceDocument;
 import core.log.service.ActionLogForwarder;
 import core.log.service.IndexService;
 
+import javax.annotation.Nullable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,10 @@ import java.util.Map;
  * @author neo
  */
 public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMessage> {
+    @Nullable
     final ActionLogForwarder forwarder;
+    @Nullable
+    final ActionFilter filter;
 
     @Inject
     IndexService indexService;
@@ -29,8 +33,9 @@ public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMess
     @Inject
     ElasticSearchType<TraceDocument> traceType;
 
-    public ActionLogMessageHandler(ActionLogForwarder forwarder) {
+    public ActionLogMessageHandler(@Nullable ActionLogForwarder forwarder, @Nullable ActionFilter filter) {
         this.forwarder = forwarder;
+        this.filter = filter;
     }
 
     @Override
@@ -46,7 +51,7 @@ public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMess
         for (Message<ActionLogMessage> message : messages) {
             ActionLogMessage value = message.value;
             actions.put(value.id, action(value));
-            if (value.traceLog != null) {
+            if (value.traceLog != null && (filter == null || !filter.ignoreTrace(value))) {
                 traces.put(value.id, trace(value));
             }
         }

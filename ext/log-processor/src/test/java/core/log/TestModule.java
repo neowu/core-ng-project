@@ -13,6 +13,7 @@ public class TestModule extends AbstractTestModule {
     @Override
     protected void initialize() {
         System.setProperty("app.log.forward.config", ClasspathResources.text("forward.json"));
+        System.setProperty("app.log.filter.config", ClasspathResources.text("filter.json"));
         load(new LogProcessorApp());
 
         config(InitSearchConfig.class); // init es client in order to call index service

@@ -21,6 +21,7 @@ import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static core.framework.search.query.Queries.match;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,7 +72,7 @@ class ActionLogMessageHandlerTest extends IntegrationTest {
         assertThat(action.performanceStats.get("redis")).usingRecursiveComparison().isEqualTo(message1.performanceStats.get("redis"));
         assertThat(action.context).containsEntry("key", List.of("value"));
 
-        TraceDocument trace = trace(now, message2.id);
+        TraceDocument trace = trace(now, message2.id).orElseThrow();
         assertThat(trace.content).isEqualTo(message2.traceLog);
 
         String index = indexService.indexName("action", now);
@@ -85,13 +86,32 @@ class ActionLogMessageHandlerTest extends IntegrationTest {
 
     @Test
     void indexWithDifferentDateFormatValues() {
-        ActionLogMessage message = message("1", "OK");
+        ActionLogMessage message = message("3", "OK");
         // instant.toString() outputs without nano fraction if nano is 0, refer to java.time.format.DateTimeFormatter.ISO_INSTANT
         message.date = ZonedDateTime.now().withNano(0).toInstant();
         handler.handle(List.of(new Message<>("k1", message)));
 
         message.date = ZonedDateTime.now().withNano(123456).toInstant();
         handler.handle(List.of(new Message<>("k1", message)));
+    }
+
+    @Test
+    void indexWithoutTrace() {
+        LocalDate now = LocalDate.of(2022, Month.OCTOBER, 3);
+
+        ActionLogMessage message1 = message("4", "WARN");
+        message1.app = "website";
+        message1.errorCode = "NOT_FOUND";
+        message1.traceLog = "trace";
+
+        ActionLogMessage message2 = message("5", "WARN");
+        message2.app = "website";
+        message2.errorCode = "REQUEST_BLOCKED";
+        message2.traceLog = "trace";
+
+        handler.index(List.of(new Message<>("k1", message1), new Message<>("k2", message2)), now);
+        assertThat(trace(now, message1.id)).isNotEmpty();
+        assertThat(trace(now, message2.id)).isEmpty();
     }
 
     private ActionDocument action(LocalDate now, String id) {
@@ -101,11 +121,11 @@ class ActionLogMessageHandlerTest extends IntegrationTest {
         return actionType.get(request).orElseThrow(() -> new Error("not found"));
     }
 
-    private TraceDocument trace(LocalDate now, String id) {
+    private Optional<TraceDocument> trace(LocalDate now, String id) {
         var request = new GetRequest();
         request.index = indexService.indexName("trace", now);
         request.id = id;
-        return traceType.get(request).orElseThrow(() -> new Error("not found"));
+        return traceType.get(request);
     }
 
     private ActionLogMessage message(String id, String result) {
