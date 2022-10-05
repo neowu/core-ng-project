@@ -1,7 +1,7 @@
 {
   "action": {
     "ignoreTrace": [
-      {"apps": ["website"], "errorCodes": ["REQUEST_BLOCKED"]}
+      {"apps": ["website"], "errorCodes": ["SECURITY_THREAT"]}
     ]
   }
 }

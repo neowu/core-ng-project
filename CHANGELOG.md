@@ -8,16 +8,8 @@
   > kafka disk usage uses size as threshold, alert message should convert to percentage
 * log-processor: support action log trace filter
   > to filter out trace to reduce storage, e.g. under massive scanning
-  > under kube, e.g.
-  > - name: APP_FILTER_CONFIG
-      value: |
-      {
-      "action": {
-      "ignoreTrace": [
-      {"apps": ["website"], "errorCodes": ["REQUEST_BLOCKED"]}
-      ]
-      }
-      }
+* kafka: update to 3.3.1
+  > kraft mode is production ready
 
 ### 8.0.6 (08/16/2022 - 09/23/2022)
 

@@ -26,7 +26,7 @@ class ActionFilterTest {
         var message = new ActionLogMessage();
         message.app = "website";
         assertThat(filter.ignoreTrace(message)).isFalse();
-        message.errorCode = "REQUEST_BLOCKED";
+        message.errorCode = "SECURITY_THREAT";
         assertThat(filter.ignoreTrace(message)).isTrue();
         message.errorCode = "NOT_FOUND";
         assertThat(filter.ignoreTrace(message)).isFalse();

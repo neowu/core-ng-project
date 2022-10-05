@@ -106,7 +106,7 @@ class ActionLogMessageHandlerTest extends IntegrationTest {
 
         ActionLogMessage message2 = message("5", "WARN");
         message2.app = "website";
-        message2.errorCode = "REQUEST_BLOCKED";
+        message2.errorCode = "SECURITY_THREAT";
         message2.traceLog = "trace";
 
         handler.index(List.of(new Message<>("k1", message1), new Message<>("k2", message2)), now);
