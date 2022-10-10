@@ -1,5 +1,10 @@
 ## Change log
 
+### 8.0.8 (10/10/2022 - )
+
+* ext: update log-collector default sys.http.maxForwardedIPs to 2
+  > to keep consistent with framework default values, use ENV to override if needed
+
 ### 8.0.7 (09/23/2022 - 10/05/2022)
 
 * ext: updated dockerfile for security compliance
