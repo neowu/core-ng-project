@@ -71,6 +71,19 @@ class ClientIPParserTest {
         assertInvalidNode("192.0.2:43");
     }
 
+    @Test
+    void hasMoreThanMaxForwardedIPs() {
+        parser.maxForwardedIPs = 1;
+        assertThat(parser.hasMoreThanMaxForwardedIPs(null)).isFalse();
+        assertThat(parser.hasMoreThanMaxForwardedIPs("10.0.0.1")).isFalse();
+        assertThat(parser.hasMoreThanMaxForwardedIPs("10.0.0.1, 10.0.0.2")).isTrue();
+
+        parser.maxForwardedIPs = 2;
+        assertThat(parser.hasMoreThanMaxForwardedIPs(" ")).isFalse();
+        assertThat(parser.hasMoreThanMaxForwardedIPs("10.0.0.1, 10.0.0.2")).isFalse();
+        assertThat(parser.hasMoreThanMaxForwardedIPs("10.0.0.1, 10.0.0.2, 10.0.0.3")).isTrue();
+    }
+
     private void assertInvalidNode(String node) {
         assertThatThrownBy(() -> parser.extractIP(node))
             .isInstanceOf(BadRequestException.class)

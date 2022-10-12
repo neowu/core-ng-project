@@ -104,6 +104,9 @@ public final class RequestParser {
         String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
         request.clientIP = clientIPParser.parse(remoteAddress, xForwardedFor);
         actionLog.context.put("client_ip", List.of(request.clientIP));
+        if (clientIPParser.hasMoreThanMaxForwardedIPs(xForwardedFor)) {
+            actionLog.context.put("x_forwarded_for", List.of(xForwardedFor));
+        }
         logger.debug("[request] remoteAddress={}, clientIP={}", remoteAddress, request.clientIP);
     }
 

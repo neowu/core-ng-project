@@ -1,9 +1,11 @@
 ## Change log
 
-### 8.0.8 (10/10/2022 - )
+### 8.0.8-b0 (10/10/2022 - )
 
 * ext: update log-collector default sys.http.maxForwardedIPs to 2
   > to keep consistent with framework default values, use ENV to override if needed
+* http: if x-forwarded-for header has more ip than maxForwardedIPs, put x-forwarded-for in action log context
+  > for request passes thru http forward proxy, or x-forwarded-for spoofing, log complete chain for troubleshooting
 
 ### 8.0.7 (09/23/2022 - 10/05/2022)
 
