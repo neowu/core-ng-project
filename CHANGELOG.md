@@ -6,6 +6,8 @@
   > to keep consistent with framework default values, use ENV to override if needed
 * http: if x-forwarded-for header has more ip than maxForwardedIPs, put x-forwarded-for in action log context
   > for request passes thru http forward proxy, or x-forwarded-for spoofing, log complete chain for troubleshooting
+* http: handle http request with empty path
+  > browser or regular http client won't send empty path, only happens by client sends raw http request
 
 ### 8.0.7 (09/23/2022 - 10/05/2022)
 

@@ -55,6 +55,9 @@ public final class RequestParser {
         String method = exchange.getRequestMethod().toString();
         actionLog.context.put("method", List.of(method));
 
+        String path = exchange.getRequestPath();
+        request.path = path.length() == 0 ? "/" : path; // according to https://www.rfc-editor.org/rfc/rfc2616#section-5.1.2, empty path must be normalized as '/'
+
         request.requestURL = requestURL(request, exchange);
         putContext(actionLog, "request_url", request.requestURL);   // record request url even if attacker passes long string
         logger.debug("[request] method={}, requestURL={}", method, request.requestURL);

