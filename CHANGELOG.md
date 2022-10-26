@@ -8,6 +8,10 @@
   > for request passes thru http forward proxy, or x-forwarded-for spoofing, log complete chain for troubleshooting
 * http: handle http request with empty path
   > browser or regular http client won't send empty path, only happens by client sends raw http request
+* http: update undertow to 2.3.0
+* db: update mysql driver to 8.0.31
+  > mysql maven group updated, it is 'com.mysql:mysql-connector-j:8.0.31'
+* log: update slf4j api to 2.0.3
 
 ### 8.0.7 (09/23/2022 - 10/05/2022)
 

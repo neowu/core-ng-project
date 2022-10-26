@@ -16,6 +16,6 @@ class DefaultLoggerServiceProviderTest {
         assertThat(provider.getLoggerFactory()).isNotNull();
         assertThat(provider.getMarkerFactory()).isNotNull();
         assertThat(provider.getMDCAdapter()).isNotNull();
-        assertThat(provider.getRequesteApiVersion()).isEqualTo("1.8");
+        assertThat(provider.getRequestedApiVersion()).isEqualTo("2.0.3");
     }
 }
