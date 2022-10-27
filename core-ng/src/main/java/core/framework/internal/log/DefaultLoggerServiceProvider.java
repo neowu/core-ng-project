@@ -32,7 +32,7 @@ public class DefaultLoggerServiceProvider implements SLF4JServiceProvider {
 
     @Override
     public String getRequestedApiVersion() {
-        return "2.0.3";
+        return "2.0.99";
     }
 
     @Override
