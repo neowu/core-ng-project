@@ -16,6 +16,14 @@ project('log-collector') {
     }
 }
 
+project('log-exporter') {
+    apply from: file("${rootDir}/gradle/app.gradle")
+    dependencies {
+        implementation project(':core-ng')
+        testImplementation project(':core-ng-test')
+    }
+}
+
 project('monitor') {
     apply from: file("${rootDir}/gradle/app.gradle")
     dependencies {

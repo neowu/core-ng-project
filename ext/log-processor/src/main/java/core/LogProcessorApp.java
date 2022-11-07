@@ -49,6 +49,7 @@ public class LogProcessorApp extends App {
         onStartup(indexService::createIndexTemplates);
 
         configureKibanaService();
+
         Forwarders forwarders = configureLogForwarders();
         ActionFilter actionFilter = configureActionFilter();
         configureKafka(forwarders, actionFilter);
