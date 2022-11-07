@@ -81,7 +81,8 @@ public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMess
 
     private Path initializeLogFilePath(String logPath) throws IOException {
         Path path = Path.of(logDir.toString(), logPath);
-        Files.createDirectories(path.getParent());
+        Path parent = path.getParent();
+        if (parent != null) Files.createDirectories(parent);
         return path;
     }
 }
