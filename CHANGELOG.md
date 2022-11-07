@@ -12,6 +12,9 @@
 * db: update mysql driver to 8.0.31
   > mysql maven group updated, it is 'com.mysql:mysql-connector-j:8.0.31'
 * log: update slf4j api to 2.0.3
+* log: added log-exporter to upload log to google storage
+  > as archive, or import to big query for OLAP
+  > currently only support gs://, support other cloud if needed in future
 
 ### 8.0.7 (09/23/2022 - 10/05/2022)
 

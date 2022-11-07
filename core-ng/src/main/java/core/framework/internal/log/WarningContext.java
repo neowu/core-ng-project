@@ -24,7 +24,8 @@ public final class WarningContext {
 
     @Nullable
     public static PerformanceWarning[] warnings(IOWarning[] warnings) {
-        if (warnings.length <= 0) return null;
+        if (warnings.length == 0) return null;
+
         var results = new PerformanceWarning[warnings.length];
         for (int i = 0; i < warnings.length; i++) {
             IOWarning warning = warnings[i];
@@ -46,6 +47,7 @@ public final class WarningContext {
 
             int maxTotalWrites = warning.maxTotalWrites();
             if (maxTotalWrites < 0 && defaultWarning != null) maxTotalWrites = defaultWarning.maxTotalWrites;
+
             results[i] = new PerformanceWarning(operation, maxOperations, maxElapsed, maxReads, maxTotalReads, maxTotalWrites);
         }
         return results;
