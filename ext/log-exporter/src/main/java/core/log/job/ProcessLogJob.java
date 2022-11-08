@@ -17,7 +17,7 @@ public class ProcessLogJob implements Job {
     @Override
     public void execute(JobContext context) {
         LocalDate today = context.scheduledTime.toLocalDate();
-        archiveService.uploadActionLog(today.minusDays(1));
-        archiveService.deleteArchive(today.minusDays(5));
+        archiveService.uploadArchive(today.minusDays(1));
+        archiveService.cleanupArchive(today.minusDays(5));
     }
 }

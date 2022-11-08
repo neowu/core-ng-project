@@ -27,7 +27,7 @@ public class LogExporterApp extends App {
         kafka().uri(requiredProperty("sys.kafka.uri"));
         kafka().poolSize(1);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(5000));        // try to get at least 1M message, and can wait longer
-        kafka().maxPoll(2000, 3 * 1024 * 1024);         // get 3M message at max
+        kafka().maxPoll(3000, 3 * 1024 * 1024);         // get 3M message at max
 
         // upload is cpu/network intensive work, queued in one thread
         executor().add(null, 1);

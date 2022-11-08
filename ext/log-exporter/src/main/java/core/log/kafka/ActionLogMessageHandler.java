@@ -7,7 +7,6 @@ import core.framework.kafka.Message;
 import core.framework.log.message.ActionLogMessage;
 import core.log.domain.ActionLogEntry;
 import core.log.service.ArchiveService;
-import core.log.service.UploadService;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -29,8 +28,6 @@ public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMess
 
     @Inject
     ArchiveService archiveService;
-    @Inject
-    UploadService uploadService;
 
     @Override
     public void handle(List<Message<ActionLogMessage>> messages) throws IOException {
@@ -55,8 +52,6 @@ public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMess
     private void writeTraceLog(String traceLogPath, String content) throws IOException {
         Path path = initializeLogFilePath(traceLogPath);
         Files.writeString(path, content, CREATE, APPEND);
-        // immediately upload trace, upload many small files may cause bandwidth/connection issue, it may affect networking (e.g. dns query) on same node
-        uploadService.uploadAsync(path, traceLogPath);
     }
 
     private ActionLogEntry entry(ActionLogMessage message) {
@@ -82,7 +77,7 @@ public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMess
     private Path initializeLogFilePath(String logPath) throws IOException {
         Path path = Path.of(logDir.toString(), logPath);
         Path parent = path.getParent();
-        if (parent != null) Files.createDirectories(parent);
+        if (parent != null && !Files.exists(parent)) Files.createDirectories(parent);
         return path;
     }
 }

@@ -43,11 +43,11 @@ class ArchiveServiceTest {
     @Test
     @EnabledOnOs({OS.MAC, OS.LINUX})
     void cleanupArchive() {
-        archiveService.deleteArchive(LocalDate.now());
+        archiveService.cleanupArchive(LocalDate.now());
     }
 
     @Test
     void uploadActionLog() {
-        archiveService.uploadActionLog(LocalDate.now());
+        archiveService.uploadArchive(LocalDate.now());
     }
 }

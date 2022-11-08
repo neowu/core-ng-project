@@ -30,6 +30,8 @@ class ShellTest {
     void execute() {
         shell.execute("ls");
 
-        shell.execute("ls", "/invalid");
+        assertThatThrownBy(() -> shell.execute("ls", "/invalid"))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("failed to execute command");
     }
 }

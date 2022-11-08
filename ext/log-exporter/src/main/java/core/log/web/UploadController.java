@@ -16,7 +16,7 @@ public class UploadController implements Controller {
     @Override
     public Response execute(Request request) {
         UploadRequest uploadRequest = request.bean(UploadRequest.class);
-        archiveService.uploadActionLog(uploadRequest.date);
+        archiveService.uploadArchive(uploadRequest.date);
         return Response.empty();
     }
 }

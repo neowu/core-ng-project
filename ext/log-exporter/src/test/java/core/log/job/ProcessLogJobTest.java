@@ -32,7 +32,7 @@ class ProcessLogJobTest {
     void execute() {
         job.execute(new JobContext("job", ZonedDateTime.parse("2022-11-07T01:00:00Z")));
 
-        verify(archiveService).uploadActionLog(LocalDate.parse("2022-11-06"));
-        verify(archiveService).deleteArchive(LocalDate.parse("2022-11-02"));
+        verify(archiveService).uploadArchive(LocalDate.parse("2022-11-06"));
+        verify(archiveService).cleanupArchive(LocalDate.parse("2022-11-02"));
     }
 }

@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
+import static core.framework.util.Strings.format;
+
 /**
  * @author neo
  */
@@ -19,17 +21,16 @@ public class Shell {
         var watch = new StopWatch();
         String command = String.join(" ", commands);
         try {
-            logger.info("start process, command={}", command);
             Process process = new ProcessBuilder().command(commands).start();
             int status = process.waitFor();
             Result result = readOutput(process, status);    // read out after process ends, means process output can't be too large, otherwise it may block process
             if (!result.success()) {
-                logger.error("process failed, error={}", result.error);
+                throw new Error(format("failed to execute command, command={}, error={}", command, result.error));
             }
         } catch (IOException | InterruptedException e) {
-            throw new Error("failed to execute command, error=" + e.getMessage(), e);
+            throw new Error(format("failed to execute command, command={}, error={}", command, e.getMessage()), e);
         } finally {
-            logger.info("process ended, elapsed={}, command={}", Duration.ofNanos(watch.elapsed()), command);
+            logger.info("execute command, command={}, elapsed={}", command, Duration.ofNanos(watch.elapsed()));
         }
     }
 

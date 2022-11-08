@@ -40,6 +40,6 @@ class UploadControllerTest {
         Response response = controller.execute(request);
 
         assertThat(response.status()).isEqualTo(HTTPStatus.NO_CONTENT);
-        verify(archiveService).uploadActionLog(LocalDate.now());
+        verify(archiveService).uploadArchive(LocalDate.now());
     }
 }
