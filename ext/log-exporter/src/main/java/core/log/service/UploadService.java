@@ -28,7 +28,7 @@ public class UploadService {
     public void uploadDirAsync(Path dir, String remotePath) {
         executor.submit("upload", () -> {
             // requires '-q', otherwise standard output may block if buffer is full, Shell reads std after process ends
-            shell.execute("gsutil", "-mrq", "-o", "Boto:parallel_process_count=2", "-o", "Boto:parallel_thread_count=2", "cp", dir.toString(), bucket + remotePath);
+            shell.execute("gsutil", "-mq", "-o", "Boto:parallel_process_count=2", "-o", "Boto:parallel_thread_count=2", "cp", "-r", dir.toString(), bucket + remotePath);
         });
     }
 }
