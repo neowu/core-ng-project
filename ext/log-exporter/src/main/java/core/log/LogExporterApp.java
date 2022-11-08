@@ -2,10 +2,12 @@ package core.log;
 
 import core.framework.http.HTTPMethod;
 import core.framework.log.message.ActionLogMessage;
+import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.module.App;
 import core.log.job.ProcessLogJob;
 import core.log.kafka.ActionLogMessageHandler;
+import core.log.kafka.EventMessageHandler;
 import core.log.service.ArchiveService;
 import core.log.service.UploadService;
 import core.log.web.UploadController;
@@ -36,6 +38,7 @@ public class LogExporterApp extends App {
         bind(ArchiveService.class);
 
         kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));
+        kafka().subscribe(LogTopics.TOPIC_EVENT, EventMessage.class, bind(EventMessageHandler.class));
 
         schedule().dailyAt("process-log-job", bind(ProcessLogJob.class), LocalTime.of(1, 0));
 

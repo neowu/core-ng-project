@@ -35,6 +35,12 @@ class ArchiveServiceTest {
     }
 
     @Test
+    void eventPath() {
+        assertThat(archiveService.eventPath(LocalDate.parse("2022-11-03")))
+            .matches("/event/2022/event-2022-11-03-[a-z0-9]*.ndjson");
+    }
+
+    @Test
     void traceArchivePath() {
         assertThat(archiveService.traceLogPath(LocalDate.parse("2022-11-03"), "service", "id"))
             .isEqualTo("/trace/2022-11-03/service/id.txt");

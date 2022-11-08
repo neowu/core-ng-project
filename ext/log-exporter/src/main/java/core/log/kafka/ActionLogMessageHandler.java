@@ -24,8 +24,6 @@ import static java.nio.file.StandardOpenOption.CREATE;
 public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMessage> {
     private final JSONWriter<ActionLogEntry> writer = new JSONWriter<>(ActionLogEntry.class);
 
-    Path logDir = Path.of("/var/log/app");
-
     @Inject
     ArchiveService archiveService;
 
@@ -33,7 +31,7 @@ public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMess
     public void handle(List<Message<ActionLogMessage>> messages) throws IOException {
         LocalDate date = LocalDate.now();
 
-        Path path = initializeLogFilePath(archiveService.actionLogPath(date));
+        Path path = archiveService.initializeLogFilePath(archiveService.actionLogPath(date));
         try (BufferedOutputStream stream = new BufferedOutputStream(Files.newOutputStream(path, CREATE, APPEND), 3 * 1024 * 1024)) {
             for (Message<ActionLogMessage> message : messages) {
                 ActionLogEntry entry = entry(message.value);
@@ -50,7 +48,7 @@ public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMess
     }
 
     private void writeTraceLog(String traceLogPath, String content) throws IOException {
-        Path path = initializeLogFilePath(traceLogPath);
+        Path path = archiveService.initializeLogFilePath(traceLogPath);
         Files.writeString(path, content, CREATE, APPEND);
     }
 
@@ -72,12 +70,5 @@ public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMess
         entry.stats = message.stats;
         entry.performanceStats = message.performanceStats;
         return entry;
-    }
-
-    private Path initializeLogFilePath(String logPath) throws IOException {
-        Path path = Path.of(logDir.toString(), logPath);
-        Path parent = path.getParent();
-        if (parent != null && !Files.exists(parent)) Files.createDirectories(parent);
-        return path;
     }
 }

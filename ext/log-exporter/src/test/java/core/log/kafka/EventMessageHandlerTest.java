@@ -1,7 +1,7 @@
 package core.log.kafka;
 
 import core.framework.kafka.Message;
-import core.framework.log.message.ActionLogMessage;
+import core.framework.log.message.EventMessage;
 import core.framework.util.Files;
 import core.log.service.ArchiveService;
 import org.junit.jupiter.api.AfterEach;
@@ -15,12 +15,12 @@ import java.util.List;
 /**
  * @author neo
  */
-class ActionLogMessageHandlerTest {
-    private ActionLogMessageHandler handler;
+class EventMessageHandlerTest {
+    private EventMessageHandler handler;
 
     @BeforeEach
-    void createActionLogMessageHandler() {
-        handler = new ActionLogMessageHandler();
+    void createEventMessageHandler() {
+        handler = new EventMessageHandler();
         handler.archiveService = new ArchiveService();
         handler.archiveService.logDir = Files.tempDir();
     }
@@ -32,11 +32,10 @@ class ActionLogMessageHandlerTest {
 
     @Test
     void handle() throws IOException {
-        var message = new ActionLogMessage();
+        var message = new EventMessage();
         message.date = Instant.parse("2022-11-07T00:00:00Z");
         message.id = "id";
         message.app = "app";
-        message.traceLog = "trace";
         handler.handle(List.of(new Message<>("key", message)));
     }
 }

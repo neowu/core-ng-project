@@ -5,6 +5,8 @@ import core.framework.inject.Inject;
 import core.framework.util.Network;
 import core.framework.util.Strings;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -16,7 +18,7 @@ public class ArchiveService {
     private final String hash = Hash.md5Hex(Network.LOCAL_HOST_NAME).substring(0, 5);   // generally there only need one log-exporter, this is to avoid file name collision with multiple log-exporter
     private final Shell shell = new Shell();
 
-    Path logDir = Path.of("/var/log/app");
+    public Path logDir = Path.of("/var/log/app");
 
     @Inject
     UploadService uploadService;
@@ -28,15 +30,33 @@ public class ArchiveService {
             uploadService.uploadAsync(actionLogFilePath, actionLogPath);
         }
 
+        String eventPath = eventPath(date);
+        Path eventFilePath = Path.of(logDir.toString(), eventPath);
+        if (Files.exists(eventFilePath)) {
+            uploadService.uploadAsync(eventFilePath, eventPath);
+        }
+
         Path traceLogDirPath = Path.of(logDir.toString(), Strings.format("/trace/{}", date));
         if (Files.exists(traceLogDirPath)) {
-            uploadService.uploadDirAsync(traceLogDirPath, "/trace");
+            File[] appDirs = traceLogDirPath.toFile().listFiles(File::isDirectory);
+            if (appDirs != null) {
+                for (File appDir : appDirs) {
+                    String app = appDir.getName();
+                    String traceLogPath = Strings.format("/trace/{}/{}-{}-{}.tar.gz", date, app, date, hash);
+                    Path traceLogFilePath = Path.of(logDir.toString(), traceLogPath);
+                    shell.execute("tar", "-czf", traceLogFilePath.toString(), "-C", logDir.toString(), Strings.format("trace/{}/{}", date, app));
+                    uploadService.uploadAsync(traceLogFilePath, traceLogPath);
+                }
+            }
         }
     }
 
     public void cleanupArchive(LocalDate date) {
         Path actionLogFilePath = Path.of(logDir.toString(), actionLogPath(date));
         shell.execute("rm", "-f", actionLogFilePath.toString());
+
+        Path eventFilePath = Path.of(logDir.toString(), eventPath(date));
+        shell.execute("rm", "-f", eventFilePath.toString());
 
         Path traceLogDirPath = Path.of(logDir.toString(), Strings.format("/trace/{}", date));
         shell.execute("rm", "-rf", traceLogDirPath.toString());
@@ -46,7 +66,18 @@ public class ArchiveService {
         return Strings.format("/action/{}/action-{}-{}.ndjson", date.getYear(), date, hash);
     }
 
+    public String eventPath(LocalDate date) {
+        return Strings.format("/event/{}/event-{}-{}.ndjson", date.getYear(), date, hash);
+    }
+
     public String traceLogPath(LocalDate date, String app, String id) {
         return Strings.format("/trace/{}/{}/{}.txt", date, app, id);
+    }
+
+    public Path initializeLogFilePath(String logPath) throws IOException {
+        Path path = Path.of(logDir.toString(), logPath);
+        Path parent = path.getParent();
+        if (parent != null && !Files.exists(parent)) Files.createDirectories(parent);
+        return path;
     }
 }
