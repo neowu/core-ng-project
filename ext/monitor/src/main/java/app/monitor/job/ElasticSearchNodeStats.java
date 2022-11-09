@@ -8,6 +8,9 @@ import java.util.Map;
  * @author neo
  */
 public class ElasticSearchNodeStats {
+    @Property(name = "_nodes")
+    public NodeStats stats;
+
     @Property(name = "nodes")
     public Map<String, Node> nodes;
 
@@ -85,5 +88,14 @@ public class ElasticSearchNodeStats {
     public static class CPU {
         @Property(name = "percent")
         public Integer percent;
+    }
+
+    public static class NodeStats {
+        @Property(name = "total")
+        public Integer total;
+        @Property(name = "successful")
+        public Integer successful;
+        @Property(name = "failed")
+        public Integer failed;
     }
 }

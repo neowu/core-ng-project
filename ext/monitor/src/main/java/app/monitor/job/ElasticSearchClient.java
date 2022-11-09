@@ -9,6 +9,7 @@ import core.framework.internal.json.JSONReader;
 import core.framework.util.Strings;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author neo
@@ -25,6 +26,14 @@ public class ElasticSearchClient {
         HTTPResponse response = httpClient.execute(request);
         if (response.statusCode != HTTPStatus.OK.code)
             throw new Error(Strings.format("failed to call elasticsearch node stats api, uri={}, status={}", request.requestURI(), response.statusCode));
-        return reader.fromJSON(response.body);
+        return parseResponse(response.body);
+    }
+
+    ElasticSearchNodeStats parseResponse(byte[] body) throws IOException {
+        ElasticSearchNodeStats stats = reader.fromJSON(body);
+        if (stats.stats.failed > 0) {
+            throw new Error(Strings.format("failed to call elasticsearch node stats api, error={}", new String(body, StandardCharsets.UTF_8)));
+        }
+        return stats;
     }
 }
