@@ -6,6 +6,8 @@ import core.framework.search.impl.ESLoggerConfigFactory;
 import core.framework.search.impl.LocalElasticSearch;
 import org.apache.http.HttpHost;
 import org.apache.logging.log4j.core.config.ConfigurationFactory;
+import org.elasticsearch.common.logging.internal.LoggerFactoryImpl;
+import org.elasticsearch.logging.internal.spi.LoggerFactory;
 
 /**
  * @author neo
@@ -62,6 +64,9 @@ public class TestSearchConfig extends SearchConfig {
         at org.elasticsearch.index.IndexModule.<init>(IndexModule.java:176)
     * */
     void configureLogger() {
+        // ES starts to migrate log4j api to its own logger api, once important info migrated (like node info), we will remove log4j adapter
+        if (LoggerFactory.provider() == null) LoggerFactory.setInstance(new LoggerFactoryImpl());
+
         if (System.getProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY) != null) return;
         System.setProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY, ESLoggerConfigFactory.class.getName());
         // refer to org.apache.logging.log4j.core.jmx.Server.PROPERTY_DISABLE_JMX, disable to reduce overhead

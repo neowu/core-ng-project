@@ -1,7 +1,7 @@
 version: "3"
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.4.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.0
     ports:
     - 9200:9200
     environment:
@@ -12,7 +12,7 @@ services:
     - xpack.ml.enabled=false
     - ingest.geoip.downloader.enabled=false
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.4.1
+    image: docker.elastic.co/kibana/kibana:8.5.0
     ports:
     - 5601:5601
     environment:
