@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.0.8 (10/10/2022 - )
+### 8.0.8 (10/10/2022 - 11/09/2022)
 
 * ext: update log-collector default sys.http.maxForwardedIPs to 2
   > to keep consistent with framework default values, use ENV to override if needed
