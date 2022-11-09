@@ -42,5 +42,5 @@ jobs:
     - uses: docker/build-push-action@v2
       with:
         context: "build/ext/log-exporter/docker"
-        tags: "neowu/monitor:${{ env.TAG }}"
+        tags: "neowu/log-exporter:${{ env.TAG }}"
         push: true
