@@ -27,13 +27,13 @@ public class ArchiveService {
         String actionLogPath = actionLogPath(date);
         Path actionLogFilePath = Path.of(logDir.toString(), actionLogPath);
         if (Files.exists(actionLogFilePath)) {
-            uploadService.uploadAsync(actionLogFilePath, actionLogPath);
+            uploadService.upload(actionLogFilePath, actionLogPath);
         }
 
         String eventPath = eventPath(date);
         Path eventFilePath = Path.of(logDir.toString(), eventPath);
         if (Files.exists(eventFilePath)) {
-            uploadService.uploadAsync(eventFilePath, eventPath);
+            uploadService.upload(eventFilePath, eventPath);
         }
 
         Path traceLogDirPath = Path.of(logDir.toString(), Strings.format("/trace/{}", date));
@@ -45,7 +45,7 @@ public class ArchiveService {
                     String traceLogPath = Strings.format("/trace/{}/{}-{}-{}.tar.gz", date, app, date, hash);
                     Path traceLogFilePath = Path.of(logDir.toString(), traceLogPath);
                     shell.execute("tar", "-czf", traceLogFilePath.toString(), "-C", logDir.toString(), Strings.format("trace/{}/{}", date, app));
-                    uploadService.uploadAsync(traceLogFilePath, traceLogPath);
+                    uploadService.upload(traceLogFilePath, traceLogPath);
                 }
             }
         }
