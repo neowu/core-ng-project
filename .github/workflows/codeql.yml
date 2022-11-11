@@ -1,4 +1,4 @@
-name: CodeQL
+name: codeql
 on:
   push:
     branches: [ master ]
@@ -17,16 +17,15 @@ jobs:
       matrix:
         language: [ java ]
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 17
+    - uses: github/codeql-action/init@v2
       with:
         languages: ${{ matrix.language }}
         queries: +security-and-quality
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+    - uses: github/codeql-action/autobuild@v2
+    - uses: github/codeql-action/analyze@v2
       with:
         category: "/language:${{ matrix.language }}"
