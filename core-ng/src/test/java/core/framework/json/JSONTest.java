@@ -70,7 +70,8 @@ class JSONTest {
         bean.childrenField.add(child2);
 
         String json = JSON.toJSON(bean);
-        assertThat(json).contains("\"list\":[\"value1\",\"value2\"],\"children\":[{\"boolean\":true,\"long\":null},{\"boolean\":false,\"long\":null}]");
+        assertThat(json).contains("""
+            "list":["value1","value2"],"children":[{"boolean":true,"long":null,"double":null},{"boolean":false,"long":null,"double":null}]""");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertThat(parsedBean).usingRecursiveComparison().isEqualTo(bean);
