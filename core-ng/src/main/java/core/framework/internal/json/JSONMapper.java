@@ -1,5 +1,7 @@
 package core.framework.internal.json;
 
+import com.fasterxml.jackson.core.StreamReadFeature;
+import com.fasterxml.jackson.core.StreamWriteFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,6 +66,8 @@ public class JSONMapper {
             .addModule(new AfterburnerModule().setUseValueClassLoader(false))
             // only detect public fields, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
             .visibility(new VisibilityChecker.Std(NONE, NONE, NONE, NONE, PUBLIC_ONLY))
+            .enable(StreamReadFeature.USE_FAST_DOUBLE_PARSER)
+            .enable(StreamWriteFeature.USE_FAST_DOUBLE_WRITER)
             .enable(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS)
             .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)

@@ -83,6 +83,9 @@ public class TestBean {
 
         @Property(name = "long")
         public Long longField;
+
+        @Property(name = "double")
+        public Double doubleField;
     }
 
     public static class Empty {

@@ -1,4 +1,4 @@
-name: ext
+name: Ext
 on:
   push:
     tags: [ "*.*.*" ]

@@ -2,6 +2,8 @@
 
 ### 8.0.9 (11/09/2022 - )
 
+* json: update jackson to 2.14.0
+
 ### 8.0.8 (10/10/2022 - 11/09/2022)
 
 * ext: update log-collector default sys.http.maxForwardedIPs to 2

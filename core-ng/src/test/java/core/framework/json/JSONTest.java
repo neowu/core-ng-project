@@ -45,10 +45,12 @@ class JSONTest {
         var child = new TestBean.Child();
         child.booleanField = Boolean.TRUE;
         child.longField = 200L;
+        child.doubleField = 2.3456;
         bean.childField = child;
 
         String json = JSON.toJSON(bean);
-        assertThat(json).contains("\"child\":{\"boolean\":true,\"long\":200}");
+        assertThat(json).contains("""
+            "child":{"boolean":true,"long":200,"double":2.3456}""");
 
         var parsedBean = JSON.fromJSON(TestBean.class, json);
         assertThat(parsedBean).usingRecursiveComparison().isEqualTo(bean);
