@@ -149,17 +149,19 @@ public class HTMLParser {
             throw new Error(format("it is recommended not to put value for boolean attribute, attribute={}>{}, location={}", attribute.tagName, attribute.name, attribute.location));
 
         if ("link".equals(attribute.tagName) && "href".equals(attribute.name)
-                || "script".equals(attribute.tagName) && "src".equals(attribute.name)
-                || "img".equals(attribute.tagName) && "src".equals(attribute.name)) {
-            validateStaticResourceURL(attribute);
+            || "script".equals(attribute.tagName) && "src".equals(attribute.name)
+            || "img".equals(attribute.tagName) && "src".equals(attribute.name)) {
+            validateURI(attribute);
         }
     }
 
-    private void validateStaticResourceURL(Attribute attribute) {
-        if (!attribute.value.startsWith("http://")
-                && !attribute.value.startsWith("https://")
-                && !attribute.value.startsWith("//")
-                && !Strings.startsWith(attribute.value, '/'))
-            throw new Error(format("static resource url value must be either absolute or start with '/', attribute={}>{}, value={}, location={}", attribute.tagName, attribute.name, attribute.value, attribute.location));
+    private void validateURI(Attribute attribute) {
+        String value = attribute.value;
+        if (!value.startsWith("http://")
+            && !value.startsWith("https://")
+            && !value.startsWith("//")
+            && !Strings.startsWith(value, '/')
+            && !value.startsWith("data:"))
+            throw new Error(format("uri value must be either absolute or start with '/', attribute={}>{}, value={}, location={}", attribute.tagName, attribute.name, value, attribute.location));
     }
 }
