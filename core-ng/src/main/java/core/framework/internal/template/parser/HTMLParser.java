@@ -151,17 +151,17 @@ public class HTMLParser {
         if ("link".equals(attribute.tagName) && "href".equals(attribute.name)
             || "script".equals(attribute.tagName) && "src".equals(attribute.name)
             || "img".equals(attribute.tagName) && "src".equals(attribute.name)) {
-            validateURI(attribute);
+            validateStaticURI(attribute);
         }
     }
 
-    private void validateURI(Attribute attribute) {
+    private void validateStaticURI(Attribute attribute) {
         String value = attribute.value;
         if (!value.startsWith("http://")
             && !value.startsWith("https://")
             && !value.startsWith("//")
             && !Strings.startsWith(value, '/')
             && !value.startsWith("data:"))
-            throw new Error(format("uri value must be either absolute or start with '/', attribute={}>{}, value={}, location={}", attribute.tagName, attribute.name, value, attribute.location));
+            throw new Error(format("static uri value must be either absolute or start with '/', attribute={}>{}, value={}, location={}", attribute.tagName, attribute.name, value, attribute.location));
     }
 }
