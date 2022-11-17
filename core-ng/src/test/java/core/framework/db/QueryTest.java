@@ -24,6 +24,7 @@ class QueryTest<T> {
     void createQuery() {
         MockitoAnnotations.openMocks(this);
         Mockito.doCallRealMethod().when(query).in(any(), anyList());
+        Mockito.doCallRealMethod().when(query).notIn(any(), anyList());
     }
 
     @Test
@@ -42,5 +43,23 @@ class QueryTest<T> {
 
         query.in("id", List.of("1", "2", "3"));
         verify(query).where("id IN (?, ?, ?)", "1", "2", "3");
+    }
+
+    @Test
+    void notIn() {
+        assertThatThrownBy(() -> query.notIn(null, List.of()))
+                .hasMessageContaining("field must not be null");
+
+        assertThatThrownBy(() -> query.notIn("id", List.of()))
+                .hasMessageContaining("params must not be empty");
+
+        query.notIn("id", List.of("1"));
+        verify(query).where("id NOT IN (?)", "1");
+
+        query.notIn("id", List.of("1", "2"));
+        verify(query).where("id NOT IN (?, ?)", "1", "2");
+
+        query.notIn("id", List.of("1", "2", "3"));
+        verify(query).where("id NOT IN (?, ?, ?)", "1", "2", "3");
     }
 }

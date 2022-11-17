@@ -45,4 +45,20 @@ public interface Query<T> {
         builder.append(')');
         where(builder.toString(), params.toArray());
     }
+
+    // syntax sugar, to help to build "where not in clause" with dynamic params
+    default <V> void notIn(String field, List<V> params) {
+        if (field == null) throw new Error("field must not be null");
+        if (params == null || params.isEmpty()) throw new Error("params must not be empty");
+        // efficient version of: where(Strings.format("{} IN ({})", field, params.stream().map(param -> "?").collect(Collectors.joining(", "))), params.toArray());
+        int size = params.size();
+        var builder = new StringBuilder(field.length() + size * 3 + 6);    // e.g. field in (?, ?, ?)
+        builder.append(field).append(" NOT IN (");
+        for (int i = 0; i < size; i++) {
+            if (i > 0) builder.append(", ");
+            builder.append('?');
+        }
+        builder.append(')');
+        where(builder.toString(), params.toArray());
+    }
 }
