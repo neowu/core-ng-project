@@ -7,7 +7,6 @@
 
 * framework error (queue listener, background task error, custom scheduler trigger) forward to kafka?
 * redis using ping/pong to validate connection? for zero downtime upgrading e.g. with gcloud memory store
-* websocket, replace AbstractReceiveListener, so it can include IO/error handling within action lifecycle?
 
 * use adminClient to check kafka ready? or retry sending message?
 * mongo: monitor thru mongo command, db.stats()?

@@ -84,7 +84,7 @@ public class HTTPHandler implements HttpHandler {
         try {
             webContext.initialize(request);
 
-            logger.debug("httpDelay={}", httpDelay);    // http delay is usually low, so not to use Duration format
+            logger.debug("httpDelay={}", httpDelay);    // http delay includes request body parsing time, it could be long if client sent post body slowly, and it is usually low, so not to use Duration format
             actionLog.stats.put("http_delay", (double) httpDelay);
 
             requestParser.parse(request, exchange, actionLog);

@@ -21,20 +21,12 @@ class WebSocketMessageListenerTest {
     @Test
     void closeCode() {
         assertThat(listener.closeCode(new Error()))
-                .isEqualTo(WebSocketCloseCodes.INTERNAL_ERROR);
+            .isEqualTo(WebSocketCloseCodes.INTERNAL_ERROR);
 
         assertThat(listener.closeCode(new TooManyRequestsException("rate exceeds")))
-                .isEqualTo(WebSocketCloseCodes.TRY_AGAIN_LATER);
+            .isEqualTo(WebSocketCloseCodes.TRY_AGAIN_LATER);
 
         assertThat(listener.closeCode(new BadRequestException("bad request")))
-                .isEqualTo(WebSocketCloseCodes.POLICY_VIOLATION);
-    }
-
-    @Test
-    void maxBufferSize() {
-        assertThat(listener.getMaxCloseBufferSize()).isGreaterThan(-1);
-        assertThat(listener.getMaxPingBufferSize()).isGreaterThan(-1);
-        assertThat(listener.getMaxPongBufferSize()).isGreaterThan(-1);
-        assertThat(listener.getMaxTextBufferSize()).isGreaterThan(-1);
+            .isEqualTo(WebSocketCloseCodes.POLICY_VIOLATION);
     }
 }
