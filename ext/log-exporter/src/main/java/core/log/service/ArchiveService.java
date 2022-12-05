@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * @author neo
@@ -70,8 +71,8 @@ public class ArchiveService {
         return Strings.format("/event/{}/event-{}-{}.ndjson", date.getYear(), date, hash);
     }
 
-    public String traceLogPath(LocalDate date, String app, String id) {
-        return Strings.format("/trace/{}/{}/{}.txt", date, app, id);
+    public String traceLogPath(LocalDateTime now, String app, String id) {
+        return Strings.format("/trace/{}/{}/{}/{}.txt", now.toLocalDate(), app, now.getHour(), id);
     }
 
     public Path initializeLogFilePath(String logPath) throws IOException {

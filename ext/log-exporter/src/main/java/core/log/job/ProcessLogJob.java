@@ -17,7 +17,7 @@ public class ProcessLogJob implements Job {
     @Override
     public void execute(JobContext context) {
         LocalDate today = context.scheduledTime.toLocalDate();
+        archiveService.cleanupArchive(today.minusDays(5));  // cleanup first, to free disk space when possible
         archiveService.uploadArchive(today.minusDays(1));
-        archiveService.cleanupArchive(today.minusDays(5));
     }
 }

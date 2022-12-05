@@ -12,7 +12,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.nio.file.StandardOpenOption.APPEND;
@@ -29,15 +29,15 @@ public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMess
 
     @Override
     public void handle(List<Message<ActionLogMessage>> messages) throws IOException {
-        LocalDate date = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
 
-        Path path = archiveService.initializeLogFilePath(archiveService.actionLogPath(date));
+        Path path = archiveService.initializeLogFilePath(archiveService.actionLogPath(now.toLocalDate()));
         try (BufferedOutputStream stream = new BufferedOutputStream(Files.newOutputStream(path, CREATE, APPEND), 3 * 1024 * 1024)) {
             for (Message<ActionLogMessage> message : messages) {
                 ActionLogEntry entry = entry(message.value);
 
                 if (message.value.traceLog != null) {
-                    entry.traceLogPath = archiveService.traceLogPath(date, entry.app, entry.id);
+                    entry.traceLogPath = archiveService.traceLogPath(now, entry.app, entry.id);
                     writeTraceLog(entry.traceLogPath, message.value.traceLog);
                 }
 

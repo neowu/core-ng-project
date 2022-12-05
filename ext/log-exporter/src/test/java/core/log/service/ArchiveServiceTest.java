@@ -8,6 +8,7 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,8 +43,9 @@ class ArchiveServiceTest {
 
     @Test
     void traceArchivePath() {
-        assertThat(archiveService.traceLogPath(LocalDate.parse("2022-11-03"), "service", "id"))
-            .isEqualTo("/trace/2022-11-03/service/id.txt");
+        LocalDateTime now = LocalDateTime.parse("2022-11-03T02:00:00");
+        assertThat(archiveService.traceLogPath(now, "service", "id"))
+            .isEqualTo("/trace/2022-11-03/service/2/id.txt");
     }
 
     @Test
