@@ -118,11 +118,6 @@
     <rule ref="category/java/errorprone.xml/SuspiciousEqualsMethodName"/>
     <rule ref="category/java/errorprone.xml/SuspiciousHashcodeMethodName"/>
     <rule ref="category/java/errorprone.xml/SuspiciousOctalEscape"/>
-    <rule ref="category/java/errorprone.xml/TestClassWithoutTestCases">
-        <properties>
-            <property name="testClassPattern" value=".*Test$"/>
-        </properties>
-    </rule>
     <rule ref="category/java/errorprone.xml/UnconditionalIfStatement"/>
     <rule ref="category/java/errorprone.xml/UnnecessaryBooleanAssertion"/>
     <rule ref="category/java/errorprone.xml/UnnecessaryCaseChange"/>

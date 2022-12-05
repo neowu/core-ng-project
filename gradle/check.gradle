@@ -58,9 +58,10 @@ subprojects {
             spotbugsPlugins 'com.mebigfatguy.sb-contrib:sb-contrib:7.4.7'
         }
 
-        reportLevel = 'low'
-        includeFilter = rootProject.file('gradle/check/spotbugs.xml')
         toolVersion = '4.7.3'
+        reportLevel = 'low'
+        extraArgs = ['-longBugCodes']
+        includeFilter = rootProject.file('gradle/check/spotbugs.xml')
 
         def spotbugsReport = tasks.register('spotbugsReport') {
             group = 'verification'
@@ -74,7 +75,6 @@ subprojects {
 
         tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach { task ->
             group = 'verification'
-            extraArgs = ['-longBugCodes']
             reports {
                 text.enabled = true
             }
