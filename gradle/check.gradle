@@ -75,9 +75,9 @@ subprojects {
 
         tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach { task ->
             group = 'verification'
-            reports {
+            reports.configure({
                 text.enabled = true
-            }
+            })
             task.finalizedBy(spotbugsReport)
         }
     }
