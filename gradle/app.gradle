@@ -70,14 +70,15 @@ afterEvaluate {
                     include 'web/**'
                     into('app')
                 }
-                into("${buildDir}/docker/package")
+                into "${buildDir}/docker/package"
             }
             if (project.file('docker/Dockerfile').exists()) {
-                // due to https://github.com/gradle/gradle/issues/4553, project.sync can't use preserve
-                delete project.file("${buildDir}/docker").listFiles().findAll { it.name != 'package' }
-                project.copy {
-                    from(project.file('docker'))
-                    into("${buildDir}/docker")
+                project.sync {
+                    from project.file('docker')
+                    into "${buildDir}/docker"
+                    preserve {
+                        include 'package/**'
+                    }
                 }
             }
         }
