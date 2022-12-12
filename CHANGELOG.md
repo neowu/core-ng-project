@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.0.9-b1 (11/09/2022 - )
+### 8.0.9 (11/09/2022 - 12/12/2022)
 
 * json: update jackson to 2.14.0
 * html: HTMLTemplate supports data uri
