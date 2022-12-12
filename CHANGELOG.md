@@ -5,6 +5,7 @@
 * json: update jackson to 2.14.0
 * html: HTMLTemplate supports data uri
 * http: tweaked websocket handling, support more close code
+* log: finalize log-exporter design
 
 ### 8.0.8 (10/10/2022 - 11/09/2022)
 
