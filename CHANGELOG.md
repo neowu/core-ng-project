@@ -22,7 +22,7 @@
   > as archive, or import to big query for OLAP
   > currently only support gs://, support other clouds if needed in future
 * search: update es to 8.5.0
-  > es 8.5.0 has bug to break monitor, https://github.com/elastic/elasticsearch/issues/91259
+  > es 8.5.0 has bug to break monitor, https://github.com/elastic/elasticsearch/issues/91259, fixed by 8.5.3
 
 ### 8.0.7 (09/23/2022 - 10/05/2022)
 
