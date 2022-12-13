@@ -1,5 +1,10 @@
 ## Change log
 
+### 8.0.10 (12/13/2022 - )
+
+* log: remove APP_LOG_FILTER_CONFIG from log-processor
+  > not really useful in practice, log system should be designed to be capable of persisting massive data
+
 ### 8.0.9 (11/09/2022 - 12/12/2022)
 
 * json: update jackson to 2.14.0

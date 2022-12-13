@@ -99,19 +99,13 @@ class ActionLogMessageHandlerTest extends IntegrationTest {
     void indexWithoutTrace() {
         LocalDate now = LocalDate.of(2022, Month.OCTOBER, 3);
 
-        ActionLogMessage message1 = message("4", "WARN");
-        message1.app = "website";
-        message1.errorCode = "NOT_FOUND";
-        message1.traceLog = "trace";
+        ActionLogMessage message = message("4", "WARN");
+        message.app = "website";
+        message.errorCode = "NOT_FOUND";
+        message.traceLog = "trace";
 
-        ActionLogMessage message2 = message("5", "WARN");
-        message2.app = "website";
-        message2.errorCode = "SECURITY_THREAT";
-        message2.traceLog = "trace";
-
-        handler.index(List.of(new Message<>("k1", message1), new Message<>("k2", message2)), now);
-        assertThat(trace(now, message1.id)).isNotEmpty();
-        assertThat(trace(now, message2.id)).isEmpty();
+        handler.index(List.of(new Message<>("k1", message)), now);
+        assertThat(trace(now, message.id)).isNotEmpty();
     }
 
     private ActionDocument action(LocalDate now, String id) {
