@@ -60,6 +60,7 @@ public class DBConfig extends Config {
     public void user(String user) {
         if ("iam/gcloud".equals(user)) {
             database.authProvider("gcloud");
+            context.logManager.maskFields("access_token");  // mask token from IAM http response
         } else {
             database.user = user;
         }

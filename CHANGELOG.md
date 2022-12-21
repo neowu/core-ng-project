@@ -4,6 +4,9 @@
 
 * log: remove APP_LOG_FILTER_CONFIG from log-processor
   > not really useful in practice, log system should be designed to be capable of persisting massive data
+* db: updated pool.maxIdleTime from 1 hour to 2 hours
+  > with cloud auth, metadata service could be down during GKE control plane updating (zonal GKE only, not regional GKE)
+  > increase maxIdleTime will hold db connection longer and improve efficiency of db pool, especially in cloud env, there is no firewall between app and db
 
 ### 8.0.9 (11/09/2022 - 12/12/2022)
 

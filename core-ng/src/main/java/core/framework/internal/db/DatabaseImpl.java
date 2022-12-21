@@ -64,7 +64,7 @@ public final class DatabaseImpl implements Database {
 
         pool = new Pool<>(this::createConnection, name);
         pool.size(5, 50);    // default optimization for AWS medium/large instances
-        pool.maxIdleTime = Duration.ofHours(1);  // make sure db server does not kill connection shorter than this, e.g. MySQL default wait_timeout is 8 hours
+        pool.maxIdleTime = Duration.ofHours(2);  // make sure db server does not kill connection shorter than this, e.g. MySQL default wait_timeout is 8 hours
         pool.validator(connection -> connection.isValid(1), Duration.ofSeconds(30));
 
         operation = new DatabaseOperation(pool);
