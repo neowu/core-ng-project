@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch.core.search.ResponseBody;
 import core.framework.log.ActionLogContext;
 import core.framework.search.ForEach;
 import core.framework.util.StopWatch;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public class ElasticSearchForEach<T> {
     private String scrollId;
 
     public ElasticSearchForEach(ForEach<T> forEach, String index, Class<T> documentClass, ElasticSearchImpl elasticSearch) {
-        validate(forEach);
+        validate(forEach, elasticSearch.maxResultWindow);
         this.elasticSearch = elasticSearch;
         this.documentClass = documentClass;
         this.index = index;
@@ -82,18 +83,22 @@ public class ElasticSearchForEach<T> {
         }
     }
 
+    // should not throw exception here to hide original exception, it's called in finally block,
     private void clearScrolls() {
         try {
-            elasticSearch.client.clearScroll(builder -> builder.scrollId(new ArrayList<>(scrollIds)));
-        } catch (IOException e) {
+            if (!scrollIds.isEmpty()) {
+                elasticSearch.client.clearScroll(builder -> builder.scrollId(new ArrayList<>(scrollIds)));
+            }
+        } catch (IOException | ElasticsearchException e) {
             LOGGER.warn("failed to clear scrolls, error={}", e.getMessage(), e);
         }
     }
 
-    private void validate(ForEach<T> forEach) {
+    private void validate(ForEach<T> forEach, int maxBatchSize) {
         if (forEach.consumer == null) throw new Error("forEach.consumer must not be null");
         if (forEach.query == null) throw new Error("forEach.query must not be null");
         if (forEach.scrollTimeout == null) throw new Error("forEach.scrollTimeout must not be null");
-        if (forEach.batchSize == null || forEach.batchSize <= 0) throw new Error("forEach.batchSize must not be null or less than one");
+        if (forEach.batchSize == null || forEach.batchSize <= 0 || forEach.batchSize > maxBatchSize)
+            throw new Error(Strings.format("forEach.batchSize must within (0, {}], batchSize={}", maxBatchSize, forEach.batchSize));
     }
 }

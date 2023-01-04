@@ -8,6 +8,7 @@
   > with cloud auth, metadata service could be down during GKE control plane updating (zonal GKE only, not regional GKE)
   > increase maxIdleTime will hold db connection longer and improve efficiency of db pool, especially in cloud env, there is no firewall between app and db
 * mongo: update driver to 4.8.1
+* search: improved ForEach validation and clear scroll error handling
 
 ### 8.0.9 (11/09/2022 - 12/12/2022)
 
