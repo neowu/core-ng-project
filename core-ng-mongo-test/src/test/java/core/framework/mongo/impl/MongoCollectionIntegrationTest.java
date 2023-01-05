@@ -99,7 +99,7 @@ class MongoCollectionIntegrationTest extends IntegrationTest {
 
     @Test
     void count() {
-        TestMongoEntity entity = entity("value", TestMongoEntity.TestEnum.VALUE1);
+        entity("value", TestMongoEntity.TestEnum.VALUE1);
         long count = collection.count(Filters.eq("string_field", "value"));
 
         assertThat(count).isOne();

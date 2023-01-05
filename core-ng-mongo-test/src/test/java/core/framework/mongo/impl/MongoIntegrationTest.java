@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-public class MongoIntegrationTest extends IntegrationTest {
+class MongoIntegrationTest extends IntegrationTest {
     @Inject
     Mongo mongo;
 
@@ -26,5 +26,4 @@ public class MongoIntegrationTest extends IntegrationTest {
         Document result = mongo.runCommand(new Document("buildInfo", 1));
         assertThat(result.get("ok")).isEqualTo(1.0);
     }
-
 }
