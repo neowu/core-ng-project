@@ -17,8 +17,9 @@ public final class TemplateBody implements Body {
     }
 
     @Override
-    public void send(Sender sender, ResponseHandlerContext context) {
+    public long send(Sender sender, ResponseHandlerContext context) {
         String content = context.templateManager.process(templatePath, model, language);
         sender.send(content);
+        return content.length();
     }
 }

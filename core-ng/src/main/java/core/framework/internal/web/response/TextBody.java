@@ -20,9 +20,10 @@ public final class TextBody implements Body {
     }
 
     @Override
-    public void send(Sender sender, ResponseHandlerContext context) {
+    public long send(Sender sender, ResponseHandlerContext context) {
         byte[] bytes = Strings.bytes(text);
         logger.debug("[response] body={}", text);
         sender.send(ByteBuffer.wrap(bytes));
+        return bytes.length;
     }
 }

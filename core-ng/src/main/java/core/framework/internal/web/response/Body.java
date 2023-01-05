@@ -6,5 +6,6 @@ import io.undertow.io.Sender;
  * @author neo
  */
 interface Body {
-    void send(Sender sender, ResponseHandlerContext context);
+    // return body length
+    long send(Sender sender, ResponseHandlerContext context);
 }
