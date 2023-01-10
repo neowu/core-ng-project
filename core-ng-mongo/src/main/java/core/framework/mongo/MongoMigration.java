@@ -6,6 +6,7 @@ import core.framework.mongo.impl.MongoImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.function.Consumer;
 
 /**
@@ -29,6 +30,7 @@ public class MongoMigration {
         var mongo = new MongoImpl();
         try {
             mongo.uri = new ConnectionString(uri);
+            mongo.timeout(Duration.ofHours(1)); // index building could take long
             mongo.initialize();
             consumer.accept(mongo);
         } catch (Throwable e) {

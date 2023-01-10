@@ -1,5 +1,11 @@
 ## Change log
 
+### 8.0.11 (01/10/2023 - )
+
+* mongo: update MongoMigration with 1 hour timeout
+
+> index creation on large collection could take long
+
 ### 8.0.10 (12/13/2022 - 01/04/2023)
 
 * log: remove APP_LOG_FILTER_CONFIG from log-processor
