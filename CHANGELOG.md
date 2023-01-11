@@ -1,10 +1,11 @@
 ## Change log
 
-### 8.0.11 (01/10/2023 - )
+### 8.0.11-b0 (01/10/2023 - )
 
 * mongo: update MongoMigration with 1 hour timeout
-
-> index creation on large collection could take long
+  > index creation on large collection could take long
+* mongo: added runAdminCommand, and enhanced MongoMigration to support get properties easier
+  > make it easier to determine env, and run different command
 
 ### 8.0.10 (12/13/2022 - 01/04/2023)
 

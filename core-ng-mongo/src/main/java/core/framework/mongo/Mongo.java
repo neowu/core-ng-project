@@ -18,4 +18,6 @@ public interface Mongo {
     void dropCollection(String collection);
 
     Document runCommand(Bson command);
+
+    Document runAdminCommand(Bson command);
 }

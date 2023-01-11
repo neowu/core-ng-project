@@ -120,6 +120,16 @@ public class MongoImpl implements Mongo {
         }
     }
 
+    @Override
+    public Document runAdminCommand(Bson command) {
+        var watch = new StopWatch();
+        try {
+            return mongoClient.getDatabase("admin").runCommand(command);
+        } finally {
+            logger.info("runAdminCommand, command={}, elapsed={}", command, watch.elapsed());
+        }
+    }
+
     public void poolSize(int minSize, int maxSize) {
         connectionPoolSettings.minSize(minSize);
         connectionPoolSettings.maxSize(maxSize);

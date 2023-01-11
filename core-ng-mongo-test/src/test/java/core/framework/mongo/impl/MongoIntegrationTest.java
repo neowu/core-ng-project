@@ -26,4 +26,10 @@ class MongoIntegrationTest extends IntegrationTest {
         Document result = mongo.runCommand(new Document("buildInfo", 1));
         assertThat(result.get("ok")).isEqualTo(1.0);
     }
+
+    @Test
+    void runAdminCommand() {
+        Document result = mongo.runAdminCommand(new Document("serverStatus", 1));
+        assertThat(result.get("ok")).isEqualTo(1.0);
+    }
 }
