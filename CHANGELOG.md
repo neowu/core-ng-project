@@ -8,6 +8,7 @@
   > make it easier to determine env, and run different command
 * mongo: not checking dns if mongodb+srv protocol
   > srv protocol is mainly used by mongo atlas, the readiness probe is mainly for self-hosting mongo in kube cluster
+* mongo: added dropIndex() for migration
 
 ### 8.0.10 (12/13/2022 - 01/04/2023)
 

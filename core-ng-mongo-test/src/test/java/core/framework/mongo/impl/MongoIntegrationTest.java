@@ -19,6 +19,7 @@ class MongoIntegrationTest extends IntegrationTest {
     @Test
     void createIndex() {
         mongo.createIndex("entity", Indexes.ascending("string_field"));
+        mongo.dropIndex("entity", Indexes.ascending("string_field"));
     }
 
     @Test

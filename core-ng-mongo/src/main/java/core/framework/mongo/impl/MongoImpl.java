@@ -101,6 +101,16 @@ public class MongoImpl implements Mongo {
     }
 
     @Override
+    public void dropIndex(String collection, Bson keys) {
+        var watch = new StopWatch();
+        try {
+            database.getCollection(collection).dropIndex(keys);
+        } finally {
+            logger.info("dropIndex, collection={}, keys={}, elapsed={}", collection, keys, watch.elapsed());
+        }
+    }
+
+    @Override
     public void dropCollection(String collection) {
         var watch = new StopWatch();
         try {
