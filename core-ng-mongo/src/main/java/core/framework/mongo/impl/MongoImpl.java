@@ -2,6 +2,7 @@ package core.framework.mongo.impl;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -102,11 +103,17 @@ public class MongoImpl implements Mongo {
 
     @Override
     public void dropIndex(String collection, Bson keys) {
+        boolean deleted = false;
         var watch = new StopWatch();
         try {
             database.getCollection(collection).dropIndex(keys);
+            deleted = true;
+        } catch (MongoCommandException e) {
+            if (!"IndexNotFound".equals(e.getErrorCodeName())) {    // only ignore index not found error
+                throw e;
+            }
         } finally {
-            logger.info("dropIndex, collection={}, keys={}, elapsed={}", collection, keys, watch.elapsed());
+            logger.info("dropIndex, collection={}, keys={}, deleted={}, elapsed={}", collection, keys, deleted, watch.elapsed());
         }
     }
 
