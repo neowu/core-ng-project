@@ -3,6 +3,7 @@ package core.framework.mongo.module;
 import com.mongodb.ConnectionString;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
+import core.framework.internal.module.ReadinessProbe;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
@@ -50,8 +51,16 @@ public class MongoConfig extends Config {
         var connectionString = new ConnectionString(uri);
         if (connectionString.getDatabase() == null) throw new Error("uri must have database, uri=" + uri);
         mongo.uri = connectionString(connectionString);
-        context.probe.hostURIs.add(connectionString.getHosts().get(0));
+        addProbe(context.probe, connectionString);
         this.uri = uri;
+    }
+
+    void addProbe(ReadinessProbe probe, ConnectionString connectionString) {
+        if (!connectionString.isSrvProtocol()) {
+            // mongodb+srv protocol is generally used by Mongo Atlas, as DNS seed list
+            // readiness probe is mainly used by self-hosting mongo within kube, no need to check dns with srv
+            probe.hostURIs.add(connectionString.getHosts().get(0));
+        }
     }
 
     ConnectionString connectionString(ConnectionString uri) {

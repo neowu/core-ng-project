@@ -6,6 +6,8 @@
   > index creation on large collection could take long
 * mongo: added runAdminCommand, and enhanced MongoMigration to support get properties easier
   > make it easier to determine env, and run different command
+* mongo: not checking dns if mongodb+srv protocol
+  > srv protocol is mainly used by mongo atlas, the readiness probe is mainly for self-hosting mongo in kube cluster
 
 ### 8.0.10 (12/13/2022 - 01/04/2023)
 
