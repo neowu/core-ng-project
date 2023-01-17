@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.0.11-b0 (01/10/2023 - )
+### 8.0.11 (01/10/2023 - 01/17/2023)
 
 * mongo: update MongoMigration with 1 hour timeout
   > index creation on large collection could take long
