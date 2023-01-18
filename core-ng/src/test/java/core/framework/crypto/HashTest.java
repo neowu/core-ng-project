@@ -16,14 +16,7 @@ class HashTest {
     }
 
     @Test
-    void sha1Hex() {     // verify by: echo -n "123" | sha1sum
-        assertThat(Hash.sha1Hex("")).isEqualTo("da39a3ee5e6b4b0d3255bfef95601890afd80709");
-        assertThat(Hash.sha1Hex("+")).isEqualTo("a979ef10cc6f6a36df6b8a323307ee3bb2e2db9c");
-        assertThat(Hash.sha1Hex("123")).isEqualTo("40bd001563085fc35165329ea1ff5c5ecbdbbeef");
-    }
-
-    @Test
-    void sha256Hex() {     // verify by: echo -n "123" | sha1sum
+    void sha256Hex() {     // verify by: echo -n "123" | sha256sum
         assertThat(Hash.sha256Hex("")).isEqualTo("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
         assertThat(Hash.sha256Hex("+")).isEqualTo("a318c24216defe206feeb73ef5be00033fa9c4a74d0b967f6532a26ca5906d3b");
         assertThat(Hash.sha256Hex("123")).isEqualTo("a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3");

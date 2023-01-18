@@ -10,13 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 class HMACTest {
     @Test
-    void digestByMD5() {
-        HMAC hmac = new HMAC(Strings.bytes("4VPDEtyUE"), HMAC.Hash.MD5);
-        byte[] bytes = hmac.digest(Strings.bytes("hello"));
-        assertNotNull(bytes);
-    }
-
-    @Test
     void digestBySHA512() {
         HMAC hmac = new HMAC(Strings.bytes("4VPDEtyUE"), HMAC.Hash.SHA512);
         byte[] bytes = hmac.digest(Strings.bytes("hello"));

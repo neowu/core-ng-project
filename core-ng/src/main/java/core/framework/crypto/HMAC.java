@@ -44,7 +44,7 @@ public final class HMAC {
     }
 
     public enum Hash {
-        MD5("HmacMD5"), SHA1("HmacSHA1"), SHA256("HmacSHA256"), SHA512("HmacSHA512");
+        SHA256("HmacSHA256"), SHA512("HmacSHA512");
         final String algorithm;
 
         Hash(String algorithm) {
