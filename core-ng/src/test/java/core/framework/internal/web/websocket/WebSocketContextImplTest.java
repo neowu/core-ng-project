@@ -52,4 +52,17 @@ class WebSocketContextImplTest {
         context.remove(channel);
         assertThat(context.all()).isEmpty();
     }
+
+    @Test
+    void key() {
+        var channel = new ChannelImpl<TestWebSocketMessage, TestWebSocketMessage>(null, context, null);
+        context.add(channel);
+
+        channel.key("name");
+
+        assertThat(context.<TestWebSocketMessage>key("name")).hasValue(channel);
+
+        context.remove(channel);
+        assertThat(context.<TestWebSocketMessage>key("name")).isNotPresent();
+    }
 }

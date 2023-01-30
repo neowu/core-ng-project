@@ -28,6 +28,7 @@ public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
     String action;
     String clientIP;
     String refId;
+    String key;
 
     ChannelImpl(WebSocketChannel channel, WebSocketContextImpl webSocketContext, ChannelHandler<T, V> handler) {
         this.channel = channel;
@@ -75,6 +76,14 @@ public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
     @Override
     public void leave(String room) {
         webSocketContext.leave(this, room);
+    }
+
+    @Override
+    public void key(String key) {
+        if (key == null) throw new Error("key must not be null");
+        if (this.key != null) throw new Error("key can only be updated once");
+        this.key = key;
+        webSocketContext.updateKey(this);
     }
 
     @Override
