@@ -16,8 +16,6 @@ public interface Channel<V> {
 
     void leave(String room);
 
-    void key(String key);
-
     interface Context {
         @Nullable
         Object get(String key); // channel is stateful, context key usually be static put onConnect, so in most of the cases get(key) expects result, that's why here is designed to return Object, not Optional<T>

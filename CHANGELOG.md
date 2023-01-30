@@ -1,10 +1,9 @@
 ## Change log
 
-### 8.0.12 (01/18/2023 - )
+### 8.0.12-b0 (01/18/2023 - )
 
 * hash: removed hmac md5/sha1, hash.sha1 support
   > not used anymore
-* ws: channel can be assigned with key which is used to look up from WebSocketContext
 
 ### 8.0.11 (01/10/2023 - 01/17/2023)
 
