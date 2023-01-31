@@ -19,6 +19,12 @@
       "highDiskSizeThreshold": 50000000000
     }
   },
+  "mongo": {
+    "mongo": {
+      "host": "mongo-0.mongo",
+      "highDiskUsageThreshold": 0.7
+    }
+  },
   "kube": {
     "namespaces": ["ops", "app"]
   },

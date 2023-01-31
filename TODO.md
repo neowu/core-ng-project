@@ -9,4 +9,3 @@
 * redis using ping/pong to validate connection? for zero downtime upgrading e.g. with gcloud memory store
 
 * use adminClient to check kafka ready? or retry sending message?
-* mongo: monitor thru mongo command, db.stats()?
