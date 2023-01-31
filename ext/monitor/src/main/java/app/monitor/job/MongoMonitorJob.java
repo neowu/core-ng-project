@@ -1,16 +1,12 @@
 package app.monitor.job;
 
-import com.mongodb.ConnectionString;
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import core.framework.internal.log.LogManager;
 import core.framework.internal.stat.Stats;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.Severity;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
-import core.framework.util.Strings;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +15,6 @@ import org.slf4j.LoggerFactory;
  * @author neo
  */
 public class MongoMonitorJob implements Job {
-    public static void main(String[] args) {
-        String connectionString = Strings.format("mongodb://{}/?serverSelectionTimeoutMS=0&socketTimeoutMS=10000&appName={}", "localhost", LogManager.APP_NAME);
-        MongoClient client = MongoClients.create(new ConnectionString(connectionString));
-        final Document document = client.getDatabase("local").runCommand(new Document("dbStats", 1));
-        System.out.println();
-
-    }
-
     private final Logger logger = LoggerFactory.getLogger(MongoMonitorJob.class);
     private final MongoClient mongo;
     private final String app;
