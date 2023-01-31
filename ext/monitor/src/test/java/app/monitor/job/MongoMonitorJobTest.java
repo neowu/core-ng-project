@@ -42,7 +42,7 @@ class MongoMonitorJobTest {
         doReturn(new Document(Map.of("objects", 5, "totalSize", 15D, "fsUsedSize", 20D, "fsTotalSize", 50D))).when(job).dbStats("admin");
 
         Stats stats = job.collect();
-        assertThat(stats.stats).containsEntry("mongo_objects", 6D);
+        assertThat(stats.stats).containsEntry("mongo_docs", 6D);
         assertThat(stats.stats).containsEntry("mongo_total_size", 25D);
         assertThat(stats.stats).containsEntry("mongo_disk_used", 20D);
         assertThat(stats.stats).containsEntry("mongo_disk_max", 50D);

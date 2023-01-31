@@ -57,7 +57,7 @@ public class MongoMonitorJob implements Job {
         }
 
         var stats = new Stats();
-        stats.put("mongo_objects", objects);
+        stats.put("mongo_docs", objects);
         stats.put("mongo_total_size", totalSize);
         stats.put("mongo_disk_used", diskUsed);
         stats.put("mongo_disk_max", diskMax);
