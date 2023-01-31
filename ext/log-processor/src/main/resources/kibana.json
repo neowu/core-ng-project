@@ -772,12 +772,12 @@
     }
   },
   {
-    "id": "stat-mongo_objects",
+    "id": "stat-mongo_docs",
     "type": "visualization",
     "attributes": {
-      "title": "stat-mongo_objects",
+      "title": "stat-mongo_docs",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "visState": "{\"title\":\"stat-mongo_objects\",\"type\":\"metrics\",\"params\":{\"id\":\"stat-mongo_objects\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"stat-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"max-stats-mongo_total_size\",\"label\":\"total size\",\"color\":\"#F94144\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.mongo_total_size\"}]},{\"id\":\"max-stats-mongo_docs\",\"label\":\"docs\",\"color\":\"#F3722C\",\"split_mode\":\"everything\",\"separate_axis\":1,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.0,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.mongo_docs\"}]}]}}"
+      "visState": "{\"title\":\"stat-mongo_docs\",\"type\":\"metrics\",\"params\":{\"id\":\"stat-mongo_docs\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"stat-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"max-stats-mongo_total_size\",\"label\":\"total size\",\"color\":\"#F94144\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.mongo_total_size\"}]},{\"id\":\"max-stats-mongo_docs\",\"label\":\"docs\",\"color\":\"#F3722C\",\"split_mode\":\"everything\",\"separate_axis\":1,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.0,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.mongo_docs\"}]}]}}"
     }
   },
   {
