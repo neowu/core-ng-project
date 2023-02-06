@@ -1,6 +1,7 @@
 package core.framework.module;
 
 import core.framework.internal.inject.InjectValidator;
+import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.HTTPIOHandler;
 import core.framework.internal.web.websocket.ChannelHandler;
@@ -10,15 +11,19 @@ import core.framework.web.websocket.WebSocketContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+
 /**
  * @author neo
  */
-public final class WebSocketConfig {
-    final ModuleContext context;
+public final class WebSocketConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
+    ModuleContext context;
 
-    WebSocketConfig(ModuleContext context) {
+    @Override
+    protected void initialize(ModuleContext context, String name) {
         this.context = context;
+        context.httpServer.handler.rateControl.config(WebSocketHandler.WS_OPEN_GROUP, 10, 10, Duration.ofSeconds(30));
     }
 
     public <T, V> void listen(String path, Class<T> clientMessageClass, Class<V> serverMessageClass, ChannelListener<T, V> listener) {

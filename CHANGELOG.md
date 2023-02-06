@@ -5,6 +5,9 @@
 * hash: removed hmac md5/sha1, hash.sha1 support
   > not used anymore
 * monitor: added mongo monitor
+* ws: add rate limit on ws connect
+  > establish wss connection is expensive, especially won't be able to reuse http conn pool from LB
+  > by default only allow to create 10 connections every 30s
 
 ### 8.0.11 (01/10/2023 - 01/17/2023)
 

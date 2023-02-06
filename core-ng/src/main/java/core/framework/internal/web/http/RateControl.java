@@ -15,7 +15,7 @@ import java.util.Map;
 public class RateControl {
     private final Logger logger = LoggerFactory.getLogger(RateControl.class);
 
-    public Map<String, RateConfig> config;
+    private Map<String, RateConfig> config;
     private Map<String, Rate> rates;
 
     public void maxEntries(int entries) {

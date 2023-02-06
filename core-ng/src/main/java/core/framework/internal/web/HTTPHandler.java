@@ -95,6 +95,7 @@ public class HTTPHandler implements HttpHandler {
             linkContext(actionLog, headers);
 
             if (webSocketHandler != null && webSocketHandler.checkWebSocket(request.method(), headers)) {
+                rateControl.validateRate(WebSocketHandler.WS_OPEN_GROUP, request.clientIP());
                 webSocketHandler.handle(exchange, request, actionLog);
                 return; // with WebSocket, not save session
             }

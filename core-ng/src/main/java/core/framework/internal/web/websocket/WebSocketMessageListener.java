@@ -141,7 +141,7 @@ final class WebSocketMessageListener implements ChannelListener<WebSocketChannel
     }
 
     private void validateRate(ChannelImpl<?, ?> wrapper) {
-        if (rateControl.config != null && wrapper.handler.limitRate != null) {
+        if (wrapper.handler.limitRate != null) {
             rateControl.validateRate(wrapper.handler.limitRate.value(), wrapper.clientIP);
         }
     }
