@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '8.0.12-b0'
+    version = '8.0.12'
 
     repositories {
         maven {
@@ -15,12 +15,12 @@ subprojects {
 }
 
 def elasticVersion = '8.6.0'
-def kafkaVersion = '3.3.1'
-def jacksonVersion = '2.14.1'
+def kafkaVersion = '3.3.2'
+def jacksonVersion = '2.14.2'
 def junitVersion = '5.9.2'
-def mockitoVersion = '5.0.0'
-def assertjVersion = '3.24.1'
-def mysqlVersion = '8.0.31'
+def mockitoVersion = '5.1.1'
+def assertjVersion = '3.24.2'
+def mysqlVersion = '8.0.32'
 
 project('core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -66,7 +66,7 @@ project('core-ng-mongo') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        api 'org.mongodb:mongodb-driver-sync:4.8.1'
+        api 'org.mongodb:mongodb-driver-sync:4.8.2'
         testImplementation project(":core-ng-test")
     }
 }

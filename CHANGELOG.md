@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.0.12-b0 (01/18/2023 - )
+### 8.0.12 (01/18/2023 - 02/07/2023)
 
 * hash: removed hmac md5/sha1, hash.sha1 support
   > not used anymore
@@ -8,6 +8,8 @@
 * ws: add rate limit on ws connect
   > establish wss connection is expensive, especially won't be able to reuse http conn pool from LB
   > by default only allow to create 10 connections every 30s
+* db: update mysql driver to 8.0.32
+* kafka: update to 3.3.2
 
 ### 8.0.11 (01/10/2023 - 01/17/2023)
 
