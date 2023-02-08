@@ -1,5 +1,7 @@
 ## Change log
 
+### 8.0.13 (02/08/2023 - )
+
 ### 8.0.12 (01/18/2023 - 02/07/2023)
 
 * hash: removed hmac md5/sha1, hash.sha1 support

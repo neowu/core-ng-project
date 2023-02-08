@@ -53,6 +53,12 @@ class RequestParserTest {
     }
 
     @Test
+    void invalidPort() {
+        assertThatThrownBy(() -> parser.port(80, "invalid, 80"))
+            .isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
     void scheme() {
         assertThat(parser.scheme("http", "https")).isEqualTo("https");
         assertThat(parser.scheme("http", null)).isEqualTo("http");

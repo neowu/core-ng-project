@@ -208,11 +208,17 @@ public final class RequestParser {
 
     int port(int requestPort, String xForwardedPort) {
         if (xForwardedPort != null) {
-            int index = xForwardedPort.indexOf(',');
-            if (index > 0)
-                return Integer.parseInt(xForwardedPort.substring(0, index));
-            else
-                return Integer.parseInt(xForwardedPort);
+            try {
+                int index = xForwardedPort.indexOf(',');
+                if (index > 0) {
+                    return Integer.parseInt(xForwardedPort.substring(0, index));
+                } else {
+                    return Integer.parseInt(xForwardedPort);
+                }
+            } catch (NumberFormatException e) {
+                // to protect X-Forwarded-Port spoofing
+                throw new BadRequestException("invalid port", "INVALID_HTTP_REQUEST", e);
+            }
         }
         return requestPort;
     }
