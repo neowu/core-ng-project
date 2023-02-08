@@ -83,7 +83,7 @@ public abstract class Module {
     }
 
     public WebSocketConfig ws() {
-        return context.config(WebSocketConfig.class, null);
+        return new WebSocketConfig(context);
     }
 
     public SiteConfig site() {

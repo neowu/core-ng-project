@@ -21,8 +21,7 @@ class WebSocketConfigTest {
 
     @BeforeAll
     void createWebSocketConfig() {
-        config = new WebSocketConfig();
-        config.initialize(new ModuleContext(null), null);
+        config = new WebSocketConfig(new ModuleContext(null));
     }
 
     @Test

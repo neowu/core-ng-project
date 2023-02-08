@@ -34,12 +34,12 @@ public class WebSocketHandler {
     static final String CHANNEL_KEY = "CHANNEL";
     public final WebSocketContextImpl context = new WebSocketContextImpl();
 
-    private final Handshake handshake = new Hybi13Handshake();
-    private final Map<String, ChannelHandler<?, ?>> handlers = new HashMap<>();
-
     // passes to AsyncWebSocketHttpServerExchange as peerConnections, channel will remove self on close
     // refer to io.undertow.websockets.core.WebSocketChannel.WebSocketChannel
-    private final Set<WebSocketChannel> channels = Sets.newConcurrentHashSet();
+    final Set<WebSocketChannel> channels = Sets.newConcurrentHashSet();
+
+    private final Handshake handshake = new Hybi13Handshake();
+    private final Map<String, ChannelHandler<?, ?>> handlers = new HashMap<>();
     private final ChannelCloseListener channelCloseListener = new ChannelCloseListener(context);
 
     private final WebSocketMessageListener messageListener;
