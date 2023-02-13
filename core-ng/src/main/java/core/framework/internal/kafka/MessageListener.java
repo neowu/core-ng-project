@@ -103,10 +103,11 @@ public class MessageListener {
         }
     }
 
+    @SuppressWarnings("deprecation")
     Consumer<byte[], byte[]> createConsumer() {
         var watch = new StopWatch();
         try {
-            Map<String, Object> config = Maps.newHashMapWithExpectedSize(12);
+            Map<String, Object> config = Maps.newHashMapWithExpectedSize(13);
             config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs);
             config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
             config.put(ConsumerConfig.CLIENT_ID_CONFIG, Network.LOCAL_HOST_NAME + "-" + CONSUMER_CLIENT_ID_SEQUENCE.getAndIncrement());      // will show in monitor metrics
@@ -119,6 +120,7 @@ public class MessageListener {
             config.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxPollBytes);
             config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);
             config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) maxWaitTime.toMillis());
+            config.put(ConsumerConfig.AUTO_INCLUDE_JMX_REPORTER_CONFIG, Boolean.FALSE);
             var deserializer = new ByteArrayDeserializer();
             Consumer<byte[], byte[]> consumer = new KafkaConsumer<>(config, deserializer, deserializer);
             consumerMetrics.add(consumer.metrics());

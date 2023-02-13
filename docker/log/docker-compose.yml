@@ -30,7 +30,7 @@ services:
     depends_on:
     - elasticsearch
   kafka:
-    image: neowu/kafka:3.3.1-kraft
+    image: neowu/kafka:3.4.0
     ports:
     - 9092:9092
     - 1099:1099
@@ -41,7 +41,7 @@ services:
     - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
     - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka:9092 --override num.partitions=1
   log-processor:
-    image: neowu/log-processor:8.0.11
+    image: neowu/log-processor:8.0.12
     environment:
     - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092
@@ -53,7 +53,7 @@ services:
     - elasticsearch
     - kibana
   log-collector:
-    image: neowu/log-collector:8.0.11
+    image: neowu/log-collector:8.0.12
     environment:
     - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092
