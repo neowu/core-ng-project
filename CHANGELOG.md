@@ -1,9 +1,11 @@
 ## Change log
 
-### 8.0.13 (02/08/2023 - )
+### 8.0.13-b0 (02/08/2023 - )
 
 * ws: add "ws_active_channels" stats
 * kafka: update to 3.4.0
+* ws: allow to provide custom rate limit config for ws connecting
+  > use http().limitRate().add(WebSocketConfig.WS_OPEN_GROUP, ...)
 
 ### 8.0.12 (01/18/2023 - 02/07/2023)
 

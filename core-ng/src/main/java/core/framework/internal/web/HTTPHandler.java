@@ -18,6 +18,7 @@ import core.framework.internal.web.route.Route;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.internal.web.site.TemplateManager;
 import core.framework.internal.web.websocket.WebSocketHandler;
+import core.framework.module.WebSocketConfig;
 import core.framework.web.Interceptor;
 import core.framework.web.Response;
 import io.undertow.server.HttpHandler;
@@ -95,7 +96,7 @@ public class HTTPHandler implements HttpHandler {
             linkContext(actionLog, headers);
 
             if (webSocketHandler != null && webSocketHandler.checkWebSocket(request.method(), headers)) {
-                rateControl.validateRate(WebSocketHandler.WS_OPEN_GROUP, request.clientIP());
+                rateControl.validateRate(WebSocketConfig.WS_OPEN_GROUP, request.clientIP());
                 webSocketHandler.handle(exchange, request, actionLog);
                 return; // with WebSocket, not save session
             }

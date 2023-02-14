@@ -30,7 +30,6 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 public class WebSocketHandler {
-    public static final String WS_OPEN_GROUP = "ws:open";
     static final String CHANNEL_KEY = "CHANNEL";
     public final WebSocketContextImpl context = new WebSocketContextImpl();
 

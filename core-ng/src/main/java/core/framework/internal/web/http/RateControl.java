@@ -40,6 +40,10 @@ public class RateControl {
         }
     }
 
+    public boolean hasGroup(String group) {
+        return config != null && config.containsKey(group);
+    }
+
     double ratePerNano(int rate, Duration interval) {
         return rate / (double) interval.toNanos();
     }
