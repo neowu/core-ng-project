@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '8.0.13-b0'
+    version = '8.0.13'
 
     repositories {
         maven {
@@ -35,7 +35,7 @@ project('core-ng') {
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-        implementation 'io.undertow:undertow-core:2.3.1.Final'
+        implementation 'io.undertow:undertow-core:2.3.4.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.8.4'      // used by kafka message compression
         compileOnly "com.mysql:mysql-connector-j:${mysqlVersion}"
@@ -66,7 +66,7 @@ project('core-ng-mongo') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        api 'org.mongodb:mongodb-driver-sync:4.8.2'
+        api 'org.mongodb:mongodb-driver-sync:4.9.0'
         testImplementation project(":core-ng-test")
     }
 }
