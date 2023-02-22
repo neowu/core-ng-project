@@ -96,7 +96,7 @@ final class WebSocketMessageListener implements ChannelListener<WebSocketChannel
 
             String data = textMessage.getData();
             logger.debug("[channel] message={}", data);     // not mask, assume ws message not containing sensitive info, the data can be json or plain text
-            actionLog.track("ws", 0, 1, 0);
+            actionLog.track("ws", 0, data.length(), 0);
 
             validateRate(wrapper);
 
@@ -126,7 +126,7 @@ final class WebSocketMessageListener implements ChannelListener<WebSocketChannel
             String reason = closeMessage.getReason();
             actionLog.context("code", code);
             logger.debug("[channel] reason={}", reason);
-            actionLog.track("ws", 0, 1, 0);
+            actionLog.track("ws", 0, 1 + reason.length(), 0);   // size = code (1 int) + reason
 
             wrapper.handler.listener.onClose(wrapper, code, reason);
 

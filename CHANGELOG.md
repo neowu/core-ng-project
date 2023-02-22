@@ -1,5 +1,11 @@
 ## Change log
 
+### 8.0.14 (02/21/2023 - )
+
+* ws: update perf stats to track bytes read/write, similar like http client
+* log: updated ws_active_channels, http_active_requests visualization
+  > max -> split by host -> stacked
+
 ### 8.0.13 (02/08/2023 - 02/21/2023)
 
 * ws: add "ws_active_channels" stats

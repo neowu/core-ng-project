@@ -50,7 +50,7 @@ public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
             WebSockets.sendText(text, channel, ChannelCallback.INSTANCE);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("ws", elapsed, 0, 1);
+            ActionLogContext.track("ws", elapsed, 0, text.length());
             LOGGER.debug("send ws message, id={}, text={}, elapsed={}", id, text, elapsed);     // not mask, assume ws message not containing sensitive info, the text can be json or plain text
         }
     }
@@ -62,7 +62,7 @@ public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
             WebSockets.sendClose(WebSocketCloseCodes.NORMAL_CLOSURE, null, channel, ChannelCallback.INSTANCE);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("ws", elapsed, 0, 1);
+            ActionLogContext.track("ws", elapsed, 0, 1);    // close message size = 1
             LOGGER.debug("close ws channel, id={}, elapsed={}", id, elapsed);
         }
     }
