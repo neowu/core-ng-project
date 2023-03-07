@@ -10,12 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class WebSocketMessageListenerTest {
-    private WebSocketMessageListener listener;
+class WebSocketListenerTest {
+    private WebSocketListener listener;
 
     @BeforeEach
     void createWebSocketMessageListener() {
-        listener = new WebSocketMessageListener(null, null);
+        listener = new WebSocketListener(null, null, null);
     }
 
     @Test

@@ -22,18 +22,23 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 
+import static core.framework.internal.web.websocket.WebSocketHandler.CHANNEL_KEY;
+
 /**
  * @author neo
  */
-final class WebSocketMessageListener implements ChannelListener<WebSocketChannel> {
+final class WebSocketListener implements ChannelListener<WebSocketChannel> {
     private static final long MAX_TEXT_MESSAGE_SIZE = 10_000_000;     // limit max text message sent by client to 10M
     private final long maxProcessTimeInNano = Duration.ofSeconds(300).toNanos();    // generally we set 300s on LB for websocket timeout
-    private final Logger logger = LoggerFactory.getLogger(WebSocketMessageListener.class);
+    private final Logger logger = LoggerFactory.getLogger(WebSocketListener.class);
     private final LogManager logManager;
+    private final WebSocketContextImpl context;
     private final RateControl rateControl;
+    CloseListener closeListener = new CloseListener();
 
-    WebSocketMessageListener(LogManager logManager, RateControl rateControl) {
+    WebSocketListener(LogManager logManager, WebSocketContextImpl context, RateControl rateControl) {
         this.logManager = logManager;
+        this.context = context;
         this.rateControl = rateControl;
     }
 
@@ -49,12 +54,12 @@ final class WebSocketMessageListener implements ChannelListener<WebSocketChannel
                 case TEXT -> new BufferedTextMessage(MAX_TEXT_MESSAGE_SIZE, true).read(result, new WebSocketCallback<>() {
                     @Override
                     public void complete(WebSocketChannel channel, BufferedTextMessage context) {
-                        onFullTextMessage(channel, context, null);
+                        channel.getWorker().execute(() -> onFullTextMessage(channel, context, null));
                     }
 
                     @Override
                     public void onError(WebSocketChannel channel, BufferedTextMessage context, Throwable throwable) {
-                        onFullTextMessage(channel, context, throwable);
+                        channel.getWorker().execute(() -> onFullTextMessage(channel, context, throwable));
                     }
                 });
                 case PING -> new BufferedBinaryMessage(125, true).read(result, new Callback<>() {
@@ -87,7 +92,7 @@ final class WebSocketMessageListener implements ChannelListener<WebSocketChannel
 
     private void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage textMessage, Throwable error) {
         @SuppressWarnings("unchecked")
-        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
+        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(CHANNEL_KEY);
         ActionLog actionLog = logManager.begin("=== ws message handling begin ===", null);
         try {
             actionLog.action(wrapper.action);
@@ -114,29 +119,36 @@ final class WebSocketMessageListener implements ChannelListener<WebSocketChannel
 
     private void onFullCloseMessage(WebSocketChannel channel, BufferedBinaryMessage message) {
         @SuppressWarnings("unchecked")
-        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
-        ActionLog actionLog = logManager.begin("=== ws close message handling begin ===", null);
-
+        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(CHANNEL_KEY);
         try (var data = message.getData()) {
-            actionLog.action(wrapper.action + ":close");
-            linkContext(channel, wrapper, actionLog);
             var closeMessage = new CloseMessage(data.getResource());
+            wrapper.closeMessage = closeMessage;
+            if (!channel.isCloseFrameSent()) {
+                WebSockets.sendClose(closeMessage, channel, ChannelCallback.INSTANCE);
+            }
+        }
+    }
 
-            int code = closeMessage.getCode();
-            String reason = closeMessage.getReason();
+    void onClose(WebSocketChannel channel) {
+        @SuppressWarnings("unchecked")
+        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(CHANNEL_KEY);
+        ActionLog actionLog = logManager.begin("=== ws close begin ===", null);
+        try {
+            actionLog.action(wrapper.action + ":close");
+            context.remove(wrapper);    // context.remove() does not cleanup wrapper.rooms, so can be logged below
+            linkContext(channel, wrapper, actionLog);
+
+            int code = wrapper.closeMessage == null ? WebSocketCloseCodes.ABNORMAL_CLOSURE : wrapper.closeMessage.getCode();
+            String reason = wrapper.closeMessage == null ? null : wrapper.closeMessage.getReason();
             actionLog.context("code", code);
             logger.debug("[channel] reason={}", reason);
-            actionLog.track("ws", 0, 1 + reason.length(), 0);   // size = code (1 int) + reason
+            actionLog.track("ws", 0, reason == null ? 0 : 1 + reason.length(), 0);   // size = code (1 int) + reason
 
             wrapper.handler.listener.onClose(wrapper, code, reason);
-
-            if (!channel.isCloseFrameSent()) {
-                WebSockets.sendClose(closeMessage, channel, null);
-            }
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {
-            logManager.end("=== ws close message handling end ===");
+            logManager.end("=== ws close end ===");
         }
     }
 
@@ -148,6 +160,7 @@ final class WebSocketMessageListener implements ChannelListener<WebSocketChannel
 
     private void linkContext(WebSocketChannel channel, ChannelImpl<?, ?> wrapper, ActionLog actionLog) {
         actionLog.warningContext.maxProcessTimeInNano(maxProcessTimeInNano);
+        actionLog.trace = wrapper.trace;
         actionLog.context("channel", wrapper.id);
         logger.debug("refId={}", wrapper.refId);
         List<String> refIds = List.of(wrapper.refId);
@@ -165,6 +178,13 @@ final class WebSocketMessageListener implements ChannelListener<WebSocketChannel
         if (e instanceof TooManyRequestsException) return WebSocketCloseCodes.TRY_AGAIN_LATER;
         if (e instanceof BadRequestException) return WebSocketCloseCodes.POLICY_VIOLATION;
         return WebSocketCloseCodes.INTERNAL_ERROR;
+    }
+
+    class CloseListener implements ChannelListener<WebSocketChannel> {
+        @Override
+        public void handleEvent(WebSocketChannel channel) {
+            channel.getWorker().execute(() -> onClose(channel));
+        }
     }
 
     private abstract class Callback<T> implements WebSocketCallback<T> {

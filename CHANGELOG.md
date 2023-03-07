@@ -1,10 +1,12 @@
 ## Change log
 
-### 8.0.14-b0 (02/21/2023 - )
+### 8.0.14-b1 (02/21/2023 - )
 
 * ws: update perf stats to track bytes read/write, similar like http client
 * log: updated ws_active_channels, http_active_requests visualization
   > max -> split by host -> stacked
+* ws: onMessage/onClose dispatched to task pool
+* ws: websocket abnormal closure will trigger onClose event
 
 ### 8.0.13 (02/08/2023 - 02/21/2023)
 

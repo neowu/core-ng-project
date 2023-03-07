@@ -39,16 +39,15 @@ public class WebSocketHandler {
 
     private final Handshake handshake = new Hybi13Handshake();
     private final Map<String, ChannelHandler<?, ?>> handlers = new HashMap<>();
-    private final ChannelCloseListener channelCloseListener = new ChannelCloseListener(context);
 
-    private final WebSocketMessageListener messageListener;
+    private final WebSocketListener listener;
     private final SessionManager sessionManager;
     private final LogManager logManager;
 
     public WebSocketHandler(LogManager logManager, SessionManager sessionManager, RateControl rateControl) {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
-        messageListener = new WebSocketMessageListener(logManager, rateControl);
+        listener = new WebSocketListener(logManager, context, rateControl);
     }
 
     public boolean checkWebSocket(HTTPMethod method, HeaderMap headers) {
@@ -83,13 +82,15 @@ public class WebSocketHandler {
                 wrapper.clientIP = request.clientIP();
                 wrapper.refId = actionLog.id;   // with ws, correlationId and refId are same as parent http action id
                 actionLog.context("channel", wrapper.id);
+                wrapper.trace = actionLog.trace;
+
                 channel.setAttribute(CHANNEL_KEY, wrapper);
-                channel.addCloseTask(channelCloseListener);
+                channel.addCloseTask(listener.closeListener);
                 context.add(wrapper);
 
                 handler.listener.onConnect(request, wrapper);
                 actionLog.context("room", wrapper.rooms.toArray()); // may join room onConnect
-                channel.getReceiveSetter().set(messageListener);
+                channel.getReceiveSetter().set(listener);
                 channel.resumeReceives();
 
                 channels.add(channel);

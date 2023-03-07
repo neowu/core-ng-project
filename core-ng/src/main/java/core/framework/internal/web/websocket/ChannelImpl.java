@@ -1,14 +1,17 @@
 package core.framework.internal.web.websocket;
 
+import core.framework.internal.log.Trace;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
 import core.framework.web.websocket.Channel;
+import io.undertow.websockets.core.CloseMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSockets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -28,6 +31,9 @@ public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
     String action;
     String clientIP;
     String refId;
+    Trace trace;
+    @Nullable
+    CloseMessage closeMessage;
 
     ChannelImpl(WebSocketChannel channel, WebSocketContextImpl webSocketContext, ChannelHandler<T, V> handler) {
         this.channel = channel;
