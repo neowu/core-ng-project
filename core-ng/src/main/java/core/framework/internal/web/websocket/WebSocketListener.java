@@ -140,11 +140,14 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
 
             int code = wrapper.closeMessage == null ? WebSocketCloseCodes.ABNORMAL_CLOSURE : wrapper.closeMessage.getCode();
             String reason = wrapper.closeMessage == null ? null : wrapper.closeMessage.getReason();
-            actionLog.context("code", code);
+            actionLog.context("close_code", code);
             logger.debug("[channel] reason={}", reason);
             actionLog.track("ws", 0, reason == null ? 0 : 1 + reason.length(), 0);   // size = code (1 int) + reason
 
             wrapper.handler.listener.onClose(wrapper, code, reason);
+
+            double duration = System.nanoTime() - wrapper.startTime;
+            actionLog.stats.put("ws_duration", duration);
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {

@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelImpl.class);
     final String id = UUID.randomUUID().toString();
+    final long startTime = System.nanoTime();
     final Set<String> rooms = Sets.newConcurrentHashSet();
     final ChannelHandler<T, V> handler;
     private final WebSocketChannel channel;
