@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.0.14-b1 (02/21/2023 - )
+### 8.1.0 (02/21/2023 - 03/09/2023)
 
 * ws: update perf stats to track bytes read/write, similar like http client
 * log: updated ws_active_channels, http_active_requests visualization
