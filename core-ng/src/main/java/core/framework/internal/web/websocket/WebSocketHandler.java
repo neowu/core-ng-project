@@ -97,6 +97,8 @@ public class WebSocketHandler {
             } catch (Throwable e) {
                 // upgrade is handled by io.undertow.server.protocol.http.HttpReadListener.exchangeComplete, and it catches all exceptions during onConnect
                 logManager.logError(e);
+                WebSockets.sendClose(WebSocketCloseCodes.closeCode(e), e.getMessage(), channel, ChannelCallback.INSTANCE);
+
                 IoUtils.safeClose(connection);
             }
         });

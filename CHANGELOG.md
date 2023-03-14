@@ -1,5 +1,9 @@
 ## Change log
 
+### 8.1.1-b0 (03/14/2023 - )
+
+* ws: response corresponding close-code on connect according to exception
+
 ### 8.1.0 (02/21/2023 - 03/09/2023)
 
 * ws: update perf stats to track bytes read/write, similar like http client

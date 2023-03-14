@@ -3,8 +3,6 @@ package core.framework.internal.web.websocket;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.web.http.RateControl;
-import core.framework.web.exception.BadRequestException;
-import core.framework.web.exception.TooManyRequestsException;
 import io.undertow.websockets.core.BufferedBinaryMessage;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.CloseMessage;
@@ -110,7 +108,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
         } catch (Throwable e) {
             logManager.logError(e);
             if (!channel.isCloseFrameSent()) {
-                WebSockets.sendClose(closeCode(e), e.getMessage(), channel, ChannelCallback.INSTANCE);
+                WebSockets.sendClose(WebSocketCloseCodes.closeCode(e), e.getMessage(), channel, ChannelCallback.INSTANCE);
             }
         } finally {
             logManager.end("=== ws message handling end ===");
@@ -141,7 +139,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
             int code = wrapper.closeMessage == null ? WebSocketCloseCodes.ABNORMAL_CLOSURE : wrapper.closeMessage.getCode();
             String reason = wrapper.closeMessage == null ? null : wrapper.closeMessage.getReason();
             actionLog.context("close_code", code);
-            logger.debug("[channel] reason={}", reason);
+            if (reason != null && reason.length() > 0) actionLog.context("close_reason", reason);
             actionLog.track("ws", 0, reason == null ? 0 : 1 + reason.length(), 0);   // size = code (1 int) + reason
 
             wrapper.handler.listener.onClose(wrapper, code, reason);
@@ -174,13 +172,6 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
         actionLog.context("client_ip", wrapper.clientIP);
         actionLog.context("listener", wrapper.handler.listener.getClass().getCanonicalName());
         actionLog.context("room", wrapper.rooms.toArray());
-    }
-
-    // as websocket does not have restful convention, here only supports general cases
-    int closeCode(Throwable e) {
-        if (e instanceof TooManyRequestsException) return WebSocketCloseCodes.TRY_AGAIN_LATER;
-        if (e instanceof BadRequestException) return WebSocketCloseCodes.POLICY_VIOLATION;
-        return WebSocketCloseCodes.INTERNAL_ERROR;
     }
 
     class CloseListener implements ChannelListener<WebSocketChannel> {
