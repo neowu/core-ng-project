@@ -17,5 +17,3 @@ jobs:
     - run: ./gradlew check
     - run: ./gradlew testCodeCoverageReport
     - uses: codecov/codecov-action@v3
-      with:
-        fail_ci_if_error: true
