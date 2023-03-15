@@ -56,7 +56,7 @@ afterEvaluate {
         group = 'distribution'
         dependsOn installDist
         doLast {
-            def rootGroup = parent.depth > 0 ? parent.group : project.group;
+            def rootGroup = parent.depth > 0 ? parent.group : project.group
             project.sync {
                 from(installDist.destinationDir) {
                     exclude "lib/${rootGroup}.*.jar"
