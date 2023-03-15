@@ -18,7 +18,6 @@ import io.undertow.websockets.core.WebSockets;
 import io.undertow.websockets.core.protocol.Handshake;
 import io.undertow.websockets.core.protocol.version13.Hybi13Handshake;
 import io.undertow.websockets.spi.AsyncWebSocketHttpServerExchange;
-import org.xnio.IoUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -81,25 +80,24 @@ public class WebSocketHandler {
                 wrapper.action = action;
                 wrapper.clientIP = request.clientIP();
                 wrapper.refId = actionLog.id;   // with ws, correlationId and refId are same as parent http action id
-                actionLog.context("channel", wrapper.id);
                 wrapper.trace = actionLog.trace;
+                actionLog.context("channel", wrapper.id);
 
                 channel.setAttribute(CHANNEL_KEY, wrapper);
                 channel.addCloseTask(listener.closeListener);
                 context.add(wrapper);
 
-                handler.listener.onConnect(request, wrapper);
-                actionLog.context("room", wrapper.rooms.toArray()); // may join room onConnect
                 channel.getReceiveSetter().set(listener);
                 channel.resumeReceives();
 
                 channels.add(channel);
+
+                handler.listener.onConnect(request, wrapper);
+                actionLog.context("room", wrapper.rooms.toArray()); // may join room onConnect
             } catch (Throwable e) {
                 // upgrade is handled by io.undertow.server.protocol.http.HttpReadListener.exchangeComplete, and it catches all exceptions during onConnect
                 logManager.logError(e);
                 WebSockets.sendClose(WebSocketCloseCodes.closeCode(e), e.getMessage(), channel, ChannelCallback.INSTANCE);
-
-                IoUtils.safeClose(connection);
             }
         });
         handshake.handshake(webSocketExchange);

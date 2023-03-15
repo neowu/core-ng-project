@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.1.1-b0 (03/14/2023 - )
+### 8.1.1-b1 (03/14/2023 - )
 
 * ws: response corresponding close-code on connect according to exception
 

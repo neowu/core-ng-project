@@ -3,6 +3,7 @@ package core.framework.internal.web.websocket;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.web.http.RateControl;
+import core.framework.util.Strings;
 import io.undertow.websockets.core.BufferedBinaryMessage;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.CloseMessage;
@@ -19,8 +20,6 @@ import org.xnio.IoUtils;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
-
-import static core.framework.internal.web.websocket.WebSocketHandler.CHANNEL_KEY;
 
 /**
  * @author neo
@@ -80,7 +79,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
                         onFullCloseMessage(channel, context);
                     }
                 });
-                default -> throw new Error("unexpected type, type=" + type);
+                default -> throw new IOException("unexpected type, type=" + type);
             }
         } catch (IOException e) {
             logger.warn(e.getMessage(), e);
@@ -90,7 +89,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
 
     private void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage textMessage, Throwable error) {
         @SuppressWarnings("unchecked")
-        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(CHANNEL_KEY);
+        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
         ActionLog actionLog = logManager.begin("=== ws message handling begin ===", null);
         try {
             actionLog.action(wrapper.action);
@@ -117,7 +116,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
 
     private void onFullCloseMessage(WebSocketChannel channel, BufferedBinaryMessage message) {
         @SuppressWarnings("unchecked")
-        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(CHANNEL_KEY);
+        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
         try (var data = message.getData()) {
             var closeMessage = new CloseMessage(data.getResource());
             wrapper.closeMessage = closeMessage;
@@ -129,7 +128,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
 
     void onClose(WebSocketChannel channel) {
         @SuppressWarnings("unchecked")
-        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(CHANNEL_KEY);
+        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
         ActionLog actionLog = logManager.begin("=== ws close begin ===", null);
         try {
             actionLog.action(wrapper.action + ":close");
@@ -139,16 +138,18 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
             int code = wrapper.closeMessage == null ? WebSocketCloseCodes.ABNORMAL_CLOSURE : wrapper.closeMessage.getCode();
             String reason = wrapper.closeMessage == null ? null : wrapper.closeMessage.getReason();
             actionLog.context("close_code", code);
-            if (reason != null && reason.length() > 0) actionLog.context("close_reason", reason);
+
+            // close reason classified as text message, in theory it is not supposed to be put in context (which is only for keyword and searchable)
+            // but close action usually won't trigger warnings/trace, so we have to put it on context with restriction
+            if (reason != null && reason.length() > 0) actionLog.context("close_reason", Strings.truncate(reason, ActionLog.MAX_CONTEXT_VALUE_LENGTH));
             actionLog.track("ws", 0, reason == null ? 0 : 1 + reason.length(), 0);   // size = code (1 int) + reason
 
             wrapper.handler.listener.onClose(wrapper, code, reason);
-
-            double duration = System.nanoTime() - wrapper.startTime;
-            actionLog.stats.put("ws_duration", duration);
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {
+            double duration = System.nanoTime() - wrapper.startTime;
+            actionLog.stats.put("ws_duration", duration);
             logManager.end("=== ws close end ===");
         }
     }
