@@ -1,10 +1,11 @@
 ## Change log
 
-### 8.1.1-b1 (03/14/2023 - )
+### 8.1.1-b2 (03/14/2023 - )
 
 * ws: response corresponding close-code on connect according to exception
 * httpClient: disabled okHTTP built-in followup and http-to-https redirect
   > those behavior should be impl on application level to have complete trace
+* scheduler: trigger job via /_sys/job links refId and correlationIds
 
 ### 8.1.0 (02/21/2023 - 03/09/2023)
 

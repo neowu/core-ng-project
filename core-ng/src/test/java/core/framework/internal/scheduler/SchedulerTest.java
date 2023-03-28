@@ -17,6 +17,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -98,7 +99,7 @@ class SchedulerTest {
     @Test
     void triggerNow() throws Exception {
         scheduler.addFixedRateTask("hourly-job", new TestJob(), Duration.ofHours(1));
-        scheduler.triggerNow("hourly-job");
+        scheduler.triggerNow("hourly-job", "actionId");
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Callable<?>> task = ArgumentCaptor.forClass(Callable.class);
@@ -110,6 +111,8 @@ class SchedulerTest {
         task.getValue().call();
 
         assertThat(actionLog.trace).isEqualTo(Trace.CASCADE);
+        assertThat(actionLog.refIds).isEqualTo(List.of("actionId"));
+        assertThat(actionLog.correlationIds).isEqualTo(List.of("actionId"));
         assertThat(actionLog.context).containsKeys("trigger", "job", "job_class", "scheduled_time");
     }
 

@@ -13,9 +13,11 @@ import core.framework.web.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,7 +30,7 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 public final class Scheduler {
-    public final Map<String, Task> tasks = Maps.newHashMap();
+    public final Map<String, Task> tasks = Maps.newLinkedHashMap();     // to log scheduling job in order at startup
     private final Logger logger = LoggerFactory.getLogger(Scheduler.class);
     private final ScheduledExecutorService scheduler;
     private final ExecutorService jobExecutor;
@@ -118,7 +120,7 @@ public final class Scheduler {
             ZonedDateTime scheduledTime = task.scheduledTime;
             ZonedDateTime next = task.scheduleNext();
             logger.info("execute scheduled job, job={}, rate={}, scheduled={}, next={}", task.name(), task.rate, scheduledTime, next);
-            submitJob(task, scheduledTime, Trace.NONE);
+            submitJob(task, scheduledTime, null);
         }, delay.toNanos(), task.rate.toNanos(), TimeUnit.NANOSECONDS);
     }
 
@@ -127,25 +129,29 @@ public final class Scheduler {
             ZonedDateTime next = next(task.trigger, scheduledTime);
             schedule(task, next);
             logger.info("execute scheduled job, job={}, trigger={}, scheduled={}, next={}", task.name(), task.trigger(), scheduledTime, next);
-            submitJob(task, scheduledTime, Trace.NONE);
+            submitJob(task, scheduledTime, null);
         } catch (Throwable e) {
             logger.error("failed to execute scheduled job, job is terminated, job={}, error={}", task.name(), e.getMessage(), e);
         }
     }
 
-    public void triggerNow(String name) {
+    public void triggerNow(String name, String triggerActionId) {
         Task task = tasks.get(name);
         if (task == null) throw new NotFoundException("job not found, name=" + name);
-        submitJob(task, ZonedDateTime.now(clock), Trace.CASCADE);
+        submitJob(task, ZonedDateTime.now(clock), triggerActionId);
     }
 
-    private void submitJob(Task task, ZonedDateTime scheduledTime, Trace trace) {
+    private void submitJob(Task task, ZonedDateTime scheduledTime, @Nullable String triggerActionId) {
         jobExecutor.submit(() -> {
             try {
                 ActionLog actionLog = logManager.begin("=== job execution begin ===", null);
                 String name = task.name();
                 actionLog.action("job:" + name);
-                actionLog.trace = trace;
+                if (triggerActionId != null) {  // triggered by scheduler controller
+                    actionLog.refIds = List.of(triggerActionId);
+                    actionLog.correlationIds = List.of(triggerActionId);
+                    actionLog.trace = Trace.CASCADE;
+                }
                 actionLog.warningContext.maxProcessTimeInNano(maxProcessTimeInNano);
                 actionLog.context("trigger", task.trigger());
                 Job job = task.job();
