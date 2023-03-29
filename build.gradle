@@ -18,7 +18,7 @@ def elasticVersion = '8.6.0'
 def kafkaVersion = '3.4.0'
 def jacksonVersion = '2.14.2'
 def junitVersion = '5.9.2'
-def mockitoVersion = '5.1.1'
+def mockitoVersion = '5.2.0'
 def assertjVersion = '3.24.2'
 def mysqlVersion = '8.0.32'
 
@@ -35,7 +35,7 @@ project('core-ng') {
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-        implementation 'io.undertow:undertow-core:2.3.4.Final'
+        implementation 'io.undertow:undertow-core:2.3.5.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.8.4'      // used by kafka message compression
         compileOnly "com.mysql:mysql-connector-j:${mysqlVersion}"
