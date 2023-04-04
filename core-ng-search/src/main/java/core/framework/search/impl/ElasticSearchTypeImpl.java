@@ -397,7 +397,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         for (BulkResponseItem item : response.items()) {
             ErrorCause error = item.error();
             if (error != null) {
-                builder.append("id={}, error={}, stackTrace={}\n", item.id(), error.reason(), error.stackTrace());
+                builder.append("id={}, error={}, causedBy={}, stackTrace={}\n", item.id(), error.reason(), error.causedBy(), error.stackTrace());
             }
         }
         builder.append("]");
