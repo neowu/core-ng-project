@@ -12,5 +12,7 @@
 
 * kafka: is static membership (group.instance.id) useful within stateful set?
 
-* log: use es data stream + ILM to rotate index?
+* log: use es data stream + ILM to rotate index? or time series data stream (TSDS) useful (only for metrics data)
   > not able to close index, only delete, and can simplify log processor and ES interface (no need to support "index" param in all requests)
+  > to use TSDS, convert statMessage into pure metrics, and make error/info into action?
+  > https://www.elastic.co/guide/en/elasticsearch//reference/current/tsds.html
