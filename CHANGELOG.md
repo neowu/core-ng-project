@@ -7,6 +7,7 @@
 * search: fixed default max conn settings
 * search: updated default timeout to 15s
   > tolerant more when es is busy
+* db: update mysql driver to 8.0.33
 
 ### 8.1.1 (03/14/2023 - 04/03/2023)
 
