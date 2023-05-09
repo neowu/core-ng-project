@@ -41,17 +41,18 @@ public class ElasticSearchLogInterceptor implements HttpRequestInterceptor {
             // refer to co.elastic.clients.transport.rest_client.RestClientTransport.prepareLowLevelRequest
             // it always uses ByteArrayEntity, thus always has content length
             try (Reader reader = new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8)) {
-                // with bulkIndex, es uses co.elastic.clients.transport.rest_client.MultiBufferEntity, which is chunked and content length = -1
-                long length = entity.isChunked() ? maxParamLength : entity.getContentLength();
-                boolean truncate = false;
-                if (length > maxParamLength) {
-                    length = maxParamLength;
-                    truncate = true;
+                char[] buffer;
+
+                if (entity.isChunked()) {
+                    // with bulkIndex, es uses co.elastic.clients.transport.rest_client.MultiBufferEntity, which is chunked and content length = -1
+                    buffer = new char[maxParamLength + 1];
+                } else {
+                    buffer = new char[Math.min((int) entity.getContentLength(), maxParamLength + 1)];
                 }
-                char[] buffer = new char[(int) length];
                 int read = reader.read(buffer);
-                builder.append(buffer, 0, read);
-                if (truncate) {
+
+                if (read > 0) builder.append(buffer, 0, Math.min(read, maxParamLength));    // read = -1 if nothing read into buffer
+                if (read > maxParamLength) {
                     builder.append("...(truncated)");
                 }
             } catch (IOException e) {

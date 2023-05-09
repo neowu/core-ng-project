@@ -32,11 +32,26 @@ class ElasticSearchLogInterceptorTest {
 
     @Test
     void bodyParamWithChunkedEntity() {
-        var entity = new InputStreamEntity(new ByteArrayInputStream(Strings.bytes("1234567890")));
-        entity.setChunked(true);
-        var param = new ElasticSearchLogInterceptor.BodyParam(entity);
+        var param = new ElasticSearchLogInterceptor.BodyParam(chunkedEntity("1234567890"));
         var builder = new StringBuilder();
+        param.append(builder, Set.of(), 5);
+        assertThat(builder).hasToString("12345...(truncated)");
+
+        param = new ElasticSearchLogInterceptor.BodyParam(chunkedEntity("1234567890"));
+        builder = new StringBuilder();
         param.append(builder, Set.of(), 10);
         assertThat(builder).hasToString("1234567890");
+
+        param = new ElasticSearchLogInterceptor.BodyParam(chunkedEntity("1234567890"));
+        builder = new StringBuilder();
+        param.append(builder, Set.of(), 20);
+        assertThat(builder).hasToString("1234567890");
+    }
+
+    InputStreamEntity chunkedEntity(String text) {
+        var entity = new InputStreamEntity(new ByteArrayInputStream(Strings.bytes(text)));
+        entity.setChunked(true);
+        assertThat(entity.getContentLength()).isEqualTo(-1);
+        return entity;
     }
 }
