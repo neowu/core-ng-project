@@ -37,7 +37,7 @@ import java.util.Map;
 public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
 
-    public Duration timeout = Duration.ofSeconds(10);
+    public Duration timeout = Duration.ofSeconds(15);
     public HttpHost[] hosts;
     public int maxResultWindow = 10000;
     ElasticsearchClient client;
@@ -52,8 +52,8 @@ public class ElasticSearchImpl implements ElasticSearch {
                 .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
             builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
                 .setMaxConnPerRoute(100)
-                .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis()));
-            builder.setHttpClientConfigCallback(config -> config.addInterceptorFirst(new ElasticSearchLogInterceptor()));
+                .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis())
+                .addInterceptorFirst(new ElasticSearchLogInterceptor()));
             restClient = builder.build();
             mapper = JSONMapper.builder().serializationInclusion(JsonInclude.Include.NON_NULL).build();
             client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper(mapper)));

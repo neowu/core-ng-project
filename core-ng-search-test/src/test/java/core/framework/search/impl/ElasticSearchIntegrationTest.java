@@ -7,6 +7,10 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.json.JsonData;
 import core.framework.inject.Inject;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
+import core.framework.internal.log.Trace;
+import core.framework.internal.log.appender.ConsoleAppender;
 import core.framework.json.JSON;
 import core.framework.search.BulkDeleteRequest;
 import core.framework.search.ClusterStateResponse;
@@ -70,16 +74,23 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     void index() {
+        final LogManager logManager = new LogManager();
+        logManager.appender = new ConsoleAppender();
+        ActionLog action = logManager.begin("begin", null);
+        action.trace = Trace.CURRENT;
+
         TestDocument document = document("2", "value2", 2, 0,
             ZonedDateTime.now(),
             LocalTime.of(12, 1, 2, 200000000));
-        documentType.index(document.id, document);
+        documentType.bulkIndex(Map.of(document.id, document));
 
         Optional<TestDocument> returnedDocument = documentType.get(document.id);
         assertThat(returnedDocument).get()
             .usingRecursiveComparison()
             .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
             .isEqualTo(document);
+
+        logManager.end("end");
     }
 
     @Test
