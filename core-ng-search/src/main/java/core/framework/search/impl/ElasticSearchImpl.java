@@ -217,9 +217,7 @@ public class ElasticSearchImpl implements ElasticSearch {
         if (Strings.isBlank(apiKey) || Strings.isBlank(keySecret)) return Optional.empty();
 
         String apiKeyAuth = Encodings.base64(Strings.format("{}:{}", apiKey, keySecret));
-        Header[] authHeaders =
-            new Header[]{new BasicHeader("Authorization",
-                "ApiKey " + apiKeyAuth)};
+        Header[] authHeaders = {new BasicHeader("Authorization", "ApiKey " + apiKeyAuth)};
         return Optional.of(authHeaders);
     }
 }

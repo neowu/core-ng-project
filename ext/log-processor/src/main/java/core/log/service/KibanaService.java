@@ -28,6 +28,13 @@ public class KibanaService {
         this.client = client;
     }
 
+    public KibanaService(String kibanaURL, String banner, HTTPClient client) {
+        this.kibanaURL = kibanaURL;
+        this.apiKey = null;
+        this.banner = banner;
+        this.client = client;
+    }
+
     public void importObjects() {
         var watch = new StopWatch();
         try {
