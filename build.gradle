@@ -53,7 +53,6 @@ project('core-ng-test') {
     dependencies {
         api "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         api "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
-        api "org.mockito:mockito-inline:${mockitoVersion}"
         api "org.assertj:assertj-core:${assertjVersion}"
         implementation project(":core-ng")
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
