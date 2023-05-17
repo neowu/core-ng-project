@@ -8,6 +8,7 @@
 * search: updated default timeout to 15s
   > tolerant more when es is busy
 * db: update mysql driver to 8.0.33
+* json: update jackson to 2.15.0
 
 ### 8.1.1 (03/14/2023 - 04/03/2023)
 

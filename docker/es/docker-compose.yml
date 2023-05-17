@@ -8,7 +8,9 @@ services:
     - 9200:9200
     environment:
     - cluster.name=es
-    - discovery.type=single-node
+    #    - discovery.type=single-node
+    - cluster.initial_master_nodes=elasticsearch
+    - node.name=elasticsearch
     - ES_JAVA_OPTS=-Xms512m -Xmx512m
     - xpack.security.enabled=false
     - xpack.ml.enabled=false

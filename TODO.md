@@ -16,3 +16,6 @@
   > not able to close index, only delete, and can simplify log processor and ES interface (no need to support "index" param in all requests)
   > to use TSDS, convert statMessage into pure metrics, and make error/info into action?
   > https://www.elastic.co/guide/en/elasticsearch//reference/current/tsds.html
+
+* db: update "on duplicated key" values() syntax,
+  > The use of VALUES() to refer to the new row and columns is deprecated beginning with MySQL 8.0.20, and is subject to removal in a future version of MySQL.
