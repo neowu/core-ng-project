@@ -42,7 +42,6 @@ project('core-ng') {
         compileOnly 'org.jboss.logging:jboss-logging-annotations:2.2.1.Final'
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
-        testImplementation "org.mockito:mockito-inline:${mockitoVersion}"
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         testRuntimeOnly 'org.hsqldb:hsqldb:2.7.1'
