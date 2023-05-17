@@ -216,7 +216,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     generate elasticsearch's authorization header using provided apiKey & keySecret
     */
     Optional<Header[]> authorization() {
-        if (Strings.isBlank(apiKey) || Strings.isBlank(keySecret)) return Optional.empty();
+        if (Strings.isBlank(apiKey) || Strings.isBlank(keySecret)) return Optional.empty(); // if auth's config is invalid, skip auth header, fail silently
 
         String apiKeyAuth = Encodings.base64(Strings.format("{}:{}", apiKey, keySecret));
         Header[] authHeaders = {new BasicHeader("Authorization", "ApiKey " + apiKeyAuth)};

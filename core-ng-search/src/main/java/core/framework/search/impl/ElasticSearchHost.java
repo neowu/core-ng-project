@@ -10,9 +10,6 @@ import java.net.URL;
  * @author neo
  */
 public final class ElasticSearchHost {
-    private ElasticSearchHost() {
-    }
-
     public static HttpHost[] parse(String host) {
         String[] values = Strings.split(host, ',');
         HttpHost[] hosts = new HttpHost[values.length];
@@ -30,5 +27,8 @@ public final class ElasticSearchHost {
         } catch (MalformedURLException e) {
             return new HttpHost(value, 9200);
         }
+    }
+
+    private ElasticSearchHost() {
     }
 }
