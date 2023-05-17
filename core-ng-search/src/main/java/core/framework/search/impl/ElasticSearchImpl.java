@@ -212,7 +212,9 @@ public class ElasticSearchImpl implements ElasticSearch {
         return new SearchException(builder.toString(), e);
     }
 
-    /* Handle elasticsearch apiKey & keySecret authorization */
+    /*
+    generate elasticsearch's authorization header using provided apiKey & keySecret
+    */
     Optional<Header[]> authorization() {
         if (Strings.isBlank(apiKey) || Strings.isBlank(keySecret)) return Optional.empty();
 
