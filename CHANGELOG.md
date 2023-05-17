@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.1.2-b0 (05/08/2023 - )
+### 8.1.2 (05/08/2023 - 05/16/2023)
 
 * search: fixed ElasticSearchLogInterceptor logging issue with chunked http entity
   > failed to generate trace log with bulkIndex
