@@ -10,6 +10,8 @@ import java.net.URL;
  * @author neo
  */
 public final class ElasticSearchHost {
+    public static final int DEFAULT_PORT = 9200;
+
     public static HttpHost[] parse(String host) {
         String[] values = Strings.split(host, ',');
         HttpHost[] hosts = new HttpHost[values.length];
@@ -23,10 +25,19 @@ public final class ElasticSearchHost {
     private static HttpHost host(String value) {
         try {
             URL url = new URL(value);
-            return new HttpHost(url.getHost(), 9200, url.getProtocol());
+
+            return new HttpHost(url.getHost(), port(url), url.getProtocol());
         } catch (MalformedURLException e) {
-            return new HttpHost(value, 9200);
+            return new HttpHost(value, DEFAULT_PORT);
         }
+    }
+
+    private static int port(URL url) {
+        if (url.getPort() > 0) {
+            return url.getPort();
+        }
+
+        return DEFAULT_PORT;
     }
 
     private ElasticSearchHost() {
