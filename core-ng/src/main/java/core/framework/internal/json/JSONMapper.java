@@ -67,6 +67,7 @@ public class JSONMapper {
             // only detect public fields, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
             .visibility(new VisibilityChecker.Std(NONE, NONE, NONE, NONE, PUBLIC_ONLY))
             .enable(StreamReadFeature.USE_FAST_DOUBLE_PARSER)
+            .enable(StreamReadFeature.USE_FAST_BIG_NUMBER_PARSER)
             .enable(StreamWriteFeature.USE_FAST_DOUBLE_WRITER)
             .enable(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS)
             .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)

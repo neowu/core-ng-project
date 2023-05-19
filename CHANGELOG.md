@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.1.2-b0 (05/08/2023 - )
+### 8.1.2 (05/08/2023 - 05/16/2023)
 
 * search: fixed ElasticSearchLogInterceptor logging issue with chunked http entity
   > failed to generate trace log with bulkIndex
@@ -8,6 +8,7 @@
 * search: updated default timeout to 15s
   > tolerant more when es is busy
 * db: update mysql driver to 8.0.33
+* json: update jackson to 2.15.0
 
 ### 8.1.1 (03/14/2023 - 04/03/2023)
 

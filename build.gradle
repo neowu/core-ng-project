@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '8.1.2-b0'
+    version = '8.1.2'
 
     repositories {
         maven {
@@ -16,9 +16,9 @@ subprojects {
 
 def elasticVersion = '8.7.0'
 def kafkaVersion = '3.4.0'
-def jacksonVersion = '2.14.2'
-def junitVersion = '5.9.2'
-def mockitoVersion = '5.2.0'
+def jacksonVersion = '2.15.0'
+def junitVersion = '5.9.3'
+def mockitoVersion = '5.3.1'
 def assertjVersion = '3.24.2'
 def mysqlVersion = '8.0.33'
 
@@ -42,7 +42,6 @@ project('core-ng') {
         compileOnly 'org.jboss.logging:jboss-logging-annotations:2.2.1.Final'
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
-        testImplementation "org.mockito:mockito-inline:${mockitoVersion}"
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         testRuntimeOnly 'org.hsqldb:hsqldb:2.7.1'
@@ -54,7 +53,6 @@ project('core-ng-test') {
     dependencies {
         api "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         api "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
-        api "org.mockito:mockito-inline:${mockitoVersion}"
         api "org.assertj:assertj-core:${assertjVersion}"
         implementation project(":core-ng")
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"

@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -112,7 +112,7 @@ class EventControllerTest extends IntegrationTest {
     @Test
     void sendEventRequest() {
         var event = new Event();
-        event.date = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC"));
+        event.date = ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC);
         event.result = Result.OK;
         event.action = "action";
         event.elapsedTime = 10L;
