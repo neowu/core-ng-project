@@ -23,4 +23,10 @@ class ElasticSearchHostTest {
         assertThat(ElasticSearchHost.parse("https://some-secure-es.io"))
             .containsExactly(new HttpHost("some-secure-es.io", 9200, "https"));
     }
+
+    @Test
+    void customPort() {
+        assertThat(ElasticSearchHost.parse("https://some-secure-es.io:9545"))
+            .containsExactly(new HttpHost("some-secure-es.io", 9545, "https"));
+    }
 }
