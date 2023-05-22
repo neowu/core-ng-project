@@ -3,9 +3,6 @@ package core.framework.search.impl;
 import core.framework.util.Strings;
 import org.apache.http.HttpHost;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 /**
  * @author neo
  */
@@ -21,15 +18,22 @@ public final class ElasticSearchHost {
     }
 
     private static HttpHost host(String value) {
-        try {
-            var uri = new URI(value);
-            String host = uri.getHost();
-            if (host == null) throw new Error("invalid elasticsearch host, host=" + value);
-            int port = uri.getPort();
-            if (port < 0) port = 9200;
-            return new HttpHost(host, port, uri.getScheme());
-        } catch (URISyntaxException e) {
-            throw new Error(e);
+        int hostStart = 0;
+        int hostEnd = value.length();
+        String schema = "http";
+        int schemaIndex = value.indexOf("://");
+        if (schemaIndex > 0) {
+            if (schemaIndex == value.length() - 3) throw new Error("invalid elasticsearch host, host=" + value);
+            schema = value.substring(0, schemaIndex);
+            hostStart = schemaIndex + 3;
         }
+        int portIndex = value.indexOf(':', schemaIndex + 1);
+        int port = 9200;
+        if (portIndex > 0) {
+            if (portIndex == value.length() - 1) throw new Error("invalid elasticsearch host, host=" + value);
+            port = Integer.parseInt(value.substring(portIndex + 1));
+            hostEnd = portIndex;
+        }
+        return new HttpHost(value.substring(hostStart, hostEnd), port, schema);
     }
 }

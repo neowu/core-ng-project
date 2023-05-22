@@ -30,7 +30,7 @@ class KibanaServiceTest {
 
     @BeforeEach
     void createKibanaService() {
-        service = new KibanaService("http://kibana:5601", "banner", httpClient);
+        service = new KibanaService("http://kibana:5601", null, "banner", httpClient);
     }
 
     @Test

@@ -12,6 +12,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ElasticSearchHostTest {
     @Test
     void parse() {
+        assertThat(ElasticSearchHost.parse("es-0"))
+            .containsExactly(new HttpHost("es-0", 9200));
+
+        assertThat(ElasticSearchHost.parse("es-0:9300"))
+            .containsExactly(new HttpHost("es-0", 9300));
+
         assertThat(ElasticSearchHost.parse("http://es-0"))
             .containsExactly(new HttpHost("es-0", 9200));
 
@@ -23,18 +29,19 @@ class ElasticSearchHostTest {
     void parseWithHTTPS() {
         assertThat(ElasticSearchHost.parse("https://es-cloud.io"))
             .containsExactly(new HttpHost("es-cloud.io", 9200, "https"));
-    }
 
-    @Test
-    void parseWithCustomPort() {
         assertThat(ElasticSearchHost.parse("https://es-cloud.io:9545"))
             .containsExactly(new HttpHost("es-cloud.io", 9545, "https"));
     }
 
     @Test
-    void parseWithInvalidURI() {
-        assertThatThrownBy(() -> ElasticSearchHost.parse("es-0"))
+    void parseWithInvalidHost() {
+        assertThatThrownBy(() -> ElasticSearchHost.parse("es-0:"))
             .isInstanceOf(Error.class)
-            .hasMessageContaining("invalid elasticsearch uri");
+            .hasMessageContaining("invalid elasticsearch host");
+
+        assertThatThrownBy(() -> ElasticSearchHost.parse("http://"))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("invalid elasticsearch host");
     }
 }
