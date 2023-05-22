@@ -18,10 +18,19 @@ public class KibanaService {
 
     private final HTTPClient client;
     private final String kibanaURL;
+    private final String apiKey;
     private final String banner;
+
+    public KibanaService(String kibanaURL, String apiKey, String banner, HTTPClient client) {
+        this.kibanaURL = kibanaURL;
+        this.apiKey = apiKey;
+        this.banner = banner;
+        this.client = client;
+    }
 
     public KibanaService(String kibanaURL, String banner, HTTPClient client) {
         this.kibanaURL = kibanaURL;
+        this.apiKey = null;
         this.banner = banner;
         this.client = client;
     }
@@ -33,6 +42,9 @@ public class KibanaService {
             String objects = ClasspathResources.text("kibana.json").replace("${NOTIFICATION_BANNER}", banner);
             var request = new HTTPRequest(HTTPMethod.POST, kibanaURL + "/api/saved_objects/_bulk_create?overwrite=true");
             request.headers.put("kbn-xsrf", "true");
+            if (apiKey != null) {
+                request.headers.put("Authorization", "ApiKey " + apiKey);
+            }
             request.body(objects, ContentType.APPLICATION_JSON);
             HTTPResponse response = client.execute(request);
             if (response.statusCode == 200) {

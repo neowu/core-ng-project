@@ -12,9 +12,21 @@ class ElasticSearchHostTest {
     @Test
     void parse() {
         assertThat(ElasticSearchHost.parse("es-0"))
-                .containsExactly(new HttpHost("es-0", 9200));
+            .containsExactly(new HttpHost("es-0", 9200));
 
         assertThat(ElasticSearchHost.parse("es-0, es-1"))
-                .containsExactly(new HttpHost("es-0", 9200), new HttpHost("es-1", 9200));
+            .containsExactly(new HttpHost("es-0", 9200), new HttpHost("es-1", 9200));
+    }
+
+    @Test
+    void parseHttps() {
+        assertThat(ElasticSearchHost.parse("https://some-secure-es.io"))
+            .containsExactly(new HttpHost("some-secure-es.io", 9200, "https"));
+    }
+
+    @Test
+    void customPort() {
+        assertThat(ElasticSearchHost.parse("https://some-secure-es.io:9545"))
+            .containsExactly(new HttpHost("some-secure-es.io", 9545, "https"));
     }
 }

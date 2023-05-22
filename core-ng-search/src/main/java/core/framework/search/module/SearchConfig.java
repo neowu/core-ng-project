@@ -7,6 +7,7 @@ import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.impl.ElasticSearchHost;
 import core.framework.search.impl.ElasticSearchImpl;
+import core.framework.util.Strings;
 import core.framework.util.Types;
 
 import java.time.Duration;
@@ -40,9 +41,24 @@ public class SearchConfig extends Config {
     }
 
     // comma separated hosts
-    public void host(String host) {
+    public void host(String host, String apiKey, String keySecret) {
+        if (!Strings.isBlank(apiKey)) search.apiKey = apiKey;
+        if (!Strings.isBlank(keySecret)) search.keySecret = keySecret;
+
         search.hosts = ElasticSearchHost.parse(host);
-        context.probe.urls.add(search.hosts[0].toURI() + "/_cluster/health?local=true");      // in kube env, it's ok to just check first pod of stateful set
+
+        // skip probe if auth has been configured, most likely it isn't deployed in kube env
+        if (!hasAuth()) {
+            context.probe.urls.add(search.hosts[0].toURI() + "/_cluster/health?local=true");      // in kube env, it's ok to just check first pod of stateful set
+        }
+    }
+
+    public void host(String host) {
+        host(host, null, null);
+    }
+
+    boolean hasAuth() {
+        return !Strings.isBlank(search.apiKey) && !Strings.isBlank(search.keySecret);
     }
 
     // refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-max-result-window

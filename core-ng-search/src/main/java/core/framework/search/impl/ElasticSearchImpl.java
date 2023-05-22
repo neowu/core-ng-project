@@ -15,9 +15,13 @@ import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.SearchException;
+import core.framework.util.Encodings;
 import core.framework.util.StopWatch;
+import core.framework.util.Strings;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
@@ -30,6 +34,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -39,6 +44,8 @@ public class ElasticSearchImpl implements ElasticSearch {
 
     public Duration timeout = Duration.ofSeconds(15);
     public HttpHost[] hosts;
+    public String apiKey;
+    public String keySecret;
     public int maxResultWindow = 10000;
     ElasticsearchClient client;
     private RestClient restClient;
@@ -48,6 +55,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void initialize() {
         if (client == null) {   // initialize can be called by initSearch explicitly during test,
             RestClientBuilder builder = RestClient.builder(hosts);
+            authorization().ifPresent(builder::setDefaultHeaders);
             builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
                 .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
             builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
@@ -202,5 +210,16 @@ public class ElasticSearchImpl implements ElasticSearch {
             builder.append("causedBy: ").append(causedBy.reason());
         }
         return new SearchException(builder.toString(), e);
+    }
+
+    /*
+    generate elasticsearch's authorization header using provided apiKey & keySecret
+    */
+    Optional<Header[]> authorization() {
+        if (Strings.isBlank(apiKey) || Strings.isBlank(keySecret)) return Optional.empty(); // if auth's config is invalid, skip auth header, fail silently
+
+        String apiKeyAuth = Encodings.base64(Strings.format("{}:{}", apiKey, keySecret));
+        Header[] authHeaders = {new BasicHeader("Authorization", "ApiKey " + apiKeyAuth)};
+        return Optional.of(authHeaders);
     }
 }
