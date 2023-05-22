@@ -59,7 +59,7 @@ public class LogProcessorApp extends App {
         // explicitly use all properties in case runtime env doesn't define any, otherwise startup may fail with unused property error
         Optional<String> kibanaURL = property("app.kibana.url");
         String banner = property("app.kibana.banner").orElse("");
-        String apiKey = property("app.kibana.apikey").orElse("");
+        String apiKey = property("app.kibana.apiKey").orElse(null);
         kibanaURL.ifPresent(url -> {
             HTTPClient client = HTTPClient.builder().maxRetries(5).build();  // create ad hoc http client, will be recycled once done
             onStartup(() -> new Thread(new KibanaService(url, apiKey, banner, client)::importObjects, "kibana").start());
@@ -86,14 +86,12 @@ public class LogProcessorApp extends App {
 
     private void configureSearch() {
         SearchConfig search = config(SearchConfig.class);
+        search.host(requiredProperty("sys.elasticsearch.host"));
         search.timeout(Duration.ofSeconds(20)); // use longer timeout/slowES threshold as log indexing can be slower with large batches
-        Optional<String> apiKey = property("sys.elasticsearch.apiKey");
-        Optional<String> keySecret = property("sys.elasticsearch.keySecret");
-        String host = requiredProperty("sys.elasticsearch.host");
-        if (apiKey.isPresent() && keySecret.isPresent()) {
-            search.host(host, apiKey.get(), keySecret.get());
-        } else {
-            search.host(host);
+        String apiKeyId = property("sys.elasticsearch.apiKeyId").orElse(null);
+        String apiKeySecret = property("sys.elasticsearch.apiKeySecret").orElse(null);
+        if (apiKeyId != null) {
+            search.auth(apiKeyId, apiKeySecret);
         }
         search.type(ActionDocument.class);
         search.type(TraceDocument.class);

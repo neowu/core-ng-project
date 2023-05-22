@@ -17,7 +17,6 @@ import core.framework.search.ElasticSearchType;
 import core.framework.search.SearchException;
 import core.framework.util.Encodings;
 import core.framework.util.StopWatch;
-import core.framework.util.Strings;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -34,7 +33,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author neo
@@ -44,10 +42,9 @@ public class ElasticSearchImpl implements ElasticSearch {
 
     public Duration timeout = Duration.ofSeconds(15);
     public HttpHost[] hosts;
-    public String apiKey;
-    public String keySecret;
     public int maxResultWindow = 10000;
     ElasticsearchClient client;
+    Header authHeader;
     private RestClient restClient;
     private ObjectMapper mapper;
 
@@ -55,7 +52,9 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void initialize() {
         if (client == null) {   // initialize can be called by initSearch explicitly during test,
             RestClientBuilder builder = RestClient.builder(hosts);
-            authorization().ifPresent(builder::setDefaultHeaders);
+            if (authHeader != null) {
+                builder.setDefaultHeaders(new Header[]{authHeader});
+            }
             builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
                 .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
             builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
@@ -76,6 +75,11 @@ public class ElasticSearchImpl implements ElasticSearch {
         } finally {
             logger.info("register elasticsearch type, documentClass={}, elapsed={}", documentClass.getCanonicalName(), watch.elapsed());
         }
+    }
+
+    public void auth(String apiKeyId, String apiKeySecret) {
+        if (apiKeyId == null) throw new Error("apiKeyId must not be null");
+        authHeader = new BasicHeader("Authorization", "ApiKey " + Encodings.base64(apiKeyId + ":" + apiKeySecret));
     }
 
     public void close() throws IOException {
@@ -210,16 +214,5 @@ public class ElasticSearchImpl implements ElasticSearch {
             builder.append("causedBy: ").append(causedBy.reason());
         }
         return new SearchException(builder.toString(), e);
-    }
-
-    /*
-    generate elasticsearch's authorization header using provided apiKey & keySecret
-    */
-    Optional<Header[]> authorization() {
-        if (Strings.isBlank(apiKey) || Strings.isBlank(keySecret)) return Optional.empty(); // if auth's config is invalid, skip auth header, fail silently
-
-        String apiKeyAuth = Encodings.base64(Strings.format("{}:{}", apiKey, keySecret));
-        Header[] authHeaders = {new BasicHeader("Authorization", "ApiKey " + apiKeyAuth)};
-        return Optional.of(authHeaders);
     }
 }

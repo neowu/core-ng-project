@@ -1,5 +1,13 @@
 ## Change log
 
+### 8.1.3-b0 (05/21/2023 - ) !!! es host format changed
+
+* search: support es cloud
+  > !!! es host must be configured as full uri, e.g. http://es-0.es, or https://es-0.es:9200
+  > added searchConfig.auth(apiKeyId, apiKeySecret)
+* kibana: support es cloud
+  > configure auth via: app.kibana.apiKey, sys.elasticsearch.apiKeyId, sys.elasticsearch.apiKeySecret
+
 ### 8.1.2 (05/08/2023 - 05/16/2023)
 
 * search: fixed ElasticSearchLogInterceptor logging issue with chunked http entity

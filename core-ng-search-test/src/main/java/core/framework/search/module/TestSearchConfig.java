@@ -53,6 +53,11 @@ public class TestSearchConfig extends SearchConfig {
         search.hosts = new HttpHost[]{localESHost};
     }
 
+    @Override
+    public void auth(String apiKeyId, String apiKeySecret) {
+
+    }
+
     // ES uses log4j2 core api directly, cannot use log4j-to-slf4j to bridge, refer to following exception
     // here is to bridge to core-ng logger
     /*

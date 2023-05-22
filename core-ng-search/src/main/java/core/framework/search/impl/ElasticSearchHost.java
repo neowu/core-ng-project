@@ -3,18 +3,16 @@ package core.framework.search.impl;
 import core.framework.util.Strings;
 import org.apache.http.HttpHost;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * @author neo
  */
 public final class ElasticSearchHost {
-    public static final int DEFAULT_PORT = 9200;
-
     public static HttpHost[] parse(String host) {
         String[] values = Strings.split(host, ',');
-        HttpHost[] hosts = new HttpHost[values.length];
+        var hosts = new HttpHost[values.length];
         for (int i = 0; i < values.length; i++) {
             String value = values[i].strip();
             hosts[i] = host(value);
@@ -24,22 +22,14 @@ public final class ElasticSearchHost {
 
     private static HttpHost host(String value) {
         try {
-            URL url = new URL(value);
-
-            return new HttpHost(url.getHost(), port(url), url.getProtocol());
-        } catch (MalformedURLException e) {
-            return new HttpHost(value, DEFAULT_PORT);
+            var uri = new URI(value);
+            String host = uri.getHost();
+            if (host == null) throw new Error("invalid elasticsearch host, host=" + value);
+            int port = uri.getPort();
+            if (port < 0) port = 9200;
+            return new HttpHost(host, port, uri.getScheme());
+        } catch (URISyntaxException e) {
+            throw new Error(e);
         }
-    }
-
-    private static int port(URL url) {
-        if (url.getPort() > 0) {
-            return url.getPort();
-        }
-
-        return DEFAULT_PORT;
-    }
-
-    private ElasticSearchHost() {
     }
 }
