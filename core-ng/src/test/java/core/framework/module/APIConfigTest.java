@@ -3,7 +3,9 @@ package core.framework.module;
 import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
+import core.framework.http.HTTPClient;
 import core.framework.internal.module.ModuleContext;
+import core.framework.web.service.WebServiceClientInterceptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,6 +41,13 @@ class APIConfigTest {
         assertThat(client).isNotNull();
     }
 
+    @Test
+    void clientWithCustomHTTPClint() {
+        HTTPClient httpClient = HTTPClient.builder().build();
+        TestWebService client = config.createClient(TestWebService.class, "http://localhost", httpClient, new TestWebServiceClientInterceptor());
+        assertThat(client).isNotNull();
+    }
+
     public interface TestWebService {
         @PUT
         @Path("/test/:id")
@@ -49,5 +58,9 @@ class APIConfigTest {
         @Override
         public void put(Integer id) {
         }
+    }
+
+    public static class TestWebServiceClientInterceptor implements WebServiceClientInterceptor {
+
     }
 }

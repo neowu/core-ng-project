@@ -18,10 +18,12 @@ import core.framework.internal.web.service.WebServiceImplValidator;
 import core.framework.internal.web.service.WebServiceInterfaceValidator;
 import core.framework.util.ASCII;
 import core.framework.web.Controller;
+import core.framework.web.service.WebServiceClientInterceptor;
 import core.framework.web.service.WebServiceClientProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.time.Duration;
 
@@ -84,15 +86,21 @@ public class APIConfig extends Config {
         return new APIClientConfig((WebServiceClientProxy) client);
     }
 
-    public <T> T createClient(Class<T> serviceInterface, String serviceURL, HTTPClient httpClient) {
+    private <T> T createClient(Class<T> serviceInterface, String serviceURL, HTTPClient httpClient) {
         logger.info("create web service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         var validator = new WebServiceInterfaceValidator(serviceInterface, context.beanClassValidator);
         validator.requestBeanWriter = writer;
         validator.responseBeanReader = reader;
         validator.validate();
+        return createWebServiceClient(serviceInterface, new WebServiceClient(serviceURL, httpClient, writer, reader));
+    }
 
-        var webServiceClient = new WebServiceClient(serviceURL, httpClient, writer, reader);
-        return createWebServiceClient(serviceInterface, webServiceClient);
+    public <T> T createClient(Class<T> serviceInterface, String serviceURL, HTTPClient httpClient, @Nullable WebServiceClientInterceptor interceptor) {
+        T proxy = createClient(serviceInterface, serviceURL, httpClient);
+        if (interceptor != null) {
+            new APIClientConfig((WebServiceClientProxy) proxy).intercept(interceptor);
+        }
+        return proxy;
     }
 
     <T> T createWebServiceClient(Class<T> serviceInterface, WebServiceClient webServiceClient) {

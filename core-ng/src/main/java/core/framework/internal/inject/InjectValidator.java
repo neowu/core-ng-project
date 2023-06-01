@@ -15,7 +15,7 @@ import java.util.Set;
  * @author neo
  */
 public class InjectValidator {
-    // validate all cascaded fields with @Inject are proper assigned,
+    // validate all cascaded fields with @Inject are properly assigned,
     // to prevent cases like someone added new @Inject field to one class but didn't realize the instance is not created thru DI
 
     private final Class<?> rootClass;
