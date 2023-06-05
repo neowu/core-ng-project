@@ -7,7 +7,8 @@
   > added searchConfig.auth(apiKeyId, apiKeySecret)
 * kibana: support es cloud
   > configure auth via: app.kibana.apiKey, sys.elasticsearch.apiKeyId, sys.elasticsearch.apiKeySecret
-* api: support create api client with custom httpclient and interceptor
+* api: support create api client with custom httpclient
+  > removed api().httpClient(), pass custom built httpClient into api.client() instead
 
 ### 8.1.2 (05/08/2023 - 05/16/2023)
 

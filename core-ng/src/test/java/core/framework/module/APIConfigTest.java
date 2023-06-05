@@ -9,9 +9,8 @@ import core.framework.web.service.WebServiceClientInterceptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author neo
@@ -34,8 +33,7 @@ class APIConfigTest {
 
     @Test
     void client() {
-        config.httpClient().timeout(Duration.ofSeconds(5));
-        config.client(TestWebService.class, "http://localhost");
+        config.client(TestWebService.class, "http://localhost", mock(HTTPClient.class));
 
         TestWebService client = (TestWebService) config.context.beanFactory.bean(TestWebService.class, null);
         assertThat(client).isNotNull();
@@ -44,7 +42,9 @@ class APIConfigTest {
     @Test
     void clientWithCustomHTTPClint() {
         HTTPClient httpClient = HTTPClient.builder().build();
-        TestWebService client = config.createClient(TestWebService.class, "http://localhost", httpClient, new TestWebServiceClientInterceptor());
+        config.client(TestWebService.class, "http://localhost", httpClient);
+
+        TestWebService client = (TestWebService) config.context.beanFactory.bean(TestWebService.class, null);
         assertThat(client).isNotNull();
     }
 
