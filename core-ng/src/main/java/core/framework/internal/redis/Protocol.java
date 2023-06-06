@@ -99,6 +99,7 @@ final class Protocol {
         static final byte[] LTRIM = Strings.bytes("LTRIM");
 
         static final byte[] ZADD = Strings.bytes("ZADD");
+        static final byte[] ZINCRBY = Strings.bytes("ZINCRBY");
         static final byte[] ZRANGE = Strings.bytes("ZRANGE");
         static final byte[] ZREM = Strings.bytes("ZREM");
         static final byte[] ZPOPMIN = Strings.bytes("ZPOPMIN");

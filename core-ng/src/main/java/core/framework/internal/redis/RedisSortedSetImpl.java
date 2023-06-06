@@ -14,6 +14,7 @@ import java.io.UncheckedIOException;
 import java.util.Map;
 
 import static core.framework.internal.redis.Protocol.Command.ZADD;
+import static core.framework.internal.redis.Protocol.Command.ZINCRBY;
 import static core.framework.internal.redis.Protocol.Command.ZPOPMIN;
 import static core.framework.internal.redis.Protocol.Command.ZRANGE;
 import static core.framework.internal.redis.Protocol.Command.ZREM;
@@ -66,6 +67,34 @@ public class RedisSortedSetImpl implements RedisSortedSet {
             long elapsed = watch.elapsed();
             logger.debug("zadd, key={}, values={}, onlyIfAbsent={}, added={}, elapsed={}", key, values, onlyIfAbsent, added, elapsed);
             ActionLogContext.track("redis", elapsed, 0, added);
+        }
+    }
+
+    @Override
+    public long increaseByScore(String key, String value, long score) {
+        var watch = new StopWatch();
+        validate("key", key);
+        validate("value", value);
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        long finalScore = 0;
+        try {
+            RedisConnection connection = item.resource;
+            connection.writeArray(4);
+            connection.writeBlobString(ZINCRBY);
+            connection.writeBlobString(encode(key));
+            connection.writeBlobString(encode(score));
+            connection.writeBlobString(encode(value));
+            connection.flush();
+            finalScore = connection.readLong();
+            return finalScore;
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            logger.debug("zincrby, key={}, value={}, finalScore={}, elapsed={}", key, value, finalScore, elapsed);
+            ActionLogContext.track("redis", elapsed, 0, 1);
         }
     }
 
