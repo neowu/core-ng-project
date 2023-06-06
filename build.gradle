@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '8.1.3'
+    version = '8.1.4-b0'
 
     repositories {
         maven {

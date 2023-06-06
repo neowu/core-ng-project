@@ -71,29 +71,29 @@ public class RedisSortedSetImpl implements RedisSortedSet {
     }
 
     @Override
-    public long increaseByScore(String key, String value, long score) {
+    public long increaseScoreBy(String key, String value, long increment) {
         var watch = new StopWatch();
         validate("key", key);
         validate("value", value);
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
-        long finalScore = 0;
+        long score = 0;
         try {
             RedisConnection connection = item.resource;
             connection.writeArray(4);
             connection.writeBlobString(ZINCRBY);
             connection.writeBlobString(encode(key));
-            connection.writeBlobString(encode(score));
+            connection.writeBlobString(encode(increment));
             connection.writeBlobString(encode(value));
             connection.flush();
-            finalScore = connection.readLong();
-            return finalScore;
+            score = (long) Double.parseDouble(decode(connection.readBlobString()));
+            return score;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            logger.debug("zincrby, key={}, value={}, finalScore={}, elapsed={}", key, value, finalScore, elapsed);
+            logger.debug("zincrby, key={}, value={}, increment={}, score={}, elapsed={}", key, value, increment, score, elapsed);
             ActionLogContext.track("redis", elapsed, 0, 1);
         }
     }

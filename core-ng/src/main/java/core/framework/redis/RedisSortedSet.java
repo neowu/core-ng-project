@@ -15,7 +15,7 @@ public interface RedisSortedSet {
 
     int add(String key, Map<String, Long> values, boolean onlyIfAbsent);
 
-    long increaseByScore(String key, String value, long score);
+    long increaseScoreBy(String key, String value, long increment);
 
     default Map<String, Long> range(String key) {
         return range(key, 0, -1);

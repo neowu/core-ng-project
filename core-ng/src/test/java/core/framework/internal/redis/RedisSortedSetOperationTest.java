@@ -30,6 +30,15 @@ class RedisSortedSetOperationTest extends AbstractRedisOperationTest {
     }
 
     @Test
+    void increaseScoreBy() {
+        response(":3\r\n");
+        long score = redis.sortedSet().increaseScoreBy("key", "value", 2);
+
+        assertThat(score).isEqualTo(3);
+        assertRequestEquals("*4\r\n$7\r\nZINCRBY\r\n$3\r\nkey\r\n$1\r\n2\r\n$5\r\nvalue\r\n");
+    }
+
+    @Test
     void range() {
         response("*4\r\n$2\r\nv1\r\n$3\r\n100\r\n$2\r\nv2\r\n$3\r\n200\r\n");
         Map<String, Long> values = redis.sortedSet().range("key");

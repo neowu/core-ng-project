@@ -1,5 +1,9 @@
 ## Change log
 
+### 8.1.4-b0 (06/05/2023 - )
+
+* redis: supports SortedSet.increaseScoreBy()
+
 ### 8.1.3 (05/21/2023 - 06/04/2023)
 
 * search: support es cloud

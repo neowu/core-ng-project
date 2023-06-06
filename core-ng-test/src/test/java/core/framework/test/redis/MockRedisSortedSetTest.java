@@ -32,11 +32,11 @@ class MockRedisSortedSetTest {
     }
 
     @Test
-    void increaseByScore() {
-        assertThat(sortedSet.increaseByScore("key", "1", 1)).isEqualTo(1);
-        assertThat(sortedSet.increaseByScore("key", "1", 1)).isEqualTo(2);
-        assertThat(sortedSet.increaseByScore("key", "2", 2)).isEqualTo(2);
-        assertThat(sortedSet.increaseByScore("key", "2", 2)).isEqualTo(4);
+    void increaseScoreBy() {
+        assertThat(sortedSet.increaseScoreBy("key", "1", 1)).isEqualTo(1);
+        assertThat(sortedSet.increaseScoreBy("key", "1", 1)).isEqualTo(2);
+        assertThat(sortedSet.increaseScoreBy("key", "2", 2)).isEqualTo(2);
+        assertThat(sortedSet.increaseScoreBy("key", "2", 2)).isEqualTo(4);
 
         assertThat(sortedSet.range("key", 0, -1)).containsExactly(entry("1", 2L), entry("2", 4L));
     }
