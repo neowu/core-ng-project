@@ -31,7 +31,7 @@ class RedisSortedSetOperationTest extends AbstractRedisOperationTest {
 
     @Test
     void increaseScoreBy() {
-        response(":3\r\n");
+        response("$1\r\n3\r\n");
         long score = redis.sortedSet().increaseScoreBy("key", "value", 2);
 
         assertThat(score).isEqualTo(3);
