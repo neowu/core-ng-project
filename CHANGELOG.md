@@ -8,6 +8,7 @@
 * search: set connect timeout to 5s
   > generally es is within same network, it doesn't need long connect timeout in order to fail fast
 * kafka: updated client to 3.4.1
+* http: updated okhttp to 4.11.0
 
 ### 8.1.3 (05/21/2023 - 06/04/2023)
 

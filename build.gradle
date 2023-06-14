@@ -34,7 +34,7 @@ project('core-ng') {
         implementation 'org.javassist:javassist:3.29.2-GA'
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-        implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+        implementation 'com.squareup.okhttp3:okhttp:4.11.0'
         implementation 'io.undertow:undertow-core:2.3.5.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.8.4'      // used by kafka message compression
