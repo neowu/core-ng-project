@@ -1,11 +1,13 @@
 ## Change log
 
-### 8.1.4-b0 (06/05/2023 - )
+### 8.1.4 (06/05/2023 - 06/13/2023)
 
 * redis: supports SortedSet.increaseScoreBy()
 * mongo: set connect timeout to 5s
+* search: update es to 8.8.1
 * search: set connect timeout to 5s
   > generally es is within same network, it doesn't need long connect timeout in order to fail fast
+* kafka: updated client to 3.4.1
 
 ### 8.1.3 (05/21/2023 - 06/04/2023)
 
