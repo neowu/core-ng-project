@@ -3,6 +3,9 @@
 ### 8.1.4-b0 (06/05/2023 - )
 
 * redis: supports SortedSet.increaseScoreBy()
+* mongo: set connect timeout to 5s
+* search: set connect timeout to 5s
+  > generally es is within same network, it doesn't need long connect timeout in order to fail fast
 
 ### 8.1.3 (05/21/2023 - 06/04/2023)
 

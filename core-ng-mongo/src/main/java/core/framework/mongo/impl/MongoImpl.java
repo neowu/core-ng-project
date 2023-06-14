@@ -62,7 +62,7 @@ public class MongoImpl implements Mongo {
             connectionPoolSettings.maxWaitTime(timeoutInMs, TimeUnit.MILLISECONDS); // pool checkout timeout
             if (metrics != null) connectionPoolSettings.addConnectionPoolListener(metrics);
             var socketSettings = SocketSettings.builder()
-                .connectTimeout((int) timeoutInMs, TimeUnit.MILLISECONDS)
+                .connectTimeout(5, TimeUnit.SECONDS)    // use 5s as connect timeout, usually mongo db is within vpc network, doesn't need long connect timeout
                 .readTimeout((int) timeoutInMs, TimeUnit.MILLISECONDS)
                 .build();
             var clusterSettings = ClusterSettings.builder()

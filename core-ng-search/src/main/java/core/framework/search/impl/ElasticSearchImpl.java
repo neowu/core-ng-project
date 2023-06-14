@@ -55,8 +55,9 @@ public class ElasticSearchImpl implements ElasticSearch {
             if (authHeader != null) {
                 builder.setDefaultHeaders(new Header[]{authHeader});
             }
-            builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
-                .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
+            builder.setRequestConfigCallback(config -> config.setConnectionRequestTimeout(5_000)    // timeout of requesting connection from connection pool
+                .setConnectTimeout(5_000)   // 5s, usually es is within same network, use shorter timeout to fail fast
+                .setSocketTimeout((int) timeout.toMillis()));
             builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
                 .setMaxConnPerRoute(100)
                 .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis())
