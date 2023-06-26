@@ -1,5 +1,9 @@
 ## Change log
 
+### 8.1.5 (06/22/2023 - )
+
+* kafka: updated client to 3.5.0
+
 ### 8.1.4 (06/05/2023 - 06/13/2023)
 
 * redis: supports SortedSet.increaseScoreBy()
