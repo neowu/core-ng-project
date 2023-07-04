@@ -2,7 +2,10 @@
 def env = hasProperty('env') ? env : null
 
 apply plugin: 'application'
-mainClassName = 'Main'
+
+application {
+    mainClass = 'Main'
+}
 
 tasks.named("processResources").configure {
     if (env != null) {

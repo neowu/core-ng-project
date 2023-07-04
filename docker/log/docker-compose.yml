@@ -30,7 +30,7 @@ services:
     depends_on:
     - elasticsearch
   kafka:
-    image: neowu/kafka:3.4.0
+    image: neowu/kafka:3.5.0
     ports:
     - 9092:9092
     - 1099:1099

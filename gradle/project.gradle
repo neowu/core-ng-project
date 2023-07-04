@@ -5,8 +5,10 @@ subprojects {
 
     apply plugin: 'java'
 
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
@@ -67,5 +69,5 @@ allprojects {
 }
 
 tasks.named('wrapper') {
-    gradleVersion = '8.1.1'
+    gradleVersion = '8.2'
 }
