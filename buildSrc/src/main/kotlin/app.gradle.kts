@@ -2,16 +2,13 @@ plugins {
     application
 }
 
-// use gradlew -Penv=${env} to pass
-val env = if (hasProperty("env")) properties["env"] else null
-
 application {
     mainClass.set("Main")
 }
 
 tasks.named<ProcessResources>("processResources") {
-    if (env != null) {
-        val envResources = file("conf/${env}/resources")
+    if (Env.property(project, "env") != null) {
+        val envResources = file("conf/${Env.property(project, "env")}/resources")
         assert(!envResources.exists())
         inputs.dir(envResources)
         from(envResources)

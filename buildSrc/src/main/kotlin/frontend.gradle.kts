@@ -4,8 +4,6 @@ tasks.named("mkdir") {
     }
 }
 
-val env: String? = if (hasProperty("env")) properties["env"] as String else null
-
 afterEvaluate {
     assert(project.extensions.extraProperties.has("frontendDir"))
     val frontendDir = project.extensions.extraProperties.get("frontendDir") as String
@@ -20,9 +18,11 @@ afterEvaluate {
                 commandLine(Frontend.commandLine(listOf("yarn", "install")))
             }
 
-            val command = ArrayList<String>();
-            command.addAll(listOf("yarn", "run", "build"))
+            val command = mutableListOf("yarn", "run", "build")
+
+            val env = Env.property(project, "env")
             if (env != null) command.addAll(listOf("--env", env))
+
             exec {
                 workingDir(frontendDir)
                 commandLine(Frontend.commandLine(command))

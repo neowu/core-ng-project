@@ -4,9 +4,6 @@ plugins {
     id("org.flywaydb.flyway")
 }
 
-// use gradlew -Penv=${env} to pass
-val env = if (hasProperty("env")) properties["env"] else null
-
 tasks.withType<AbstractFlywayTask> {
     doFirst {
         flyway {
@@ -14,6 +11,7 @@ tasks.withType<AbstractFlywayTask> {
             placeholderReplacement = false
             assert(file("src/main/resources/db/migration").exists())
 
+            val env = Env.property(project, "env")
             val propertyFile = if (env == null) file("src/main/resources/flyway.properties") else file("conf/${env}/resources/flyway.properties")
             assert(propertyFile.exists())
             val properties = DBMigration.loadProperties(propertyFile)

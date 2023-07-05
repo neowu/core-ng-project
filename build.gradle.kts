@@ -109,14 +109,14 @@ project("core-ng-search-test") {
     }
 }
 
-val mavenURL = if (hasProperty("mavenURL")) properties["mavenURL"] else null    // usage: "gradlew -PmavenURL=/path clean publish"
+val mavenURL = Env.property(project, "mavenURL")    // usage: "gradlew -PmavenURL=/path clean publish"
 
 subprojects {
     if (mavenURL != null && project.name.startsWith("core-ng")) {
         apply(plugin = "maven-publish")
 
-        val mavenDir = project.file(mavenURL)
-        if (!mavenDir.exists()) throw Error("$mavenDir not exists")
+        val mavenDir = file(mavenURL)
+        assert(mavenDir.exists())
         publishing {
             publications {
                 create<MavenPublication>("maven") {
