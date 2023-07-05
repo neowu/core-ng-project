@@ -1,9 +1,12 @@
 .idea/
 /.gradle/
 /build/
+buildSrc/.gradle/
+buildSrc/build/
 *.iml
 /classes/
 **/src/dev/java/
 .DS_Store
 node_modules/
 wiki/
+

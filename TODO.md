@@ -2,8 +2,6 @@
 
 * template, use ByteBuffer[] for performance?
 
-* change gradle to kotlin? (it's worse if not use plugins block)
-  > refer to https://docs.gradle.org/current/userguide/kotlin_dsl.html#sec:kotlin_using_standard_api)
 * impl own json bind by referring https://github.com/json-iterator/java and https://github.com/ngs-doo/dsl-json with annotation processor?
 
 * framework error (queue listener, background task error, custom scheduler trigger) forward to kafka?
