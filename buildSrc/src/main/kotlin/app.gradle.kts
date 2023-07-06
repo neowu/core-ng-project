@@ -7,8 +7,9 @@ application {
 }
 
 tasks.named<ProcessResources>("processResources") {
-    if (Env.property(project, "env") != null) {
-        val envResources = file("conf/${Env.property(project, "env")}/resources")
+    val env = project.properties["env"] // use gradlew -Penv=${env} to pass
+    if (env != null) {
+        val envResources = file("conf/${env}/resources")
         assert(!envResources.exists())
         inputs.dir(envResources)
         from(envResources)
@@ -61,13 +62,14 @@ afterEvaluate {
         doLast {
             val rootGroup = if (parent!!.depth > 0) parent!!.group else project.group
             project.sync {
-                from(tasks.named<Sync>("installDist").get().destinationDir.toString()) {
+                val destinationDir = tasks.named<Sync>("installDist").get().destinationDir
+                from(destinationDir) {
                     exclude("lib/${rootGroup}.*.jar")
                     exclude("bin")
                     exclude("web")
                     into("dependency")
                 }
-                from(tasks.named<Sync>("installDist").get().destinationDir.toString()) {
+                from(destinationDir) {
                     include("lib/${rootGroup}.*.jar")
                     include("bin/**")
                     include("web/**")
@@ -75,9 +77,9 @@ afterEvaluate {
                 }
                 into("${buildDir}/docker/package")
             }
-            if (project.file("docker/Dockerfile").exists()) {
+            if (file("docker/Dockerfile").exists()) {
                 project.sync {
-                    from(project.file("docker"))
+                    from(file("docker"))
                     into("${buildDir}/docker")
                     preserve {
                         include("package/**")

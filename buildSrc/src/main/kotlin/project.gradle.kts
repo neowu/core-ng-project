@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    idea
+    idea apply false
 }
 
 defaultTasks("clean", "build")

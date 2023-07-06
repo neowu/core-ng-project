@@ -11,9 +11,8 @@ tasks.withType<AbstractFlywayTask> {
             placeholderReplacement = false
             assert(file("src/main/resources/db/migration").exists())
 
-            val env = Env.property(project, "env")
+            val env = project.properties["env"] // use gradlew -Penv=${env} to pass
             val propertyFile = if (env == null) file("src/main/resources/flyway.properties") else file("conf/${env}/resources/flyway.properties")
-            assert(propertyFile.exists())
             val properties = DBMigration.loadProperties(propertyFile)
 
             url = properties["flyway.url"]

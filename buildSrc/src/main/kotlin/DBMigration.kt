@@ -7,40 +7,39 @@ import java.util.Properties
 /**
  * @author neo
  */
-class DBMigration {
-    companion object {
-        fun loadProperties(propertyFile: File): Map<String, String> {
-            val properties = Properties()
-            FileInputStream(propertyFile).use {
-                properties.load(it)
-            }
-            return properties.map { (key, value) ->
-                key as String to value as String
-            }.toMap()
+object DBMigration {
+    fun loadProperties(propertyFile: File): Map<String, String> {
+        assert(propertyFile.exists())
+        val properties = Properties()
+        FileInputStream(propertyFile).use {
+            properties.load(it)
         }
+        return properties.map { (key, value) ->
+            key as String to value as String
+        }.toMap()
+    }
 
-        // refer to core.framework.internal.db.cloud.GCloudAuthProvider
-        fun iamUser(): String {
-            val email = metadata("email")
-            val regex = """([^@]*)@[^@]*""".toRegex()
-            return regex.matchEntire(email)!!.groups[1]!!.value
-        }
+    // refer to core.framework.internal.db.cloud.GCloudAuthProvider
+    fun iamUser(): String {
+        val email = metadata("email")
+        val regex = """([^@]*)@[^@]*""".toRegex()
+        return regex.matchEntire(email)!!.groups[1]!!.value
+    }
 
-        fun iamAccessToken(): String {
-            val tokenJSON = metadata("token")
-            val regex = """\{"access_token":"([^"]*)",.*""".toRegex()
-            return regex.matchEntire(tokenJSON)!!.groups[1]!!.value
-        }
+    fun iamAccessToken(): String {
+        val tokenJSON = metadata("token")
+        val regex = """\{"access_token":"([^"]*)",.*""".toRegex()
+        return regex.matchEntire(tokenJSON)!!.groups[1]!!.value
+    }
 
-        private fun metadata(attribute: String): String {
-            val conn = URL("http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/${attribute}").openConnection() as HttpURLConnection
-            conn.requestMethod = "GET"
-            conn.setRequestProperty("Metadata-Flavor", "Google")
-            conn.connectTimeout = 500
-            conn.readTimeout = 1000
-            val statusCode = conn.responseCode
-            if (statusCode != 200) throw Error("failed to fetch gcloud iam metadata, status=${statusCode}")
-            return conn.inputStream.bufferedReader().use { it.readText() }
-        }
+    private fun metadata(attribute: String): String {
+        val conn = URL("http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/${attribute}").openConnection() as HttpURLConnection
+        conn.requestMethod = "GET"
+        conn.setRequestProperty("Metadata-Flavor", "Google")
+        conn.connectTimeout = 500
+        conn.readTimeout = 1000
+        val statusCode = conn.responseCode
+        if (statusCode != 200) throw Error("failed to fetch gcloud iam metadata, status=${statusCode}")
+        return conn.inputStream.bufferedReader().use { it.readText() }
     }
 }

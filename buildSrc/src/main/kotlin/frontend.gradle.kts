@@ -20,8 +20,8 @@ afterEvaluate {
 
             val command = mutableListOf("yarn", "run", "build")
 
-            val env = Env.property(project, "env")
-            if (env != null) command.addAll(listOf("--env", env))
+            val env = project.properties["env"] // use gradlew -Penv=${env} to pass
+            if (env != null) command.addAll(listOf("--env", env as String))
 
             exec {
                 workingDir(frontendDir)

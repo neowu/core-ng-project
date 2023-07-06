@@ -62,7 +62,7 @@ project("core-ng-test") {
         api("org.assertj:assertj-core:${assertjVersion}")
         implementation(project(":core-ng"))
         implementation("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+        implementation("org.junit.platform:junit-platform-launcher")
         testRuntimeOnly("org.hsqldb:hsqldb:2.7.1")
     }
 }
@@ -109,7 +109,7 @@ project("core-ng-search-test") {
     }
 }
 
-val mavenURL = Env.property(project, "mavenURL")    // usage: "gradlew -PmavenURL=/path clean publish"
+val mavenURL = project.properties["mavenURL"] as String?    // usage: "gradlew -PmavenURL=/path clean publish"
 
 subprojects {
     if (mavenURL != null && project.name.startsWith("core-ng")) {

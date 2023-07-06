@@ -1,15 +1,15 @@
 import com.github.spotbugs.snom.Confidence
 
 plugins {
-    checkstyle
-    pmd
-    jacoco
-    id("com.github.spotbugs")
-    id("jacoco-report-aggregation")
+    checkstyle apply false
+    pmd apply false
+    jacoco apply false
+    id("com.github.spotbugs") apply false
+    id("jacoco-report-aggregation") apply false
 }
 
 subprojects {
-    if (!plugins.hasPlugin("java")) return@subprojects      // only apply to project has java plugin
+    if (!plugins.hasPlugin("java")) return@subprojects      // only apply to projects have java plugin
 
     apply(plugin = "checkstyle")
     apply(plugin = "pmd")
