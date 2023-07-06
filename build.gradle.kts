@@ -40,7 +40,7 @@ project("core-ng") {
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
         implementation("com.squareup.okhttp3:okhttp:4.11.0")
-        implementation("io.undertow:undertow-core:2.3.5.Final")
+        implementation("io.undertow:undertow-core:2.3.7.Final")
         implementation("org.apache.kafka:kafka-clients:${kafkaVersion}@jar")
         implementation("org.xerial.snappy:snappy-java:1.1.10.1")      // used by kafka message compression
         compileOnly("com.mysql:mysql-connector-j:${mysqlVersion}")
@@ -71,7 +71,7 @@ project("core-ng-mongo") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng"))
-        api("org.mongodb:mongodb-driver-sync:4.9.0")
+        api("org.mongodb:mongodb-driver-sync:4.10.1")
         testImplementation(project(":core-ng-test"))
     }
 }
@@ -81,7 +81,7 @@ project("core-ng-mongo-test") {
     dependencies {
         implementation(project(":core-ng-test"))
         implementation(project(":core-ng-mongo"))
-        implementation("de.bwaldvogel:mongo-java-server:1.43.0")
+        implementation("de.bwaldvogel:mongo-java-server:1.44.0")
     }
 }
 

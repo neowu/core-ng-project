@@ -5,6 +5,7 @@
 * kafka: updated client to 3.5.0
 * gradle: updated test dependency and kotlin DSL
   > prepare for gradle 9.0
+* mongo: update driver to 4.10.1
 
 ### 8.1.4 (06/05/2023 - 06/13/2023)
 
