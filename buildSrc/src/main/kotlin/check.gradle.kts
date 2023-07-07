@@ -23,7 +23,7 @@ subprojects {
             checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
         }
 
-        configFile = rootProject.file("buildSrc/src/main/resources/checkstyle.xml")
+        configFile = rootProject.file("buildSrc/src/main/config/checkstyle.xml")
         configProperties["configDir"] = configFile.parentFile
 
         tasks.named<Checkstyle>("checkstyleMain") {
@@ -46,7 +46,7 @@ subprojects {
 
     pmd {
         ruleSets = listOf()
-        ruleSetFiles = rootProject.files("buildSrc/src/main/resources/pmd.xml")
+        ruleSetFiles = rootProject.files("buildSrc/src/main/config/pmd.xml")
         toolVersion = "6.55.0"
         isConsoleOutput = true
 
@@ -63,7 +63,7 @@ subprojects {
         toolVersion.set("4.7.3")
         reportLevel.set(Confidence.LOW)
         extraArgs.set(listOf("-longBugCodes"))
-        includeFilter.set(rootProject.file("buildSrc/src/main/resources/spotbugs.xml"))
+        includeFilter.set(rootProject.file("buildSrc/src/main/config/spotbugs.xml"))
     }
 
     jacoco {
