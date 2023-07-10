@@ -1,6 +1,6 @@
 ## Change log
 
-### 8.1.5 (06/22/2023 - )
+### 8.1.5 (06/22/2023 - 07/10/2023)
 
 * kafka: updated client to 3.5.0
 * gradle: updated test dependency and kotlin DSL
