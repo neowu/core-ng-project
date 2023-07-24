@@ -84,9 +84,13 @@ public class BeanFactory {
     }
 
     private Object lookupValue(Field field) {
-        Named name = field.getDeclaredAnnotation(Named.class);
+        Named named = field.getDeclaredAnnotation(Named.class);
         Type fieldType = stripOwnerType(field.getGenericType());
-        return bean(fieldType, name == null ? null : name.value());
+
+        String name = named == null ? null : named.value();
+        Object bean = beans.get(new Key(fieldType, name));
+        if (bean == null) throw new Error(format("can not resolve dependency, type={}, name={}, field={}", fieldType.getTypeName(), name, Fields.path(field)));
+        return bean;
     }
 
     private Type stripOwnerType(Type paramType) {    // type from field/method params could has owner type, which is not used in bind/key
