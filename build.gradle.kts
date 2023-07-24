@@ -7,7 +7,7 @@ apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
-    version = "8.1.5"
+    version = "8.1.6"
 
     repositories {
         maven {
@@ -25,7 +25,7 @@ val jacksonVersion = "2.15.2"
 val junitVersion = "5.9.3"
 val mockitoVersion = "5.4.0"
 val assertjVersion = "3.24.2"
-val mysqlVersion = "8.0.33"
+val mysqlVersion = "8.1.0"
 
 project("core-ng-api") {
     apply(plugin = "lib")
