@@ -3,6 +3,7 @@
 ### 8.1.6 (07/24/2023 - )
 
 * mysql: update driver to 8.1.0
+* kafka: updated client to 3.5.1
 
 ### 8.1.5 (06/22/2023 - 07/10/2023)
 
