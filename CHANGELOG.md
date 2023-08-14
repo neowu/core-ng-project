@@ -4,6 +4,7 @@
 
 * mysql: update driver to 8.1.0
 * kafka: updated client to 3.5.1
+* search: update es to 8.9.0
 
 ### 8.1.5 (06/22/2023 - 07/10/2023)
 
