@@ -19,7 +19,7 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle("com.puppycrawl.tools:checkstyle:10.12.1")
+            checkstyle("com.puppycrawl.tools:checkstyle:10.12.2")
             checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
         }
 
@@ -57,7 +57,7 @@ subprojects {
 
     spotbugs {
         dependencies {
-            spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.4.7")
+            spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.0")
         }
 
         toolVersion.set("4.7.3")
@@ -67,7 +67,7 @@ subprojects {
     }
 
     jacoco {
-        toolVersion = "0.8.8"
+        toolVersion = "0.8.10"
 
         tasks.named<JacocoReport>("testCodeCoverageReport") {
             reports {
