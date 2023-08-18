@@ -120,7 +120,7 @@ public class CancelQueryTaskImpl extends TimerTask implements CancelQueryTask {
         this.queryToCancel = queryToCancel;
     }
 
-    private static class DefaultTransactionEventHandler implements TransactionEventHandler {
+    private static final class DefaultTransactionEventHandler implements TransactionEventHandler {
         @Override
         public void transactionBegun() {
         }
