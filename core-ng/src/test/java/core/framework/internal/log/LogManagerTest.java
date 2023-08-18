@@ -62,7 +62,7 @@ class LogManagerTest {
         logManager.end("end");
     }
 
-    private static class TestException extends Exception implements ErrorCode {
+    private static final class TestException extends Exception implements ErrorCode {
         @Serial
         private static final long serialVersionUID = 4243205974337190882L;
 
