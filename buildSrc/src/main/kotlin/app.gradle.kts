@@ -75,12 +75,12 @@ afterEvaluate {
                     include("web/**")
                     into("app")
                 }
-                into("${buildDir}/docker/package")
+                into("${layout.buildDirectory}/docker/package")
             }
             if (file("docker/Dockerfile").exists()) {
                 project.sync {
                     from(file("docker"))
-                    into("${buildDir}/docker")
+                    into("${layout.buildDirectory}/docker")
                     preserve {
                         include("package/**")
                     }

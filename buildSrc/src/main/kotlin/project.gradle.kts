@@ -26,7 +26,7 @@ subprojects {
         mavenLocal()
     }
 
-    buildDir = file("$rootDir/build/${rootDir.toPath().relativize(projectDir.toPath())}")
+    layout.buildDirectory.set(file("$rootDir/build/${rootDir.toPath().relativize(projectDir.toPath())}"))
 
     tasks.named<Test>("test") {
         useJUnitPlatform()

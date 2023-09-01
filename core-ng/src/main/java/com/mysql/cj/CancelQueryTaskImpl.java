@@ -2,7 +2,6 @@ package com.mysql.cj;
 
 import com.mysql.cj.Query.CancelStatus;
 import com.mysql.cj.conf.HostInfo;
-import com.mysql.cj.conf.PropertyKey;
 import com.mysql.cj.protocol.a.NativeMessageBuilder;
 import core.framework.internal.db.DatabaseImpl;
 import core.framework.internal.db.cloud.CloudAuthProvider;
@@ -20,12 +19,9 @@ public class CancelQueryTaskImpl extends TimerTask implements CancelQueryTask {
 
     Query queryToCancel;
     Throwable caughtWhileCancelling = null;
-    boolean queryTimeoutKillsConnection;
 
     public CancelQueryTaskImpl(Query cancellee) {
         this.queryToCancel = cancellee;
-        NativeSession session = (NativeSession) cancellee.getSession();
-        this.queryTimeoutKillsConnection = session.getPropertySet().getBooleanProperty(PropertyKey.queryTimeoutKillsConnection).getValue();
     }
 
     @Override
