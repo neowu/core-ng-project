@@ -23,7 +23,7 @@ val elasticVersion = "8.9.0"
 val kafkaVersion = "3.5.1"
 val jacksonVersion = "2.15.2"
 val junitVersion = "5.10.0"
-val mockitoVersion = "5.4.0"
+val mockitoVersion = "5.5.0"
 val assertjVersion = "3.24.2"
 val mysqlVersion = "8.1.0"
 
@@ -35,12 +35,12 @@ project("core-ng") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng-api"))
-        api("org.slf4j:slf4j-api:2.0.7")
+        api("org.slf4j:slf4j-api:2.0.9")
         implementation("org.javassist:javassist:3.29.2-GA")
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
         implementation("com.squareup.okhttp3:okhttp:4.11.0")
-        implementation("io.undertow:undertow-core:2.3.7.Final")
+        implementation("io.undertow:undertow-core:2.3.8.Final")
         implementation("org.apache.kafka:kafka-clients:${kafkaVersion}@jar")
         implementation("org.xerial.snappy:snappy-java:1.1.10.1")      // used by kafka message compression
         compileOnly("com.mysql:mysql-connector-j:${mysqlVersion}")
@@ -71,7 +71,7 @@ project("core-ng-mongo") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng"))
-        api("org.mongodb:mongodb-driver-sync:4.10.1")
+        api("org.mongodb:mongodb-driver-sync:4.10.2")
         testImplementation(project(":core-ng-test"))
     }
 }
