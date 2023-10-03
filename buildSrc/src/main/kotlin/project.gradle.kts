@@ -40,10 +40,10 @@ subprojects {
         description = "Create project directories."
         doLast {
             for ((_, sourceSet) in project.the<SourceSetContainer>().asMap) {
-                for (dir in sourceSet.java.srcDirs()) {
+                for (dir in sourceSet.java.srcDirs) {
                     dir.mkdirs()
                 }
-                for (dir in sourceSet.resources.srcDirs()) {
+                for (dir in sourceSet.resources.srcDirs) {
                     dir.mkdirs()
                 }
             }
