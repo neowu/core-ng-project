@@ -9,7 +9,7 @@ import java.util.Properties
  */
 object DBMigration {
     fun loadProperties(propertyFile: File): Map<String, String> {
-        assert(propertyFile.exists())
+        if (!propertyFile.exists()) throw Error("$propertyFile does not exist")
         val properties = Properties()
         FileInputStream(propertyFile).use {
             properties.load(it)

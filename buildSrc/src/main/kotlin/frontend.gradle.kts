@@ -5,13 +5,13 @@ tasks.named("mkdir") {
 }
 
 afterEvaluate {
-    assert(project.extensions.extraProperties.has("frontendDir"))
-    val frontendDir = project.extensions.extraProperties.get("frontendDir") as String
+    if (!project.extensions.extraProperties.has("frontendDir")) throw Error("project does not have frontendDir property, assign by project.ext[\"frontendDir\"]")
+    val frontendDir = file(project.extensions.extraProperties.get("frontendDir") as String)
 
     tasks.register("buildFrontend") {
         group = "build"
         doLast {
-            assert(file(frontendDir).exists())
+            if (!frontendDir.exists()) throw Error("$frontendDir does not exist")
 
             exec {
                 workingDir(frontendDir)

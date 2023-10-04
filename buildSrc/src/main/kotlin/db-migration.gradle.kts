@@ -9,7 +9,8 @@ tasks.withType<AbstractFlywayTask> {
         flyway {
             configurations = arrayOf("runtimeClasspath") // use runtimeOnly scope in actual db-migration project
             placeholderReplacement = false
-            assert(file("src/main/resources/db/migration").exists())
+            val migrationDir = file("src/main/resources/db/migration")
+            if (!migrationDir.exists()) throw Error("$migrationDir does not exist")
 
             val env = project.properties["env"] // use gradlew -Penv=${env} to pass
             val propertyFile = if (env == null) file("src/main/resources/flyway.properties") else file("conf/${env}/resources/flyway.properties")
