@@ -7,7 +7,7 @@ plugins {
 defaultTasks("clean", "build")
 
 subprojects {
-    if (childProjects.isNotEmpty()) return@subprojects;    // ignore parent project
+    if (childProjects.isNotEmpty()) return@subprojects      // ignore parent project
 
     apply(plugin = "java")
 

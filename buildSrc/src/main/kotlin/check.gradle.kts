@@ -71,10 +71,10 @@ subprojects {
 
         tasks.named<JacocoReport>("testCodeCoverageReport") {
             reports {
-                xml.required = true
-                xml.outputLocation = rootProject.file("${layout.buildDirectory}/reports/jacoco/report.xml")
-                html.required = true
-                csv.required = false
+                xml.required.set(true)
+                xml.outputLocation.set(rootProject.file("${layout.buildDirectory}/reports/jacoco/report.xml"))
+                html.required.set(true)
+                csv.required.set(false)
             }
         }
     }
