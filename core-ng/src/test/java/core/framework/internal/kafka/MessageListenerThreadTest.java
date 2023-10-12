@@ -36,7 +36,7 @@ class MessageListenerThreadTest {
     @Mock
     MessageHandler<TestMessage> messageHandler;
     @Mock
-    Consumer<byte[], byte[]> consumer;
+    Consumer<String, byte[]> consumer;
     @Mock
     BulkMessageHandler<TestMessage> bulkMessageHandler;
     private MessageListenerThread thread;
@@ -58,7 +58,7 @@ class MessageListenerThreadTest {
 
     @Test
     void messages() throws IOException {
-        ConsumerRecord<byte[], byte[]> record = new ConsumerRecord<>("topic", 0, 1, Strings.bytes("key"), Strings.bytes("{}"));
+        ConsumerRecord<String, byte[]> record = new ConsumerRecord<>("topic", 0, 1, "key", Strings.bytes("{}"));
         record.headers().add(MessageHeaders.HEADER_CLIENT, Strings.bytes("client"));
         record.headers().add(MessageHeaders.HEADER_REF_ID, Strings.bytes("refId"));
         record.headers().add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes("correlationId"));
@@ -94,20 +94,11 @@ class MessageListenerThreadTest {
     }
 
     @Test
-    void key() {
-        assertThat(thread.key(new ConsumerRecord<>("topic", 0, 0, null, null)))
-            .isNull();
-
-        assertThat(thread.key(new ConsumerRecord<>("topic", 0, 0, Strings.bytes("key"), null)))
-            .isEqualTo("key");
-    }
-
-    @Test
     void handle() throws Exception {
         var key = "key";
         var message = new TestMessage();
         message.stringField = "value";
-        var record = new ConsumerRecord<>("topic", 0, 0, Strings.bytes(key), Strings.bytes(JSON.toJSON(message)));
+        var record = new ConsumerRecord<>("topic", 0, 0, key, Strings.bytes(JSON.toJSON(message)));
         record.headers().add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));
         record.headers().add(MessageHeaders.HEADER_CLIENT, Strings.bytes("client"));
         thread.handle("topic", new MessageProcess<>(messageHandler, null, TestMessage.class), List.of(record));
@@ -119,7 +110,7 @@ class MessageListenerThreadTest {
     void handleWithNullKey() throws Exception {
         var message = new TestMessage();
         message.stringField = "value";
-        var record = new ConsumerRecord<>("topic", 0, 0, (byte[]) null, Strings.bytes(JSON.toJSON(message)));
+        var record = new ConsumerRecord<>("topic", 0, 0, (String) null, Strings.bytes(JSON.toJSON(message)));
         record.headers().add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));
         record.headers().add(MessageHeaders.HEADER_CLIENT, Strings.bytes("client"));
         record.headers().add(MessageHeaders.HEADER_TRACE, Strings.bytes("cascade"));
@@ -133,7 +124,7 @@ class MessageListenerThreadTest {
         var key = "key";
         var message = new TestMessage();
         message.stringField = "value";
-        var record = new ConsumerRecord<>("topic", 0, 0, Strings.bytes(key), Strings.bytes(JSON.toJSON(message)));
+        var record = new ConsumerRecord<>("topic", 0, 0, key, Strings.bytes(JSON.toJSON(message)));
         record.headers().add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes("correlationId"));
         record.headers().add(MessageHeaders.HEADER_REF_ID, Strings.bytes("refId"));
         thread.handleBulk("topic", new MessageProcess<>(null, bulkMessageHandler, TestMessage.class), List.of(record));

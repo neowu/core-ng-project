@@ -64,7 +64,7 @@ public class MessageListener {
         threads = new MessageListenerThread[poolSize];
         for (int i = 0; i < poolSize; i++) {
             String name = listenerThreadName(this.name, i);
-            Consumer<byte[], byte[]> consumer = createConsumer();
+            Consumer<String, byte[]> consumer = createConsumer();
             threads[i] = new MessageListenerThread(name, consumer, this);
         }
         for (var thread : threads) {
@@ -104,7 +104,7 @@ public class MessageListener {
     }
 
     @SuppressWarnings("deprecation")
-    Consumer<byte[], byte[]> createConsumer() {
+    Consumer<String, byte[]> createConsumer() {
         var watch = new StopWatch();
         try {
             Map<String, Object> config = Maps.newHashMapWithExpectedSize(13);
@@ -121,8 +121,7 @@ public class MessageListener {
             config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);
             config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) maxWaitTime.toMillis());
             config.put(ConsumerConfig.AUTO_INCLUDE_JMX_REPORTER_CONFIG, Boolean.FALSE);
-            var deserializer = new ByteArrayDeserializer();
-            Consumer<byte[], byte[]> consumer = new KafkaConsumer<>(config, deserializer, deserializer);
+            Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new KeyDeserializer(), new ByteArrayDeserializer());
             consumerMetrics.add(consumer.metrics());
 
             consumer.subscribe(topics);

@@ -40,11 +40,11 @@ class MessageListenerThread extends Thread {
     private final LogManager logManager;
 
     private final Object lock = new Object();
-    private final Consumer<byte[], byte[]> consumer;
+    private final Consumer<String, byte[]> consumer;
 
     private volatile boolean processing;
 
-    MessageListenerThread(String name, Consumer<byte[], byte[]> consumer, MessageListener listener) {
+    MessageListenerThread(String name, Consumer<String, byte[]> consumer, MessageListener listener) {
         super(name);
         this.consumer = consumer;
         this.listener = listener;
@@ -67,7 +67,7 @@ class MessageListenerThread extends Thread {
     private void process() {
         while (!listener.shutdown) {
             try {
-                ConsumerRecords<byte[], byte[]> records = consumer.poll(Duration.ofSeconds(30));    // consumer should call poll at least once every MAX_POLL_INTERVAL_MS
+                ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofSeconds(30));    // consumer should call poll at least once every MAX_POLL_INTERVAL_MS
                 if (records.isEmpty()) continue;
                 processRecords(records);
             } catch (Throwable e) {
@@ -102,20 +102,20 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    private void processRecords(ConsumerRecords<byte[], byte[]> kafkaRecords) {
+    private void processRecords(ConsumerRecords<String, byte[]> kafkaRecords) {
         var watch = new StopWatch();
         int count = 0;
         int size = 0;
         try {
-            Map<String, List<ConsumerRecord<byte[], byte[]>>> messages = new HashMap<>();     // record in one topic maintains order
-            for (ConsumerRecord<byte[], byte[]> record : kafkaRecords) {
+            Map<String, List<ConsumerRecord<String, byte[]>>> messages = new HashMap<>();     // record in one topic maintains order
+            for (ConsumerRecord<String, byte[]> record : kafkaRecords) {
                 messages.computeIfAbsent(record.topic(), key -> new ArrayList<>()).add(record);
                 count++;
                 size += record.value().length;
             }
-            for (Map.Entry<String, List<ConsumerRecord<byte[], byte[]>>> entry : messages.entrySet()) {
+            for (Map.Entry<String, List<ConsumerRecord<String, byte[]>>> entry : messages.entrySet()) {
                 String topic = entry.getKey();
-                List<ConsumerRecord<byte[], byte[]>> records = entry.getValue();
+                List<ConsumerRecord<String, byte[]>> records = entry.getValue();
                 MessageProcess<?> process = listener.processes.get(topic);
                 if (process.bulkHandler != null) {
                     handleBulk(topic, process, records);
@@ -129,8 +129,8 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    <T> void handle(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records) {
-        for (ConsumerRecord<byte[], byte[]> record : records) {
+    <T> void handle(String topic, MessageProcess<T> process, List<ConsumerRecord<String, byte[]>> records) {
+        for (ConsumerRecord<String, byte[]> record : records) {
             ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
             try {
                 initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), process.warnings);
@@ -148,7 +148,7 @@ class MessageListenerThread extends Thread {
                 if (refId != null) actionLog.refIds = List.of(refId);
                 logger.debug("[header] refId={}, client={}, correlationId={}, trace={}", refId, client, correlationId, trace);
 
-                String key = key(record);
+                String key = record.key();
                 actionLog.context.put("key", Collections.singletonList(key)); // key can be null
 
                 long timestamp = record.timestamp();
@@ -167,7 +167,7 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records) {
+    <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<String, byte[]>> records) {
         ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
         try {
             initAction(actionLog, topic, process.bulkHandler.getClass().getCanonicalName(), process.warnings);
@@ -194,7 +194,7 @@ class MessageListenerThread extends Thread {
         if (warnings != null) actionLog.initializeWarnings(warnings);
     }
 
-    <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONReader<T> reader) throws IOException {
+    <T> List<Message<T>> messages(List<ConsumerRecord<String, byte[]>> records, ActionLog actionLog, JSONReader<T> reader) throws IOException {
         int size = records.size();
         actionLog.track("kafka", 0, size, 0);
         List<Message<T>> messages = new ArrayList<>(size);
@@ -204,7 +204,7 @@ class MessageListenerThread extends Thread {
         Set<String> keys = Sets.newHashSetWithExpectedSize(size);
         long minTimestamp = Long.MAX_VALUE;
 
-        for (ConsumerRecord<byte[], byte[]> record : records) {
+        for (ConsumerRecord<String, byte[]> record : records) {
             Headers headers = record.headers();
             String trace = header(headers, MessageHeaders.HEADER_TRACE);
             if (trace != null) actionLog.trace = Trace.parse(trace);   // trigger trace if any message is trace
@@ -215,7 +215,7 @@ class MessageListenerThread extends Thread {
             String refId = header(headers, MessageHeaders.HEADER_REF_ID);
             if (refId != null) refIds.add(refId);
 
-            String key = key(record);
+            String key = record.key();
             keys.add(key);
 
             byte[] value = record.value();
@@ -235,11 +235,6 @@ class MessageListenerThread extends Thread {
         if (!refIds.isEmpty()) actionLog.refIds = List.copyOf(refIds);
         checkConsumerDelay(actionLog, minTimestamp, listener.longConsumerDelayThresholdInNano);
         return messages;
-    }
-
-    String key(ConsumerRecord<byte[], byte[]> record) {
-        byte[] key = record.key();
-        return key == null ? null : new String(key, UTF_8);
     }
 
     String header(Headers headers, String key) {
