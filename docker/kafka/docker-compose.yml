@@ -1,7 +1,7 @@
 version: "3"
 services:
   kafka:
-    image: kafka:3.5.1
+    image: neowu/kafka:3.6.0
     ports:
     - 9092:9092
     - 1099:1099
@@ -14,14 +14,14 @@ services:
     volumes:
     - data:/data
 #  kafka-2:
-#    image: neowu/kafka:3.5.1
+#    image: neowu/kafka:3.6.0
 #    environment:
 #    - KAFKA_NODE_ID=1
 #    - KAFKA_CLUSTER_ID=FjC2JEw2S5C18hSjY1yEuA
 #    - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
 #    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka-2:9092 --override num.partitions=3 --override controller.quorum.voters=1@kafka:9093
 #  mm:
-#    image: neowu/kafka:3.5.1
+#    image: neowu/kafka:3.6.0
 #    volumes:
 #    - ./connect-mirror-maker.properties:/opt/kafka/config/connect-mirror-maker.properties
 #    entrypoint: ["/bin/bash", "-c", "/opt/kafka/bin/connect-mirror-maker.sh /opt/kafka/config/connect-mirror-maker.properties"]
