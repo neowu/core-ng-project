@@ -23,9 +23,10 @@ public final class ThreadPools {
         return threadPool;
     }
 
-    // provides thread pool with unlimited threads
-    public static ExecutorService cachedThreadPool(String prefix) {
-        return Executors.newCachedThreadPool(new ThreadFactoryImpl(prefix));
+    // create new virtual thread for each task
+    public static ExecutorService virtualThreadExecutor(String prefix) {
+        ThreadFactory factory = Thread.ofVirtual().name(prefix, 0).factory();
+        return Executors.newThreadPerTaskExecutor(factory);
     }
 
     public static ScheduledExecutorService singleThreadScheduler(String prefix) {

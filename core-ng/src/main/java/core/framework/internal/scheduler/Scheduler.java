@@ -39,7 +39,7 @@ public final class Scheduler {
     public Clock clock = Clock.systemUTC();
 
     public Scheduler(LogManager logManager) {
-        this(logManager, ThreadPools.singleThreadScheduler("scheduler-"), ThreadPools.cachedThreadPool("scheduler-job-"));
+        this(logManager, ThreadPools.singleThreadScheduler("scheduler-"), ThreadPools.virtualThreadExecutor("scheduler-job-"));
     }
 
     Scheduler(LogManager logManager, ScheduledExecutorService scheduler, ExecutorService jobExecutor) {

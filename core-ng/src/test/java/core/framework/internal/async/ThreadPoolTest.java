@@ -14,20 +14,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class CachedThreadPoolTest {
+class ThreadPoolTest {
     private ExecutorService pool;
-    private ExecutorService unlimitedPool;
+    private ExecutorService virtualThreadExecutor;
 
     @BeforeEach
     void createThreadPool() {
         pool = ThreadPools.cachedThreadPool(1, "test-cached-pool-");
-        unlimitedPool = ThreadPools.cachedThreadPool("test-unlimited-cached-pool-");
+        virtualThreadExecutor = ThreadPools.virtualThreadExecutor("test-virtual-thread-executor-");
     }
 
     @AfterEach
     void closeThreadPool() {
         pool.shutdown();
-        unlimitedPool.shutdown();
+        virtualThreadExecutor.shutdown();
     }
 
     @Test
@@ -35,9 +35,9 @@ class CachedThreadPoolTest {
         pool.submit(() -> assertThat(Thread.currentThread().getName()).isEqualTo("test-cached-pool-1"))
             .get();
 
-        List<Future<Object>> futures = unlimitedPool.invokeAll(List.of(
-            () -> assertThat(Thread.currentThread().getName()).startsWith("test-unlimited-cached-pool-"),
-            () -> assertThat(Thread.currentThread().getName()).startsWith("test-unlimited-cached-pool-")
+        List<Future<Object>> futures = virtualThreadExecutor.invokeAll(List.of(
+            () -> assertThat(Thread.currentThread().getName()).startsWith("test-virtual-thread-executor-"),
+            () -> assertThat(Thread.currentThread().getName()).startsWith("test-virtual-thread-executor-")
         ));
         for (Future<?> future : futures) {
             future.get();

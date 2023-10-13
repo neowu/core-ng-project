@@ -29,11 +29,11 @@ public final class ExecutorImpl implements Executor {
     private final long maxProcessTimeInNano;
     volatile ScheduledExecutorService scheduler;
 
-    public ExecutorImpl(int poolSize, String name, LogManager logManager, long maxProcessTimeInNano) {
-        this.name = name;
+    public ExecutorImpl(ExecutorService executor, LogManager logManager, long maxProcessTimeInNano) {
+        this.name = null;
         this.logManager = logManager;
         this.maxProcessTimeInNano = maxProcessTimeInNano;
-        this.executor = ThreadPools.cachedThreadPool(poolSize, "executor" + (name == null ? "" : "-" + name) + "-");
+        this.executor = executor;
     }
 
     public void shutdown() {

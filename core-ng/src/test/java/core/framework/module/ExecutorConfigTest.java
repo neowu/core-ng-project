@@ -1,6 +1,7 @@
 package core.framework.module;
 
 import core.framework.async.Executor;
+import core.framework.internal.async.ThreadPools;
 import core.framework.internal.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ class ExecutorConfigTest {
 
     @Test
     void createExecutor() {
-        Executor executor = config.createExecutor(null, 1);
+        Executor executor = config.createExecutor(ThreadPools.virtualThreadExecutor("test-"));
         assertThat(executor).isNotNull();
     }
 }
