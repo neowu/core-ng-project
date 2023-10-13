@@ -9,7 +9,7 @@ import org.assertj.core.api.MapAssert;
 /**
  * @author neo
  */
-public class ValidatorAssert extends AbstractAssert<ValidatorAssert, Object> {
+public final class ValidatorAssert extends AbstractAssert<ValidatorAssert, Object> {
     private final BeanValidator validator;
 
     public ValidatorAssert(Object actual) {

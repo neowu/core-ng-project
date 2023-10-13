@@ -1,5 +1,6 @@
 package core.framework.internal.validate;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -59,9 +60,11 @@ class ClassValidatorSupportTest {
         }
 
         @SuppressWarnings("PMD.FinalFieldCouldBeStatic")
+        @SuppressFBWarnings("SS_SHOULD_BE_STATIC")
         public final String finalField = "value";
         public int intField;
         public transient String transientField;
+        @SuppressFBWarnings("UUF_UNUSED_FIELD")
         String nonPublicField;
     }
 

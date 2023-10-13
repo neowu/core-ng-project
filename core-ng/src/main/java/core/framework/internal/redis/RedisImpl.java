@@ -45,7 +45,7 @@ import static core.framework.internal.redis.RedisEncodings.validate;
 /**
  * @author neo
  */
-public class RedisImpl implements Redis {
+public final class RedisImpl implements Redis {
     final RedisConnectionFactory connectionFactory = new RedisConnectionFactory();
 
     private final Logger logger = LoggerFactory.getLogger(RedisImpl.class);

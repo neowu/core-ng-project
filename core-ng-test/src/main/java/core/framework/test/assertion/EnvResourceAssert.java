@@ -4,6 +4,7 @@ import org.assertj.core.api.AbstractAssert;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -86,8 +87,8 @@ public class EnvResourceAssert extends AbstractAssert<EnvResourceAssert, Path> {
     }
 
     private Properties loadProperties(Path path) throws IOException {
-        try (Reader reader = Files.newBufferedReader(path)) {
-            Properties properties = new Properties();
+        try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            var properties = new Properties();
             properties.load(reader);
             return properties;
         }

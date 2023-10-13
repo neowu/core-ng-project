@@ -4,6 +4,8 @@
 
 * kafka: updated client to 3.6.0
 
+(pmd only support java 21 from 7.0, and 7.0/gradle pmd 7.0 support is not released yet, refer to https://github.com/gradle/gradle/issues/24502)
+
 ### 8.1.6 (07/24/2023 - 08/16/2023)
 
 * mysql: update driver to 8.1.0

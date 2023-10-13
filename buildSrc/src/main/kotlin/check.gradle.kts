@@ -60,7 +60,7 @@ subprojects {
             spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.0")
         }
 
-        toolVersion.set("4.7.3")
+        toolVersion.set("4.8.0")
         reportLevel.set(Confidence.LOW)
         extraArgs.set(listOf("-longBugCodes"))
         includeFilter.set(rootProject.file("buildSrc/src/main/check/spotbugs.xml"))

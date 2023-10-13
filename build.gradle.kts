@@ -45,6 +45,7 @@ project("core-ng") {
         implementation("org.xerial.snappy:snappy-java:1.1.10.1")      // used by kafka message compression
         compileOnly("com.mysql:mysql-connector-j:${mysqlVersion}")
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")
+        compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.0")
         testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
         testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
         testImplementation("org.assertj:assertj-core:${assertjVersion}")
