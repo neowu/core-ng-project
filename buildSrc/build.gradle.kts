@@ -1,4 +1,5 @@
 plugins {
+    kotlin("jvm") version "1.9.20-RC"
     `kotlin-dsl`
 }
 
@@ -9,7 +10,7 @@ repositories {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 

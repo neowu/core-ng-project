@@ -1,7 +1,7 @@
 import java.io.File
 import java.io.FileInputStream
 import java.net.HttpURLConnection
-import java.net.URL
+import java.net.URI
 import java.util.Properties
 
 /**
@@ -33,7 +33,7 @@ object DBMigration {
     }
 
     private fun metadata(attribute: String): String {
-        val conn = URL("http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/${attribute}").openConnection() as HttpURLConnection
+        val conn = URI("http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/${attribute}").toURL().openConnection() as HttpURLConnection
         conn.requestMethod = "GET"
         conn.setRequestProperty("Metadata-Flavor", "Google")
         conn.connectTimeout = 500
