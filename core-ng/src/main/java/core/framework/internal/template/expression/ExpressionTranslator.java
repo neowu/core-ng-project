@@ -15,28 +15,27 @@ class ExpressionTranslator {
     }
 
     public String translate() {
-        if (expression instanceof ValueToken) return ((ValueToken) expression).value;
+        if (expression instanceof ValueToken token) return token.value;
 
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         append(builder, expression, true);
         return builder.toString();
     }
 
     private void append(StringBuilder builder, Token token, boolean root) {
-        if (token instanceof FieldToken) {
-            FieldToken field = (FieldToken) token;
-            if (root && !context.paramClasses.containsKey(field.name)) {
+        if (token instanceof FieldToken fieldToken) {
+            if (root && !context.paramClasses.containsKey(fieldToken.name)) {
                 builder.append("$root.");
             }
-            builder.append(field.name);
-            if (field.next != null) {
+            builder.append(fieldToken.name);
+            if (fieldToken.next != null) {
                 builder.append('.');
-                append(builder, field.next, false);
+                append(builder, fieldToken.next, false);
             }
-        } else if (token instanceof MethodToken) {
-            appendMethod(builder, (MethodToken) token, root);
-        } else if (token instanceof ValueToken) {
-            builder.append(((ValueToken) token).value);
+        } else if (token instanceof final MethodToken methodToken) {
+            appendMethod(builder, methodToken, root);
+        } else if (token instanceof final ValueToken valueToken) {
+            builder.append(valueToken.value);
         }
     }
 

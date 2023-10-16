@@ -108,7 +108,7 @@ public class HTTPErrorHandler {
     }
 
     String errorHTML(Throwable e, String actionId) {
-        String errorCode = e instanceof ErrorCode ? ((ErrorCode) e).errorCode() : "ERROR";
+        String errorCode = e instanceof ErrorCode code ? code.errorCode() : "ERROR";
         return "<html><body><h1>" + errorCode + "</h1><p>" + e.getMessage() + "</p><p>id: " + actionId + "</p></body></html>";
     }
 

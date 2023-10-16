@@ -23,7 +23,7 @@ val elasticVersion = "8.10.3"
 val kafkaVersion = "3.6.0"
 val jacksonVersion = "2.15.2"
 val junitVersion = "5.10.0"
-val mockitoVersion = "5.5.0"
+val mockitoVersion = "5.6.0"
 val assertjVersion = "3.24.2"
 val mysqlVersion = "8.1.0"
 

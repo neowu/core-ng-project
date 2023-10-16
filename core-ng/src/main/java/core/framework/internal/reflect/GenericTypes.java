@@ -13,8 +13,8 @@ public final class GenericTypes {
     public static Class<?> rawClass(Type type) {
         if (type instanceof Class) {
             return (Class<?>) type;
-        } else if (type instanceof ParameterizedType) {
-            return (Class<?>) ((ParameterizedType) type).getRawType();
+        } else if (type instanceof final ParameterizedType parameterizedType) {
+            return (Class<?>) parameterizedType.getRawType();
         } else {
             throw new Error("unsupported type, type=" + type);
         }
@@ -25,10 +25,11 @@ public final class GenericTypes {
     }
 
     public static boolean isGenericList(Type type) {
-        if (!(type instanceof ParameterizedType)) return false;
-
-        Class<?> rawClass = (Class<?>) ((ParameterizedType) type).getRawType();
-        return List.class.isAssignableFrom(rawClass) && ((ParameterizedType) type).getActualTypeArguments()[0] instanceof Class;
+        if (type instanceof ParameterizedType parameterizedType) {
+            Class<?> rawClass = (Class<?>) parameterizedType.getRawType();
+            return List.class.isAssignableFrom(rawClass) && parameterizedType.getActualTypeArguments()[0] instanceof Class;
+        }
+        return false;
     }
 
     public static Class<?> listValueClass(Type type) {
@@ -40,10 +41,11 @@ public final class GenericTypes {
     }
 
     public static boolean isGenericOptional(Type type) {
-        if (!(type instanceof ParameterizedType)) return false;
-
-        Class<?> rawClass = (Class<?>) ((ParameterizedType) type).getRawType();
-        return Optional.class.equals(rawClass) && ((ParameterizedType) type).getActualTypeArguments()[0] instanceof Class;
+        if (type instanceof ParameterizedType parameterizedType) {
+            Class<?> rawClass = (Class<?>) parameterizedType.getRawType();
+            return Optional.class.equals(rawClass) && parameterizedType.getActualTypeArguments()[0] instanceof Class;
+        }
+        return false;
     }
 
     public static Class<?> optionalValueClass(Type type) {

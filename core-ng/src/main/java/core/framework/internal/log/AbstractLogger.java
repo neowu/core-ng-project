@@ -16,24 +16,24 @@ abstract class AbstractLogger implements Logger {
     abstract void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception);
 
     private void logWithOneArgument(Marker marker, LogLevel level, String format, Object arg) {
-        if (arg instanceof Throwable)
-            log(marker, level, format, null, (Throwable) arg);
+        if (arg instanceof Throwable exception)
+            log(marker, level, format, null, exception);
         else
             log(marker, level, format, new Object[]{arg}, null);
     }
 
     private void logWithTwoArguments(Marker marker, LogLevel level, String format, Object arg1, Object arg2) {
-        if (arg2 instanceof Throwable)
-            log(marker, level, format, new Object[]{arg1}, (Throwable) arg2);
+        if (arg2 instanceof Throwable exception)
+            log(marker, level, format, new Object[]{arg1}, exception);
         else
             log(marker, level, format, new Object[]{arg1, arg2}, null);
     }
 
     private void logWithArguments(Marker marker, LogLevel level, String format, Object... arguments) {
-        if (arguments.length > 0 && arguments[arguments.length - 1] instanceof Throwable throwable) {
+        if (arguments.length > 0 && arguments[arguments.length - 1] instanceof Throwable exception) {
             Object[] messageArguments = new Object[arguments.length - 1];
             System.arraycopy(arguments, 0, messageArguments, 0, arguments.length - 1);
-            log(marker, level, format, messageArguments, throwable);
+            log(marker, level, format, messageArguments, exception);
         } else {
             log(marker, level, format, arguments, null);
         }

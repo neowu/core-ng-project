@@ -47,9 +47,12 @@ final class EntityCodec<T> implements CollectibleCodec<T> {
     @Override
     public BsonValue getDocumentId(T document) {
         Object id = idHandler.get(document);
-        if (id instanceof ObjectId) return new BsonObjectId((ObjectId) id);
-        if (id instanceof String) new BsonString((String) id);
-        throw new Error("unsupported id type, id=" + id);
+        return switch (id) {
+            case ObjectId value -> new BsonObjectId(value);
+            case String value -> new BsonString(value);
+            case null -> null;
+            default -> throw new Error("unsupported id type, id=" + id);
+        };
     }
 
     @Override

@@ -35,6 +35,7 @@ subprojects {
         failFast = true
         testLogging.showStandardStreams = true
         testLogging.exceptionFormat = TestExceptionFormat.FULL
+        jvmArgs("-XX:+EnableDynamicAgentLoading")
     }
 
     tasks.register("mkdir") {

@@ -241,8 +241,8 @@ public final class RepositoryImpl<T> implements Repository<T> {
         if (primaryKeys.isEmpty()) throw new Error("primaryKeys must not be empty");
         List<Object[]> params = new ArrayList<>(primaryKeys.size());
         for (Object primaryKey : primaryKeys) {
-            if (primaryKey instanceof Object[]) {
-                params.add((Object[]) primaryKey);
+            if (primaryKey instanceof final Object[] keys) {
+                params.add(keys);
             } else {
                 params.add(new Object[]{primaryKey});
             }

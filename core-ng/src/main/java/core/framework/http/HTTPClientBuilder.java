@@ -198,8 +198,8 @@ public final class HTTPClientBuilder {
                 TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 factory.init((KeyStore) null);
                 for (TrustManager trustManager : factory.getTrustManagers()) {
-                    if (trustManager instanceof X509TrustManager) {
-                        for (X509Certificate issuer : ((X509TrustManager) trustManager).getAcceptedIssuers()) {
+                    if (trustManager instanceof final X509TrustManager manager) {
+                        for (X509Certificate issuer : manager.getAcceptedIssuers()) {
                             trustStore.setCertificateEntry(issuer.getSubjectX500Principal().getName(), issuer);
                         }
                     }

@@ -77,7 +77,7 @@ public class LogManager {
     }
 
     String errorCode(Throwable e) {
-        return e instanceof ErrorCode ? ((ErrorCode) e).errorCode() : e.getClass().getCanonicalName();
+        return e instanceof ErrorCode errorCode ? errorCode.errorCode() : e.getClass().getCanonicalName();
     }
 
     public void maskFields(String... fields) {

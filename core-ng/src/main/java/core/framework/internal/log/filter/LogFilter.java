@@ -58,24 +58,18 @@ public class LogFilter {
     }
 
     private String arrayArgument(Object argument) {
-        if (argument instanceof Object[]) {
-            return Arrays.toString((Object[]) argument);
-        } else if (argument instanceof int[]) {
-            return Arrays.toString((int[]) argument);
-        } else if (argument instanceof long[]) {
-            return Arrays.toString((long[]) argument);
-        } else if (argument instanceof char[]) {
-            return Arrays.toString((char[]) argument);
-        } else if (argument instanceof double[]) {
-            return Arrays.toString((double[]) argument);
-        } else if (argument instanceof byte[]) {
-            return Arrays.toString((byte[]) argument);
-        } else if (argument instanceof boolean[]) {
-            return Arrays.toString((boolean[]) argument);
-        } else if (argument instanceof float[]) {
-            return Arrays.toString((float[]) argument);
-        } else {    // in java there are only those possible array type, the last one is short[]
-            return Arrays.toString((short[]) argument);
-        }
+        return switch (argument) {
+            case final Object[] value -> Arrays.toString(value);
+            case final int[] value -> Arrays.toString(value);
+            case final long[] value -> Arrays.toString(value);
+            case final char[] value -> Arrays.toString(value);
+            case final double[] value -> Arrays.toString(value);
+            case final byte[] value -> Arrays.toString(value);
+            case final boolean[] value -> Arrays.toString(value);
+            case final float[] value -> Arrays.toString(value);
+            case final short[] value -> Arrays.toString(value);
+            case null -> "null";
+            default -> throw new Error("unexpected argument, argument=" + argument);
+        };
     }
 }

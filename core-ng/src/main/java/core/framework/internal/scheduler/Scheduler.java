@@ -53,13 +53,13 @@ public final class Scheduler {
         for (var entry : tasks.entrySet()) {
             String name = entry.getKey();
             Task task = entry.getValue();
-            if (task instanceof FixedRateTask) {
-                schedule((FixedRateTask) task);
+            if (task instanceof final FixedRateTask fixedRateTask) {
+                schedule(fixedRateTask);
                 logger.info("schedule job, job={}, trigger={}, jobClass={}", name, task.trigger(), task.job().getClass().getCanonicalName());
-            } else if (task instanceof TriggerTask) {
+            } else if (task instanceof TriggerTask triggerTask) {
                 try {
-                    ZonedDateTime next = next(((TriggerTask) task).trigger, now);
-                    schedule((TriggerTask) task, next);
+                    ZonedDateTime next = next(triggerTask.trigger, now);
+                    schedule(triggerTask, next);
                     logger.info("schedule job, job={}, trigger={}, jobClass={}, next={}", name, task.trigger(), task.job().getClass().getCanonicalName(), next);
                 } catch (Throwable e) {
                     logger.error("failed to schedule job, job={}", name, e);  // next() with custom trigger impl may throw exception, we don't let runtime error fail startup

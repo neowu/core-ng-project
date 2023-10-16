@@ -198,45 +198,36 @@ public class DatabaseOperation {
     }
 
     private void setParam(PreparedStatement statement, int index, Object param) throws SQLException {
-        if (param instanceof String) {
-            statement.setString(index, (String) param);
-        } else if (param instanceof Integer) {
-            statement.setInt(index, (Integer) param);
-        } else if (param instanceof Enum) {
-            statement.setString(index, enumMapper.getDBValue((Enum<?>) param));
-        } else if (param instanceof LocalDateTime) {
-            statement.setTimestamp(index, Timestamp.valueOf((LocalDateTime) param));
-        } else if (param instanceof ZonedDateTime) {
-            // https://dev.mysql.com/doc/refman/8.0/en/datetime.html,
-            // TIMESTAMP has a range of '1970-01-01 00:00:01' UTC to '2038-01-19 03:14:07' UTC.
-            // for timestamp column type, there is year 2038 issue
-            // for datetime column type, jdbc will save UTC values
+        switch (param) {
+            case String value -> statement.setString(index, value);
+            case Integer value -> statement.setInt(index, value);
+            case Enum<?> value -> statement.setString(index, enumMapper.getDBValue(value));
+            case LocalDateTime value -> statement.setTimestamp(index, Timestamp.valueOf(value));
+            case ZonedDateTime value -> {
+                // https://dev.mysql.com/doc/refman/8.0/en/datetime.html,
+                // TIMESTAMP has a range of '1970-01-01 00:00:01' UTC to '2038-01-19 03:14:07' UTC.
+                // for timestamp column type, there is year 2038 issue
+                // for datetime column type, jdbc will save UTC values
 
-            // with insert ignore, out of range timestamp param will be converted to "0000-00-00 00:00:00" into db, and will trigger "Zero date value prohibited" error on read
-            // refer to https://dev.mysql.com/doc/refman/8.0/en/insert.html
-            // Data conversions that would trigger errors abort the statement if IGNORE is not specified. With IGNORE, invalid values are adjusted to the closest values and inserted; warnings are produced but the statement does not abort.
+                // with insert ignore, out of range timestamp param will be converted to "0000-00-00 00:00:00" into db, and will trigger "Zero date value prohibited" error on read
+                // refer to https://dev.mysql.com/doc/refman/8.0/en/insert.html
+                // Data conversions that would trigger errors abort the statement if IGNORE is not specified. With IGNORE, invalid values are adjusted to the closest values and inserted; warnings are produced but the statement does not abort.
 
-            // here only to check > 0, make trade off between validating TIMESTAMP column type and keeping compatible with DATETIME column type
-            // most likely the values we deal with from external systems are lesser (e.g. nodejs default year is 1900, it converts 0 into 1900/01/01 00:00:00)
-            // if it passes timestamp after 2038-01-19 03:14:07 (Instant.ofEpochSecond(Integer.MAX_VALUE)), it will still trigger this issue on MySQL
-            // so on application level, if you can not ensure the range of input value, write its own utils to check
-            Instant instant = ((ZonedDateTime) param).toInstant();
-            if (instant.getEpochSecond() <= 0) throw new Error("timestamp must be after 1970-01-01 00:00:00, value=" + param);
-            statement.setTimestamp(index, Timestamp.from(instant));
-        } else if (param instanceof Boolean) {
-            statement.setBoolean(index, (Boolean) param);
-        } else if (param instanceof Long) {
-            statement.setLong(index, (Long) param);
-        } else if (param instanceof Double) {
-            statement.setDouble(index, (Double) param);
-        } else if (param instanceof BigDecimal) {
-            statement.setBigDecimal(index, (BigDecimal) param);
-        } else if (param instanceof LocalDate) {
-            statement.setDate(index, Date.valueOf((LocalDate) param));
-        } else if (param == null) {
-            statement.setNull(index, Types.NULL);   // both mysql/hsql driver are not using sqlType param
-        } else {
-            throw new Error(format("unsupported param type, type={}, value={}", param.getClass().getCanonicalName(), param));
+                // here only to check > 0, make trade off between validating TIMESTAMP column type and keeping compatible with DATETIME column type
+                // most likely the values we deal with from external systems are lesser (e.g. nodejs default year is 1900, it converts 0 into 1900/01/01 00:00:00)
+                // if it passes timestamp after 2038-01-19 03:14:07 (Instant.ofEpochSecond(Integer.MAX_VALUE)), it will still trigger this issue on MySQL
+                // so on application level, if you can not ensure the range of input value, write its own utils to check
+                Instant instant = value.toInstant();
+                if (instant.getEpochSecond() <= 0) throw new Error("timestamp must be after 1970-01-01 00:00:00, value=" + param);
+                statement.setTimestamp(index, Timestamp.from(instant));
+            }
+            case Boolean value -> statement.setBoolean(index, value);
+            case Long value -> statement.setLong(index, value);
+            case Double value -> statement.setDouble(index, value);
+            case BigDecimal value -> statement.setBigDecimal(index, value);
+            case LocalDate value -> statement.setDate(index, Date.valueOf(value));
+            case null -> statement.setNull(index, Types.NULL);   // both mysql/hsql driver are not using sqlType param
+            default -> throw new Error(format("unsupported param type, type={}, value={}", param.getClass().getCanonicalName(), param));
         }
     }
 }

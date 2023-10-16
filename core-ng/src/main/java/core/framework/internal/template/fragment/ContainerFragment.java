@@ -14,8 +14,8 @@ public abstract class ContainerFragment implements Fragment {
     public void addStaticContent(String content) {
         if (!children.isEmpty()) {
             Fragment lastFragment = children.getLast();
-            if (lastFragment instanceof StaticFragment) {
-                ((StaticFragment) lastFragment).append(content);
+            if (lastFragment instanceof StaticFragment staticFragment) {
+                staticFragment.append(content);
                 return;
             }
         }
