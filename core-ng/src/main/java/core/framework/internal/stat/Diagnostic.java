@@ -16,20 +16,20 @@ import java.nio.file.Path;
  */
 public class Diagnostic {
     public static String thread() {
-        return invoke("threadPrint", "-e");
+        return invokeDiagnosticCommand("threadPrint", "-e", "-l");
     }
 
     public static String vm() {
-        return invoke("vmInfo");
+        return invokeDiagnosticCommand("vmInfo");
     }
 
     public static String heap() {
-        return invoke("gcClassHistogram");
+        return invokeDiagnosticCommand("gcClassHistogram");
     }
 
     // enable by -XX:NativeMemoryTracking=summary
     public static String nativeMemory() {
-        return invoke("vmNativeMemory", "summary");
+        return invokeDiagnosticCommand("vmNativeMemory", "summary");
     }
 
     // currently Java 21 only support dump virtual thread to file
@@ -50,7 +50,7 @@ public class Diagnostic {
 
     // use "jcmd pid help" to list all operations,
     // refer to com.sun.management.internal.DiagnosticCommandImpl.getMBeanInfo, all command names are transformed
-    private static String invoke(String operation, String... params) {
+    private static String invokeDiagnosticCommand(String operation, String... params) {
         try {
             MBeanServer server = ManagementFactory.getPlatformMBeanServer();
             var name = new ObjectName("com.sun.management", "type", "DiagnosticCommand");
