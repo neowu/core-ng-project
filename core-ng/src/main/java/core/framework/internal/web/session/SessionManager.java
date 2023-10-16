@@ -44,7 +44,6 @@ public class SessionManager implements SessionContext {
         return session;
     }
 
-    @SuppressWarnings("LogicConditionNeedOptimization") // false positive
     public void save(RequestImpl request, Response response, ActionLog actionLog) {
         // request.session can be null or ReadOnlySession for websocket, only regular http request may generate session
         if (request.session instanceof SessionImpl session && !session.saved) {

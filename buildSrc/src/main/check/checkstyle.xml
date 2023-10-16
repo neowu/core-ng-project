@@ -51,7 +51,6 @@
         <module name="FallThrough"/>
         <module name="IllegalInstantiation"/>           <!--Checks for illegal instantiations where a factory method is preferred.-->
         <module name="InnerAssignment"/>
-        <module name="LogicConditionNeedOptimizationCheck"/>            <!--provided by sevntu-checkstyle-->
         <module name="MapIterationInForEachLoop"/>                      <!--provided by sevntu-checkstyle-->
         <module name="MissingSwitchDefault"/>           <!--Checks that switch statement has "default" clause.-->
         <module name="MoveVariableInsideIfCheck"/>      <!--provided by sevntu-checkstyle-->
