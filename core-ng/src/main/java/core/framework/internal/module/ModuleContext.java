@@ -57,6 +57,7 @@ public class ModuleContext {    // after core.framework.module.App.start(), enti
         var diagnosticController = new DiagnosticController();
         route(HTTPMethod.GET, "/_sys/vm", (LambdaController) diagnosticController::vm, true);
         route(HTTPMethod.GET, "/_sys/thread", (LambdaController) diagnosticController::thread, true);
+        route(HTTPMethod.GET, "/_sys/thread/virtual", (LambdaController) diagnosticController::virtualThread, true);
         route(HTTPMethod.GET, "/_sys/heap", (LambdaController) diagnosticController::heap, true);
         route(HTTPMethod.GET, "/_sys/proc", (LambdaController) diagnosticController::proc, true);
         route(HTTPMethod.GET, "/_sys/property", new PropertyController(propertyManager), true);

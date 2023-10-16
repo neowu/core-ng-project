@@ -28,7 +28,7 @@ public class LocalPluginsService extends PluginsService {
                     "classpath plugin",
                     "NA",
                     Version.CURRENT,
-                    "17",
+                "21",
                     pluginClass.getName(),
                     null,
                     List.of(),

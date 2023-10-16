@@ -30,24 +30,30 @@ class DiagnosticControllerTest {
     @Test
     void vm() {
         Response response = controller.vm(request);
-        assertThat(response.contentType()).get().isEqualTo(ContentType.TEXT_PLAIN);
+        assertThat(response.contentType()).hasValue(ContentType.TEXT_PLAIN);
     }
 
     @Test
     void heap() {
         Response response = controller.heap(request);
-        assertThat(response.contentType()).get().isEqualTo(ContentType.TEXT_PLAIN);
+        assertThat(response.contentType()).hasValue(ContentType.TEXT_PLAIN);
     }
 
     @Test
     void thread() {
         Response response = controller.thread(request);
-        assertThat(response.contentType()).get().isEqualTo(ContentType.TEXT_PLAIN);
+        assertThat(response.contentType()).hasValue(ContentType.TEXT_PLAIN);
+    }
+
+    @Test
+    void virtualThread() {
+        Response response = controller.virtualThread(request);
+        assertThat(response.contentType()).hasValue(ContentType.TEXT_PLAIN);
     }
 
     @Test
     void proc() {
         Response response = controller.proc(request);
-        assertThat(response.contentType()).get().isEqualTo(ContentType.TEXT_PLAIN);
+        assertThat(response.contentType()).hasValue(ContentType.TEXT_PLAIN);
     }
 }

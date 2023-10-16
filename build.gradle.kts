@@ -7,7 +7,7 @@ apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
-    version = "9.0.0"
+    version = "9.0.0-b0"
 
     repositories {
         maven {
@@ -19,7 +19,7 @@ subprojects {
     }
 }
 
-val elasticVersion = "8.9.0"
+val elasticVersion = "8.10.3"
 val kafkaVersion = "3.6.0"
 val jacksonVersion = "2.15.2"
 val junitVersion = "5.10.0"
