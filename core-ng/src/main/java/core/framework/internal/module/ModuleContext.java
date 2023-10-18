@@ -58,7 +58,8 @@ public class ModuleContext {    // after core.framework.module.App.start(), enti
         httpServer = createHTTPServer();
     }
 
-    public void createBuiltinBeans() {
+    // create builtin beans can be overridden by test context
+    public void initialize() {
         var executor = new ExecutorImpl(ThreadPools.virtualThreadExecutor("executor-"), logManager, shutdownHook.shutdownTimeoutInNano);
         beanFactory.bind(Executor.class, null, executor);
         shutdownHook.add(ShutdownHook.STAGE_2, timeout -> executor.shutdown());

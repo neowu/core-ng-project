@@ -30,7 +30,7 @@ public class TestModuleContext extends ModuleContext {
     }
 
     @Override
-    public void createBuiltinBeans() {
+    public void initialize() {
         beanFactory.bind(Executor.class, null, new MockExecutor());
     }
 

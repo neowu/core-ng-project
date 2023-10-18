@@ -54,7 +54,7 @@ public abstract class App extends Module {
         logger.info("jvmArgs={}", String.join(" ", ManagementFactory.getRuntimeMXBean().getInputArguments()));
 
         context = new ModuleContext(logManager);
-        context.createBuiltinBeans();
+        context.initialize();
         runtime.addShutdownHook(new Thread(context.shutdownHook, "shutdown"));
 
         logger.info("initialize application");
