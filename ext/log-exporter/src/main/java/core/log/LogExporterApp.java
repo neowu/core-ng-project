@@ -42,7 +42,6 @@ public class LogExporterApp extends App {
         // log-exporter will be configured as stateful set and PV, so there is no shutdown hook to upload today's file when restarting
 
         // manually trigger upload with date
-        executor().add(null, 1);
         http().bean(UploadRequest.class);
         http().route(HTTPMethod.PUT, "/log/upload", bind(UploadController.class));
     }
