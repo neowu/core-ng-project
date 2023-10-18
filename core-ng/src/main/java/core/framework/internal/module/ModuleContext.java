@@ -1,6 +1,9 @@
 package core.framework.internal.module;
 
+import core.framework.async.Executor;
 import core.framework.http.HTTPMethod;
+import core.framework.internal.async.ExecutorImpl;
+import core.framework.internal.async.ThreadPools;
 import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.inject.BeanFactory;
 import core.framework.internal.log.LogManager;
@@ -52,7 +55,14 @@ public class ModuleContext {    // after core.framework.module.App.start(), enti
     public ModuleContext(LogManager logManager) {
         this.logManager = logManager;
         shutdownHook = new ShutdownHook(logManager);
-        httpServer = createHTTPServer(logManager);
+        httpServer = createHTTPServer();
+    }
+
+    public void createBuiltinBeans() {
+        var executor = new ExecutorImpl(ThreadPools.virtualThreadExecutor("executor-"), logManager, shutdownHook.shutdownTimeoutInNano);
+        beanFactory.bind(Executor.class, null, executor);
+        shutdownHook.add(ShutdownHook.STAGE_2, timeout -> executor.shutdown());
+        shutdownHook.add(ShutdownHook.STAGE_3, executor::awaitTermination);
 
         var diagnosticController = new DiagnosticController();
         route(HTTPMethod.GET, "/_sys/vm", (LambdaController) diagnosticController::vm, true);
@@ -65,7 +75,7 @@ public class ModuleContext {    // after core.framework.module.App.start(), enti
         route(HTTPMethod.GET, "/_sys/api/message", apiController::message, true);
     }
 
-    private HTTPServer createHTTPServer(LogManager logManager) {
+    private HTTPServer createHTTPServer() {
         var httpServer = new HTTPServer(logManager);
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
         beanFactory.bind(SessionContext.class, null, httpServer.siteManager.sessionManager);

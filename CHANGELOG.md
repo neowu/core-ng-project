@@ -1,10 +1,10 @@
 ## Change log
 
-### 9.0.0-b0 (09/01/2023 - ) !!! updated to Java 21
+### 9.0.0-b1 (09/01/2023 - ) !!! updated to Java 21
 
 * kafka: updated client to 3.6.0
 * search: update es to 8.10.3
-* executor: executor().add() will create virtual thread pool, while executor.add(name, size) still create old cached thread pool
+* executor: removed executor config, provide builtin Executor binding, backed by virtual thread
 * sys: add "_sys/thread/virtual" diagnostic controller to print virtual thread dump
   > refer to https://openjdk.org/jeps/444 for more info about virtual thread
 

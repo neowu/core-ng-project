@@ -52,10 +52,10 @@ public class TestModule extends AbstractTestModule {
         bind(new TestBean(requiredProperty("test.inject-test.property")));
 
         configureJob();
-        configureExecutor();
 
         highCPUUsageThreshold(0.8);
         highHeapUsageThreshold(0.8);
+        highMemUsageThreshold(0.8);
 
         onShutdown(() -> {
         });
@@ -72,11 +72,6 @@ public class TestModule extends AbstractTestModule {
         cache().redis("localhost", "password");
         cache().maxLocalSize(5000);
         cache().add(TestDBEntity.class, Duration.ofHours(6));
-    }
-
-    private void configureExecutor() {
-        executor().add();
-        executor().add("name", 1);
     }
 
     private void configureSite() {
