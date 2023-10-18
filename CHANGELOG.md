@@ -7,6 +7,8 @@
 * executor: removed executor config, provide builtin Executor binding, backed by virtual thread
 * sys: add "_sys/thread/virtual" diagnostic controller to print virtual thread dump
   > refer to https://openjdk.org/jeps/444 for more info about virtual thread
+* mongo: update driver to 4.11.0
+  > improved for virtual thread, https://www.mongodb.com/docs/drivers/java/sync/current/whats-new/#std-label-version-4.11
 
 (pmd only support java 21 from 7.0, and 7.0/gradle pmd 7.0 support is not released yet, refer to https://github.com/gradle/gradle/issues/24502)
 

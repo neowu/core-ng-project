@@ -51,7 +51,7 @@ project("core-ng") {
         testImplementation("org.assertj:assertj-core:${assertjVersion}")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-        testRuntimeOnly("org.hsqldb:hsqldb:2.7.1")
+        testRuntimeOnly("org.hsqldb:hsqldb:2.7.2")
     }
 }
 
@@ -64,7 +64,7 @@ project("core-ng-test") {
         implementation(project(":core-ng"))
         implementation("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
         implementation("org.junit.platform:junit-platform-launcher")
-        testRuntimeOnly("org.hsqldb:hsqldb:2.7.1")
+        testRuntimeOnly("org.hsqldb:hsqldb:2.7.2")
     }
 }
 
@@ -72,7 +72,7 @@ project("core-ng-mongo") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng"))
-        api("org.mongodb:mongodb-driver-sync:4.10.2")
+        api("org.mongodb:mongodb-driver-sync:4.11.0")
         testImplementation(project(":core-ng-test"))
     }
 }
