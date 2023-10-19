@@ -107,7 +107,7 @@ class MessageListenerThread extends Thread {
         int count = 0;
         int size = 0;
         try {
-            Map<String, List<ConsumerRecord<String, byte[]>>> messages = new HashMap<>();     // record in one topic maintains order
+            Map<String, List<ConsumerRecord<String, byte[]>>> messages = new HashMap<>();     // records in one topic maintain order
             for (ConsumerRecord<String, byte[]> record : kafkaRecords) {
                 messages.computeIfAbsent(record.topic(), key -> new ArrayList<>()).add(record);
                 count++;

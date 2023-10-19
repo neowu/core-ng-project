@@ -48,11 +48,11 @@ public final class KafkaAppender implements LogAppender {
 
     public KafkaAppender(KafkaURI uri) {
         this.uri = uri;
-        logForwarderThread = new Thread(() -> {
+        logForwarderThread = Thread.ofPlatform().name("log-forwarder").unstarted(() -> {
             logger.info("log forwarder thread started, uri={}", this.uri);
             initialize();
             process();
-        }, "log-forwarder");
+        });
     }
 
     void initialize() {
