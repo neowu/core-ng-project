@@ -85,8 +85,12 @@ public final class ActionLog {
             stat.checkTotalIO();
         }
 
-        double cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
-        stats.put("cpu_time", cpuTime);
+        if (startCPUTime > -1) {
+            // startCPUTime = -1 if in virtual thread, and it doesn't support cpu time, refer to sun.management.ThreadImpl.getCurrentThreadCpuTime
+            double cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
+            stats.put("cpu_time", cpuTime);
+        }
+
         elapsed = elapsed();
         add(event("elapsed={}", elapsed));
         warningContext.checkMaxProcessTime(elapsed);

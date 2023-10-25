@@ -5,6 +5,7 @@
 * kafka: updated client to 3.6.0
 * search: update es to 8.10.3
 * executor: removed executor config, provide builtin Executor binding, backed by virtual thread
+  > virtual thread doesn't support currentThreadCPUTime, thus if in virtual thread, action.cpu_time won't be tracked
 * sys: add "_sys/thread/virtual" diagnostic controller to print virtual thread dump
   > refer to https://openjdk.org/jeps/444 for more info about virtual thread
 * mongo: update driver to 4.11.0
