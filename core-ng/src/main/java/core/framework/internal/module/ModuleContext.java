@@ -72,8 +72,8 @@ public class ModuleContext {    // after core.framework.module.App.start(), enti
         route(HTTPMethod.GET, "/_sys/heap", (LambdaController) diagnosticController::heap, true);
         route(HTTPMethod.GET, "/_sys/proc", (LambdaController) diagnosticController::proc, true);
         route(HTTPMethod.GET, "/_sys/property", new PropertyController(propertyManager), true);
-        route(HTTPMethod.GET, "/_sys/api", apiController::service, true);
-        route(HTTPMethod.GET, "/_sys/api/message", apiController::message, true);
+        route(HTTPMethod.GET, "/_sys/api", (LambdaController) apiController::service, true);
+        route(HTTPMethod.GET, "/_sys/api/message", (LambdaController) apiController::message, true);
     }
 
     private HTTPServer createHTTPServer() {
