@@ -25,7 +25,7 @@ val jacksonVersion = "2.15.2"
 val junitVersion = "5.10.0"
 val mockitoVersion = "5.6.0"
 val assertjVersion = "3.24.2"
-val mysqlVersion = "8.1.0"
+val mysqlVersion = "8.2.0"
 
 project("core-ng-api") {
     apply(plugin = "lib")
