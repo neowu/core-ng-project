@@ -85,9 +85,12 @@ public final class ActionLog {
             stat.checkTotalIO();
         }
 
-        if (startCPUTime > -1) {
-            // startCPUTime = -1 if in virtual thread, and it doesn't support cpu time, refer to sun.management.ThreadImpl.getCurrentThreadCpuTime
-            double cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
+        long endCPUTime = THREAD.getCurrentThreadCpuTime();
+        // startCPUTime = -1 if in virtual thread, and it doesn't support cpu time, refer to sun.management.ThreadImpl.getCurrentThreadCpuTime
+        // actionLog could be created in normal thread and passed to virtual thread, so check both start/end time
+        // consider remove cpu time in future if using virtual thread in most cases
+        if (startCPUTime > -1 && endCPUTime > -1) {
+            double cpuTime = endCPUTime - startCPUTime;
             stats.put("cpu_time", cpuTime);
         }
 
