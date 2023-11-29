@@ -12,6 +12,7 @@ import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.reflect.Classes;
 import core.framework.internal.reflect.Fields;
 import core.framework.internal.reflect.GenericTypes;
+import core.framework.util.Strings;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -36,7 +37,7 @@ public class BeanValidatorBuilder {
 
     @Nullable
     public BeanValidator build() {
-        validate(beanClass);
+        validate(beanClass, null);
         if (Classes.instanceFields(beanClass).stream().noneMatch(this::hasValidationAnnotation)) return null;
 
         builder = new DynamicInstanceBuilder<>(BeanValidator.class, beanClass.getSimpleName());
@@ -173,17 +174,18 @@ public class BeanValidatorBuilder {
         return parentPath + "." + path;
     }
 
-    private void validate(Class<?> beanClass) {
+    private void validate(Class<?> beanClass, Field parentField) {
         try {
             Object beanWithDefaultValue = beanClass.getDeclaredConstructor().newInstance();
             for (Field field : Classes.instanceFields(beanClass)) {
                 validateAnnotations(field, beanWithDefaultValue);
                 Class<?> targetClass = targetValidationClass(field);
                 if (beanClass(targetClass))
-                    validate(targetClass);
+                    validate(targetClass, field);
             }
         } catch (ReflectiveOperationException e) {
-            throw new Error(e);
+            String path = parentField == null ? null : Fields.path(parentField);
+            throw new Error(Strings.format("failed to validate class, field={}, error={}", path, e.getMessage()), e);
         }
     }
 
@@ -261,8 +263,7 @@ public class BeanValidatorBuilder {
 
     // whether to check all fields inside
     private boolean beanClass(Class<?> fieldClass) {
-        // ignore all java built in class
-        if (fieldClass.getPackageName().startsWith("java")) return false;
+        if (fieldClass.getPackageName().startsWith("java")) return false;   // ignore all java built in class
         if (fieldClass.isEnum()) return false;
         if ("org.bson.types.ObjectId".equals(fieldClass.getCanonicalName())) return false; // not depends on mongo jar if application doesn't include mongo driver
         return true;
