@@ -1,9 +1,9 @@
 ## Change log
 
-### 9.0.0-b1 (09/01/2023 - ) !!! updated to Java 21
+### 9.0.0 (09/01/2023 - 12/01/2023) !!! updated to Java 21
 
 * kafka: updated client to 3.6.0
-* search: update es to 8.10.3
+* search: update es to 8.11.1
 * executor: removed executor config, provide builtin Executor binding, backed by virtual thread
   > virtual thread doesn't support currentThreadCPUTime, thus if in virtual thread, action.cpu_time won't be tracked
 * sys: add "_sys/thread/virtual" diagnostic controller to print virtual thread dump
