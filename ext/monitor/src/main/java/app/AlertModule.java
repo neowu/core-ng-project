@@ -60,7 +60,7 @@ public class AlertModule extends Module {
         AlertConfig config = Bean.fromJSON(AlertConfig.class, alertConfig);
         bind(new AlertService(config));
 
-        kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
+        kafka().concurrency(2);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get 1M message
         kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));
         kafka().subscribe(LogTopics.TOPIC_STAT, StatMessage.class, bind(StatMessageHandler.class));

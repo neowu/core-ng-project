@@ -17,9 +17,9 @@ class MessageListenerTest {
     }
 
     @Test
-    void listenerThreadName() {
-        assertThat(listener.listenerThreadName(null, 0)).isEqualTo("kafka-listener-0");
-        assertThat(listener.listenerThreadName("name", 2)).isEqualTo("kafka-listener-name-2");
+    void threadName() {
+        assertThat(listener.threadName(null)).isEqualTo("kafka-listener");
+        assertThat(listener.threadName("name")).isEqualTo("kafka-listener-name");
     }
 
     @Test

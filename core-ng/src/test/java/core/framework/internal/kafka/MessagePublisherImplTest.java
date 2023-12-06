@@ -46,9 +46,9 @@ class MessagePublisherImplTest {
         publisher.publish(message);
         verify(producer).send(argThat(record -> {
             assertThat(record.key()).isNull();
-            assertThat(new String(record.headers().lastHeader(MessageHeaders.HEADER_CORRELATION_ID).value(), UTF_8)).isEqualTo("correlationId");
-            assertThat(new String(record.headers().lastHeader(MessageHeaders.HEADER_REF_ID).value(), UTF_8)).isEqualTo(actionLog.id);
-            assertThat(new String(record.headers().lastHeader(MessageHeaders.HEADER_TRACE).value(), UTF_8)).isEqualTo(Trace.CASCADE.name());
+            assertThat(new String(record.headers().lastHeader(KafkaMessage.HEADER_CORRELATION_ID).value(), UTF_8)).isEqualTo("correlationId");
+            assertThat(new String(record.headers().lastHeader(KafkaMessage.HEADER_REF_ID).value(), UTF_8)).isEqualTo(actionLog.id);
+            assertThat(new String(record.headers().lastHeader(KafkaMessage.HEADER_TRACE).value(), UTF_8)).isEqualTo(Trace.CASCADE.name());
             return true;
         }));
 

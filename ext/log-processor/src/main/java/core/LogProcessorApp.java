@@ -75,7 +75,7 @@ public class LogProcessorApp extends App {
 
     private void configureKafka(Forwarders forwarders) {
         kafka().uri(requiredProperty("sys.kafka.uri"));
-        kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
+        kafka().concurrency(2);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get at least 1M message
         kafka().maxPoll(2000, 3 * 1024 * 1024);     // get 3M message at max
 

@@ -1,6 +1,6 @@
 package core.framework.internal.web.sys;
 
-import core.framework.internal.kafka.MessageHeaders;
+import core.framework.internal.kafka.KafkaMessage;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.Trace;
@@ -34,6 +34,6 @@ class KafkaControllerTest {
     @Test
     void record() {
         ProducerRecord<byte[], byte[]> record = controller.record("topic", "key", new byte[0], actionLog);
-        assertThat(record.headers().lastHeader(MessageHeaders.HEADER_TRACE).value()).asString().isEqualTo(Trace.CASCADE.name());
+        assertThat(record.headers().lastHeader(KafkaMessage.HEADER_TRACE).value()).asString().isEqualTo(Trace.CASCADE.name());
     }
 }

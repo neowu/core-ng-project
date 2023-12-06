@@ -18,23 +18,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author neo
  */
 public class MessageListener {
-    private static final AtomicInteger CONSUMER_CLIENT_ID_SEQUENCE = new AtomicInteger(1);
     public final ConsumerMetrics consumerMetrics;
     public final Set<String> topics = new HashSet<>();
     public final Map<String, MessageProcess<?>> processes = new HashMap<>();
+    public final Map<String, MessageProcess<?>> bulkProcesses = new HashMap<>();
     final LogManager logManager;
 
     private final Logger logger = LoggerFactory.getLogger(MessageListener.class);
     private final KafkaURI uri;
     private final String name;
 
-    public int poolSize = Runtime.getRuntime().availableProcessors() * 4;
+    public int concurrency = Runtime.getRuntime().availableProcessors() * 16;
     public long longConsumerDelayThresholdInNano = Duration.ofSeconds(30).toNanos();
     public int maxPollRecords = 500;            // default kafka setting, refer to org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
     public int maxPollBytes = 3 * 1024 * 1024;  // get 3M bytes if possible for batching, this is not absolute limit of max bytes to poll, refer to org.apache.kafka.clients.consumer.ConsumerConfig.FETCH_MAX_BYTES_DOC
@@ -43,8 +42,7 @@ public class MessageListener {
     public String groupId = LogManager.APP_NAME;
 
     long maxProcessTimeInNano;
-    volatile boolean shutdown;
-    private MessageListenerThread[] threads;
+    private MessageListenerThread thread;
 
     public MessageListener(KafkaURI uri, String name, LogManager logManager, long maxProcessTimeInNano) {
         this.uri = uri;
@@ -57,50 +55,41 @@ public class MessageListener {
     public <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
         boolean added = topics.add(topic);
         if (!added) throw new Error("topic is already subscribed, topic=" + topic);
-        processes.put(topic, new MessageProcess<>(handler, bulkHandler, messageClass));
+        if (handler != null) {
+            processes.put(topic, new MessageProcess<>(handler, messageClass));
+        } else {
+            bulkProcesses.put(topic, new MessageProcess<>(bulkHandler, messageClass));
+        }
     }
 
     public void start() {
-        threads = new MessageListenerThread[poolSize];
-        for (int i = 0; i < poolSize; i++) {
-            String name = listenerThreadName(this.name, i);
-            Consumer<String, byte[]> consumer = createConsumer();
-            threads[i] = new MessageListenerThread(name, consumer, this);
-        }
-        for (var thread : threads) {
-            thread.start();
-        }
+        Consumer<String, byte[]> consumer = createConsumer();
+        thread = new MessageListenerThread(threadName(name), consumer, this);
+        thread.start();
         logger.info("kafka listener started, uri={}, topics={}, name={}, groupId={}", uri, topics, name, groupId);
     }
 
-    String listenerThreadName(String name, int index) {
-        return "kafka-listener-" + (name == null ? "" : name + "-") + index;
-    }
-
     public void shutdown() {
-        shutdown = true;
-        if (threads != null) {  // in case of shutdown in middle of start
+        if (thread != null) {  // in case of shutdown in middle of start
             logger.info("shutting down kafka listener, uri={}, name={}", uri, name);
-            for (MessageListenerThread thread : threads) {
-                if (thread != null) {   // in case of shutdown in middle of start
-                    thread.shutdown();
-                }
-            }
+            thread.shutdown();
         }
     }
 
     public void awaitTermination(long timeoutInMs) {
-        if (threads != null) {
+        if (thread != null) {
             long end = System.currentTimeMillis() + timeoutInMs;
-            for (MessageListenerThread thread : threads) {
-                try {
-                    thread.awaitTermination(end - System.currentTimeMillis());
-                } catch (InterruptedException e) {
-                    logger.warn(e.getMessage(), e);
-                }
+            try {
+                thread.awaitTermination(end - System.currentTimeMillis());
+            } catch (InterruptedException e) {
+                logger.warn(e.getMessage(), e);
             }
             logger.info("kafka listener stopped, uri={}, topics={}, name={}", uri, topics, name);
         }
+    }
+
+    String threadName(String name) {
+        return "kafka-listener" + (name == null ? "" : "-" + name);
     }
 
     @SuppressWarnings("deprecation")
@@ -110,7 +99,7 @@ public class MessageListener {
             Map<String, Object> config = Maps.newHashMapWithExpectedSize(13);
             config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs);
             config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-            config.put(ConsumerConfig.CLIENT_ID_CONFIG, Network.LOCAL_HOST_NAME + "-" + CONSUMER_CLIENT_ID_SEQUENCE.getAndIncrement());      // will show in monitor metrics
+            config.put(ConsumerConfig.CLIENT_ID_CONFIG, Network.LOCAL_HOST_NAME + (name == null ? "" : "/" + name));      // will show in monitor metrics
             config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE);
             config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");                      // refer to org.apache.kafka.clients.consumer.ConsumerConfig, must be in("latest", "earliest", "none")
             config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 1_800_000);                  // 30min as max process time for each poll

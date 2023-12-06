@@ -67,13 +67,13 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
     }
 
     private void linkContext(Headers headers) {
-        headers.add(MessageHeaders.HEADER_CLIENT, Strings.bytes(LogManager.APP_NAME));
+        headers.add(KafkaMessage.HEADER_CLIENT, Strings.bytes(LogManager.APP_NAME));
 
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog == null) return;      // publisher may be used without action log context
 
-        headers.add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes(actionLog.correlationId()));
-        if (actionLog.trace == Trace.CASCADE) headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes(actionLog.trace.name()));
-        headers.add(MessageHeaders.HEADER_REF_ID, Strings.bytes(actionLog.id));
+        headers.add(KafkaMessage.HEADER_CORRELATION_ID, Strings.bytes(actionLog.correlationId()));
+        if (actionLog.trace == Trace.CASCADE) headers.add(KafkaMessage.HEADER_TRACE, Strings.bytes(actionLog.trace.name()));
+        headers.add(KafkaMessage.HEADER_REF_ID, Strings.bytes(actionLog.id));
     }
 }

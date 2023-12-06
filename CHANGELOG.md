@@ -1,5 +1,11 @@
 ## Change log
 
+### 9.0.1-b0 (12/01/2023 - )
+
+* kafka: updated kafka listener to virtual thread, increased default concurrency to cpu * 16
+  > now only 1 thread is pulling messages, and dispatched to {concurrency} threads
+* thread: track virtual thread count
+
 ### 9.0.0 (09/01/2023 - 12/01/2023) !!! updated to Java 21
 
 * kafka: updated client to 3.6.0

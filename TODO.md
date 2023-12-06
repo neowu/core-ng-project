@@ -18,7 +18,4 @@
 
 * db: update "on duplicated key" values() syntax,
   > The use of VALUES() to refer to the new row and columns is deprecated beginning with MySQL 8.0.20, and is subject to removal in a future version of MySQL.
-
-* kafka: should use virtual thread for message handling? increased throughput,
-  use Semaphore to control max concurrency or like currently start as many message threads?
-  benefit: is better use 1 polling thread with unlimited worker threads?
+  

@@ -27,7 +27,7 @@ public class LogExporterApp extends App {
         loadProperties("app.properties");
 
         kafka().uri(requiredProperty("sys.kafka.uri"));
-        kafka().poolSize(1);
+        kafka().concurrency(1);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(5000));        // try to get at least 1M message, and can wait longer
         kafka().maxPoll(3000, 3 * 1024 * 1024);         // get 3M message at max
 

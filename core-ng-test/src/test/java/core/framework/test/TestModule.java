@@ -100,7 +100,7 @@ public class TestModule extends AbstractTestModule {
         kafka().uri("localhost:9092");
         kafka().maxRequestSize(2 * 1024 * 1024);
         kafka().longConsumerDelayThreshold(Duration.ofSeconds(60));
-        kafka().poolSize(1);
+        kafka().concurrency(1);
         kafka().groupId("test");
         kafka().publish("topic", TestMessage.class);
         kafka().subscribe("topic1", TestMessage.class, (List<Message<TestMessage>> messages) -> {

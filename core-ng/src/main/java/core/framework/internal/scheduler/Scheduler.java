@@ -1,6 +1,7 @@
 package core.framework.internal.scheduler;
 
 import core.framework.internal.async.ThreadPools;
+import core.framework.internal.async.VirtualThreads;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.Trace;
@@ -143,8 +144,9 @@ public final class Scheduler {
 
     private void submitJob(Task task, ZonedDateTime scheduledTime, @Nullable String triggerActionId) {
         jobExecutor.submit(() -> {
+            VirtualThreads.COUNT.incrementAndGet();
+            ActionLog actionLog = logManager.begin("=== job execution begin ===", null);
             try {
-                ActionLog actionLog = logManager.begin("=== job execution begin ===", null);
                 String name = task.name();
                 actionLog.action("job:" + name);
                 if (triggerActionId != null) {  // triggered by scheduler controller
@@ -165,6 +167,7 @@ public final class Scheduler {
                 throw e;
             } finally {
                 logManager.end("=== job execution end ===");
+                VirtualThreads.COUNT.decrementAndGet();
             }
         });
     }

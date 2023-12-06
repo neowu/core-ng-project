@@ -130,8 +130,8 @@ public class KafkaConfig extends Config {
         listener().groupId = groupId;
     }
 
-    public void poolSize(int poolSize) {
-        listener().poolSize = poolSize;
+    public void concurrency(int concurrency) {
+        listener().concurrency = concurrency;
     }
 
     // to increase max message size, both producer and broker sides have size limitation

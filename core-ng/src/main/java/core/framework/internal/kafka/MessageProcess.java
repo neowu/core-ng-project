@@ -17,29 +17,37 @@ import java.util.List;
  * @author neo
  */
 public class MessageProcess<T> {
-    public final MessageHandler<T> handler;
-    public final BulkMessageHandler<T> bulkHandler;
+    public final Object handler;
     public final JSONReader<T> reader;
     public final Validator<T> validator;
     @Nullable
     public final PerformanceWarning[] warnings;
 
-    MessageProcess(MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler, Class<T> messageClass) {
+    MessageProcess(Object handler, Class<T> messageClass) {
         this.handler = handler;
-        this.bulkHandler = bulkHandler;
         reader = JSONMapper.reader(messageClass);
         validator = Validator.of(messageClass);
-        this.warnings = warnings(handler, bulkHandler);
+        this.warnings = warnings(handler);
+    }
+
+    @SuppressWarnings("unchecked")
+    public MessageHandler<T> handler() {
+        return (MessageHandler<T>) handler;
+    }
+
+    @SuppressWarnings("unchecked")
+    public BulkMessageHandler<T> bulkHandler() {
+        return (BulkMessageHandler<T>) handler;
     }
 
     @Nullable
-    private PerformanceWarning[] warnings(MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
+    private PerformanceWarning[] warnings(Object handler) {
         try {
             Method targetMethod;
-            if (handler != null) {
+            if (handler instanceof MessageHandler) {
                 targetMethod = handler.getClass().getMethod("handle", String.class, Object.class);
             } else {
-                targetMethod = bulkHandler.getClass().getMethod("handle", List.class);
+                targetMethod = handler.getClass().getMethod("handle", List.class);
             }
             return WarningContext.warnings(targetMethod.getDeclaredAnnotationsByType(IOWarning.class));
         } catch (NoSuchMethodException e) {

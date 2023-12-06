@@ -58,8 +58,9 @@ public class ExecutorTask<T> implements Callable<T> {
 
     @Override
     public T call() throws Exception {
+        VirtualThreads.COUNT.incrementAndGet();
+        ActionLog actionLog = logManager.begin("=== task execution begin ===", actionId);
         try {
-            ActionLog actionLog = logManager.begin("=== task execution begin ===", actionId);
             actionLog.action(action());
             actionLog.warningContext.maxProcessTimeInNano(maxProcessTimeInNano);
             // here it doesn't log task class, is due to task usually is lambda or method reference, it's expensive to inspect, refer to ControllerInspector
@@ -83,6 +84,7 @@ public class ExecutorTask<T> implements Callable<T> {
             throw new TaskException(Strings.format("task failed, action={}, id={}, error={}", action, actionId, e.getMessage()), e);
         } finally {
             logManager.end("=== task execution end ===");
+            VirtualThreads.COUNT.decrementAndGet();
         }
     }
 

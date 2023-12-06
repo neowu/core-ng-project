@@ -10,7 +10,7 @@ services:
     - KAFKA_CLUSTER_ID=lK_g8qooQNOD9klGoxLojA
     - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.rmi.port=1099 -Djava.rmi.server.hostname=kafka.kafka.orb.local
     - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
-    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka.kafka.orb.local:9092 --override num.partitions=3 --override controller.quorum.voters=1@kafka:9093
+    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://alpine:9092 --override num.partitions=3 --override controller.quorum.voters=1@kafka:9093
     volumes:
     - data:/data
 #  kafka-2:
