@@ -58,7 +58,7 @@ public class ExecutorTask<T> implements Callable<T> {
 
     @Override
     public T call() throws Exception {
-        VirtualThreads.COUNT.incrementAndGet();
+        VirtualThread.STATS.increase();
         ActionLog actionLog = logManager.begin("=== task execution begin ===", actionId);
         try {
             actionLog.action(action());
@@ -84,7 +84,7 @@ public class ExecutorTask<T> implements Callable<T> {
             throw new TaskException(Strings.format("task failed, action={}, id={}, error={}", action, actionId, e.getMessage()), e);
         } finally {
             logManager.end("=== task execution end ===");
-            VirtualThreads.COUNT.decrementAndGet();
+            VirtualThread.STATS.decrease();
         }
     }
 

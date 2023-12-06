@@ -1,7 +1,7 @@
 package core.framework.internal.stat;
 
 import com.sun.management.OperatingSystemMXBean;
-import core.framework.internal.async.VirtualThreads;
+import core.framework.internal.async.VirtualThread;
 import core.framework.util.Files;
 import core.framework.util.Lists;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ public class StatCollector {
     public void collectJVMUsage(Stats stats) {
         collectCPUUsage(stats);
         stats.put("thread_count", thread.getThreadCount());
-        stats.put("virtual_thread_count", VirtualThreads.COUNT.get());
+        stats.put("virtual_thread_count", VirtualThread.STATS.maxCount());
         collectHeapUsage(stats);
 
         for (GCStat gcStat : gcStats) {

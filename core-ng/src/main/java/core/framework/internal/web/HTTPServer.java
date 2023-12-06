@@ -13,6 +13,7 @@ import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Options;
+import org.xnio.Xnio;
 
 import static core.framework.log.Markers.errorCode;
 
@@ -50,24 +51,30 @@ public class HTTPServer {
             if (httpsHost != null) builder.addHttpsListener(httpsHost.port(), httpsHost.host(), new SSLContextBuilder().build());
 
             builder.setHandler(handler(config))
-                    // undertow accepts incoming connection very quick, backlog is hard to be filled even under load test, this setting is more for DDOS protection
-                    // and not necessary under cloud env, here to set to match linux default value
-                    // to use larger value, it requires to update kernel accordingly, e.g. sysctl -w net.core.somaxconn=1024 && sysctl -w net.ipv4.tcp_max_syn_backlog=4096
-                    .setSocketOption(Options.BACKLOG, 1024)
-                    .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
-                    .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)
-                    .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, Boolean.TRUE)
-                    // since we don't use Expires or Last-Modified header, so it's not necessary to set Date header, for cache, prefer cache-control/max-age
-                    // refer to https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.18.1
-                    .setServerOption(UndertowOptions.ALWAYS_SET_DATE, Boolean.FALSE)
-                    .setServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE, Boolean.FALSE)
-                    // set tcp idle timeout to 620s, by default AWS ALB uses 60s, GCloud LB uses 600s, since it is always deployed with LB, longer timeout doesn't hurt
-                    // refer to https://cloud.google.com/load-balancing/docs/https/#timeouts_and_retries
-                    // refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout
-                    .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620_000)         // 620s
-                    .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10_000)            // 10s
-                    .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, config.maxEntitySize)
-                    .setServerOption(UndertowOptions.RECORD_REQUEST_START_TIME, Boolean.TRUE);
+                // undertow accepts incoming connection very quick, backlog is hard to be filled even under load test, this setting is more for DDOS protection
+                // and not necessary under cloud env, here to set to match linux default value
+                // to use larger value, it requires to update kernel accordingly, e.g. sysctl -w net.core.somaxconn=1024 && sysctl -w net.ipv4.tcp_max_syn_backlog=4096
+                .setSocketOption(Options.BACKLOG, 1024)
+                .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
+                .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)
+                .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, Boolean.TRUE)
+                // since we don't use Expires or Last-Modified header, so it's not necessary to set Date header, for cache, prefer cache-control/max-age
+                // refer to https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.18.1
+                .setServerOption(UndertowOptions.ALWAYS_SET_DATE, Boolean.FALSE)
+                .setServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE, Boolean.FALSE)
+                // set tcp idle timeout to 620s, by default AWS ALB uses 60s, GCloud LB uses 600s, since it is always deployed with LB, longer timeout doesn't hurt
+                // refer to https://cloud.google.com/load-balancing/docs/https/#timeouts_and_retries
+                // refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout
+                .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620_000)         // 620s
+                .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10_000)            // 10s
+                .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, config.maxEntitySize)
+                .setServerOption(UndertowOptions.RECORD_REQUEST_START_TIME, Boolean.TRUE);
+
+            Xnio xnio = Xnio.getInstance(Undertow.class.getClassLoader());
+            builder.setWorker(xnio.createWorkerBuilder()
+                .setWorkerIoThreads(Math.max(Runtime.getRuntime().availableProcessors(), 2))
+                .setExternalExecutorService(handler.thread)
+                .build());
 
             server = builder.build();
             server.start();
@@ -81,7 +88,7 @@ public class HTTPServer {
         if (config.gzip) {
             // only support gzip, deflate is less popular
             handler = new EncodingHandler(handler, new ContentEncodingRepository()
-                    .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, new GZipPredicate()));
+                .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, new GZipPredicate()));
         }
         return handler;
     }
@@ -100,7 +107,7 @@ public class HTTPServer {
             boolean success = shutdownHandler.awaitTermination(timeoutInMs);
             if (!success) {
                 logger.warn(errorCode("FAILED_TO_STOP"), "failed to wait active http requests to complete");
-                server.getWorker().shutdownNow();
+                handler.thread.shutdownNow();
             } else {
                 logger.info("active http requests completed");
             }

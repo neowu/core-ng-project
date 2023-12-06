@@ -1,6 +1,6 @@
 package core.framework.internal.kafka;
 
-import core.framework.internal.async.VirtualThreads;
+import core.framework.internal.async.VirtualThread;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
@@ -164,10 +164,10 @@ class MessageListenerThread extends Thread {
             semaphore.acquire();
             thread.start(() -> {
                 try {
-                    VirtualThreads.COUNT.incrementAndGet();
+                    VirtualThread.STATS.increase();
                     handleSingle(messages.topic, process, message);
                 } finally {
-                    VirtualThreads.COUNT.decrementAndGet();
+                    VirtualThread.STATS.decrease();
                     semaphore.release();
                 }
             });
@@ -176,7 +176,7 @@ class MessageListenerThread extends Thread {
             semaphore.acquire();
             thread.start(() -> {
                 try {
-                    VirtualThreads.COUNT.incrementAndGet();
+                    VirtualThread.STATS.increase();
                     handleSingle(messages.topic, process, message);
                     if (message.subsequent != null) {
                         for (KafkaMessage subsequent : message.subsequent) {
@@ -184,7 +184,7 @@ class MessageListenerThread extends Thread {
                         }
                     }
                 } finally {
-                    VirtualThreads.COUNT.decrementAndGet();
+                    VirtualThread.STATS.decrease();
                     semaphore.release();
                 }
             });
@@ -223,11 +223,11 @@ class MessageListenerThread extends Thread {
     private void processBulk(MessageProcess<?> bulkProcess, KafkaMessages messages) throws InterruptedException {
         semaphore.acquire();
         thread.start(() -> {
-            VirtualThreads.COUNT.incrementAndGet();
+            VirtualThread.STATS.increase();
             try {
                 handleBulk(messages.topic, bulkProcess, messages.unordered);
             } finally {
-                VirtualThreads.COUNT.decrementAndGet();
+                VirtualThread.STATS.decrease();
                 semaphore.release();
             }
         });

@@ -63,7 +63,7 @@ public class HTTPIOHandler implements HttpHandler {
             }
         }
 
-        exchange.dispatch(handler);
+        exchange.dispatch(handler.thread, handler);
     }
 
     // undertow is not handling max entity size checking correctly, it terminates request directly and bypass exchange.endExchange() in certain cases, and log errors in debug level
