@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static core.framework.log.Markers.errorCode;
+
 /**
  * @author neo
  */
@@ -78,13 +80,16 @@ public class MessageListener {
 
     public void awaitTermination(long timeoutInMs) {
         if (thread != null) {
-            long end = System.currentTimeMillis() + timeoutInMs;
             try {
-                thread.awaitTermination(end - System.currentTimeMillis());
+                boolean success = thread.awaitTermination(timeoutInMs);
+                if (!success) {
+                    logger.warn(errorCode("FAILED_TO_STOP"), "failed to terminate kafka listener, name={}", name);
+                } else {
+                    logger.info("kafka listener stopped, uri={}, topics={}, name={}", uri, topics, name);
+                }
             } catch (InterruptedException e) {
                 logger.warn(e.getMessage(), e);
             }
-            logger.info("kafka listener stopped, uri={}, topics={}, name={}", uri, topics, name);
         }
     }
 
