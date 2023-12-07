@@ -116,6 +116,7 @@ public class StatCollector {
         boolean highUsage = stats.checkHighUsage(usage, highCPUUsageThreshold, "cpu");
         if (highUsage) {
             stats.info("thread_dump", Diagnostic.thread());
+            stats.info("virtual_thread_dump", Diagnostic.virtualThread());
         }
     }
 }
