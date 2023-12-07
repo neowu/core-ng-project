@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.0.1-b2 (12/01/2023 - )
+### 9.0.1 (12/01/2023 - 12/7/2023)
 
 * thread: updated default virtual thread scheduler parallelism to at least 16
   > jdbc is not fully supported virtual thread yet, allow more virtual thread unfriendly tasks to run parallel
