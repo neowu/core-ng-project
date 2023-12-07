@@ -33,26 +33,24 @@ public class CancelQueryTaskImpl extends TimerTask implements CancelQueryTask {
 
     @Override
     public void run() {
-        Thread cancelThread = new Thread(() -> {
-            Query localQueryToCancel = queryToCancel;
-            if (localQueryToCancel == null) {
+        Thread.ofVirtual().start(() -> {
+            Query query = queryToCancel;
+            if (query == null) {
                 return;
             }
-            NativeSession session = (NativeSession) localQueryToCancel.getSession();
+            NativeSession session = (NativeSession) query.getSession();
             if (session == null) {
                 return;
             }
 
             try {
-                killQuery(localQueryToCancel, session);
+                killQuery(query, session);
             } catch (Throwable t) {
                 caughtWhileCancelling = t;
             } finally {
                 setQueryToCancel(null);
             }
         });
-
-        cancelThread.start();
     }
 
     private void killQuery(Query localQueryToCancel, NativeSession session) throws IOException {

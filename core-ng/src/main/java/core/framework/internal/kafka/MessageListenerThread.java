@@ -164,10 +164,10 @@ class MessageListenerThread extends Thread {
             semaphore.acquire();
             thread.start(() -> {
                 try {
-                    VirtualThread.STATS.increase();
+                    VirtualThread.COUNT.increase();
                     handleSingle(messages.topic, process, message);
                 } finally {
-                    VirtualThread.STATS.decrease();
+                    VirtualThread.COUNT.decrease();
                     semaphore.release();
                 }
             });
@@ -176,7 +176,7 @@ class MessageListenerThread extends Thread {
             semaphore.acquire();
             thread.start(() -> {
                 try {
-                    VirtualThread.STATS.increase();
+                    VirtualThread.COUNT.increase();
                     handleSingle(messages.topic, process, message);
                     if (message.subsequent != null) {
                         for (KafkaMessage subsequent : message.subsequent) {
@@ -184,7 +184,7 @@ class MessageListenerThread extends Thread {
                         }
                     }
                 } finally {
-                    VirtualThread.STATS.decrease();
+                    VirtualThread.COUNT.decrease();
                     semaphore.release();
                 }
             });
@@ -223,11 +223,11 @@ class MessageListenerThread extends Thread {
     private void processBulk(MessageProcess<?> bulkProcess, KafkaMessages messages) throws InterruptedException {
         semaphore.acquire();
         thread.start(() -> {
-            VirtualThread.STATS.increase();
+            VirtualThread.COUNT.increase();
             try {
                 handleBulk(messages.topic, bulkProcess, messages.unordered);
             } finally {
-                VirtualThread.STATS.decrease();
+                VirtualThread.COUNT.decrease();
                 semaphore.release();
             }
         });

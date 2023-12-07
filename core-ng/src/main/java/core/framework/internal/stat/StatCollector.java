@@ -47,7 +47,7 @@ public class StatCollector {
     public void collectJVMUsage(Stats stats) {
         collectCPUUsage(stats);
         stats.put("thread_count", thread.getThreadCount());
-        stats.put("virtual_thread_count", VirtualThread.STATS.maxCount());
+        stats.put("virtual_thread_count", VirtualThread.COUNT.max());
         collectHeapUsage(stats);
 
         for (GCStat gcStat : gcStats) {

@@ -86,7 +86,7 @@ public class HTTPHandler implements HttpHandler {
 
     private void handle(HttpServerExchange exchange) {
         semaphore.acquireUninterruptibly();
-        VirtualThread.STATS.increase();
+        VirtualThread.COUNT.increase();
         long httpDelay = System.nanoTime() - exchange.getRequestStartTime();
         ActionLog actionLog = logManager.begin("=== http transaction begin ===", null);
         var request = new RequestImpl(exchange, requestBeanReader);
@@ -129,7 +129,7 @@ public class HTTPHandler implements HttpHandler {
             // sender.send() will write response until can't write more, then call channel.resumeWrites(), which will resume after this finally block finished, so this can be small delay
             webContext.cleanup();
             logManager.end("=== http transaction end ===");
-            VirtualThread.STATS.decrease();
+            VirtualThread.COUNT.decrease();
             semaphore.release();
         }
     }

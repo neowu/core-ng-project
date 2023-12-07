@@ -1,7 +1,9 @@
 ## Change log
 
-### 9.0.1-b1 (12/01/2023 - )
+### 9.0.1-b2 (12/01/2023 - )
 
+* thread: updated default virtual thread scheduler parallelism to at least 16
+  > jdbc is not fully supported virtual thread yet, allow more virtual thread unfriendly tasks to run parallel
 * kafka: updated kafka listener to virtual thread, increased default concurrency to cpu * 16
   > now only 1 thread is pulling messages, and dispatched to {concurrency} threads
 * thread: track virtual thread count

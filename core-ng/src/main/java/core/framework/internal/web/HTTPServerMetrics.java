@@ -15,7 +15,7 @@ public class HTTPServerMetrics implements Metrics {
 
     @Override
     public void collect(Stats stats) {
-        int activeRequests = server.shutdownHandler.maxActiveRequests();
+        int activeRequests = server.shutdownHandler.activeRequests.max();
         stats.put("http_active_requests", activeRequests);
     }
 }

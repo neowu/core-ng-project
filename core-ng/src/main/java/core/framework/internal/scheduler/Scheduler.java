@@ -144,7 +144,7 @@ public final class Scheduler {
 
     private void submitJob(Task task, ZonedDateTime scheduledTime, @Nullable String triggerActionId) {
         jobExecutor.submit(() -> {
-            VirtualThread.STATS.increase();
+            VirtualThread.COUNT.increase();
             ActionLog actionLog = logManager.begin("=== job execution begin ===", null);
             try {
                 String name = task.name();
@@ -167,7 +167,7 @@ public final class Scheduler {
                 throw e;
             } finally {
                 logManager.end("=== job execution end ===");
-                VirtualThread.STATS.decrease();
+                VirtualThread.COUNT.decrease();
             }
         });
     }

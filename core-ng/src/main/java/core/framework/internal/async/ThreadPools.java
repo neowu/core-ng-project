@@ -10,6 +10,14 @@ import java.util.concurrent.ThreadFactory;
  * @author neo
  */
 public final class ThreadPools {
+    static {
+        // currently jdbc query is not fully support virtual thread yet, db operation will block current virtual thread
+        // increase parallelism to allow more virtual thread unfriendly tasks to run
+        // refer to java.lang.VirtualThread.createDefaultScheduler
+        int parallelism = Math.max(Runtime.getRuntime().availableProcessors(), 16);
+        System.setProperty("jdk.virtualThreadScheduler.parallelism", String.valueOf(parallelism));
+    }
+
     public static ExecutorService virtualThreadExecutor(String prefix) {
         ThreadFactory factory = Thread.ofVirtual().name(prefix, 0).factory();
         return Executors.newThreadPerTaskExecutor(factory);
