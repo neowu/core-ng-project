@@ -73,7 +73,7 @@ public class HTTPServer {
             Xnio xnio = Xnio.getInstance(Undertow.class.getClassLoader());
             builder.setWorker(xnio.createWorkerBuilder()
                 .setWorkerIoThreads(Math.max(Runtime.getRuntime().availableProcessors(), 2))
-                .setExternalExecutorService(handler.thread)
+                .setExternalExecutorService(handler.worker)
                 .build());
 
             server = builder.build();
@@ -107,7 +107,7 @@ public class HTTPServer {
             boolean success = shutdownHandler.awaitTermination(timeoutInMs);
             if (!success) {
                 logger.warn(errorCode("FAILED_TO_STOP"), "failed to wait active http requests to complete");
-                handler.thread.shutdownNow();
+                handler.worker.shutdownNow();
             } else {
                 logger.info("active http requests completed");
             }

@@ -32,9 +32,9 @@ class IndexServiceTest {
 
     @Test
     void createdDate() {
-        assertThat(indexService.createdDate("action-2016.02.03")).get().isEqualTo(LocalDate.of(2016, Month.FEBRUARY, 3));
-        assertThat(indexService.createdDate("stat-2015.11.15")).get().isEqualTo(LocalDate.of(2015, Month.NOVEMBER, 15));
-        assertThat(indexService.createdDate("metricbeat-6.3.2-2018.08.19")).get().isEqualTo(LocalDate.of(2018, Month.AUGUST, 19));
+        assertThat(indexService.createdDate("action-2016.02.03")).hasValue(LocalDate.of(2016, Month.FEBRUARY, 3));
+        assertThat(indexService.createdDate("stat-2015.11.15")).hasValue(LocalDate.of(2015, Month.NOVEMBER, 15));
+        assertThat(indexService.createdDate("metricbeat-6.3.2-2018.08.19")).hasValue(LocalDate.of(2018, Month.AUGUST, 19));
         assertThat(indexService.createdDate(".kibana")).isNotPresent();
     }
 

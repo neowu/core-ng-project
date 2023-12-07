@@ -1,5 +1,6 @@
 package core.framework.internal.kafka;
 
+import core.framework.internal.async.ThreadPools;
 import core.framework.internal.async.VirtualThread;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.log.ActionLog;
@@ -56,7 +57,7 @@ class MessageListenerThread extends Thread {
         logManager = listener.logManager;
         concurrency = listener.concurrency;
         semaphore = new Semaphore(concurrency);
-        thread = Thread.ofVirtual().name(name + "-", 1);   // used in single thread, no need to use factory()
+        thread = ThreadPools.virtualThreadBuilder(name + "-");   // used in single thread, no need to use factory()
     }
 
     @Override

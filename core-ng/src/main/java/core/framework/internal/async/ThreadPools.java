@@ -13,6 +13,7 @@ public final class ThreadPools {
     static {
         // currently jdbc query is not fully support virtual thread yet, db operation will block current virtual thread
         // increase parallelism to allow more virtual thread unfriendly tasks to run
+        // refer to https://bugs.mysql.com/bug.php?id=110512
         // refer to java.lang.VirtualThread.createDefaultScheduler
         int parallelism = Math.max(Runtime.getRuntime().availableProcessors(), 16);
         System.setProperty("jdk.virtualThreadScheduler.parallelism", String.valueOf(parallelism));
@@ -29,5 +30,10 @@ public final class ThreadPools {
         scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
         scheduler.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
         return scheduler;
+    }
+
+    // start all virtual thread creation from here to make sure static block above run first
+    public static Thread.Builder.OfVirtual virtualThreadBuilder(String prefix) {
+        return Thread.ofVirtual().name(prefix, 0);
     }
 }

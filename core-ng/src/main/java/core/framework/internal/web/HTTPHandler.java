@@ -59,7 +59,7 @@ public class HTTPHandler implements HttpHandler {
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;
 
-    final ExecutorService thread = ThreadPools.virtualThreadExecutor("http-handler-");
+    final ExecutorService worker = ThreadPools.virtualThreadExecutor("http-handler-");
     private final Semaphore semaphore = new Semaphore(Runtime.getRuntime().availableProcessors() * 32);
 
     public Interceptor[] interceptors;
@@ -77,7 +77,7 @@ public class HTTPHandler implements HttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) {
         if (exchange.isInIoThread()) {
-            exchange.dispatch(thread, this);  // in io handler form parser will dispatch to current io thread
+            exchange.dispatch(worker, this);  // in io handler form parser will dispatch to current io thread
             return;
         }
 

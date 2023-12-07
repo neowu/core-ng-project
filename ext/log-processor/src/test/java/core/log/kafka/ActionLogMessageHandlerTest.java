@@ -46,7 +46,9 @@ class ActionLogMessageHandlerTest extends IntegrationTest {
         LocalDate now = LocalDate.of(2016, Month.JANUARY, 15);
 
         ActionLogMessage message1 = message("1", "OK");
-        message1.context = Map.of("key", List.of("value"));
+        message1.context = Map.of("key", List.of("value"),
+            "other_key.with_dot", List.of("value"),
+            "job_start_time", List.of("2023-12-07T03:48Z[GMT]"));
         message1.stats = Map.of("count", 1d);
         message1.correlationIds = List.of("id1", "id2");
         message1.clients = List.of("client");
