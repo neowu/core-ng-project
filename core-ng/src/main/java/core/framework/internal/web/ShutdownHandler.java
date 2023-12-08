@@ -25,6 +25,7 @@ public class ShutdownHandler implements ExchangeCompletionListener {
             logger.warn("reject request due to server is shutting down, requestURL={}", exchange.getRequestURL());
             // ask client not set keep alive for current connection, with persistent=false, undertow will send header "connection: close",
             // this does no effect with http/2.0, only for http/1.1
+            // refer to io.undertow.server.protocol.http.HttpTransferEncoding.createSinkConduit
             exchange.setPersistent(false);
             exchange.setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
             exchange.endExchange();

@@ -3,6 +3,8 @@
 ### 9.0.2 (12/7/2023 - )
 
 * stats: dump virtual threads on high cpu
+* http: response "connection: keep-alive" header if client sends keep-alive header
+  > to be compatible with http/1.0 client, like ab (apache benchmark) with "-k"
 
 ### 9.0.1 (12/01/2023 - 12/7/2023)
 

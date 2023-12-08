@@ -26,6 +26,7 @@ import core.framework.web.Response;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
+import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,12 +55,12 @@ public class HTTPHandler implements HttpHandler {
     public final ResponseBeanWriter responseBeanWriter = new ResponseBeanWriter();
 
     public final RateControl rateControl = new RateControl();
+    final ExecutorService worker = ThreadPools.virtualThreadExecutor("http-handler-");
+
     private final Logger logger = LoggerFactory.getLogger(HTTPHandler.class);
     private final LogManager logManager;
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;
-
-    final ExecutorService worker = ThreadPools.virtualThreadExecutor("http-handler-");
     private final Semaphore semaphore = new Semaphore(Runtime.getRuntime().availableProcessors() * 32);
 
     public Interceptor[] interceptors;
@@ -120,6 +121,7 @@ public class HTTPHandler implements HttpHandler {
             Response response = new InvocationImpl(controller, interceptors, request, webContext).proceed();
             webContext.handleResponse(response);
 
+            addKeepAliveHeader(exchange);
             responseHandler.render(request, (ResponseImpl) response, exchange, actionLog);
         } catch (Throwable e) {
             logManager.logError(e);
@@ -131,6 +133,13 @@ public class HTTPHandler implements HttpHandler {
             logManager.end("=== http transaction end ===");
             VirtualThread.COUNT.decrease();
             semaphore.release();
+        }
+    }
+
+    void addKeepAliveHeader(HttpServerExchange exchange) {
+        String keepAlive = Headers.KEEP_ALIVE.toString();
+        if (keepAlive.equals(exchange.getRequestHeaders().getFirst(Headers.CONNECTION))) {
+            exchange.getResponseHeaders().put(Headers.CONNECTION, keepAlive);
         }
     }
 
