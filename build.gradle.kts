@@ -7,7 +7,7 @@ apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
-    version = "9.0.2-b0"
+    version = "9.0.2-b2"
 
     repositories {
         maven {
@@ -25,7 +25,6 @@ val jacksonVersion = "2.15.3"
 val junitVersion = "5.10.0"
 val mockitoVersion = "5.6.0"
 val assertjVersion = "3.24.2"
-val mysqlVersion = "8.2.0"
 
 project("core-ng-api") {
     apply(plugin = "lib")
@@ -43,7 +42,7 @@ project("core-ng") {
         implementation("io.undertow:undertow-core:2.3.10.Final")
         implementation("org.apache.kafka:kafka-clients:${kafkaVersion}@jar")
         implementation("org.xerial.snappy:snappy-java:1.1.10.5")      // used by kafka message compression
-        compileOnly("core.framework.mysql:mysql-connector-j:8.2.0-p1")
+        compileOnly("core.framework.mysql:mysql-connector-j:8.2.0-p2")
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")
         compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.0")
         testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")

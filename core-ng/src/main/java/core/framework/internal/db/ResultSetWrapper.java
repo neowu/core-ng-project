@@ -5,13 +5,12 @@ import core.framework.util.ASCII;
 import core.framework.util.Maps;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -131,9 +130,7 @@ final class ResultSetWrapper {
     }
 
     LocalDateTime getLocalDateTime(int index) throws SQLException {
-        Timestamp timestamp = resultSet.getTimestamp(index);
-        if (timestamp == null) return null;
-        return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+        return resultSet.getObject(index, LocalDateTime.class);
     }
 
     LocalDate getLocalDate(String column) throws SQLException {
@@ -143,9 +140,7 @@ final class ResultSetWrapper {
     }
 
     LocalDate getLocalDate(int index) throws SQLException {
-        Date date = resultSet.getDate(index);
-        if (date == null) return null;
-        return date.toLocalDate();
+        return resultSet.getObject(index, LocalDate.class);
     }
 
     ZonedDateTime getZonedDateTime(String column) throws SQLException {
@@ -155,8 +150,10 @@ final class ResultSetWrapper {
     }
 
     ZonedDateTime getZonedDateTime(int index) throws SQLException {
-        Timestamp timestamp = resultSet.getTimestamp(index);
-        if (timestamp == null) return null;
-        return ZonedDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
+        // in mysql driver, getObject(type) is faster than getTimestamp/getDate due to "synchronized calendar"
+        // hsql doesn't support ZonedDateTime, use OffsetDateTime for both mysql and hsql
+        OffsetDateTime time = resultSet.getObject(index, OffsetDateTime.class);
+        if (time == null) return null;
+        return time.atZoneSameInstant(ZoneId.systemDefault());
     }
 }

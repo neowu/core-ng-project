@@ -133,6 +133,7 @@ public final class DatabaseImpl implements Database {
             // refer to https://cloud.google.com/sql/docs/mysql/authentication
             if (authProvider != null) {
                 properties.setProperty(PropertyKey.sslMode.getKeyName(), PropertyDefinitions.SslMode.PREFERRED.name());
+                properties.setProperty(CloudAuthProvider.Registry.KEY, "cloud");
             } else if (index == -1 || url.indexOf("sslMode=", index + 1) == -1) {
                 properties.setProperty(PropertyKey.sslMode.getKeyName(), PropertyDefinitions.SslMode.DISABLED.name());
             }
@@ -163,7 +164,8 @@ public final class DatabaseImpl implements Database {
         logger.info("use cloud auth provider, provider={}", provider);
         if ("gcloud".equals(provider)) {
             authProvider = new GCloudAuthProvider();
-            CloudAuthProvider.Registry.INSTANCE = authProvider;
+            // supports multiple db(), mix and match with cloud auth and user/password
+            if (CloudAuthProvider.Registry.get() == null) CloudAuthProvider.Registry.register(new GCloudAuthProvider());
         } else {
             throw new Error("unsupported cloud auth provider, provider=" + provider);
         }
