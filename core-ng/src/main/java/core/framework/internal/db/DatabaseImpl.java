@@ -2,12 +2,12 @@ package core.framework.internal.db;
 
 import com.mysql.cj.conf.PropertyDefinitions;
 import com.mysql.cj.conf.PropertyKey;
+import core.framework.db.CloudAuthProvider;
 import core.framework.db.Database;
 import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
-import core.framework.internal.db.cloud.CloudAuthProvider;
 import core.framework.internal.db.cloud.GCloudAuthProvider;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
@@ -36,8 +36,6 @@ import java.util.Properties;
  * @author neo
  */
 public final class DatabaseImpl implements Database {
-    public static final String PROPERTY_KEY_AUTH_PROVIDER = "authProvider";
-
     static {
         // disable unnecessary mysql connection cleanup thread to reduce overhead
         System.setProperty(PropertyDefinitions.SYSP_disableAbandonedConnectionCleanup, "true");
@@ -135,7 +133,6 @@ public final class DatabaseImpl implements Database {
             // refer to https://cloud.google.com/sql/docs/mysql/authentication
             if (authProvider != null) {
                 properties.setProperty(PropertyKey.sslMode.getKeyName(), PropertyDefinitions.SslMode.PREFERRED.name());
-                properties.setProperty(PROPERTY_KEY_AUTH_PROVIDER, "gcloud");
             } else if (index == -1 || url.indexOf("sslMode=", index + 1) == -1) {
                 properties.setProperty(PropertyKey.sslMode.getKeyName(), PropertyDefinitions.SslMode.DISABLED.name());
             }
@@ -165,7 +162,8 @@ public final class DatabaseImpl implements Database {
     public void authProvider(String provider) {
         logger.info("use cloud auth provider, provider={}", provider);
         if ("gcloud".equals(provider)) {
-            authProvider = GCloudAuthProvider.INSTANCE;
+            authProvider = new GCloudAuthProvider();
+            CloudAuthProvider.Registry.INSTANCE = authProvider;
         } else {
             throw new Error("unsupported cloud auth provider, provider=" + provider);
         }

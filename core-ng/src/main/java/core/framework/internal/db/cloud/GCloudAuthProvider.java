@@ -1,5 +1,6 @@
 package core.framework.internal.db.cloud;
 
+import core.framework.db.CloudAuthProvider;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
@@ -11,9 +12,6 @@ import java.time.Duration;
  * @author neo
  */
 public final class GCloudAuthProvider implements CloudAuthProvider {
-    // in cloud env, only need one instance per pod, and will be accessed by MySQL CancelQueryTaskImpl
-    public static final GCloudAuthProvider INSTANCE = new GCloudAuthProvider();
-
     // for timeout settings, refer to gcloud sdk com.google.auth.oauth2.ComputeEngineCredentials#runningOnComputeEngine
     private final HTTPClient httpClient = HTTPClient.builder()
         .connectTimeout(Duration.ofMillis(500))
@@ -25,9 +23,6 @@ public final class GCloudAuthProvider implements CloudAuthProvider {
     String user;    // iam user, won't change once pod is created
     String accessToken;
     long expirationTime;
-
-    GCloudAuthProvider() {
-    }
 
     @Override
     public String user() {
