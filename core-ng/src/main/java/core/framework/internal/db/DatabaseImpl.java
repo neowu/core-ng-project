@@ -8,7 +8,6 @@ import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
-import core.framework.internal.db.cloud.GCloudAuthProvider;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.resource.Pool;
@@ -48,11 +47,11 @@ public final class DatabaseImpl implements Database {
 
     public String user;
     public String password;
+    public CloudAuthProvider authProvider;
     public IsolationLevel isolationLevel;
 
     private String url;
     private Properties driverProperties;
-    private CloudAuthProvider authProvider;
     private Duration timeout;
     private Driver driver;
     private Dialect dialect;
@@ -133,7 +132,7 @@ public final class DatabaseImpl implements Database {
             // refer to https://cloud.google.com/sql/docs/mysql/authentication
             if (authProvider != null) {
                 properties.setProperty(PropertyKey.sslMode.getKeyName(), PropertyDefinitions.SslMode.PREFERRED.name());
-                properties.setProperty(CloudAuthProvider.Registry.KEY, "cloud");
+                properties.setProperty(CloudAuthProvider.Provider.CLOUD_AUTH, "true");
             } else if (index == -1 || url.indexOf("sslMode=", index + 1) == -1) {
                 properties.setProperty(PropertyKey.sslMode.getKeyName(), PropertyDefinitions.SslMode.DISABLED.name());
             }
@@ -158,17 +157,6 @@ public final class DatabaseImpl implements Database {
         this.timeout = timeout;
         operation.queryTimeoutInSeconds = (int) timeout.getSeconds();
         pool.checkoutTimeout(timeout);
-    }
-
-    public void authProvider(String provider) {
-        logger.info("use cloud auth provider, provider={}", provider);
-        if ("gcloud".equals(provider)) {
-            authProvider = new GCloudAuthProvider();
-            // supports multiple db(), mix and match with cloud auth and user/password
-            if (CloudAuthProvider.Registry.get() == null) CloudAuthProvider.Registry.register(new GCloudAuthProvider());
-        } else {
-            throw new Error("unsupported cloud auth provider, provider=" + provider);
-        }
     }
 
     public void url(String url) {

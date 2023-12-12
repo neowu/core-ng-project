@@ -8,15 +8,15 @@ public interface CloudAuthProvider {
 
     String accessToken();
 
-    class Registry {
+    class Provider {
         // used by driver to determine if current connection requires cloud auth, for multiple connections with different auth
-        public static final String KEY = "core.framework.db.authProvider";
+        public static final String CLOUD_AUTH = "core.framework.db.cloudAuth";
         // in cloud env, only need one global auth provider
         private static CloudAuthProvider provider;
 
-        public static void register(CloudAuthProvider provider) {
-            if (Registry.provider != null) throw new Error("provider is registered, provider=" + Registry.provider);
-            Registry.provider = provider;
+        public static void set(CloudAuthProvider provider) {
+            if (Provider.provider != null) throw new Error("provider is set, provider=" + Provider.provider);
+            Provider.provider = provider;
         }
 
         public static CloudAuthProvider get() {

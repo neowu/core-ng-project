@@ -2,6 +2,7 @@ package core.framework.internal.db;
 
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
+import core.framework.internal.db.cloud.GCloudAuthProvider;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogLevel;
 import core.framework.internal.log.LogManager;
@@ -236,7 +237,7 @@ class DatabaseImplTest {
             .doesNotContainKeys("sslMode")
             .containsEntry("characterEncoding", "utf-8");
 
-        database.authProvider("gcloud");
+        database.authProvider = new GCloudAuthProvider();
         properties = database.driverProperties("jdbc:mysql://localhost/demo");
         assertThat(properties)
             .containsEntry("sslMode", "PREFERRED");

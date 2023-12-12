@@ -15,8 +15,10 @@ public final class ThreadPools {
         // increase parallelism to allow more virtual thread unfriendly tasks to run
         // refer to https://bugs.mysql.com/bug.php?id=110512
         // refer to java.lang.VirtualThread.createDefaultScheduler
-        int parallelism = Math.max(Runtime.getRuntime().availableProcessors(), 16);
-        System.setProperty("jdk.virtualThreadScheduler.parallelism", String.valueOf(parallelism));
+        if (System.getProperty("jdk.virtualThreadScheduler.parallelism") == null) {
+            int parallelism = Math.max(Runtime.getRuntime().availableProcessors(), 16);
+            System.setProperty("jdk.virtualThreadScheduler.parallelism", String.valueOf(parallelism));
+        }
     }
 
     public static ExecutorService virtualThreadExecutor(String prefix) {

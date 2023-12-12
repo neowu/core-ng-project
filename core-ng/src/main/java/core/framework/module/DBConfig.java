@@ -1,9 +1,11 @@
 package core.framework.module;
 
+import core.framework.db.CloudAuthProvider;
 import core.framework.db.Database;
 import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.internal.db.DatabaseImpl;
+import core.framework.internal.db.cloud.GCloudAuthProvider;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
@@ -59,7 +61,12 @@ public class DBConfig extends Config {
 
     public void user(String user) {
         if ("iam/gcloud".equals(user)) {
-            database.authProvider("gcloud");
+            CloudAuthProvider provider = CloudAuthProvider.Provider.get();
+            if (provider == null) {
+                provider = new GCloudAuthProvider();
+                CloudAuthProvider.Provider.set(provider);
+            }
+            database.authProvider = provider;
             context.logManager.maskFields("access_token");  // mask token from IAM http response
         } else {
             database.user = user;
