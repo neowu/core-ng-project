@@ -11,9 +11,7 @@ import java.util.concurrent.ThreadFactory;
  */
 public final class ThreadPools {
     static {
-        // currently jdbc query is not fully support virtual thread yet, db operation will block current virtual thread
         // increase parallelism to allow more virtual thread unfriendly tasks to run
-        // refer to https://bugs.mysql.com/bug.php?id=110512
         // refer to java.lang.VirtualThread.createDefaultScheduler
         if (System.getProperty("jdk.virtualThreadScheduler.parallelism") == null) {
             int parallelism = Math.max(Runtime.getRuntime().availableProcessors(), 16);

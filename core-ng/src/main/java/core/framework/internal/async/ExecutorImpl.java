@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static core.framework.log.Markers.errorCode;
 
@@ -23,6 +24,7 @@ import static core.framework.log.Markers.errorCode;
  */
 public final class ExecutorImpl implements Executor {
     private final Logger logger = LoggerFactory.getLogger(ExecutorImpl.class);
+    private final ReentrantLock lock = new ReentrantLock();
     private final ExecutorService executor;
     private final LogManager logManager;
     private final long maxProcessTimeInNano;
@@ -36,7 +38,8 @@ public final class ExecutorImpl implements Executor {
 
     public void shutdown() {
         logger.info("shutting down executor");
-        synchronized (this) {
+        lock.lock();
+        try {
             if (scheduler != null) {
                 List<Runnable> canceledTasks = scheduler.shutdownNow(); // drop all delayed tasks
                 if (!canceledTasks.isEmpty()) {
@@ -44,6 +47,8 @@ public final class ExecutorImpl implements Executor {
                 }
             }
             executor.shutdown();
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -74,7 +79,8 @@ public final class ExecutorImpl implements Executor {
 
     @Override
     public void submit(String action, Task task, Duration delay) {
-        synchronized (this) {
+        lock.lock();
+        try {
             if (executor.isShutdown()) {
                 logger.warn(errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action);    // with current executor impl, rejection only happens when shutdown
                 return;
@@ -82,6 +88,8 @@ public final class ExecutorImpl implements Executor {
             if (scheduler == null) {
                 scheduler = ThreadPools.singleThreadScheduler("executor-scheduler-");
             }
+        } finally {
+            lock.unlock();
         }
         scheduleDelayedTask(action, task, delay);
     }

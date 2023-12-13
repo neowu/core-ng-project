@@ -8,6 +8,7 @@ import core.framework.internal.util.LRUMap;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
  */
 public class AlertService {
     private final LRUMap<String, AlertStat> stats = new LRUMap<>(1000);
+    private final ReentrantLock lock = new ReentrantLock();
     private final String kibanaURL;
     private final Matchers ignoredErrors;
     private final Matchers criticalErrors;
@@ -57,7 +59,8 @@ public class AlertService {
             return new Result(false, -1);
 
         String key = alertKey(alert);
-        synchronized (stats) {
+        lock.lock();
+        try {
             AlertStat stat = stats.get(key);
             if (stat == null) {
                 stats.put(key, new AlertStat(alert.date));
@@ -71,6 +74,8 @@ public class AlertService {
                 stat.alertCountSinceLastSent++;
                 return new Result(false, -1);
             }
+        } finally {
+            lock.unlock();
         }
     }
 

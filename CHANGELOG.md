@@ -1,5 +1,9 @@
 ## Change log
 
+### 9.0.3 (12/12/2023 - )
+
+* kafka: updated client to 3.6.1
+
 ### 9.0.2 (12/7/2023 - 12/12/2023)
 
 * stats: dump virtual threads on high cpu
@@ -9,6 +13,7 @@
   > use "core.framework.mysql:mysql-connector-j:8.2.0"
   > !!! for db-migration, pls continue to use "com.mysql:mysql-connector-j:8.2.0", as our patched version may remove unused features
   > refer to https://github.com/neowu/mysql-connector-j
+  > refer to https://bugs.mysql.com/bug.php?id=110512
 
 ### 9.0.1 (12/01/2023 - 12/7/2023)
 

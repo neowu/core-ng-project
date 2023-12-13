@@ -15,12 +15,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author neo
  */
 public class APIController {
     public final IPv4AccessControl accessControl = new IPv4AccessControl();
+    private final ReentrantLock lock = new ReentrantLock();
 
     public Set<Class<?>> serviceInterfaces = new LinkedHashSet<>();
     public Set<Class<?>> beanClasses = new LinkedHashSet<>();  // custom bean classes not referred by service interfaces
@@ -46,7 +48,10 @@ public class APIController {
     }
 
     APIDefinitionResponse serviceDefinition() {
-        synchronized (this) {
+        if (serviceDefinition != null) return serviceDefinition;
+
+        lock.lock();
+        try {
             if (serviceDefinition == null) {
                 var builder = new APIDefinitionBuilder(serviceInterfaces, beanClasses);
                 serviceDefinition = builder.build();
@@ -54,17 +59,24 @@ public class APIController {
                 beanClasses = null;
             }
             return serviceDefinition;
+        } finally {
+            lock.unlock();
         }
     }
 
     MessageAPIDefinitionResponse messageDefinition() {
-        synchronized (this) {
+        if (messageDefinition != null) return messageDefinition;
+
+        lock.lock();
+        try {
             if (messageDefinition == null) {
                 var builder = new MessageAPIDefinitionBuilder(topics);
                 messageDefinition = builder.build();
                 topics = null;    // release memory
             }
             return messageDefinition;
+        } finally {
+            lock.unlock();
         }
     }
 }
