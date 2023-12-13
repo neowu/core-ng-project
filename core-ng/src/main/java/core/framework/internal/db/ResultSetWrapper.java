@@ -130,7 +130,11 @@ final class ResultSetWrapper {
     }
 
     LocalDateTime getLocalDateTime(int index) throws SQLException {
-        return resultSet.getObject(index, LocalDateTime.class);
+        // mysql saves datetime or timestamp in UTC, com.mysql.cj.result.LocalDateTimeValueFactory use UTC value directly
+        // so here it has to convert back to application timezone, in cloud env it most likely still be UTC
+        OffsetDateTime time = resultSet.getObject(index, OffsetDateTime.class);
+        if (time == null) return null;
+        return LocalDateTime.ofInstant(time.toInstant(), ZoneId.systemDefault());
     }
 
     LocalDate getLocalDate(String column) throws SQLException {
