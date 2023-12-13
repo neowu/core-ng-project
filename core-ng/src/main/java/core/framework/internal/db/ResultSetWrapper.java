@@ -62,9 +62,7 @@ final class ResultSetWrapper {
     }
 
     Integer getInt(int index) throws SQLException {
-        int value = resultSet.getInt(index);
-        if (resultSet.wasNull()) return null;
-        return value;
+        return resultSet.getObject(index, Integer.class);
     }
 
     Boolean getBoolean(String column) throws SQLException {
@@ -74,9 +72,7 @@ final class ResultSetWrapper {
     }
 
     Boolean getBoolean(int index) throws SQLException {
-        boolean value = resultSet.getBoolean(index);
-        if (resultSet.wasNull()) return null;
-        return value;
+        return resultSet.getObject(index, Boolean.class);
     }
 
     Long getLong(String column) throws SQLException {
@@ -86,9 +82,7 @@ final class ResultSetWrapper {
     }
 
     Long getLong(int index) throws SQLException {
-        long value = resultSet.getLong(index);
-        if (resultSet.wasNull()) return null;
-        return value;
+        return resultSet.getObject(index, Long.class);
     }
 
     Double getDouble(String column) throws SQLException {
@@ -98,9 +92,7 @@ final class ResultSetWrapper {
     }
 
     Double getDouble(int index) throws SQLException {
-        double value = resultSet.getDouble(index);
-        if (resultSet.wasNull()) return null;
-        return value;
+        return resultSet.getObject(index, Double.class);
     }
 
     String getString(String column) throws SQLException {
@@ -130,11 +122,7 @@ final class ResultSetWrapper {
     }
 
     LocalDateTime getLocalDateTime(int index) throws SQLException {
-        // mysql saves datetime or timestamp in UTC, com.mysql.cj.result.LocalDateTimeValueFactory use UTC value directly
-        // so here it has to convert back to application timezone, in cloud env it most likely still be UTC
-        OffsetDateTime time = resultSet.getObject(index, OffsetDateTime.class);
-        if (time == null) return null;
-        return LocalDateTime.ofInstant(time.toInstant(), ZoneId.systemDefault());
+        return resultSet.getObject(index, LocalDateTime.class);
     }
 
     LocalDate getLocalDate(String column) throws SQLException {

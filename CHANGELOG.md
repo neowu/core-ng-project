@@ -3,6 +3,9 @@
 ### 9.0.3 (12/12/2023 - )
 
 * kafka: updated client to 3.6.1
+* db: tweaked all datetime related operations for virtual thread
+  > use new date api if possible, mysql driver uses too many locks/sync for old Date/Timestamp impl
+  > pls make sure to map MySQL column type: LocalDate -> DATE, LocalDateTime -> DATETIME, ZonedDateTime -> TIMESTAMP(6)
 
 ### 9.0.2 (12/7/2023 - 12/12/2023)
 

@@ -7,11 +7,9 @@ import core.framework.util.Lists;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -200,9 +198,9 @@ public class DatabaseOperation {
     private void setParam(PreparedStatement statement, int index, Object param) throws SQLException {
         switch (param) {
             case String value -> statement.setString(index, value);
-            case Integer value -> statement.setInt(index, value);
             case Enum<?> value -> statement.setString(index, enumMapper.getDBValue(value));
-            case LocalDateTime value -> statement.setTimestamp(index, Timestamp.valueOf(value));
+            case LocalDate value -> statement.setObject(index, value, Types.DATE);
+            case LocalDateTime value -> statement.setObject(index, value, Types.TIMESTAMP);
             case ZonedDateTime value -> {
                 // https://dev.mysql.com/doc/refman/8.0/en/datetime.html,
                 // TIMESTAMP has a range of '1970-01-01 00:00:01' UTC to '2038-01-19 03:14:07' UTC.
@@ -219,13 +217,13 @@ public class DatabaseOperation {
                 // so on application level, if you can not ensure the range of input value, write its own utils to check
                 Instant instant = value.toInstant();
                 if (instant.getEpochSecond() <= 0) throw new Error("timestamp must be after 1970-01-01 00:00:00, value=" + param);
-                statement.setTimestamp(index, Timestamp.from(instant));
+                statement.setObject(index, instant, Types.TIMESTAMP);
             }
             case Boolean value -> statement.setBoolean(index, value);
+            case Integer value -> statement.setInt(index, value);
             case Long value -> statement.setLong(index, value);
             case Double value -> statement.setDouble(index, value);
             case BigDecimal value -> statement.setBigDecimal(index, value);
-            case LocalDate value -> statement.setDate(index, Date.valueOf(value));
             case null -> statement.setNull(index, Types.NULL);   // both mysql/hsql driver are not using sqlType param
             default -> throw new Error(format("unsupported param type, type={}, value={}", param.getClass().getCanonicalName(), param));
         }

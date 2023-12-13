@@ -84,7 +84,7 @@ public final class EntitySchemaGenerator {
 
     // http://dev.mysql.com/doc/connector-j/en/connector-j-reference-type-conversions.html
     private String columnType(Class<?> fieldClass, Size size, boolean json) {
-        if (json) return "LONGVARCHAR";
+        if (json) return "TEXT";
         if (Integer.class.equals(fieldClass)) return "INT";
         if (Long.class.equals(fieldClass)) return "BIGINT";
         if (String.class.equals(fieldClass)) {
@@ -102,10 +102,13 @@ public final class EntitySchemaGenerator {
             return "DOUBLE";
         }
         if (BigDecimal.class.equals(fieldClass)) {
-            return "DECIMAL(10,2)";
+            return "DECIMAL(20,6)";
         }
-        if (LocalDateTime.class.equals(fieldClass) || ZonedDateTime.class.equals(fieldClass)) {
-            return "TIMESTAMP";
+        if (LocalDateTime.class.equals(fieldClass)) {
+            return "DATETIME";
+        }
+        if (ZonedDateTime.class.equals(fieldClass)) {
+            return "TIMESTAMP(6)";
         }
         if (LocalDate.class.equals(fieldClass)) {
             return "DATE";
