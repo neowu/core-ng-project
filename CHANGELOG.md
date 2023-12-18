@@ -5,7 +5,10 @@
 * kafka: updated client to 3.6.1
 * db: tweaked all datetime related operations for virtual thread
   > use new date api if possible, mysql driver uses too many locks/sync for old Date/Timestamp impl
-  > pls make sure to map MySQL column type: LocalDate -> DATE, LocalDateTime -> DATETIME, ZonedDateTime -> TIMESTAMP(6)
+  > it recommends to map MySQL column type: LocalDate -> DATE, LocalDateTime -> DATETIME, ZonedDateTime -> TIMESTAMP(6)
+  > with Timestamp, in mysql console, it is easier to use "SET @@session.time_zone" to adjust datetime value displayed
+* mysql: updated mysql driver according to profiling result
+  > use "core.framework.mysql:mysql-connector-j:8.2.0-r1"
 
 ### 9.0.2 (12/7/2023 - 12/12/2023)
 

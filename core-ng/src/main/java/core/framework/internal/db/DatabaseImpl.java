@@ -125,6 +125,7 @@ public final class DatabaseImpl implements Database {
             properties.setProperty(PropertyKey.rewriteBatchedStatements.getKeyName(), "true");
             properties.setProperty(PropertyKey.queryInterceptors.getKeyName(), MySQLQueryInterceptor.class.getName());
             properties.setProperty(PropertyKey.logger.getKeyName(), "Slf4JLogger");
+            properties.setProperty(PropertyKey.cachePrepStmts.getKeyName(), "true");
 
             int index = url.indexOf('?');
             // mysql with ssl has overhead, usually we ensure security on arch level, e.g. gcloud sql proxy or firewall rule
