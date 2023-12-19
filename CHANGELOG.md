@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.0.3 (12/12/2023 - )
+### 9.0.3 (12/12/2023 - 12/19/2023)
 
 * kafka: updated client to 3.6.1
 * db: tweaked all datetime related operations for virtual thread
@@ -9,6 +9,7 @@
   > with Timestamp, in mysql console, it is easier to use "SET @@session.time_zone" to adjust datetime value displayed
 * mysql: updated mysql driver according to profiling result
   > use "core.framework.mysql:mysql-connector-j:8.2.0-r1"
+  > simplified and tuned used code path
 
 ### 9.0.2 (12/7/2023 - 12/12/2023)
 
