@@ -1,7 +1,5 @@
 package core.framework.internal.db;
 
-import com.mysql.cj.conf.PropertyDefinitions;
-import com.mysql.cj.conf.PropertyKey;
 import core.framework.db.CloudAuthProvider;
 import core.framework.db.Database;
 import core.framework.db.IsolationLevel;
@@ -36,8 +34,8 @@ import java.util.Properties;
  */
 public final class DatabaseImpl implements Database {
     static {
-        // disable unnecessary mysql connection cleanup thread to reduce overhead
-        System.setProperty(PropertyDefinitions.SYSP_disableAbandonedConnectionCleanup, "true");
+        // disable unnecessary mysql connection cleanup thread to reduce overhead, refer to PropertyDefinitions.SYSP_disableAbandonedConnectionCleanup
+        System.setProperty("com.mysql.cj.disableAbandonedConnectionCleanup", "true");
     }
 
     public final Pool<Connection> pool;
@@ -109,37 +107,37 @@ public final class DatabaseImpl implements Database {
         if (authProvider == null && password != null) properties.setProperty("password", password);
         if (url.startsWith("jdbc:mysql:")) {
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
-            properties.setProperty(PropertyKey.connectTimeout.getKeyName(), String.valueOf(timeout.toMillis()));
+            properties.setProperty("connectTimeout", String.valueOf(timeout.toMillis()));
             // add 10s for socket timeout which is read timeout, as all queries have queryTimeout, MySQL will send "KILL QUERY" command to MySQL server
             // otherwise we will see socket timeout exception (com.mysql.cj.exceptions.StatementIsClosedException: No operations allowed after statement closed)
             // refer to com.mysql.cj.CancelQueryTaskImpl
-            properties.setProperty(PropertyKey.socketTimeout.getKeyName(), String.valueOf(timeout.toMillis() + 10_000));
+            properties.setProperty("socketTimeout", String.valueOf(timeout.toMillis() + 10_000));
             // refer to https://dev.mysql.com/doc/c-api/8.0/en/mysql-affected-rows.html
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-connp-props-connection.html#cj-conn-prop_useAffectedRows
             // Don't set the CLIENT_FOUND_ROWS flag when connecting to the server (not JDBC-compliant, will break most applications that rely on "found" rows vs. "affected rows" for DML statements),
             // but does cause "correct" update counts from "INSERT ... ON DUPLICATE KEY UPDATE" statements to be returned by the server.
-            properties.setProperty(PropertyKey.useAffectedRows.getKeyName(), "true");
+            properties.setProperty("useAffectedRows", "true");
             // refer to com.mysql.cj.protocol.a.NativeProtocol.configureTimeZone,
             // force to UTC, generally on cloud it defaults to UTC, this setting is to make local match cloud
-            properties.setProperty(PropertyKey.connectionTimeZone.getKeyName(), "UTC");
-            properties.setProperty(PropertyKey.rewriteBatchedStatements.getKeyName(), "true");
-            properties.setProperty(PropertyKey.queryInterceptors.getKeyName(), MySQLQueryInterceptor.class.getName());
-            properties.setProperty(PropertyKey.logger.getKeyName(), "Slf4JLogger");
-            properties.setProperty(PropertyKey.cachePrepStmts.getKeyName(), "true");
+            properties.setProperty("connectionTimeZone", "UTC");
+            properties.setProperty("rewriteBatchedStatements", "true");
+            properties.setProperty("queryInterceptors", MySQLQueryInterceptor.class.getName());
+            properties.setProperty("logger", "Slf4JLogger");
+            properties.setProperty("cachePrepStmts", "true");
 
             int index = url.indexOf('?');
             // mysql with ssl has overhead, usually we ensure security on arch level, e.g. gcloud sql proxy or firewall rule
             // with gcloud iam / clear_text_password plugin, ssl is required
             // refer to https://cloud.google.com/sql/docs/mysql/authentication
             if (authProvider != null) {
-                properties.setProperty(PropertyKey.sslMode.getKeyName(), PropertyDefinitions.SslMode.PREFERRED.name());
+                properties.setProperty("sslMode", "PREFERRED");
                 properties.setProperty(CloudAuthProvider.Provider.CLOUD_AUTH, "true");
             } else if (index == -1 || url.indexOf("sslMode=", index + 1) == -1) {
-                properties.setProperty(PropertyKey.sslMode.getKeyName(), PropertyDefinitions.SslMode.DISABLED.name());
+                properties.setProperty("sslMode", "DISABLED");
             }
-            // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-charsets.html
+            // refer to https://dev.mysql.com/doc/connector-j/en/connector-j-reference-charsets.html
             if (index == -1 || url.indexOf("characterEncoding=", index + 1) == -1)
-                properties.setProperty(PropertyKey.characterEncoding.getKeyName(), "utf-8");
+                properties.setProperty("characterEncoding", "utf-8");
         } else if (url.startsWith("jdbc:postgresql:")) {
             // refer to org.postgresql.PGProperty
             properties.setProperty("connectTimeout", String.valueOf(timeout.toSeconds()));
