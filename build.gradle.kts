@@ -21,7 +21,7 @@ subprojects {
 
 val elasticVersion = "8.11.1"
 val kafkaVersion = "3.6.1"
-val jacksonVersion = "2.15.3"
+val jacksonVersion = "2.16.1"
 val junitVersion = "5.10.0"
 val mockitoVersion = "5.6.0"
 val assertjVersion = "3.24.2"
