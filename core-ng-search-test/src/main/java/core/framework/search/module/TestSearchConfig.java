@@ -6,6 +6,8 @@ import core.framework.search.impl.ESLoggerConfigFactory;
 import core.framework.search.impl.LocalElasticSearch;
 import org.apache.http.HttpHost;
 import org.apache.logging.log4j.core.config.ConfigurationFactory;
+import org.elasticsearch.common.logging.internal.LoggerFactoryImpl;
+import org.elasticsearch.logging.internal.spi.LoggerFactory;
 
 /**
  * @author neo
@@ -24,6 +26,7 @@ public class TestSearchConfig extends SearchConfig {
 
         // disable warning from org.elasticsearch.node.Node
         // refer to org.elasticsearch.node.Node deprecationLogger/no-jdk
+        // org.elasticsearch.monitor.jvm.JvmInfo Line 144
         System.setProperty("es.bundled_jdk", "true");
     }
 
@@ -50,9 +53,25 @@ public class TestSearchConfig extends SearchConfig {
         search.hosts = new HttpHost[]{localESHost};
     }
 
-    // ES Node refers to log4j core API directly in org.elasticsearch.common.logging.Loggers, this is to bridge es log to coreng logger
-    // refer to org.elasticsearch.common.logging.NodeAndClusterIdStateListener, NodeAndClusterIdConverter.setNodeIdAndClusterId(nodeId, clusterUUID);
+    @Override
+    public void auth(String apiKeyId, String apiKeySecret) {
+
+    }
+
+    // ES uses log4j2 core api directly, cannot use log4j-to-slf4j to bridge, refer to following exception
+    // here is to bridge to core-ng logger
+    /*
+      java.lang.ClassCastException: class org.apache.logging.slf4j.SLF4JLoggerContext cannot be cast to class org.apache.logging.log4j.core.LoggerContext (org.apache.logging.slf4j.SLF4JLoggerContext and org.apache.logging.log4j.core.LoggerContext are in unnamed module of loader 'app')
+        at org.apache.logging.log4j.core.LoggerContext.getContext(LoggerContext.java:231)
+        at org.apache.logging.log4j.core.config.Configurator.setLevel(Configurator.java:366)
+        at org.elasticsearch.common.logging.Loggers.setLevel(Loggers.java:114)
+        at org.elasticsearch.index.SearchSlowLog.<init>(SearchSlowLog.java:111)
+        at org.elasticsearch.index.IndexModule.<init>(IndexModule.java:176)
+    * */
     void configureLogger() {
+        // ES starts to migrate log4j api to its own logger api, once important info migrated (like node info), we will remove log4j adapter
+        if (LoggerFactory.provider() == null) LoggerFactory.setInstance(new LoggerFactoryImpl());
+
         if (System.getProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY) != null) return;
         System.setProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY, ESLoggerConfigFactory.class.getName());
         // refer to org.apache.logging.log4j.core.jmx.Server.PROPERTY_DISABLE_JMX, disable to reduce overhead

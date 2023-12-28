@@ -4,6 +4,7 @@ import org.assertj.core.api.AbstractAssert;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,8 +19,19 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author neo
  */
 public class EnvResourceAssert extends AbstractAssert<EnvResourceAssert, Path> {
+    private final Path mainResources;
+    private final Path testResources;
+
+    EnvResourceAssert(Path confPath, Path mainResources, Path testResources) {
+        super(confPath, EnvResourceAssert.class);
+        this.mainResources = mainResources;
+        this.testResources = testResources;
+    }
+
     public EnvResourceAssert() {
-        super(Paths.get("conf").toAbsolutePath(), EnvResourceAssert.class);
+        this(Paths.get("conf").toAbsolutePath(),
+            Paths.get("src/main/resources"),
+            Paths.get("src/test/resources"));
     }
 
     public void overridesDefaultResources() {
@@ -34,9 +46,8 @@ public class EnvResourceAssert extends AbstractAssert<EnvResourceAssert, Path> {
                 assertPropertyOverridesDefault(resourceDir);
             }
 
-            Path testResourceDir = Paths.get("src/test/resources");
-            if (Files.exists(testResourceDir)) {
-                assertPropertyOverridesDefault(testResourceDir);
+            if (Files.exists(testResources)) {
+                assertPropertyOverridesDefault(testResources);
             }
         } catch (IOException e) {
             throw new AssertionError(e);
@@ -46,29 +57,27 @@ public class EnvResourceAssert extends AbstractAssert<EnvResourceAssert, Path> {
     private List<Path> resourceDirs() throws IOException {
         try (Stream<Path> stream = Files.list(actual)) {
             return stream.filter(Files::isDirectory)
-                         .map(path -> path.resolve("resources")).filter(Files::exists)
-                         .collect(Collectors.toList());
+                .map(path -> path.resolve("resources")).filter(Files::exists)
+                .collect(Collectors.toList());
         }
     }
 
     private void assertOverridesDefault(Path resourceDir) throws IOException {
-        Path defaultResourceDir = Paths.get("src/main/resources");
         try (Stream<Path> stream = Files.walk(resourceDir)) {
             stream.forEach(path -> {
-                Path defaultFile = defaultResourceDir.resolve(resourceDir.relativize(path));
+                Path defaultFile = mainResources.resolve(resourceDir.relativize(path));
                 assertThat(defaultFile).as("%s must override src/main/resources", path).exists();
             });
         }
     }
 
     private void assertPropertyOverridesDefault(Path resourceDir) throws IOException {
-        Path defaultResourceDir = Paths.get("src/main/resources");
         List<Path> propertyFiles;
         try (Stream<Path> stream = Files.walk(resourceDir).filter(path -> path.toString().endsWith(".properties"))) {
             propertyFiles = stream.collect(Collectors.toList());
         }
         for (Path propertyFile : propertyFiles) {
-            Path defaultPropertyFile = defaultResourceDir.resolve(resourceDir.relativize(propertyFile));
+            Path defaultPropertyFile = mainResources.resolve(resourceDir.relativize(propertyFile));
             if (!Files.exists(defaultPropertyFile)) continue;   // for src/test/resources, ignore non override property file, conf/resources is checked by assertOverridesDefault
 
             Properties envProperties = loadProperties(propertyFile);
@@ -78,8 +87,8 @@ public class EnvResourceAssert extends AbstractAssert<EnvResourceAssert, Path> {
     }
 
     private Properties loadProperties(Path path) throws IOException {
-        try (Reader reader = Files.newBufferedReader(path)) {
-            Properties properties = new Properties();
+        try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            var properties = new Properties();
             properties.load(reader);
             return properties;
         }

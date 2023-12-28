@@ -21,7 +21,8 @@ class WebSocketConfigTest {
 
     @BeforeAll
     void createWebSocketConfig() {
-        config = new WebSocketConfig(new ModuleContext(null));
+        config = new WebSocketConfig();
+        config.initialize(new ModuleContext(null), null);
     }
 
     @Test
@@ -45,5 +46,11 @@ class WebSocketConfigTest {
         var webSocketContext = (WebSocketContext) config.context.beanFactory.bean(WebSocketContext.class, null);
         assertThat(webSocketContext).isNotNull();
         assertThat(config.context.apiController.beanClasses).contains(TestWebSocketMessage.class);
+    }
+
+    @Test
+    void validate() {
+        config.validate();
+        assertThat(config.context.httpServer.handler.rateControl.hasGroup(WebSocketConfig.WS_OPEN_GROUP)).isTrue();
     }
 }

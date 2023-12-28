@@ -1,0 +1,16 @@
+{
+  "_nodes": {
+    "total": 1, "successful": 0, "failed": 1,
+    "failures": [
+      {
+        "type": "failed_node_exception",
+        "reason": "Failed node [w5q6h5eWQDi90vVj5A9Iew]",
+        "node_id": "w5q6h5eWQDi90vVj5A9Iew",
+        "caused_by": {
+          "type": "null_pointer_exception",
+          "reason": "Cannot invoke \"org.elasticsearch.index.mapper.MapperService.mappingLookup()\" because the return value of \"org.elasticsearch.index.IndexService.mapperService()\" is null"
+        }
+      }
+    ]
+  }, "cluster_name": "log", "nodes": {}
+}

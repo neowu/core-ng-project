@@ -13,6 +13,8 @@ import core.framework.util.Sets;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -33,9 +35,8 @@ public final class MongoClassValidator implements ClassVisitor {
     MongoClassValidator(Class<?> entityClass) {
         validator = new ClassValidator(entityClass);
         validator.allowedValueClasses = Set.of(ObjectId.class, String.class, Boolean.class,
-                Integer.class, Long.class, Double.class,
-                LocalDateTime.class, ZonedDateTime.class);
-        validator.allowChild = true;
+            Integer.class, Long.class, Double.class, BigDecimal.class,
+            LocalDateTime.class, ZonedDateTime.class, LocalDate.class);
         validator.visitor = this;
     }
 
@@ -66,9 +67,13 @@ public final class MongoClassValidator implements ClassVisitor {
             core.framework.mongo.Field mongoField = field.getDeclaredAnnotation(core.framework.mongo.Field.class);
             if (mongoField == null)
                 throw new Error("mongo entity field must have @Field, field=" + Fields.path(field));
-            String mongoFieldName = mongoField.name();
+
+            Property property = field.getDeclaredAnnotation(Property.class);
+            if (property != null)
+                throw new Error("mongo entity field must not have json annotation, please separate view and entity, field=" + Fields.path(field));
 
             Set<String> fields = this.fields.computeIfAbsent(parentPath, key -> Sets.newHashSet());
+            String mongoFieldName = mongoField.name();
             if (fields.contains(mongoFieldName)) {
                 throw new Error(format("found duplicate field, field={}, mongoField={}", Fields.path(field), mongoFieldName));
             }

@@ -2,6 +2,7 @@ package core.framework.internal.web.response;
 
 import core.framework.log.ErrorCode;
 import core.framework.log.Severity;
+import core.framework.util.Files;
 import io.undertow.io.IoCallback;
 import io.undertow.io.Sender;
 import io.undertow.server.HttpServerExchange;
@@ -29,11 +30,13 @@ public final class FileBody implements Body {
     }
 
     @Override
-    public void send(Sender sender, ResponseHandlerContext context) {
+    public long send(Sender sender, ResponseHandlerContext context) {
         LOGGER.debug("[response] file={}", path);
         try {
+            long size = Files.size(path);
             FileChannel channel = FileChannel.open(path, StandardOpenOption.READ);
             sender.transferFrom(channel, new FileBodyCallback(channel));
+            return size;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

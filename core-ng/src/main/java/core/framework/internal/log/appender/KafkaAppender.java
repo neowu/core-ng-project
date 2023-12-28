@@ -22,9 +22,12 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import static core.framework.log.Markers.errorCode;
 
 /**
  * @author neo
@@ -45,11 +48,11 @@ public final class KafkaAppender implements LogAppender {
 
     public KafkaAppender(KafkaURI uri) {
         this.uri = uri;
-        logForwarderThread = new Thread(() -> {
+        logForwarderThread = Thread.ofPlatform().name("log-forwarder").unstarted(() -> {
             logger.info("log forwarder thread started, uri={}", this.uri);
             initialize();
             process();
-        }, "log-forwarder");
+        });
     }
 
     void initialize() {
@@ -82,15 +85,18 @@ public final class KafkaAppender implements LogAppender {
     KafkaProducer<byte[], byte[]> createProducer(KafkaURI uri) {
         var watch = new StopWatch();
         try {
-            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs,
-                ProducerConfig.ACKS_CONFIG, "0",                                        // no acknowledge to maximize performance
-                ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder",                       // if not specify, kafka uses producer-${seq} name, also impact jmx naming
-                ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
-                ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000,                      // 60s, type is INT
-                ProducerConfig.LINGER_MS_CONFIG, 50L,
-                ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                       // longer backoff to reduce cpu usage when kafka is not available
-                ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L,                 // 5s
-                ProducerConfig.MAX_BLOCK_MS_CONFIG, 30_000L);                           // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+            Map<String, Object> config = new HashMap<>();                               // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+            config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs);
+            config.put(ProducerConfig.ACKS_CONFIG, "0");                                // no acknowledge to maximize performance
+            config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, Boolean.FALSE);        // since kafka 3.0.0, "enable.idempotence" is true by default, and it overrides "acks" to all
+            config.put(ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");               // if not specify, kafka uses producer-${seq} name, also impact jmx naming
+            config.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name);
+            config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000);              // 60s, type is INT
+            config.put(ProducerConfig.LINGER_MS_CONFIG, 50L);
+            config.put(ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L);               // longer backoff to reduce cpu usage when kafka is not available
+            config.put(ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L);         // 5s
+            config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 30_000L);
+            config.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 2_097_152);              // 2M, 1024*1024*2, kafka producer checks uncompressed request size, but with snappy, it is generally ok to send larger value, compression ratio is 1.5x~1.7x
             var serializer = new ByteArraySerializer();
             var producer = new KafkaProducer<>(config, serializer, serializer);
             producerMetrics.set(producer.metrics());
@@ -102,9 +108,21 @@ public final class KafkaAppender implements LogAppender {
 
     @Override
     public void append(ActionLogMessage message) {
+        byte[] value = actionLogWriter.toJSON(message);
+
+        // refer to org.apache.kafka.common.record.DefaultRecordBatch.estimateBatchSizeUpperBound
+        // overhead is 88 + valueSize
+        if (value.length > 2_000_000) {
+            logger.warn(errorCode("LOG_TOO_LARGE"), "action log message is too large, size={}, id={}, action={}", value.length, message.id, message.action);
+            new ConsoleAppender().append(message);  // fall back to console appender to print
+
+            truncate(message, value.length - 2_000_000, 10_000);
+            value = actionLogWriter.toJSON(message);    // the value length is supposed to be less than 2_000_000, since json escapes '\n' as 2 chars, but in trace string it's one char
+        }
+
         // not specify message key for sticky partition, StickyPartitionCache will be used if key is null
         // refer to org.apache.kafka.clients.producer.internals.DefaultPartitioner.partition
-        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, actionLogWriter.toJSON(message)));
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, value));
     }
 
     @Override
@@ -129,6 +147,24 @@ public final class KafkaAppender implements LogAppender {
                 producer.send(record);
             }
             producer.close(Duration.ofMillis(timeoutInMs));
+        }
+    }
+
+    // traceLog string length can be much smaller than json bytes size,
+    // since json encodes some chars into 2 bytes, e.g. \n, '"',
+    // if traceLog contains many of them like logs contains json string, it may over truncates
+    // in worst case, minTraceLength will be kept
+    void truncate(ActionLogMessage message, int overflow, int minTraceLength) {
+        // clear all large context
+        message.context.entrySet().removeIf(entry -> entry.getValue().size() > 10);
+        if (message.traceLog != null) {
+            int traceLength = message.traceLog.length();
+            // leave trace at least minTraceLength chars, if large context is removed, trace log most likely has enough room
+            int endIndex = Math.max(traceLength - overflow, minTraceLength);
+            String warning = "...(hard trace limit reached, please check console log for full trace)";
+            if (endIndex + warning.length() < traceLength) {
+                message.traceLog = message.traceLog.substring(0, endIndex) + warning;
+            }
         }
     }
 

@@ -1,35 +1,32 @@
 version: "3"
 services:
   kafka:
-    image: neowu/kafka:3.0.0-kraft
+    image: neowu/kafka:3.6.0
     ports:
     - 9092:9092
     - 1099:1099
     environment:
     - KAFKA_NODE_ID=1
     - KAFKA_CLUSTER_ID=lK_g8qooQNOD9klGoxLojA
-    - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.rmi.port=1099 -Djava.rmi.server.hostname=kafka
+    - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.rmi.port=1099 -Djava.rmi.server.hostname=kafka.kafka.orb.local
     - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
-    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://localhost:9092 --override num.partitions=3
-#  example of kafka with zookeeper
-#  zookeeper:
-#    image: zookeeper:3.6.3
-#    ports:
-#    - 2181
+    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://alpine:9092 --override num.partitions=3 --override controller.quorum.voters=1@kafka:9093
+    volumes:
+    - data:/data
+#  kafka-2:
+#    image: neowu/kafka:3.6.0
 #    environment:
-#    - JMXDISABLE=true
-#    - SERVER_JVMFLAGS=-Dzookeeper.jmx.log4j.disable=true
-#    - ZOO_DATA_DIR=/data
-#    - ZOO_DATA_LOG_DIR=/datalog
-#    - ZOO_ADMINSERVER_ENABLED=false
-#  kafka:
-#    image: neowu/kafka:3.0.0
-#    ports:
-#    - 9092:9092
-#    - 1099:1099
-#    environment:
-#    - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.rmi.port=1099 -Djava.rmi.server.hostname=kafka
+#    - KAFKA_NODE_ID=1
+#    - KAFKA_CLUSTER_ID=FjC2JEw2S5C18hSjY1yEuA
 #    - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
-#    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://localhost:9092 --override num.partitions=3
-#    depends_on:
-#    - zookeeper
+#    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka-2:9092 --override num.partitions=3 --override controller.quorum.voters=1@kafka:9093
+#  mm:
+#    image: neowu/kafka:3.6.0
+#    volumes:
+#    - ./connect-mirror-maker.properties:/opt/kafka/config/connect-mirror-maker.properties
+#    entrypoint: ["/bin/bash", "-c", "/opt/kafka/bin/connect-mirror-maker.sh /opt/kafka/config/connect-mirror-maker.properties"]
+#    depends_on: [kafka, kafka-2]
+#  example of kafka with zookeeper
+volumes:
+  data:
+    external: false

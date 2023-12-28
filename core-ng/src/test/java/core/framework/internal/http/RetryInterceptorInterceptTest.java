@@ -44,7 +44,6 @@ class RetryInterceptorInterceptTest {
 
         request = new Request.Builder().url("http://localhost").build();
         when(chain.request()).thenReturn(request);
-        when(chain.call()).thenReturn(call);
     }
 
     @Test
@@ -77,6 +76,7 @@ class RetryInterceptorInterceptTest {
             .message("ok")
             .build();
         when(chain.proceed(request)).thenThrow(new ConnectException("connection refused")).thenReturn(okResponse);
+        when(chain.call()).thenReturn(call);
 
         Response response = interceptor.intercept(chain);
         assertThat(response).isSameAs(okResponse);
@@ -85,26 +85,24 @@ class RetryInterceptorInterceptTest {
     @Test
     void failedToRetry() throws IOException {
         when(chain.proceed(request)).thenThrow(new ConnectException("connection refused"));
+        when(chain.call()).thenReturn(call);
 
         assertThatThrownBy(() -> interceptor.intercept(chain))
             .isInstanceOf(ConnectException.class)
             .hasMessageContaining("connection refused");
+
+        verify(chain, times(3)).proceed(request);
     }
 
     @Test
     void callTimeout() throws IOException {
+        var timeoutException = new IOException("Canceled");
+        when(chain.proceed(request)).thenThrow(timeoutException);    // refer to RetryAndFollowUpInterceptor Line 72
+        when(chain.call()).thenReturn(call);
         when(call.isCanceled()).thenReturn(Boolean.TRUE);
-        var source = mock(BufferedSource.class);
-        var serviceUnavailableResponse = new Response.Builder().request(request)
-            .protocol(Protocol.HTTP_2)
-            .code(HTTPStatus.SERVICE_UNAVAILABLE.code)
-            .message("service unavailable")
-            .body(ResponseBody.create(source, MediaType.get("application/json"), 0))
-            .build();
-        when(chain.proceed(request)).thenReturn(serviceUnavailableResponse);
 
-        Response response = interceptor.intercept(chain);
-        assertThat(response).isSameAs(serviceUnavailableResponse);
+        assertThatThrownBy(() -> interceptor.intercept(chain))
+            .isSameAs(timeoutException);
 
         verify(chain, times(1)).proceed(request);
     }

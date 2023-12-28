@@ -7,10 +7,12 @@
       "refresh_interval": "${REFRESH_INTERVAL}"
     },
     "mappings": {
+      "date_detection": false,
       "dynamic_templates": [
         {
           "context": {
             "path_match": "context.*",
+            "match_mapping_type": "string",
             "mapping": {
               "type": "keyword"
             }

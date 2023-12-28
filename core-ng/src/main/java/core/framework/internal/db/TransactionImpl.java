@@ -2,6 +2,7 @@ package core.framework.internal.db;
 
 
 import core.framework.db.Transaction;
+import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
@@ -27,12 +28,26 @@ final class TransactionImpl implements Transaction {
 
     @Override
     public void rollback() {
-        transactionManager.rollbackTransaction();
+        var watch = new StopWatch();
+        try {
+            transactionManager.rollbackTransaction();
+        } finally {
+            long elapsed = watch.elapsed();
+            logger.debug("rollback transaction, elapsed={}", elapsed);
+            ActionLogContext.track("db", elapsed);
+        }
     }
 
     @Override
     public void commit() {
-        transactionManager.commitTransaction();
+        var watch = new StopWatch();
+        try {
+            transactionManager.commitTransaction();
+        } finally {
+            long elapsed = watch.elapsed();
+            logger.debug("commit transaction, elapsed={}", elapsed);
+            ActionLogContext.track("db", elapsed);
+        }
     }
 
     @Override

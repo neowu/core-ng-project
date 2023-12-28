@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static core.framework.log.Markers.errorCode;
 
@@ -23,29 +24,31 @@ import static core.framework.log.Markers.errorCode;
  */
 public final class ExecutorImpl implements Executor {
     private final Logger logger = LoggerFactory.getLogger(ExecutorImpl.class);
+    private final ReentrantLock lock = new ReentrantLock();
     private final ExecutorService executor;
     private final LogManager logManager;
-    private final String name;
     private final long maxProcessTimeInNano;
     volatile ScheduledExecutorService scheduler;
 
-    public ExecutorImpl(int poolSize, String name, LogManager logManager, long maxProcessTimeInNano) {
-        this.name = name;
+    public ExecutorImpl(ExecutorService executor, LogManager logManager, long maxProcessTimeInNano) {
+        this.executor = executor;
         this.logManager = logManager;
         this.maxProcessTimeInNano = maxProcessTimeInNano;
-        this.executor = ThreadPools.cachedThreadPool(poolSize, "executor" + (name == null ? "" : "-" + name) + "-");
     }
 
     public void shutdown() {
-        logger.info("shutting down executor, name={}", name);
-        synchronized (this) {
+        logger.info("shutting down executor");
+        lock.lock();
+        try {
             if (scheduler != null) {
                 List<Runnable> canceledTasks = scheduler.shutdownNow(); // drop all delayed tasks
                 if (!canceledTasks.isEmpty()) {
-                    logger.warn(errorCode("TASK_REJECTED"), "delayed tasks are canceled due to server is shutting down, name={}, tasks={}", name, canceledTasks);
+                    logger.warn(errorCode("TASK_REJECTED"), "delayed tasks are canceled due to server is shutting down, tasks={}", canceledTasks);
                 }
             }
             executor.shutdown();
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -53,9 +56,9 @@ public final class ExecutorImpl implements Executor {
         boolean success = executor.awaitTermination(timeoutInMs, TimeUnit.MILLISECONDS);
         if (!success) {
             List<Runnable> canceledTasks = executor.shutdownNow();    // only return tasks not started yet
-            logger.warn(errorCode("FAILED_TO_STOP"), "failed to terminate executor, name={}, canceledTasks={}", name, canceledTasks);
+            logger.warn(errorCode("FAILED_TO_STOP"), "failed to terminate executor, canceledTasks={}", canceledTasks);
         } else {
-            logger.info("executor stopped, name={}", name);
+            logger.info("executor stopped");
         }
     }
 
@@ -63,21 +66,30 @@ public final class ExecutorImpl implements Executor {
     public <T> Future<T> submit(String action, Callable<T> task) {
         var now = Instant.now();
         String actionId = LogManager.ID_GENERATOR.next(now);
-        logger.debug("submit task, action={}, id={}", action, actionId);
+        logger.debug("submit task, action={}, id={}, taskClass={}", action, actionId, CallableTask.taskClass(task).getName());
         ExecutorTask<T> execution = execution(actionId, action, now, task);
         return submitTask(execution);
     }
 
     @Override
+    public Future<Void> submit(String action, Task task) {
+        // wrap task with class (rather than lambda), to preserve task class info
+        return submit(action, new CallableTask(task));
+    }
+
+    @Override
     public void submit(String action, Task task, Duration delay) {
-        synchronized (this) {
+        lock.lock();
+        try {
             if (executor.isShutdown()) {
                 logger.warn(errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action);    // with current executor impl, rejection only happens when shutdown
                 return;
             }
             if (scheduler == null) {
-                scheduler = ThreadPools.singleThreadScheduler("executor-scheduler" + (name == null ? "" : "-" + name) + "-");
+                scheduler = ThreadPools.singleThreadScheduler("executor-scheduler-");
             }
+        } finally {
+            lock.unlock();
         }
         scheduleDelayedTask(action, task, delay);
     }
@@ -88,10 +100,7 @@ public final class ExecutorImpl implements Executor {
         logger.debug("submit delayed task, action={}, id={}, delay={}", action, actionId, delay);
 
         // construct execution outside scheduler thread, to obtain parent action log
-        ExecutorTask<Void> execution = execution(actionId, action, now.plus(delay), () -> {
-            task.execute();
-            return null;
-        });
+        ExecutorTask<Void> execution = execution(actionId, action, now.plus(delay), new CallableTask(task));
         try {
             scheduler.schedule(new DelayedTask(execution), delay.toMillis(), TimeUnit.MILLISECONDS);
             return true;

@@ -44,9 +44,8 @@ public class RedisAdminImpl implements RedisAdmin {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, 1, 0);
             logger.debug("info, returnedValue={}, elapsed={}", value, elapsed);
-            redis.checkSlowOperation(elapsed);
+            ActionLogContext.track("redis", elapsed, 1, 0);
         }
     }
 

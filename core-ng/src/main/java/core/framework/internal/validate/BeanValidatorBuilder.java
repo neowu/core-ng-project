@@ -12,15 +12,11 @@ import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.reflect.Classes;
 import core.framework.internal.reflect.Fields;
 import core.framework.internal.reflect.GenericTypes;
+import core.framework.util.Strings;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
 import java.util.regex.PatternSyntaxException;
 
 import static core.framework.internal.asm.Literal.type;
@@ -41,7 +37,7 @@ public class BeanValidatorBuilder {
 
     @Nullable
     public BeanValidator build() {
-        validate(beanClass);
+        validate(beanClass, null);
         if (Classes.instanceFields(beanClass).stream().noneMatch(this::hasValidationAnnotation)) return null;
 
         builder = new DynamicInstanceBuilder<>(BeanValidator.class, beanClass.getSimpleName());
@@ -77,7 +73,7 @@ public class BeanValidatorBuilder {
                 buildMapValidation(builder, field, pathLiteral, parentPath);
             } else if (Number.class.isAssignableFrom(fieldClass)) {
                 buildNumberValidation(builder, field, pathLiteral);
-            } else if (!isValueClass(fieldClass)) {
+            } else if (beanClass(fieldClass)) {
                 String method = validateMethod(fieldClass, path(field, parentPath));
                 builder.indent(2).append("{}(bean.{}, errors, partial);\n", method, field.getName());
             }
@@ -116,7 +112,7 @@ public class BeanValidatorBuilder {
         if (GenericTypes.isList(valueType)) return; // ensured by class validator, if it's list it must be List<Value>
 
         Class<?> valueClass = GenericTypes.rawClass(valueType);
-        if (!isValueClass(valueClass)) {
+        if (beanClass(valueClass)) {
             String method = validateMethod(valueClass, path(field, parentPath));
             builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.entrySet().iterator(); iterator.hasNext(); ) {\n", field.getName())
                 .indent(3).append("java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();\n")
@@ -130,7 +126,7 @@ public class BeanValidatorBuilder {
         buildSizeValidation(builder, field, pathLiteral, "size");
 
         Class<?> valueClass = GenericTypes.listValueClass(field.getGenericType());
-        if (!isValueClass(valueClass)) {
+        if (beanClass(valueClass)) {
             String method = validateMethod(valueClass, path(field, parentPath));
             builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.iterator(); iterator.hasNext(); ) {\n", field.getName())
                 .indent(3).append("{} value = ({}) iterator.next();\n", type(valueClass), type(valueClass))
@@ -178,17 +174,18 @@ public class BeanValidatorBuilder {
         return parentPath + "." + path;
     }
 
-    private void validate(Class<?> beanClass) {
+    private void validate(Class<?> beanClass, Field parentField) {
         try {
             Object beanWithDefaultValue = beanClass.getDeclaredConstructor().newInstance();
             for (Field field : Classes.instanceFields(beanClass)) {
                 validateAnnotations(field, beanWithDefaultValue);
                 Class<?> targetClass = targetValidationClass(field);
-                if (!isValueClass(targetClass))
-                    validate(targetClass);
+                if (beanClass(targetClass))
+                    validate(targetClass, field);
             }
         } catch (ReflectiveOperationException e) {
-            throw new Error(e);
+            String path = parentField == null ? null : Fields.path(parentField);
+            throw new Error(Strings.format("failed to validate class, field={}, error={}", path, e.getMessage()), e);
         }
     }
 
@@ -203,7 +200,7 @@ public class BeanValidatorBuilder {
         if (hasAnnotation) return true;
 
         Class<?> targetClass = targetValidationClass(field);
-        if (!isValueClass(targetClass)) {
+        if (beanClass(targetClass)) {
             for (Field valueField : Classes.instanceFields(targetClass)) {
                 if (hasValidationAnnotation(valueField)) return true;
             }
@@ -264,16 +261,11 @@ public class BeanValidatorBuilder {
             throw new Error(format("@Digits must on Number, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName()));
     }
 
-    private boolean isValueClass(Class<?> fieldClass) {
-        return String.class.equals(fieldClass)
-               || Number.class.isAssignableFrom(fieldClass)
-               || Boolean.class.equals(fieldClass)
-               || LocalDateTime.class.equals(fieldClass)
-               || LocalDate.class.equals(fieldClass)
-               || LocalTime.class.equals(fieldClass)
-               || Instant.class.equals(fieldClass)
-               || ZonedDateTime.class.equals(fieldClass)
-               || fieldClass.isEnum()
-               || "org.bson.types.ObjectId".equals(fieldClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver
+    // whether to check all fields inside
+    private boolean beanClass(Class<?> fieldClass) {
+        if (fieldClass.getPackageName().startsWith("java")) return false;   // ignore all java built in class
+        if (fieldClass.isEnum()) return false;
+        if ("org.bson.types.ObjectId".equals(fieldClass.getCanonicalName())) return false; // not depends on mongo jar if application doesn't include mongo driver
+        return true;
     }
 }

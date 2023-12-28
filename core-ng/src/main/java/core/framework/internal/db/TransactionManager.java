@@ -20,7 +20,7 @@ public final class TransactionManager {
 
     private final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
     private final Pool<Connection> pool;
-    public long longTransactionThresholdInNanos = Duration.ofSeconds(10).toNanos();
+    public long longTransactionThresholdInNanos = Duration.ofSeconds(5).toNanos();
 
     TransactionManager(Pool<Connection> pool) {
         this.pool = pool;

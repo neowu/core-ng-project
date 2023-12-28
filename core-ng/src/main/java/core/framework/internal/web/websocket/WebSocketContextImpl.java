@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,17 +16,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class WebSocketContextImpl implements WebSocketContext {
     private final Logger logger = LoggerFactory.getLogger(WebSocketContextImpl.class);
-    private final Map<String, Map<String, Channel<?>>> rooms = new ConcurrentHashMap<>();
     private final Map<String, Channel<?>> channels = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, Channel<?>>> rooms = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unchecked")
     @Override
     public <V> List<Channel<V>> all() {
-        List<Channel<V>> results = new ArrayList<>(channels.size());
-        for (Channel<?> channel : channels.values()) {
-            results.add((Channel<V>) channel);
-        }
-        return results;
+        // "new ArrayList(Collection)" doesn't check null element, so it's faster than List.copyOf
+        return (List<Channel<V>>) new ArrayList<>((Collection<?>) channels.values());
     }
 
     @SuppressWarnings("unchecked")
@@ -33,11 +31,7 @@ public class WebSocketContextImpl implements WebSocketContext {
     public <V> List<Channel<V>> room(String name) {
         Map<String, Channel<?>> channels = rooms.get(name);
         if (channels == null) return List.of();
-        List<Channel<V>> results = new ArrayList<>(channels.size());
-        for (Channel<?> channel : channels.values()) {
-            results.add((Channel<V>) channel);
-        }
-        return results;
+        return (List<Channel<V>>) new ArrayList<>((Collection<?>) channels.values());
     }
 
     void join(ChannelImpl<?, ?> channel, String room) {
@@ -60,7 +54,9 @@ public class WebSocketContextImpl implements WebSocketContext {
     void remove(ChannelImpl<?, ?> channel) {
         channels.remove(channel.id);
         for (String room : channel.rooms) {
-            rooms.get(room).remove(channel.id);
+            Map<String, Channel<?>> roomChannels = rooms.get(room);
+            roomChannels.remove(channel.id);
+            if (roomChannels.isEmpty()) rooms.remove(room); // cleanup room if it has no channels
         }
     }
 }

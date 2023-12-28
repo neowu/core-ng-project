@@ -27,6 +27,11 @@ public class DiagnosticController {
         return Response.text(Diagnostic.thread());
     }
 
+    public Response virtualThread(Request request) {
+        accessControl.validate(request.clientIP());
+        return Response.text(Diagnostic.virtualThread());
+    }
+
     public Response heap(Request request) {
         accessControl.validate(request.clientIP());
         return Response.text(Diagnostic.heap());

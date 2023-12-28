@@ -4,6 +4,7 @@ import core.framework.test.module.TestModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -21,10 +22,16 @@ class SearchConfigTest {
     @Test
     void validate() {
         assertThatThrownBy(() -> config.validate())
-                .hasMessageContaining("search host must be configured");
+            .hasMessageContaining("search host must be configured");
 
         config.host("localhost");
         assertThatThrownBy(() -> config.validate())
-                .hasMessageContaining("search is configured but no type added");
+            .hasMessageContaining("search is configured but no type added");
+    }
+
+    @Test
+    void auth() {
+        config.auth("key", "secret");
+        assertThat(config.auth).isTrue();
     }
 }

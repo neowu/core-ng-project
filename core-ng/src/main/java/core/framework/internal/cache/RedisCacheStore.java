@@ -89,7 +89,7 @@ public class RedisCacheStore implements CacheStore {
     public <T> void putAll(List<Entry<T>> values, Duration expiration, CacheContext<T> context) {
         Map<String, byte[]> cacheValues = Maps.newHashMapWithExpectedSize(values.size());
         for (Entry<T> value : values) {
-            cacheValues.put(value.key, context.writer.toJSON(value.value));
+            cacheValues.put(value.key(), context.writer.toJSON(value.value()));
         }
         try {
             redis.multiSet(cacheValues, expiration);

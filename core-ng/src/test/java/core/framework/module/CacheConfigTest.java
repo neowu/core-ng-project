@@ -3,7 +3,6 @@ package core.framework.module;
 import core.framework.internal.cache.CacheImpl;
 import core.framework.internal.cache.LocalCacheStore;
 import core.framework.internal.cache.RedisCacheStore;
-import core.framework.internal.cache.RedisLocalCacheStore;
 import core.framework.internal.cache.TestCache;
 import core.framework.internal.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +31,7 @@ class CacheConfigTest {
     @Test
     void validate() {
         assertThatThrownBy(() -> config.validate())
-                .hasMessageContaining("cache is configured but no cache added");
+            .hasMessageContaining("cache is configured but no cache added");
     }
 
     @Test
@@ -40,10 +39,10 @@ class CacheConfigTest {
         config.local();
 
         assertThatThrownBy(() -> config.local())
-                .hasMessageContaining("cache store is already configured");
+            .hasMessageContaining("cache store is already configured");
 
         assertThatThrownBy(() -> config.redis("localhost"))
-                .hasMessageContaining("cache store is already configured");
+            .hasMessageContaining("cache store is already configured");
     }
 
     @Test
@@ -67,13 +66,13 @@ class CacheConfigTest {
         assertThat(cache.cacheStore).isInstanceOf(RedisCacheStore.class);
 
         cacheStoreConfig.local();
-        assertThat(cache.cacheStore).isInstanceOf(RedisLocalCacheStore.class);
+        assertThat(cache.cacheStore).isInstanceOf(LocalCacheStore.class);
     }
 
     @Test
     void cacheName() {
         assertThat(config.cacheName(TestCache.class))
-                .isEqualTo("testcache");
+            .isEqualTo("testcache");
     }
 
     @Test
@@ -84,7 +83,7 @@ class CacheConfigTest {
         assertThat(config.caches.get("testcache")).isNotNull();
 
         assertThatThrownBy(() -> config.add(TestCache.class, Duration.ofHours(1)))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("found duplicate cache name");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("found duplicate cache name");
     }
 }

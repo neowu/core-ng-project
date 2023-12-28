@@ -1,14 +1,17 @@
 package core.framework.internal.web.websocket;
 
+import core.framework.internal.log.Trace;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
 import core.framework.web.websocket.Channel;
+import io.undertow.websockets.core.CloseMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSockets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -20,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelImpl.class);
     final String id = UUID.randomUUID().toString();
+    final long startTime = System.nanoTime();
     final Set<String> rooms = Sets.newConcurrentHashSet();
     final ChannelHandler<T, V> handler;
     private final WebSocketChannel channel;
@@ -28,6 +32,9 @@ public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
     String action;
     String clientIP;
     String refId;
+    Trace trace;
+    @Nullable
+    CloseMessage closeMessage;
 
     ChannelImpl(WebSocketChannel channel, WebSocketContextImpl webSocketContext, ChannelHandler<T, V> handler) {
         this.channel = channel;
@@ -50,7 +57,7 @@ public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
             WebSockets.sendText(text, channel, ChannelCallback.INSTANCE);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("ws", elapsed, 0, 1);
+            ActionLogContext.track("ws", elapsed, 0, text.length());
             LOGGER.debug("send ws message, id={}, text={}, elapsed={}", id, text, elapsed);     // not mask, assume ws message not containing sensitive info, the text can be json or plain text
         }
     }
@@ -62,7 +69,7 @@ public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
             WebSockets.sendClose(WebSocketCloseCodes.NORMAL_CLOSURE, null, channel, ChannelCallback.INSTANCE);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("ws", elapsed, 0, 1);
+            ActionLogContext.track("ws", elapsed, 0, 1);    // close message size = 1
             LOGGER.debug("close ws channel, id={}, elapsed={}", id, elapsed);
         }
     }

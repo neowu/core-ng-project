@@ -1,7 +1,7 @@
-FROM        neowu/jre:17.0.1
+FROM        neowu/jre:21
 LABEL       app=monitor
-RUN         addgroup --system app && adduser --system --no-create-home --ingroup app app
-USER        app
+RUN         addgroup --gid 1000 --system app && adduser --system --no-create-home --ingroup app --uid 1000 app
+USER        1000
 COPY        package/dependency     /opt/app
 COPY        package/app            /opt/app
 CMD         ["/opt/app/bin/monitor"]

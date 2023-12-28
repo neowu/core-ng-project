@@ -61,21 +61,26 @@ public class ExpressionBuilder {
     }
 
     private Type returnType(Token token, Class<?> modelClass) {
-        if (token instanceof MethodToken) {
-            String methodName = ((MethodToken) token).name;
-            Type returnType = methodReturnType(modelClass, methodName);
-            if (((MethodToken) token).next != null) {
-                return returnType(((MethodToken) token).next, GenericTypes.rawClass(returnType));
+        switch (token) {
+            case MethodToken methodToken -> {
+                String methodName = methodToken.name;
+                Type returnType = methodReturnType(modelClass, methodName);
+                if (methodToken.next != null) {
+                    return returnType(methodToken.next, GenericTypes.rawClass(returnType));
+                }
+                return returnType;
             }
-            return returnType;
-        } else if (token instanceof FieldToken) {
-            Type fieldType = fieldType(modelClass, ((FieldToken) token).name);
-            if (((FieldToken) token).next != null) {
-                return returnType(((FieldToken) token).next, GenericTypes.rawClass(fieldType));
+            case FieldToken fieldToken -> {
+                Type fieldType = fieldType(modelClass, fieldToken.name);
+                if (fieldToken.next != null) {
+                    return returnType(fieldToken.next, GenericTypes.rawClass(fieldType));
+                }
+                return fieldType;
             }
-            return fieldType;
-        } else {
-            return ((ValueToken) token).type;
+            case ValueToken valueToken -> {
+                return valueToken.type;
+            }
+            default -> throw new Error("unexpected token, token=" + token);
         }
     }
 
@@ -86,7 +91,7 @@ public class ExpressionBuilder {
             return modelClass.getField(fieldName).getGenericType();
         } catch (NoSuchFieldException e) {
             throw new Error(format("can not find field, class={}, field={}, expression={}, location={}",
-                    modelClass, fieldName, expressionSource, location), e);
+                modelClass, fieldName, expressionSource, location), e);
         }
     }
 

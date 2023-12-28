@@ -34,6 +34,16 @@ class ActionLogTest {
     }
 
     @Test
+    void tooManyContextValues() {
+        for (int i = 0; i < ActionLog.MAX_CONTEXT_VALUES_SIZE + 10; i++) {
+            log.context("key", i);
+        }
+        assertThat(log.result()).isEqualTo("WARN");
+        assertThat(log.errorMessage).contains("too many context values");
+        assertThat(log.context.get("key")).hasSize(ActionLog.MAX_CONTEXT_VALUES_SIZE);
+    }
+
+    @Test
     void flushTraceLogWithTrace() {
         log.trace = Trace.CURRENT;
         assertThat(log.flushTraceLog()).isTrue();
@@ -112,23 +122,19 @@ class ActionLogTest {
 
     @Test
     void trace() {
-        String suffix = "...(soft trace limit reached)\n";
-        String trace = log.trace(200, 500);
-        assertThat(trace).hasSize(200 + suffix.length())
-            .contains("ActionLog - begin")
-            .endsWith(suffix);
+        String trace = log.trace();
+        assertThat(trace).contains("c.f.i.log.ActionLog - begin");
 
         log.process(new LogEvent("logger", null, LogLevel.WARN, "warning", null, null));
+        trace = log.trace();
+        assertThat(trace).contains("WARN logger - warning");
+    }
 
-        trace = log.trace(200, 500);
-        assertThat(trace).endsWith("warning\n");
+    @Test
+    void correlationIds() {
+        assertThat(log.correlationIds()).containsExactly(log.id);
 
-        trace = log.trace(250, 500);   // the max debug length will hit warning event
-        assertThat(trace).contains("warning")
-            .endsWith(suffix);
-
-        log.process(new LogEvent("logger", null, LogLevel.WARN, "warning2", null, null));
-        trace = log.trace(250, 320);   // truncate with hard limit
-        assertThat(trace).endsWith("...(hard trace limit reached)");
+        log.correlationIds = List.of("correlationId");
+        assertThat(log.correlationIds()).isSameAs(log.correlationIds);
     }
 }

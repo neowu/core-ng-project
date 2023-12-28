@@ -11,9 +11,6 @@ import java.util.Map;
  * @author neo
  */
 public class ActionLogMessageFactory {
-    private static final int HARD_TRACE_LIMIT = 900000; // 900K, kafka max message size is 1M, leave 100K for rest, assume majority chars is in ascii (one char = one byte)
-    private static final int SOFT_TRACE_LIMIT = 600000; // 600K assume majority chars is in ascii (one char = one byte)
-
     public ActionLogMessage create(ActionLog log) {
         var message = new ActionLogMessage();
         message.app = LogManager.APP_NAME;
@@ -21,7 +18,7 @@ public class ActionLogMessageFactory {
         message.id = log.id;
         message.date = log.date;
         message.result = log.result();
-        message.correlationIds = log.correlationIds;
+        message.correlationIds = log.correlationIds();
         message.clients = log.clients;
         message.refIds = log.refIds;
         message.elapsed = log.elapsed;
@@ -32,7 +29,7 @@ public class ActionLogMessageFactory {
         message.stats = log.stats;
         message.performanceStats = performanceStats(log.performanceStats);
         if (log.flushTraceLog()) {
-            message.traceLog = log.trace(SOFT_TRACE_LIMIT, HARD_TRACE_LIMIT);
+            message.traceLog = log.trace();
         }
         return message;
     }
@@ -41,6 +38,7 @@ public class ActionLogMessageFactory {
         Map<String, PerformanceStatMessage> messages = Maps.newHashMapWithExpectedSize(stats.size());
         for (Map.Entry<String, PerformanceStat> entry : stats.entrySet()) {
             PerformanceStat value = entry.getValue();
+            if (value.count == 0) continue;     // for IOWarnings, it may initialize warnings not used by current action (e.g. for executor task action)
             var message = new PerformanceStatMessage();
             message.count = value.count;
             message.totalElapsed = value.totalElapsed;

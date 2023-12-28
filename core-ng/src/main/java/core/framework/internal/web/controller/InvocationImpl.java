@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  * @author neo
@@ -19,12 +18,12 @@ public final class InvocationImpl implements Invocation {
     private final Logger logger = LoggerFactory.getLogger(InvocationImpl.class);
 
     private final ControllerHolder controller;
-    private final List<Interceptor> interceptors;
+    private final Interceptor[] interceptors;
     private final Request request;
     private final WebContextImpl context;
     private int currentStack;
 
-    public InvocationImpl(ControllerHolder controller, List<Interceptor> interceptors, Request request, WebContextImpl context) {
+    public InvocationImpl(ControllerHolder controller, Interceptor[] interceptors, Request request, WebContextImpl context) {
         this.controller = controller;
         this.interceptors = interceptors;
         this.request = request;
@@ -47,13 +46,13 @@ public final class InvocationImpl implements Invocation {
 
     @Override
     public Response proceed() throws Exception {
-        if (controller.skipInterceptor || currentStack >= interceptors.size()) {
+        if (controller.skipInterceptor || currentStack >= interceptors.length) {
             logger.debug("execute controller, controller={}", controller.controllerInfo);
             Response response = controller.controller.execute(request);
             if (response == null) throw new Error("controller must not return null response, controller=" + controller.controllerInfo);
             return response;
         } else {
-            Interceptor interceptor = interceptors.get(currentStack);
+            Interceptor interceptor = interceptors[currentStack];
             currentStack++;
             logger.debug("intercept, interceptorClass={}", interceptor.getClass().getCanonicalName());
             Response response = interceptor.intercept(this);

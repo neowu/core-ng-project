@@ -6,6 +6,8 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -96,6 +98,20 @@ public final class BsonReaderWrapper {      // used by generated entity decoder
         }
     }
 
+    public BigDecimal readBigDecimal(String field) {
+        BsonType currentType = reader.getCurrentBsonType();
+        if (currentType == BsonType.NULL) {
+            reader.readNull();
+            return null;
+        } else if (currentType == BsonType.DECIMAL128) {
+            return reader.readDecimal128().bigDecimalValue();
+        } else {
+            logger.warn("unexpected field type, field={}, type={}", field, currentType);
+            reader.skipValue();
+            return null;
+        }
+    }
+
     public Boolean readBoolean(String field) {
         BsonType currentType = reader.getCurrentBsonType();
         if (currentType == BsonType.NULL) {
@@ -116,6 +132,10 @@ public final class BsonReaderWrapper {      // used by generated entity decoder
 
     public ZonedDateTime readZonedDateTime(String field) {
         return ZonedDateTimeCodec.read(reader, field);
+    }
+
+    public LocalDate readLocalDate(String field) {
+        return LocalDateCodec.read(reader, field);
     }
 
     public List<?> startReadList(String field) {
@@ -148,7 +168,7 @@ public final class BsonReaderWrapper {      // used by generated entity decoder
 
     public boolean startReadEntity(String field) {
         BsonType currentType = reader.getCurrentBsonType();
-        if (currentType != null && currentType == BsonType.NULL) {
+        if (currentType == BsonType.NULL) {
             reader.readNull();
             return false;
         }

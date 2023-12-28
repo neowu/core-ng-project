@@ -96,7 +96,9 @@ public final class HTTPClientBuilder {
                 .callTimeout(callTimeout()) // call timeout is only used as last defense, timeout for complete call includes connect/retry/etc
                 .connectionPool(new ConnectionPool(100, keepAlive.toSeconds(), TimeUnit.SECONDS))
                 .eventListenerFactory(new HTTPEventListenerFactory())
-                .retryOnConnectionFailure(false);   // use RetryInterceptor to record all failures, RetryAndFollowUpInterceptor will always be added to chain by okHTTP, so it still supports followup
+                .retryOnConnectionFailure(false)    // disable all okHTTP builtin retry and followups, those should be handled on application level for traces
+                .followRedirects(false)
+                .followSslRedirects(false);
 
             configureHTTPS(builder);
 
@@ -121,14 +123,14 @@ public final class HTTPClientBuilder {
             TrustManager[] trustManagers;
             if (trustAll) {
                 trustManagers = new TrustManager[]{new DefaultTrustManager()};
+                builder.hostnameVerifier((hostname, sslSession) -> true);
             } else {
                 var trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init(trustStore);
                 trustManagers = trustManagerFactory.getTrustManagers();
             }
-            sslContext.init(keyManagers, trustManagers, null);
-            builder.hostnameVerifier((hostname, sslSession) -> true)
-                .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustManagers[0]);
+            sslContext.init(keyManagers, trustManagers, null);  // lgtm [java/insecure-trustmanager]
+            builder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustManagers[0]);
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new Error(e);
         }
@@ -196,8 +198,8 @@ public final class HTTPClientBuilder {
                 TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 factory.init((KeyStore) null);
                 for (TrustManager trustManager : factory.getTrustManagers()) {
-                    if (trustManager instanceof X509TrustManager) {
-                        for (X509Certificate issuer : ((X509TrustManager) trustManager).getAcceptedIssuers()) {
+                    if (trustManager instanceof final X509TrustManager manager) {
+                        for (X509Certificate issuer : manager.getAcceptedIssuers()) {
                             trustStore.setCertificateEntry(issuer.getSubjectX500Principal().getName(), issuer);
                         }
                     }

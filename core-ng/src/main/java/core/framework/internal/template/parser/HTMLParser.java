@@ -28,7 +28,7 @@ public class HTMLParser {
     private final Set<String> booleanAttributes = Set.of("checked", "selected", "disabled", "readonly", "multiple", "ismap", "defer", "required", "sortable", "autofocus", "allowfullscreen", "async", "hidden");
 
     private final HTMLLexer lexer;
-    private final Deque<ContainerNode> stack = new ArrayDeque<>();
+    private final Deque<ContainerNode> nodes = new ArrayDeque<>();
 
     public HTMLParser(TemplateSource source) {
         this.lexer = new HTMLLexer(source.name(), source.content());
@@ -37,7 +37,7 @@ public class HTMLParser {
     // only support subnet of HTML, which means enforce strict and consistence rules
     public Document parse() {
         Document document = new Document();
-        stack.push(document);
+        nodes.push(document);
         end:
         while (true) {
             HTMLTokenType type = lexer.nextNodeToken();
@@ -45,11 +45,11 @@ public class HTMLParser {
                 case EOF:
                     break end;
                 case TEXT:
-                    stack.peek().add(new Text(lexer.currentToken()));
+                    nodes.peek().add(new Text(lexer.currentToken()));
                     break;
                 case START_COMMENT:
                     lexer.nextEndCommentToken();
-                    stack.peek().add(new Comment(lexer.currentToken()));
+                    nodes.peek().add(new Comment(lexer.currentToken()));
                     break;
                 case START_TAG:
                     String tagName = validateTagName(lexer.currentToken().substring(1));
@@ -71,7 +71,7 @@ public class HTMLParser {
 
     private void parseElement(String tagName) {
         Element currentElement = new Element(tagName);
-        stack.peek().add(currentElement);
+        nodes.peek().add(currentElement);
 
         Attribute currentAttribute = null;
         while (true) {
@@ -87,10 +87,10 @@ public class HTMLParser {
                 }
                 case START_TAG_END -> {
                     if (currentAttribute != null) validateAttribute(currentAttribute);
-                    if (!voidElements.contains(tagName)) stack.push(currentElement);
+                    if (!voidElements.contains(tagName)) nodes.push(currentElement);
                     if ("script".equals(currentElement.name) || "style".equals(currentElement.name)) {
                         HTMLTokenType contentType = lexer.nextScriptToken(currentElement.name);
-                        if (contentType == HTMLTokenType.TEXT) stack.peek().add(new Text(lexer.currentToken()));
+                        if (contentType == HTMLTokenType.TEXT) nodes.peek().add(new Text(lexer.currentToken()));
                     }
                     return;
                 }
@@ -117,7 +117,7 @@ public class HTMLParser {
 
     private void closeTag(String tagName) {
         while (true) {
-            ContainerNode lastNode = stack.pop();
+            ContainerNode lastNode = nodes.pop();
             if (lastNode instanceof Document)
                 throw new Error(format("can not find matched tag to close, tagName={}, location={}", tagName, lexer.currentLocation()));
             Element element = (Element) lastNode;
@@ -149,17 +149,19 @@ public class HTMLParser {
             throw new Error(format("it is recommended not to put value for boolean attribute, attribute={}>{}, location={}", attribute.tagName, attribute.name, attribute.location));
 
         if ("link".equals(attribute.tagName) && "href".equals(attribute.name)
-                || "script".equals(attribute.tagName) && "src".equals(attribute.name)
-                || "img".equals(attribute.tagName) && "src".equals(attribute.name)) {
-            validateStaticResourceURL(attribute);
+            || "script".equals(attribute.tagName) && "src".equals(attribute.name)
+            || "img".equals(attribute.tagName) && "src".equals(attribute.name)) {
+            validateStaticURI(attribute);
         }
     }
 
-    private void validateStaticResourceURL(Attribute attribute) {
-        if (!attribute.value.startsWith("http://")
-                && !attribute.value.startsWith("https://")
-                && !attribute.value.startsWith("//")
-                && !Strings.startsWith(attribute.value, '/'))
-            throw new Error(format("static resource url value must be either absolute or start with '/', attribute={}>{}, value={}, location={}", attribute.tagName, attribute.name, attribute.value, attribute.location));
+    private void validateStaticURI(Attribute attribute) {
+        String value = attribute.value;
+        if (!value.startsWith("http://")
+            && !value.startsWith("https://")
+            && !value.startsWith("//")
+            && !Strings.startsWith(value, '/')
+            && !value.startsWith("data:"))
+            throw new Error(format("static uri value must be either absolute or start with '/', attribute={}>{}, value={}, location={}", attribute.tagName, attribute.name, value, attribute.location));
     }
 }

@@ -83,7 +83,7 @@ public abstract class Module {
     }
 
     public WebSocketConfig ws() {
-        return new WebSocketConfig(context);
+        return context.config(WebSocketConfig.class, null);
     }
 
     public SiteConfig site() {
@@ -96,10 +96,6 @@ public abstract class Module {
 
     public SchedulerConfig schedule() {
         return context.config(SchedulerConfig.class, null);
-    }
-
-    public ExecutorConfig executor() {
-        return context.config(ExecutorConfig.class, null);
     }
 
     public APIConfig api() {

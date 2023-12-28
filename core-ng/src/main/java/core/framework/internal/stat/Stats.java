@@ -1,5 +1,6 @@
 package core.framework.internal.stat;
 
+import core.framework.log.Severity;
 import core.framework.util.ASCII;
 
 import java.text.NumberFormat;
@@ -11,13 +12,14 @@ import java.util.Map;
  */
 public class Stats {
     public final Map<String, Double> stats = new HashMap<>(); // no need to keep insertion order, kibana will sort all keys on display
+    public Severity severity;
     public String errorCode;
     public String errorMessage;
     public Map<String, String> info;
 
     public String result() {
         if (errorCode == null) return "OK";
-        return "WARN";
+        return severity == Severity.ERROR ? "ERROR" : "WARN";   // default to warning
     }
 
     public void put(String key, double value) {

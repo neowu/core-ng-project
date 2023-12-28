@@ -11,8 +11,6 @@ import org.slf4j.spi.SLF4JServiceProvider;
  * @author neo
  */
 public class DefaultLoggerServiceProvider implements SLF4JServiceProvider {
-    private static final String REQUESTED_API_VERSION = "1.8";
-
     private ILoggerFactory loggerFactory;
     private IMarkerFactory markerFactory;
     private MDCAdapter mdcAdapter;
@@ -33,8 +31,8 @@ public class DefaultLoggerServiceProvider implements SLF4JServiceProvider {
     }
 
     @Override
-    public String getRequesteApiVersion() {
-        return REQUESTED_API_VERSION;
+    public String getRequestedApiVersion() {
+        return "2.0.99";
     }
 
     @Override

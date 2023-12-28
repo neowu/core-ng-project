@@ -8,6 +8,7 @@ import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.log.message.StatMessage;
 import core.framework.module.App;
+import core.framework.module.KafkaConfig;
 import core.framework.search.module.SearchConfig;
 import core.log.LogForwardConfig;
 import core.log.domain.ActionDocument;
@@ -19,14 +20,11 @@ import core.log.kafka.ActionLogMessageHandler;
 import core.log.kafka.EventMessageHandler;
 import core.log.kafka.StatMessageHandler;
 import core.log.service.ActionLogForwarder;
-import core.log.service.ActionService;
 import core.log.service.EventForwarder;
-import core.log.service.EventService;
 import core.log.service.IndexOption;
 import core.log.service.IndexService;
 import core.log.service.JobConfig;
 import core.log.service.KibanaService;
-import core.log.service.StatService;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -46,13 +44,10 @@ public class LogProcessorApp extends App {
 
         configureIndexOption();
         IndexService indexService = bind(IndexService.class);
-        bind(ActionService.class);
-        bind(StatService.class);
-        bind(EventService.class);
-
         onStartup(indexService::createIndexTemplates);
 
         configureKibanaService();
+
         Forwarders forwarders = configureLogForwarders();
         configureKafka(forwarders);
         configureJob();
@@ -63,10 +58,11 @@ public class LogProcessorApp extends App {
     private void configureKibanaService() {
         // explicitly use all properties in case runtime env doesn't define any, otherwise startup may fail with unused property error
         Optional<String> kibanaURL = property("app.kibana.url");
+        String apiKey = property("app.kibana.apiKey").orElse(null);
         String banner = property("app.kibana.banner").orElse("");
         kibanaURL.ifPresent(url -> {
             HTTPClient client = HTTPClient.builder().maxRetries(5).build();  // create ad hoc http client, will be recycled once done
-            onStartup(() -> new Thread(new KibanaService(url, banner, client)::importObjects, "kibana").start());
+            onStartup(() -> new Thread(new KibanaService(url, apiKey, banner, client)::importObjects, "kibana").start());
         });
     }
 
@@ -79,7 +75,7 @@ public class LogProcessorApp extends App {
 
     private void configureKafka(Forwarders forwarders) {
         kafka().uri(requiredProperty("sys.kafka.uri"));
-        kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
+        kafka().concurrency(2);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get at least 1M message
         kafka().maxPoll(2000, 3 * 1024 * 1024);     // get 3M message at max
 
@@ -91,8 +87,12 @@ public class LogProcessorApp extends App {
     private void configureSearch() {
         SearchConfig search = config(SearchConfig.class);
         search.host(requiredProperty("sys.elasticsearch.host"));
+        String apiKeyId = property("sys.elasticsearch.apiKeyId").orElse(null);
+        String apiKeySecret = property("sys.elasticsearch.apiKeySecret").orElse(null);
+        if (apiKeyId != null && apiKeySecret != null) {
+            search.auth(apiKeyId, apiKeySecret);
+        }
         search.timeout(Duration.ofSeconds(20)); // use longer timeout/slowES threshold as log indexing can be slower with large batches
-        search.slowOperationThreshold(Duration.ofSeconds(10));
         search.type(ActionDocument.class);
         search.type(TraceDocument.class);
         search.type(StatDocument.class);
@@ -117,16 +117,15 @@ public class LogProcessorApp extends App {
         if (configValue != null) {
             Bean.register(LogForwardConfig.class);
             LogForwardConfig config = Bean.fromJSON(LogForwardConfig.class, configValue);
-            kafka("forward").uri(config.kafkaURI);
-            LogForwardConfig.Forward actionConfig = config.action;
-            if (actionConfig != null) {
-                MessagePublisher<ActionLogMessage> publisher = kafka("forward").publish(ActionLogMessage.class);
-                forwarders.action = new ActionLogForwarder(publisher, actionConfig.topic, actionConfig.apps, actionConfig.ignoreErrorCodes);
+            KafkaConfig kafka = kafka("forward");
+            kafka.uri(config.kafkaURI);
+            if (config.action != null) {
+                MessagePublisher<ActionLogMessage> publisher = kafka.publish(config.action.topic, ActionLogMessage.class);
+                forwarders.action = new ActionLogForwarder(publisher, config.action);
             }
-            LogForwardConfig.Forward eventConfig = config.event;
-            if (eventConfig != null) {
-                MessagePublisher<EventMessage> publisher = kafka("forward").publish(EventMessage.class);
-                forwarders.event = new EventForwarder(publisher, eventConfig.topic, eventConfig.apps, eventConfig.ignoreErrorCodes);
+            if (config.event != null) {
+                MessagePublisher<EventMessage> publisher = kafka.publish(config.event.topic, EventMessage.class);
+                forwarders.event = new EventForwarder(publisher, config.event);
             }
         }
         return forwarders;

@@ -8,11 +8,11 @@ services:
     image: redis
     ports:
     - 6379
-  envoy:
-    image: envoyproxy/envoy-alpine:v1.15-latest
-    command: ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
-    volumes:
-    - ./envoy.yaml:/etc/envoy.yaml
-    ports:
-    - 1999:1999
-    - 8001:8001
+#  envoy:
+#    image: envoyproxy/envoy-alpine:v1.21-latest
+#    command: [ "/usr/local/bin/envoy", "-c", "/etc/envoy.yml" ]
+#    volumes:
+#    - ./envoy.yml:/etc/envoy.yml
+#    ports:
+#    - 1999:1999
+#    - 8001:8001

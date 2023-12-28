@@ -8,14 +8,20 @@ import app.monitor.job.JMXClient;
 import app.monitor.job.KafkaMonitorJob;
 import app.monitor.job.KubeClient;
 import app.monitor.job.KubeMonitorJob;
+import app.monitor.job.MongoMonitorJob;
 import app.monitor.job.RedisMonitorJob;
+import com.mongodb.ConnectionString;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import core.framework.http.HTTPClient;
+import core.framework.internal.log.LogManager;
 import core.framework.json.Bean;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.LogTopics;
 import core.framework.log.message.StatMessage;
 import core.framework.module.Module;
 import core.framework.redis.Redis;
+import core.framework.util.Strings;
 
 import java.time.Duration;
 import java.util.Map;
@@ -41,6 +47,9 @@ public class MonitorModule extends Module {
         }
         if (!config.kafka.isEmpty()) {
             configureKafkaJob(publisher, config.kafka);
+        }
+        if (!config.mongo.isEmpty()) {
+            configureMongoJob(publisher, config.mongo);
         }
         if (config.kube != null) {
             configureKubeJob(publisher, config.kube);
@@ -70,9 +79,24 @@ public class MonitorModule extends Module {
             MonitorConfig.ElasticSearchConfig esConfig = entry.getValue();
 
             var job = new ElasticSearchMonitorJob(elasticSearchClient, app, esConfig.host, publisher);
+            job.highCPUUsageThreshold = esConfig.highCPUUsageThreshold;
             job.highHeapUsageThreshold = esConfig.highHeapUsageThreshold;
             job.highDiskUsageThreshold = esConfig.highDiskUsageThreshold;
             schedule().fixedRate("monitor:es:" + app, job, Duration.ofSeconds(10));
+        }
+    }
+
+    private void configureMongoJob(MessagePublisher<StatMessage> publisher, Map<String, MonitorConfig.MongoConfig> config) {
+        for (Map.Entry<String, MonitorConfig.MongoConfig> entry : config.entrySet()) {
+            String app = entry.getKey();
+            MonitorConfig.MongoConfig mongoConfig = entry.getValue();
+
+            String connectionString = Strings.format("mongodb://{}/?socketTimeoutMS=10000&serverSelectionTimeoutMS=0&appName={}", mongoConfig.host, LogManager.APP_NAME);
+            MongoClient client = MongoClients.create(new ConnectionString(connectionString));
+
+            var job = new MongoMonitorJob(client, app, mongoConfig.host, publisher);
+            job.highDiskUsageThreshold = mongoConfig.highDiskUsageThreshold;
+            schedule().fixedRate("monitor:mongo:" + mongoConfig.host, job, Duration.ofSeconds(30));
         }
     }
 

@@ -1,6 +1,9 @@
 package core.framework.internal.json;
 
+import com.fasterxml.jackson.core.StreamReadFeature;
+import com.fasterxml.jackson.core.StreamWriteFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
@@ -33,7 +36,7 @@ import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
  * @author neo
  */
 public class JSONMapper {
-    public static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
+    public static final ObjectMapper OBJECT_MAPPER = builder().build();
     private static Map<Class<?>, JSONReader<?>> readers = new HashMap<>();
     private static Map<Class<?>, JSONWriter<?>> writers = new HashMap<>();
 
@@ -54,20 +57,25 @@ public class JSONMapper {
         writers = null;
     }
 
-    private static ObjectMapper createObjectMapper() {
+    // expose builder, to allow app build its own JSON mapper to parse external json, e.g. can be less strict
+    public static JsonMapper.Builder builder() {
         return JsonMapper.builder()
-                .addModule(timeModule())
-                // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
-                .addModule(new AfterburnerModule().setUseValueClassLoader(false))
-                .defaultDateFormat(new StdDateFormat())
-                // only auto detect field, and default visibility is public_only, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
-                .visibility(new VisibilityChecker.Std(NONE, NONE, NONE, NONE, PUBLIC_ONLY))
-                .enable(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS)
-                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .annotationIntrospector(new JSONAnnotationIntrospector())
-                .deactivateDefaultTyping()
-                .build();
+            .addModule(timeModule())
+            .defaultDateFormat(new StdDateFormat())
+            // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
+            .addModule(new AfterburnerModule().setUseValueClassLoader(false))
+            // only detect public fields, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
+            .visibility(new VisibilityChecker.Std(NONE, NONE, NONE, NONE, PUBLIC_ONLY))
+            .enable(StreamReadFeature.USE_FAST_DOUBLE_PARSER)
+            .enable(StreamReadFeature.USE_FAST_BIG_NUMBER_PARSER)
+            .enable(StreamWriteFeature.USE_FAST_DOUBLE_WRITER)
+            .enable(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS)
+            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            // e.g. disable convert empty string to Integer null
+            .disable(MapperFeature.ALLOW_COERCION_OF_SCALARS)
+            .annotationIntrospector(new JSONAnnotationIntrospector())
+            .deactivateDefaultTyping();
     }
 
     private static JavaTimeModule timeModule() {
@@ -75,26 +83,26 @@ public class JSONMapper {
 
         // redefine date time formatter to output nano seconds in at least 3 digits, which inline with ISO standard and ES standard
         DateTimeFormatter localTimeFormatter = new DateTimeFormatterBuilder()
-                .parseStrict()
-                .appendValue(HOUR_OF_DAY, 2)
-                .appendLiteral(':')
-                .appendValue(MINUTE_OF_HOUR, 2)
-                .appendLiteral(':')
-                .appendValue(SECOND_OF_MINUTE, 2)
-                .appendFraction(NANO_OF_SECOND, 3, 9, true) // always output 3 digits of nano seconds (iso date format doesn't specify how many digits it should present, here always keep 3)
-                .toFormatter();
+            .parseStrict()
+            .appendValue(HOUR_OF_DAY, 2)
+            .appendLiteral(':')
+            .appendValue(MINUTE_OF_HOUR, 2)
+            .appendLiteral(':')
+            .appendValue(SECOND_OF_MINUTE, 2)
+            .appendFraction(NANO_OF_SECOND, 3, 9, true) // always output 3 digits of nano seconds (iso date format doesn't specify how many digits it should present, here always keep 3)
+            .toFormatter();
 
         module.addSerializer(ZonedDateTime.class, new ZonedDateTimeSerializer(ISO_INSTANT));
         module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(new DateTimeFormatterBuilder()
-                .parseStrict()
-                .append(ISO_LOCAL_DATE)
-                .appendLiteral('T')
-                .append(localTimeFormatter)
-                .toFormatter()));
+            .parseStrict()
+            .append(ISO_LOCAL_DATE)
+            .appendLiteral('T')
+            .append(localTimeFormatter)
+            .toFormatter()));
         module.addSerializer(LocalTime.class, new LocalTimeSerializer(new DateTimeFormatterBuilder()
-                .parseStrict()
-                .append(localTimeFormatter)
-                .toFormatter()));
+            .parseStrict()
+            .append(localTimeFormatter)
+            .toFormatter()));
         return module;
     }
 }

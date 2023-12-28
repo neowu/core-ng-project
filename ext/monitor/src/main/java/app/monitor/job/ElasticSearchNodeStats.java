@@ -8,6 +8,9 @@ import java.util.Map;
  * @author neo
  */
 public class ElasticSearchNodeStats {
+    @Property(name = "_nodes")
+    public NodeStats stats;
+
     @Property(name = "nodes")
     public Map<String, Node> nodes;
 
@@ -20,6 +23,8 @@ public class ElasticSearchNodeStats {
         public JVM jvm;
         @Property(name = "fs")
         public FS fs;
+        @Property(name = "os")
+        public OS os;
     }
 
     public static class Indices {
@@ -73,5 +78,24 @@ public class ElasticSearchNodeStats {
         public Long totalInBytes;
         @Property(name = "free_in_bytes")
         public Long freeInBytes;
+    }
+
+    public static class OS {
+        @Property(name = "cpu")
+        public CPU cpu;
+    }
+
+    public static class CPU {
+        @Property(name = "percent")
+        public Integer percent;
+    }
+
+    public static class NodeStats {
+        @Property(name = "total")
+        public Integer total;
+        @Property(name = "successful")
+        public Integer successful;
+        @Property(name = "failed")
+        public Integer failed;
     }
 }

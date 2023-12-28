@@ -108,10 +108,6 @@ class RedisConnection implements AutoCloseable {
         return (Object[]) Protocol.read(inputStream);
     }
 
-    Object read() throws IOException {
-        return Protocol.read(inputStream);
-    }
-
     Object[] readAll(int size) throws IOException {
         RedisException exception = null;
         Object[] results = new Object[size];

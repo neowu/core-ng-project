@@ -25,7 +25,6 @@ final class ModelClassValidator implements ClassVisitor {
         validator.allowedValueClasses = Set.of(String.class, Boolean.class,
             Integer.class, Long.class, Double.class, BigDecimal.class,
             LocalDate.class, LocalDateTime.class, ZonedDateTime.class);
-        validator.allowChild = true;
         validator.visitor = this;
     }
 

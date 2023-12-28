@@ -28,7 +28,7 @@ class ExecutorImplTest {
     @BeforeEach
     void createExecutorImpl() {
         logManager = new LogManager();
-        executor = new ExecutorImpl(1, "test", logManager, 30_000_000_000L);
+        executor = new ExecutorImpl(ThreadPools.virtualThreadExecutor("test-"), logManager, 30_000_000_000L);
     }
 
     @AfterEach

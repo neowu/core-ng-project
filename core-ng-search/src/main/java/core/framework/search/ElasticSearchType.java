@@ -45,14 +45,26 @@ public interface ElasticSearchType<T> {
         bulkIndex(request);
     }
 
-    void update(UpdateRequest<T> request);
+    // with script update, unless script assigns current op with 'noop', result is always updated, e.g. ctx.op = 'noop'
+    boolean update(UpdateRequest request);
 
-    default void update(String id, String script, @Nullable Map<String, Object> params) {
-        var request = new UpdateRequest<T>();
+    default boolean update(String id, String script, @Nullable Map<String, Object> params) {
+        var request = new UpdateRequest();
         request.id = id;
         request.script = script;
         request.params = params;
-        update(request);
+        request.retryOnConflict = 5;
+        return update(request);
+    }
+
+    boolean partialUpdate(PartialUpdateRequest<T> request);
+
+    default boolean partialUpdate(String id, T source) {
+        var request = new PartialUpdateRequest<T>();
+        request.id = id;
+        request.source = source;
+        request.retryOnConflict = 5;
+        return partialUpdate(request);
     }
 
     boolean delete(DeleteRequest request);
@@ -70,6 +82,8 @@ public interface ElasticSearchType<T> {
         request.ids = ids;
         bulkDelete(request);
     }
+
+    long deleteByQuery(DeleteByQueryRequest request);
 
     List<String> analyze(AnalyzeRequest request);   // can be used to test customized analyzer
 

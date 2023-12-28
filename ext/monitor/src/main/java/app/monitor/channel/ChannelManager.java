@@ -1,8 +1,11 @@
 package app.monitor.channel;
 
 import app.monitor.alert.Alert;
+import core.framework.util.Strings;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -16,19 +19,33 @@ public class ChannelManager {
         this.defaultChannelType = defaultChannelType;
     }
 
-    // channelURI is type://id, or id with default channel
     public void notify(String channelURI, Alert alert, int alertCountSinceLastSent) {
-        String[] values = parseChannelURI(channelURI);
-        String type = values[0];
-        String id = values[1];
-        Channel channel = channels.get(type == null ? defaultChannelType : type);
+        ChannelURI uri = parseChannelURI(channelURI);
+        Channel channel = channels.get(uri.type == null ? defaultChannelType : uri.type);
         if (channel == null) throw new Error("channel not found, channelURI=" + channelURI);
-        channel.notify(id, alert, alertCountSinceLastSent);
+        channel.notify(uri.id, uri.params, alert, alertCountSinceLastSent);
     }
 
-    String[] parseChannelURI(String channelURI) {
-        final int index = channelURI.indexOf("://");
-        if (index < 0) return new String[]{null, channelURI};
-        return new String[]{channelURI.substring(0, index), channelURI.substring(index + 3)};
+    // channelURI is type://id?key=value&key=value, or id with default channel
+    ChannelURI parseChannelURI(String channelURI) {
+        var uri = new ChannelURI();
+        final int protocolIndex = channelURI.indexOf("://");
+        if (protocolIndex < 0) {
+            uri.id = channelURI;
+            return uri;
+        }
+        int paramsIndex = channelURI.indexOf('?');
+        if (paramsIndex < 0) {
+            uri.type = channelURI.substring(0, protocolIndex);
+            uri.id = channelURI.substring(protocolIndex + 3);
+            return uri;
+        }
+        uri.type = channelURI.substring(0, protocolIndex);
+        uri.id = channelURI.substring(protocolIndex + 3, paramsIndex);
+        String parameters = channelURI.substring(paramsIndex + 1);
+        uri.params = Arrays.stream(Strings.split(parameters, '&'))
+            .map(entry -> Strings.split(entry, '='))
+            .collect(Collectors.toMap(entry -> entry[0], entry -> entry[1]));
+        return uri;
     }
 }

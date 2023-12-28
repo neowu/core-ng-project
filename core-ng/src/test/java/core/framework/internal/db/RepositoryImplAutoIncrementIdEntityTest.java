@@ -34,7 +34,7 @@ class RepositoryImplAutoIncrementIdEntityTest {
     void createDatabase() {
         database = new DatabaseImpl("db");
         database.url("jdbc:hsqldb:mem:mysql;sql.syntax_mys=true");
-        database.execute("CREATE TABLE auto_increment_id_entity (id INT AUTO_INCREMENT PRIMARY KEY, string_field VARCHAR(20), double_field DOUBLE, enum_field VARCHAR(10), date_time_field TIMESTAMP, zoned_date_time_field TIMESTAMP)");
+        database.execute("CREATE TABLE auto_increment_id_entity (id INT AUTO_INCREMENT PRIMARY KEY, string_field VARCHAR(20), double_field DOUBLE, enum_field VARCHAR(10), date_time_field DATETIME, zoned_date_time_field TIMESTAMP)");
         repository = database.repository(AutoIncrementIdEntity.class);
     }
 
@@ -120,15 +120,7 @@ class RepositoryImplAutoIncrementIdEntityTest {
     @Test
     void selectWithLimit() {
         Query<AutoIncrementIdEntity> query = repository.select();
-        query.limit(0);
-        assertThat(query.fetch()).isEmpty();
-        assertThat(query.fetchOne()).isEmpty();
-
-        query.limit(1000);
-        assertThat(query.fetch()).isEmpty();
-
-        query.where("string_field = ?", "value");
-        assertThat(query.fetch()).isEmpty();
+        assertThatThrownBy(() -> query.limit(0)).isInstanceOf(Error.class).hasMessageContaining("limit must be greater than 0");
     }
 
     @Test

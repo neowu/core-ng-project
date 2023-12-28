@@ -63,10 +63,6 @@ public class RedisConfig extends Config {
         ((RedisImpl) redis).pool.size(minSize, maxSize);
     }
 
-    public void slowOperationThreshold(Duration threshold) {
-        ((RedisImpl) redis).slowOperationThreshold(threshold);
-    }
-
     public void timeout(Duration timeout) {
         ((RedisImpl) redis).timeout(timeout);
     }

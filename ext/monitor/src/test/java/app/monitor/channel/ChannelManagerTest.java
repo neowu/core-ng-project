@@ -10,6 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -17,29 +19,41 @@ import static org.mockito.Mockito.verify;
  */
 @ExtendWith(MockitoExtension.class)
 class ChannelManagerTest {
+    @Mock
+    Channel slackChannel;
+    @Mock
+    Channel pagerChannel;
     private ChannelManager channelManager;
-    @Mock
-    private Channel slackChannel;
-    @Mock
-    private Channel pagerChannel;
 
     @BeforeEach
     void createChannelManager() {
-        channelManager = new ChannelManager(Map.of("slack", slackChannel, "pager", pagerChannel), "slack");
+        channelManager = new ChannelManager(Map.of("slack", slackChannel, "pagerduty", pagerChannel), "slack");
     }
 
     @Test
     void parseChannelURI() {
-        assertThat(channelManager.parseChannelURI("slack://channelId")).isEqualTo(new String[]{"slack", "channelId"});
-        assertThat(channelManager.parseChannelURI("channelId")).isEqualTo(new String[]{null, "channelId"});
+        ChannelURI uri = channelManager.parseChannelURI("slack://channelId");
+        assertThat(uri.type).isEqualTo("slack");
+        assertThat(uri.id).isEqualTo("channelId");
+        assertThat(uri.params).isNotNull();
+
+        uri = channelManager.parseChannelURI("channelId");
+        assertThat(uri.type).isNull();
+        assertThat(uri.id).isEqualTo("channelId");
+        assertThat(uri.params).isNotNull();
+
+        uri = channelManager.parseChannelURI("pagerduty://serviceId?priorityId=mockPriorityId&escalationPolicyId=mockEscalationPolicyId");
+        assertThat(uri.type).isEqualTo("pagerduty");
+        assertThat(uri.id).isEqualTo("serviceId");
+        assertThat(uri.params).containsEntry("priorityId", "mockPriorityId").containsEntry("escalationPolicyId", "mockEscalationPolicyId");
     }
 
     @Test
     void notifyWithPagerChannel() {
         var alert = new Alert();
-        channelManager.notify("pager://channelId", alert, 1);
+        channelManager.notify("pagerduty://serviceId", alert, 1);
 
-        verify(pagerChannel).notify("channelId", alert, 1);
+        verify(pagerChannel).notify(eq("serviceId"), anyMap(), eq(alert), eq(1));
     }
 
     @Test
@@ -47,6 +61,6 @@ class ChannelManagerTest {
         var alert = new Alert();
         channelManager.notify("channelId", alert, 1);
 
-        verify(slackChannel).notify("channelId", alert, 1);
+        verify(slackChannel).notify(eq("channelId"), anyMap(), eq(alert), eq(1));
     }
 }

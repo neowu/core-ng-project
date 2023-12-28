@@ -18,7 +18,6 @@ import io.undertow.websockets.core.WebSockets;
 import io.undertow.websockets.core.protocol.Handshake;
 import io.undertow.websockets.core.protocol.version13.Hybi13Handshake;
 import io.undertow.websockets.spi.AsyncWebSocketHttpServerExchange;
-import org.xnio.IoUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,22 +32,21 @@ public class WebSocketHandler {
     static final String CHANNEL_KEY = "CHANNEL";
     public final WebSocketContextImpl context = new WebSocketContextImpl();
 
+    // passes to AsyncWebSocketHttpServerExchange as peerConnections, channel will remove self on close
+    // refer to io.undertow.websockets.core.WebSocketChannel.WebSocketChannel
+    final Set<WebSocketChannel> channels = Sets.newConcurrentHashSet();
+
     private final Handshake handshake = new Hybi13Handshake();
     private final Map<String, ChannelHandler<?, ?>> handlers = new HashMap<>();
 
-    // passes to AsyncWebSocketHttpServerExchange as peerConnections, channel will remove self on close
-    // refer to io.undertow.websockets.core.WebSocketChannel.WebSocketChannel
-    private final Set<WebSocketChannel> channels = Sets.newConcurrentHashSet();
-    private final ChannelCloseListener channelCloseListener = new ChannelCloseListener(context);
-
-    private final WebSocketMessageListener messageListener;
+    private final WebSocketListener listener;
     private final SessionManager sessionManager;
     private final LogManager logManager;
 
     public WebSocketHandler(LogManager logManager, SessionManager sessionManager, RateControl rateControl) {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
-        messageListener = new WebSocketMessageListener(logManager, rateControl);
+        listener = new WebSocketListener(logManager, context, rateControl);
     }
 
     public boolean checkWebSocket(HTTPMethod method, HeaderMap headers) {
@@ -75,26 +73,31 @@ public class WebSocketHandler {
         var webSocketExchange = new AsyncWebSocketHttpServerExchange(exchange, channels);
         exchange.upgradeChannel((connection, httpServerExchange) -> {
             WebSocketChannel channel = handshake.createChannel(webSocketExchange, connection, webSocketExchange.getBufferPool());
+            // not set idle timeout for channel, e.g. channel.setIdleTimeout(timeout);
+            // in cloud env, timeout is set on LB (azure AG, or gcloud LB), usually use 300s timeout
             try {
                 var wrapper = new ChannelImpl<>(channel, context, handler);
                 wrapper.action = action;
                 wrapper.clientIP = request.clientIP();
                 wrapper.refId = actionLog.id;   // with ws, correlationId and refId are same as parent http action id
+                wrapper.trace = actionLog.trace;
                 actionLog.context("channel", wrapper.id);
+
                 channel.setAttribute(CHANNEL_KEY, wrapper);
-                channel.addCloseTask(channelCloseListener);
+                channel.addCloseTask(listener.closeListener);
                 context.add(wrapper);
 
-                handler.listener.onConnect(request, wrapper);
-                actionLog.context("room", wrapper.rooms.toArray()); // may join room onConnect
-                channel.getReceiveSetter().set(messageListener);
+                channel.getReceiveSetter().set(listener);
                 channel.resumeReceives();
 
                 channels.add(channel);
+
+                handler.listener.onConnect(request, wrapper);
+                actionLog.context("room", wrapper.rooms.toArray()); // may join room onConnect
             } catch (Throwable e) {
                 // upgrade is handled by io.undertow.server.protocol.http.HttpReadListener.exchangeComplete, and it catches all exceptions during onConnect
                 logManager.logError(e);
-                IoUtils.safeClose(connection);
+                WebSockets.sendClose(WebSocketCloseCodes.closeCode(e), e.getMessage(), channel, ChannelCallback.INSTANCE);
             }
         });
         handshake.handshake(webSocketExchange);

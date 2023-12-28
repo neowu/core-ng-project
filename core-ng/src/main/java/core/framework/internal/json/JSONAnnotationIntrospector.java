@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.introspect.Annotated;
 import core.framework.api.json.IgnoreNull;
 import core.framework.api.json.Property;
 
+import java.io.Serial;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.Map;
  * @author neo
  */
 public class JSONAnnotationIntrospector extends AnnotationIntrospector {
+    @Serial
     private static final long serialVersionUID = 3638140740110527623L;
 
     @Override

@@ -1,6 +1,7 @@
 package core.framework.internal.stat;
 
 import com.sun.management.OperatingSystemMXBean;
+import core.framework.internal.async.VirtualThread;
 import core.framework.util.Files;
 import core.framework.util.Lists;
 import org.slf4j.Logger;
@@ -27,7 +28,6 @@ public class StatCollector {
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
     private final List<GCStat> gcStats = new ArrayList<>(2);
-    private final CPUStat cpuStat = new CPUStat(os);
     private final boolean supportMemoryTracking;
     private final Path procPath = Path.of("/proc/self/statm");
 
@@ -47,6 +47,7 @@ public class StatCollector {
     public void collectJVMUsage(Stats stats) {
         collectCPUUsage(stats);
         stats.put("thread_count", thread.getThreadCount());
+        stats.put("virtual_thread_count", VirtualThread.COUNT.max());
         collectHeapUsage(stats);
 
         for (GCStat gcStat : gcStats) {
@@ -107,11 +108,15 @@ public class StatCollector {
     private void collectCPUUsage(Stats stats) {
         stats.put("sys_load_avg", os.getSystemLoadAverage());   // until java 15, OperatingSystemMXBean returns host level load and cpu usage, not container level
 
-        double usage = cpuStat.usage();
+        // since java 17, JVM is aware of container
+        // use "java -XshowSettings:system -version" to show container info
+        // refer to com.sun.management.internal.OperatingSystemImpl.ContainerCpuTicks.getContainerCpuLoad
+        double usage = os.getProcessCpuLoad();
         stats.put("cpu_usage", usage);
         boolean highUsage = stats.checkHighUsage(usage, highCPUUsageThreshold, "cpu");
         if (highUsage) {
             stats.info("thread_dump", Diagnostic.thread());
+            stats.info("virtual_thread_dump", Diagnostic.virtualThread());
         }
     }
 }

@@ -27,10 +27,6 @@ public class TestRedisConfig extends RedisConfig {
     }
 
     @Override
-    public void slowOperationThreshold(Duration threshold) {
-    }
-
-    @Override
     public void timeout(Duration timeout) {
     }
 }

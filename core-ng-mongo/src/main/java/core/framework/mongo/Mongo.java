@@ -15,7 +15,11 @@ public interface Mongo {
     // refer to com.mongodb.client.model.Indexes for building keys
     void createIndex(String collection, Bson keys, IndexOptions options);
 
+    void dropIndex(String collection, Bson keys);
+
     void dropCollection(String collection);
 
     Document runCommand(Bson command);
+
+    Document runAdminCommand(Bson command);
 }

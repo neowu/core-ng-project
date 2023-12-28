@@ -14,9 +14,9 @@ class SQLParams implements LogParam {
     private static final Logger LOGGER = LoggerFactory.getLogger(SQLParams.class);
 
     static String value(Object param, EnumDBMapper mapper) {
-        if (param instanceof Enum) {
+        if (param instanceof Enum<?> value) {
             try {
-                return mapper.getDBValue((Enum<?>) param);
+                return mapper.getDBValue(value);
             } catch (Throwable e) {
                 LOGGER.warn("failed to get db enum value, error={}", e.getMessage(), e);
                 return String.valueOf(param);

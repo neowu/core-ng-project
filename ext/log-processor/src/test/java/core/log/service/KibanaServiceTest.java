@@ -24,13 +24,13 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class KibanaServiceTest {
-    private KibanaService service;
     @Mock
-    private HTTPClient httpClient;
+    HTTPClient httpClient;
+    private KibanaService service;
 
     @BeforeEach
     void createKibanaService() {
-        service = new KibanaService("http://kibana:5601", "banner", httpClient);
+        service = new KibanaService("http://kibana:5601", null, "banner", httpClient);
     }
 
     @Test
@@ -54,7 +54,7 @@ class KibanaServiceTest {
     @Test
     void failedToImportObjects() {
         when(httpClient.execute(any(HTTPRequest.class)))
-                .thenReturn(new HTTPResponse(400, Map.of(), new byte[0]));
+            .thenReturn(new HTTPResponse(400, Map.of(), new byte[0]));
 
         service.importObjects();
     }

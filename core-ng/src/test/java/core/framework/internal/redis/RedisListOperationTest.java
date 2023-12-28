@@ -30,11 +30,11 @@ class RedisListOperationTest extends AbstractRedisOperationTest {
 
     @Test
     void popSingleElement() {
-        response("$5\r\nitem1\r\n");
+        response("*1\r\n$5\r\nitem1\r\n");
         String item = redis.list().pop("key");
 
         assertThat(item).isEqualTo("item1");
-        assertRequestEquals("*2\r\n$4\r\nLPOP\r\n$3\r\nkey\r\n");
+        assertRequestEquals("*3\r\n$4\r\nLPOP\r\n$3\r\nkey\r\n$1\r\n1\r\n");
     }
 
     @Test

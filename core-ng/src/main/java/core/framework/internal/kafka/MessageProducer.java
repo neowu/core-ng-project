@@ -43,6 +43,7 @@ public class MessageProducer {
         producer.send(record, new KafkaCallback(record));
     }
 
+    @SuppressWarnings("deprecation")
     Producer<byte[], byte[]> createProducer(KafkaURI uri) {
         var watch = new StopWatch();
         try {
@@ -53,7 +54,8 @@ public class MessageProducer {
                 ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                            // longer backoff to reduce cpu usage when kafka is not available
                 ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L,                      // 5s
                 ProducerConfig.MAX_BLOCK_MS_CONFIG, 30_000L,                                 // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
-                ProducerConfig.MAX_REQUEST_SIZE_CONFIG, maxRequestSize);
+                ProducerConfig.MAX_REQUEST_SIZE_CONFIG, maxRequestSize,
+                ProducerConfig.AUTO_INCLUDE_JMX_REPORTER_CONFIG, Boolean.FALSE);
 
             var serializer = new ByteArraySerializer();
             var producer = new KafkaProducer<>(config, serializer, serializer);
@@ -84,11 +86,11 @@ public class MessageProducer {
         public void onCompletion(RecordMetadata metadata, Exception exception) {
             if (exception != null) {    // if failed to send message (kafka is down), fallback to error output
                 byte[] key = record.key();
-                LOGGER.error("failed to send kafka message, topic={}, key={}, value={}, error={}",
+                LOGGER.error("failed to send kafka message, error={}, topic={}, key={}, value={}",
+                    exception.getMessage(),
                     record.topic(),
                     key == null ? null : new String(key, UTF_8),
                     new String(record.value(), UTF_8),
-                    exception.getMessage(),
                     exception);
             }
         }

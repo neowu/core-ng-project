@@ -44,10 +44,11 @@ public class ResponseHandler {
         putHeaders(response, exchange);
         putCookies(response, exchange);
 
-        response.body.send(exchange.getResponseSender(), context);
-        long bytesSent = exchange.getResponseBytesSent();
-        logger.debug("[response] bodyLength={}", bytesSent);    // with gzip bodyLength can be smaller than actual body content length
-        actionLog.stats.put("response_body_length", (double) bytesSent);
+        long bodyLength = response.body.send(exchange.getResponseSender(), context);
+        // due to exchange.sender is async, exchange.getResponseBytesSent() won't return accurate body length at this point,
+        // use actual body bytes size prior to gzip, to match http client perf_http stats
+        logger.debug("[response] bodyLength={}", bodyLength);
+        actionLog.stats.put("response_body_length", (double) bodyLength);
     }
 
     private void putHeaders(ResponseImpl response, HttpServerExchange exchange) {

@@ -8,7 +8,7 @@ import core.framework.web.exception.BadRequestException;
  */
 public class ClientIPParser {
     // for common scenarios, e.g. Google LB(appends 2 ips)->kube service, AWS->nginx->webapp,
-    // for google lb, it appends <immediate client IP>, <global forwarding rule external IP>, refer to https://cloud.google.com/compute/docs/load-balancing/http/ (target proxies section)
+    // for google lb, it appends <immediate client IP>, <global forwarding rule external IP>, refer to https://cloud.google.com/load-balancing/docs/https#target-proxies
     public int maxForwardedIPs = 2;
 
     String parse(String remoteAddress, String xForwardedFor) {
@@ -46,6 +46,17 @@ public class ClientIPParser {
         return extractIP(node);
     }
 
+    // could be x-forwarded-for spoofing or pass thru http forward proxies
+    boolean hasMoreThanMaxForwardedIPs(String xForwardedFor) {
+        if (xForwardedFor == null) return false;    // maxForwardedIPs must greater than 0
+        int foundIPs = 1;
+        int length = xForwardedFor.length();
+        for (int i = 0; i < length; i++) {
+            if (xForwardedFor.charAt(i) == ',') foundIPs++;
+        }
+        return foundIPs > maxForwardedIPs;
+    }
+
     // check loosely to avoid unnecessary overhead, especially x-forwarded-for is extracted from right to left, where values are from trusted LB
     // ipv4 must have 3 dots and 1 optional colon, with hex chars
     // ipv6 must have only colons with hex chars
@@ -69,7 +80,7 @@ public class ClientIPParser {
         }
         if (dots == 0) return node; // should be ipv6 format
         if (dots == 3 && (colons == 0
-                || colons == 1 && lastColonIndex > lastDotIndex && lastColonIndex < length - 1)) {
+                          || colons == 1 && lastColonIndex > lastDotIndex && lastColonIndex < length - 1)) {
             if (lastColonIndex > 0) return node.substring(0, lastColonIndex);   // should be ipv4:port
             return node;    // should be ipv4
         }

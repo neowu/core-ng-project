@@ -1,33 +1,31 @@
 package core.framework.internal.web;
 
+import core.framework.internal.stat.Counter;
 import io.undertow.server.ExchangeCompletionListener;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.StatusCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * @author neo
  */
 public class ShutdownHandler implements ExchangeCompletionListener {
-    final AtomicInteger activeRequests = new AtomicInteger(0);
+    final Counter activeRequests = new Counter();
 
     private final Logger logger = LoggerFactory.getLogger(ShutdownHandler.class);
     private final Object lock = new Object();
-    private final AtomicInteger maxActiveRequests = new AtomicInteger(0);
     private volatile boolean shutdown;
 
     boolean handle(HttpServerExchange exchange) {
-        int current = activeRequests.incrementAndGet();
-        maxActiveRequests.getAndAccumulate(current, Math::max);     // only increase active request triggers max active request process, doesn't need to handle when active requests decrease
+        activeRequests.increase();
         exchange.addExchangeCompleteListener(this);
 
         if (shutdown) {
             logger.warn("reject request due to server is shutting down, requestURL={}", exchange.getRequestURL());
             // ask client not set keep alive for current connection, with persistent=false, undertow will send header "connection: close",
             // this does no effect with http/2.0, only for http/1.1
+            // refer to io.undertow.server.protocol.http.HttpTransferEncoding.createSinkConduit
             exchange.setPersistent(false);
             exchange.setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
             exchange.endExchange();
@@ -35,11 +33,6 @@ public class ShutdownHandler implements ExchangeCompletionListener {
         }
 
         return false;
-    }
-
-    // return max/peak active requests since last call, and reset max with current value
-    int maxActiveRequests() {
-        return maxActiveRequests.getAndSet(activeRequests.get());
     }
 
     void shutdown() {
@@ -63,7 +56,7 @@ public class ShutdownHandler implements ExchangeCompletionListener {
     @Override
     public void exchangeEvent(HttpServerExchange exchange, NextListener next) {
         try {
-            int count = activeRequests.decrementAndGet();
+            int count = activeRequests.decrease();
             if (count <= 0 && shutdown) {
                 synchronized (lock) {
                     lock.notifyAll();

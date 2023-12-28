@@ -137,10 +137,8 @@ public class WebServiceInterfaceValidator {
     }
 
     private void validatePathParamType(Type paramType, Method method) {
-        if (!(paramType instanceof Class))
+        if (!(paramType instanceof Class<?> paramClass))
             throw new Error(format("path param must be class type, type={}, method={}", paramType.getTypeName(), Methods.path(method)));
-
-        Class<?> paramClass = (Class<?>) paramType;
 
         if (paramClass.isPrimitive())
             throw new Error(format("primitive class is not supported, please use object class, paramClass={}, method={}", paramClass, Methods.path(method)));
@@ -158,9 +156,9 @@ public class WebServiceInterfaceValidator {
     void validateResponseBeanType(Type beanType, Method method) {
         if (void.class == beanType) return;
 
-        // due to it's common to return wrong type as response, this is to make error message more friendly
+        // due to it is common to return wrong type as response, this is to make error message more friendly
         boolean isGenericButNotOptional = beanType instanceof ParameterizedType && !GenericTypes.isGenericOptional(beanType);
-        boolean isValueType = beanType instanceof Class && isValueType((Class<?>) beanType);
+        boolean isValueType = beanType instanceof Class<?> classType && isValueType(classType);
         if (isGenericButNotOptional || isValueType)
             throw new Error(format("response bean type must be bean class or Optional<T>, type={}, method={}", beanType.getTypeName(), Methods.path(method)));
 

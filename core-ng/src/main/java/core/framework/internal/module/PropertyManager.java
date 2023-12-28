@@ -19,14 +19,14 @@ public class PropertyManager {
         if (!properties.containsKey(key)) return Optional.empty();   // if the key is not defined in property file, do not check env, make env more deterministic, e.g. env may define property not in property files, which make integration-test inconsistent with runtime
 
         String envVarName = envVarName(key);
-        // use env var to override property, e.g. under docker/kubenetes, SYS_HTTP_PORT to override sys.http.port
+        // use env var to override property, e.g. under docker/kubenetes, SYS_HTTP_LISTEN to override sys.http.listen
         // in kube env, ConfigMap can be bound as env variables
         String value = System.getenv(envVarName);
         if (!Strings.isBlank(value)) {
             logger.info("found overridden property by env var {}, key={}, value={}", envVarName, key, maskValue(key, value));
             return Optional.of(value);
         }
-        value = System.getProperty(key);     // use system property to override property, e.g. -Dsys.http.port=8080
+        value = System.getProperty(key);     // use system property to override property, e.g. -Dsys.http.listen=8080
         if (!Strings.isBlank(value)) {
             logger.info("found overridden property by system property -D{}, key={}, value={}", key, key, maskValue(key, value));
             return Optional.of(value);

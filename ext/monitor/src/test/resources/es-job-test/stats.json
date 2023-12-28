@@ -1,4 +1,5 @@
 {
+  "_nodes": {"total": 1, "successful": 1, "failed": 0},
   "nodes": {
     "lwOM4R6MQTOinxEVW1antA": {
       "name": "es-0",
@@ -56,6 +57,9 @@
           "free_in_bytes": 89146642432,
           "available_in_bytes": 89129865216
         }
+      },
+      "os": {
+        "cpu": {"percent": 3}
       }
     }
   }

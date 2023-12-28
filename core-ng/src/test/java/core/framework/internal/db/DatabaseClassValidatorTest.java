@@ -7,6 +7,8 @@ import core.framework.db.PrimaryKey;
 import core.framework.db.Table;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -15,44 +17,63 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class DatabaseClassValidatorTest {
     @Test
     void validateEntityClass() {
-        new DatabaseClassValidator(AssignedIdEntity.class).validateEntityClass();
-        new DatabaseClassValidator(AutoIncrementIdEntity.class).validateEntityClass();
-        new DatabaseClassValidator(CompositeKeyEntity.class).validateEntityClass();
+        new DatabaseClassValidator(AssignedIdEntity.class, false).validate();
+        new DatabaseClassValidator(AutoIncrementIdEntity.class, false).validate();
+        new DatabaseClassValidator(CompositeKeyEntity.class, false).validate();
     }
 
     @Test
     void withInvalidPrimaryKeyType() {
-        assertThatThrownBy(() -> new DatabaseClassValidator(TestEntityWithInvalidPrimaryKey.class).validateEntityClass())
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("primary key must be Integer or Long");
+        assertThatThrownBy(() -> new DatabaseClassValidator(TestEntityWithInvalidPrimaryKey.class, false).validate())
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("primary key must be Integer or Long");
     }
 
     @Test
     void withDefaultValue() {
-        assertThatThrownBy(() -> new DatabaseClassValidator(TestEntityWithDefaultValue.class).validateEntityClass())
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("db entity field must not have default value");
+        assertThatThrownBy(() -> new DatabaseClassValidator(TestEntityWithDefaultValue.class, false).validate())
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("db entity field must not have default value");
     }
 
     @Test
     void viewWithPrimaryKey() {
-        assertThatThrownBy(() -> new DatabaseClassValidator(TestViewWithPrimaryKey.class).validateViewClass())
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("db view field must not have @PrimaryKey");
+        assertThatThrownBy(() -> new DatabaseClassValidator(TestViewWithPrimaryKey.class, true).validate())
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("db view field must not have @PrimaryKey");
     }
 
     @Test
     void withNotNullAnnotationPrimaryKey() {
-        assertThatThrownBy(() -> new DatabaseClassValidator(TestEntityWithNotNullAnnotationPK.class).validateEntityClass())
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("db @PrimaryKey field must not have @NotNull");
+        assertThatThrownBy(() -> new DatabaseClassValidator(TestEntityWithNotNullAnnotationPK.class, false).validate())
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("db @PrimaryKey field must not have @NotNull");
     }
 
     @Test
     void withPropertyAnnotation() {
-        assertThatThrownBy(() -> new DatabaseClassValidator(TestEntityWithPropertyAnnotation.class).validateEntityClass())
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("db entity field must not have json annotation");
+        assertThatThrownBy(() -> new DatabaseClassValidator(TestEntityWithPropertyAnnotation.class, false).validate())
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("db entity field must not have json annotation");
+    }
+
+    @Test
+    void withJSON() {
+        new DatabaseClassValidator(TestEntityWithJSON.class, false).validate();
+    }
+
+    @Test
+    void withInvalidJSONList() {
+        assertThatThrownBy(() -> new DatabaseClassValidator(TestEntityWithInvalidJSONList.class, false).validate())
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("db json list field must be List<T> and T must be enum or value class");
+    }
+
+    @Test
+    void withInvalidJSON() {
+        assertThatThrownBy(() -> new DatabaseClassValidator(TestEntityWithInvalidJSON.class, false).validate())
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("db json field must be bean or list");
     }
 
     @Table(name = "test_entity_with_invalid_pk")
@@ -92,5 +113,40 @@ class DatabaseClassValidatorTest {
         @Column(name = "id")
         @Property(name = "id")
         public String id;
+    }
+
+    @Table(name = "test_entity_with_json")
+    public static class TestEntityWithJSON {
+        @PrimaryKey
+        @Column(name = "id")
+        public String id;
+
+        @Column(name = "json", json = true)
+        public TestJSON json;
+    }
+
+    public static class TestJSON {
+        @Property(name = "data")
+        public String data;
+    }
+
+    @Table(name = "test_entity_with_invalid_json_list")
+    public static class TestEntityWithInvalidJSONList {
+        @PrimaryKey
+        @Column(name = "id")
+        public String id;
+
+        @Column(name = "list", json = true)
+        public List<TestJSON> list;
+    }
+
+    @Table(name = "test_entity_with_invalid_json")
+    public static class TestEntityWithInvalidJSON {
+        @PrimaryKey
+        @Column(name = "id")
+        public String id;
+
+        @Column(name = "stringField", json = true)
+        public String stringField;
     }
 }

@@ -3,9 +3,11 @@ package core.framework.mongo.module;
 import com.mongodb.ConnectionString;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
+import core.framework.internal.module.ReadinessProbe;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
+import core.framework.mongo.impl.MongoConnectionPoolMetrics;
 import core.framework.mongo.impl.MongoImpl;
 import core.framework.util.Types;
 
@@ -29,8 +31,10 @@ public class MongoConfig extends Config {
         this.name = name;
 
         var mongo = new MongoImpl();
+        mongo.metrics = new MongoConnectionPoolMetrics(name);
         this.context.startupHook.initialize.add(mongo::initialize);
         this.context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> mongo.close());
+        context.collector.metrics.add(mongo.metrics);
         context.beanFactory.bind(Mongo.class, name, mongo);
         this.mongo = mongo;
     }
@@ -47,8 +51,16 @@ public class MongoConfig extends Config {
         var connectionString = new ConnectionString(uri);
         if (connectionString.getDatabase() == null) throw new Error("uri must have database, uri=" + uri);
         mongo.uri = connectionString(connectionString);
-        context.probe.hostURIs.add(connectionString.getHosts().get(0));
+        addProbe(context.probe, connectionString);
         this.uri = uri;
+    }
+
+    void addProbe(ReadinessProbe probe, ConnectionString connectionString) {
+        if (!connectionString.isSrvProtocol()) {
+            // mongodb+srv protocol is generally used by Mongo Atlas, as DNS seed list
+            // readiness probe is mainly used by self-hosting mongo within kube, no need to check dns with srv
+            probe.hostURIs.add(connectionString.getHosts().get(0));
+        }
     }
 
     ConnectionString connectionString(ConnectionString uri) {
@@ -57,14 +69,6 @@ public class MongoConfig extends Config {
 
     public void poolSize(int minSize, int maxSize) {
         mongo.poolSize(minSize, maxSize);
-    }
-
-    public void slowOperationThreshold(Duration threshold) {
-        mongo.slowOperationThreshold(threshold);
-    }
-
-    public void tooManyRowsReturnedThreshold(int threshold) {
-        mongo.tooManyRowsReturnedThreshold = threshold;
     }
 
     public void timeout(Duration timeout) {

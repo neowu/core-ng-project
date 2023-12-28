@@ -54,11 +54,18 @@ class UpdateQueryBuilder<T> {
         builder.indent(1).append("int index = 0;\n");
 
         for (Field field : columnFields) {
+            Column column = field.getDeclaredAnnotation(Column.class);
             builder.indent(1).append("if (!partial || entity.{} != null) {\n", field.getName())
                 .indent(2).append("if (index > 0) sql.append(\", \");\n")
-                .indent(2).append("sql.append(\"{} = ?\");\n", field.getDeclaredAnnotation(Column.class).name())
-                .indent(2).append("params.add(entity.{});\n", field.getName())
-                .indent(2).append("index++;\n")
+                .indent(2).append("sql.append(\"{} = ?\");\n", column.name());
+
+            if (column.json()) {
+                builder.indent(2).append("params.add({}.toJSON(entity.{}));\n", type(JSONHelper.class), field.getName());
+            } else {
+                builder.indent(2).append("params.add(entity.{});\n", field.getName());
+            }
+
+            builder.indent(2).append("index++;\n")
                 .indent(1).append("}\n");
         }
 

@@ -1,40 +1,61 @@
 package core.log.kafka;
 
+import core.framework.inject.Inject;
 import core.framework.kafka.Message;
 import core.framework.log.message.StatMessage;
-import core.log.service.StatService;
-import org.junit.jupiter.api.BeforeEach;
+import core.framework.search.ElasticSearchType;
+import core.framework.search.GetRequest;
+import core.log.IntegrationTest;
+import core.log.domain.StatDocument;
+import core.log.service.IndexService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
+import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
  */
-@ExtendWith(MockitoExtension.class)
-class StatMessageHandlerTest {
-    @Mock
-    StatService statService;
-
-    private StatMessageHandler handler;
-
-    @BeforeEach
-    void createStatMessageHandler() {
-        handler = new StatMessageHandler();
-        handler.statService = statService;
-    }
+class StatMessageHandlerTest extends IntegrationTest {
+    @Inject
+    StatMessageHandler handler;
+    @Inject
+    IndexService indexService;
+    @Inject
+    ElasticSearchType<StatDocument> statType;
 
     @Test
-    void handle() {
-        List<Message<StatMessage>> messages = List.of(new Message<>("k1", new StatMessage()), new Message<>("k1", new StatMessage()));
-        handler.handle(messages);
+    void index() {
+        LocalDate now = LocalDate.of(2017, Month.OCTOBER, 10);
 
-        verify(statService).index(argThat((List<StatMessage> values) -> values.size() == 2));
+        StatMessage message = message("1");
+        message.info = Map.of("key", "value");
+        List<Message<StatMessage>> messages = List.of(new Message<>("k1", message), new Message<>("k2", message("2")));
+
+        handler.index(messages, now);
+
+        StatDocument stat = get(now, message.id);
+        assertThat(stat.stats).isEqualTo(message.stats);
+        assertThat(stat.info).isEqualTo(message.info);
+    }
+
+    private StatDocument get(LocalDate now, String id) {
+        var request = new GetRequest();
+        request.index = indexService.indexName("stat", now);
+        request.id = id;
+        return statType.get(request).orElseThrow(() -> new Error("not found"));
+    }
+
+    private StatMessage message(String id) {
+        var message = new StatMessage();
+        message.id = id;
+        message.date = Instant.now();
+        message.stats = Map.of("thread_count", 10d);
+        return message;
     }
 }

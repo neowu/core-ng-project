@@ -2,7 +2,6 @@ package core.framework.module;
 
 import core.framework.api.web.service.Path;
 import core.framework.http.HTTPClient;
-import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.inject.InjectValidator;
 import core.framework.internal.module.Config;
@@ -31,7 +30,6 @@ import java.time.Duration;
 public class APIConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     ModuleContext context;
-    private HTTPClientBuilder httpClientBuilder;
     private HTTPClient httpClient;
     private RequestBeanWriter writer;
     private ResponseBeanReader reader;
@@ -40,14 +38,15 @@ public class APIConfig extends Config {
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
         // default value is for internal api call only, targeting for kube env (with short connect timeout and more retries)
-        httpClientBuilder = HTTPClient.builder()
+        httpClient = HTTPClient.builder()
             .userAgent(WebServiceClient.USER_AGENT)
             .trustAll()
             .connectTimeout(Duration.ofSeconds(2))
             .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
             .keepAlive(Duration.ofMinutes(5))   // use longer keep alive timeout within cluster, to reduce connection creation overhead
             .slowOperationThreshold(Duration.ofSeconds(10))
-            .maxRetries(5);
+            .maxRetries(5)
+            .build();
         writer = new RequestBeanWriter();
         reader = new ResponseBeanReader();
     }
@@ -79,36 +78,25 @@ public class APIConfig extends Config {
     }
 
     public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {
-        T client = createClient(serviceInterface, serviceURL);
+        return client(serviceInterface, serviceURL, httpClient);
+    }
+
+    public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL, HTTPClient httpClient) {
+        T client = createClient(serviceInterface, serviceURL, httpClient);
         context.beanFactory.bind(serviceInterface, null, client);
         return new APIClientConfig((WebServiceClientProxy) client);
     }
 
-    public <T> T createClient(Class<T> serviceInterface, String serviceURL) {
+    public <T> T createClient(Class<T> serviceInterface, String serviceURL, HTTPClient httpClient) {
         logger.info("create web service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         var validator = new WebServiceInterfaceValidator(serviceInterface, context.beanClassValidator);
         validator.requestBeanWriter = writer;
         validator.responseBeanReader = reader;
         validator.validate();
-
-        HTTPClient httpClient = getOrCreateHTTPClient();
-        var webServiceClient = new WebServiceClient(serviceURL, httpClient, writer, reader);
-        return createWebServiceClient(serviceInterface, webServiceClient);
+        return createWebServiceClient(serviceInterface, new WebServiceClient(serviceURL, httpClient, writer, reader));
     }
 
     <T> T createWebServiceClient(Class<T> serviceInterface, WebServiceClient webServiceClient) {
         return new WebServiceClientBuilder<>(serviceInterface, webServiceClient).build();
-    }
-
-    public HTTPClientBuilder httpClient() {
-        if (httpClient != null) throw new Error("api().httpClient() must be configured before adding client");
-        return httpClientBuilder;
-    }
-
-    private HTTPClient getOrCreateHTTPClient() {
-        if (httpClient == null) {
-            this.httpClient = httpClientBuilder.build();
-        }
-        return httpClient;
     }
 }

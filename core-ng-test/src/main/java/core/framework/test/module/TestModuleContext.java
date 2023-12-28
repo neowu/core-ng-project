@@ -1,8 +1,10 @@
 package core.framework.test.module;
 
+import core.framework.async.Executor;
 import core.framework.internal.inject.Key;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
+import core.framework.test.async.MockExecutor;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
 import org.slf4j.Logger;
@@ -25,6 +27,11 @@ public class TestModuleContext extends ModuleContext {
 
     public TestModuleContext() {
         super(new LogManager());
+    }
+
+    @Override
+    public void initialize() {
+        beanFactory.bind(Executor.class, null, new MockExecutor());
     }
 
     public <T> T getConfig(Class<T> configClass, String name) {

@@ -37,6 +37,7 @@ public final class RequestImpl implements Request {
     String scheme;
     String hostname;
     int port;
+    String path;
     String requestURL;
     ContentType contentType;
     byte[] body;
@@ -64,7 +65,7 @@ public final class RequestImpl implements Request {
 
     @Override
     public String path() {
-        return exchange.getRequestPath();
+        return path;
     }
 
     @Override
@@ -80,7 +81,7 @@ public final class RequestImpl implements Request {
 
     @Override
     public Session session() {
-        if (!"https".equals(scheme)) throw new Error("session must be used under https");
+        if (!"https".equals(scheme)) throw new Error("session must be used with https");
         if (session == null) throw new Error("site().session() must be configured");
         return session;
     }

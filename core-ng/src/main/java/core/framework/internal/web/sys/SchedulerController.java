@@ -5,6 +5,7 @@ import core.framework.http.ContentType;
 import core.framework.internal.scheduler.Scheduler;
 import core.framework.internal.web.http.IPv4AccessControl;
 import core.framework.json.JSON;
+import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -47,7 +48,7 @@ public class SchedulerController {
 
         String job = request.pathParam("job");
         logger.warn(Markers.errorCode("MANUAL_OPERATION"), "trigger job manually, job={}", job);   // log trace message, due to potential impact
-        scheduler.triggerNow(job);
+        scheduler.triggerNow(job, ActionLogContext.id());
         return Response.text("job triggered, job=" + job).status(HTTPStatus.ACCEPTED);
     }
 }

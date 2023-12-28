@@ -4,7 +4,7 @@ import core.framework.internal.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -23,12 +23,12 @@ class LimitRateConfigTest {
     @Test
     void validate() {
         assertThatThrownBy(() -> config.validate())
-                .hasMessageContaining("limitRate is configured but no group added");
+            .hasMessageContaining("limitRate is configured but no group added");
     }
 
     @Test
     void add() {
-        config.add("test", 100, 100, TimeUnit.MINUTES);
+        config.add("test", 100, 100, Duration.ofMinutes(1));
         config.validate();
     }
 }

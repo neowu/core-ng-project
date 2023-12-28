@@ -3,31 +3,33 @@ package core.framework.internal.web.sys;
 import core.framework.http.ContentType;
 import core.framework.internal.web.api.APIDefinitionBuilder;
 import core.framework.internal.web.api.APIDefinitionResponse;
-import core.framework.internal.web.api.APIMessageDefinitionBuilder;
-import core.framework.internal.web.api.APIMessageDefinitionResponse;
+import core.framework.internal.web.api.MessageAPIDefinitionBuilder;
+import core.framework.internal.web.api.MessageAPIDefinitionResponse;
 import core.framework.internal.web.http.IPv4AccessControl;
 import core.framework.internal.web.service.ErrorResponse;
 import core.framework.json.JSON;
 import core.framework.web.Request;
 import core.framework.web.Response;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author neo
  */
 public class APIController {
     public final IPv4AccessControl accessControl = new IPv4AccessControl();
+    private final ReentrantLock lock = new ReentrantLock();
 
     public Set<Class<?>> serviceInterfaces = new LinkedHashSet<>();
     public Set<Class<?>> beanClasses = new LinkedHashSet<>();  // custom bean classes not referred by service interfaces
-    public List<MessagePublish> messages = new ArrayList<>();
+    public Map<String, Class<?>> topics = new LinkedHashMap<>();   // topic -> messageClass
 
     private APIDefinitionResponse serviceDefinition;
-    private APIMessageDefinitionResponse messageDefinition;
+    private MessageAPIDefinitionResponse messageDefinition;
 
     public APIController() {
         beanClasses.add(ErrorResponse.class);   // publish default error response
@@ -41,12 +43,15 @@ public class APIController {
 
     public Response message(Request request) {
         accessControl.validate(request.clientIP());
-        APIMessageDefinitionResponse response = messageDefinition();
+        MessageAPIDefinitionResponse response = messageDefinition();
         return Response.text(JSON.toJSON(response)).contentType(ContentType.APPLICATION_JSON);
     }
 
     APIDefinitionResponse serviceDefinition() {
-        synchronized (this) {
+        if (serviceDefinition != null) return serviceDefinition;
+
+        lock.lock();
+        try {
             if (serviceDefinition == null) {
                 var builder = new APIDefinitionBuilder(serviceInterfaces, beanClasses);
                 serviceDefinition = builder.build();
@@ -54,27 +59,24 @@ public class APIController {
                 beanClasses = null;
             }
             return serviceDefinition;
+        } finally {
+            lock.unlock();
         }
     }
 
-    APIMessageDefinitionResponse messageDefinition() {
-        synchronized (this) {
+    MessageAPIDefinitionResponse messageDefinition() {
+        if (messageDefinition != null) return messageDefinition;
+
+        lock.lock();
+        try {
             if (messageDefinition == null) {
-                var builder = new APIMessageDefinitionBuilder(messages);
+                var builder = new MessageAPIDefinitionBuilder(topics);
                 messageDefinition = builder.build();
-                messages = null;    // release memory
+                topics = null;    // release memory
             }
             return messageDefinition;
-        }
-    }
-
-    public static class MessagePublish {
-        public final String topic;  // topic can be null, for dynamic topic message publish
-        public final Class<?> messageClass;
-
-        public MessagePublish(String topic, Class<?> messageClass) {
-            this.topic = topic;
-            this.messageClass = messageClass;
+        } finally {
+            lock.unlock();
         }
     }
 }

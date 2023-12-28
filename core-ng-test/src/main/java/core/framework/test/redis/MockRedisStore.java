@@ -78,7 +78,7 @@ class MockRedisStore {
     }
 
     // to distinguish with hash key type
-    static class SortedSet extends HashMap<String, Long> {
+    static class SortedSet extends HashMap<String, Long> {  // Map<value, score>
         @Serial
         private static final long serialVersionUID = -1982891940392623040L;
     }

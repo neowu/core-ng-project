@@ -1,6 +1,8 @@
 package core.framework.internal.http;
 
 import core.framework.api.http.HTTPStatus;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import okhttp3.Request;
 import okhttp3.internal.http2.ConnectionShutdownException;
 import okhttp3.internal.http2.ErrorCode;
@@ -392,8 +394,6 @@ class RetryInterceptorTest {
         var exception = new ConnectException("connection failed");
         assertThat(interceptor.shouldRetry(true, "POST", 1, exception)).isFalse();
         assertThat(interceptor.shouldRetry(true, "PUT", 2, exception)).isFalse();
-
-        assertThat(interceptor.shouldRetry(true, 2, HTTPStatus.SERVICE_UNAVAILABLE.code)).isFalse();
     }
 
     @Test
@@ -404,20 +404,32 @@ class RetryInterceptorTest {
 
     @Test
     void shouldRetryWithServiceUnavailable() {
-        assertThat(interceptor.shouldRetry(false, 1, HTTPStatus.OK.code)).isFalse();
-        assertThat(interceptor.shouldRetry(false, 1, HTTPStatus.SERVICE_UNAVAILABLE.code)).isTrue();
-        assertThat(interceptor.shouldRetry(false, 3, HTTPStatus.SERVICE_UNAVAILABLE.code)).isFalse();
+        assertThat(interceptor.shouldRetry(HTTPStatus.OK.code, 1)).isFalse();
+        assertThat(interceptor.shouldRetry(HTTPStatus.SERVICE_UNAVAILABLE.code, 1)).isTrue();
+        assertThat(interceptor.shouldRetry(HTTPStatus.SERVICE_UNAVAILABLE.code, 3)).isFalse();
     }
 
     @Test
     void shouldRetryWithTooManyRequest() {
-        assertThat(interceptor.shouldRetry(false, 1, HTTPStatus.TOO_MANY_REQUESTS.code)).isTrue();
-        assertThat(interceptor.shouldRetry(false, 3, HTTPStatus.TOO_MANY_REQUESTS.code)).isFalse();
+        assertThat(interceptor.shouldRetry(HTTPStatus.TOO_MANY_REQUESTS.code, 1)).isTrue();
+        assertThat(interceptor.shouldRetry(HTTPStatus.TOO_MANY_REQUESTS.code, 3)).isFalse();
     }
 
     @Test
     void uri() {
         var request = new Request.Builder().url("http://localhost/path?query=value").build();
         assertThat(interceptor.uri(request)).isEqualTo("http://localhost/path");
+    }
+
+    @Test
+    void withinMaxProcessTime() {
+        var logManager = new LogManager();
+        ActionLog actionLog = logManager.begin("begin", null);
+
+        actionLog.warningContext.maxProcessTimeInNano(Duration.ofSeconds(1).toNanos());
+        assertThat(interceptor.withinMaxProcessTime(1)).isTrue();
+        assertThat(interceptor.withinMaxProcessTime(2)).isFalse();
+
+        logManager.end("end");
     }
 }

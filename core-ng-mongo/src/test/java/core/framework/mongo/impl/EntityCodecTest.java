@@ -20,7 +20,7 @@ class EntityCodecTest {
 
     @BeforeAll
     void createEntityCodec() {
-        EntityCodecs entityCodecs = new EntityCodecs();
+        var entityCodecs = new EntityCodecs();
         entityCodecs.registerEntity(TestEntity.class);
         entityCodec = (EntityCodec<TestEntity>) entityCodecs.codecRegistry().get(TestEntity.class);
     }
@@ -29,21 +29,21 @@ class EntityCodecTest {
     void documentHasId() {
         assertFalse(entityCodec.documentHasId(new TestEntity()));
 
-        TestEntity entity = new TestEntity();
+        var entity = new TestEntity();
         entity.id = new ObjectId();
         assertTrue(entityCodec.documentHasId(entity));
     }
 
     @Test
     void generateIdIfAbsentFromDocument() {
-        TestEntity entity = new TestEntity();
+        var entity = new TestEntity();
         entityCodec.generateIdIfAbsentFromDocument(entity);
         assertNotNull(entity.id);
     }
 
     @Test
     void getDocumentId() {
-        TestEntity entity = new TestEntity();
+        var entity = new TestEntity();
         entity.id = new ObjectId();
         assertEquals(new BsonObjectId(entity.id), entityCodec.getDocumentId(entity));
     }

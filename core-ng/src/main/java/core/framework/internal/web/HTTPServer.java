@@ -3,6 +3,7 @@ package core.framework.internal.web;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.web.site.SiteManager;
 import core.framework.util.StopWatch;
+import core.framework.web.Interceptor;
 import io.undertow.Undertow;
 import io.undertow.UndertowOptions;
 import io.undertow.server.HttpHandler;
@@ -12,6 +13,7 @@ import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Options;
+import org.xnio.Xnio;
 
 import static core.framework.log.Markers.errorCode;
 
@@ -32,26 +34,23 @@ public class HTTPServer {
     final ShutdownHandler shutdownHandler = new ShutdownHandler();
 
     private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
-    public Integer httpPort;
-    public Integer httpsPort;
-    public boolean gzip;
-    public long maxEntitySize = 10_000_000;    // limit max post body to 10M, apply to multipart as well
     private Undertow server;
 
     public HTTPServer(LogManager logManager) {
         handler = new HTTPHandler(logManager, siteManager.sessionManager, siteManager.templateManager);
     }
 
-    public void start() {
-        if (httpPort == null && httpsPort == null) httpsPort = 8443;    // by default start https only
-
+    public void start(HTTPServerConfig config) {
         var watch = new StopWatch();
+        handler.interceptors = config.interceptors.toArray(new Interceptor[0]);
+        HTTPHost httpHost = config.httpHost;
+        HTTPHost httpsHost = config.httpsHost();
         try {
             Undertow.Builder builder = Undertow.builder();
-            if (httpPort != null) builder.addHttpListener(httpPort, "0.0.0.0");
-            if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
+            if (httpHost != null) builder.addHttpListener(httpHost.port(), httpHost.host());
+            if (httpsHost != null) builder.addHttpsListener(httpsHost.port(), httpsHost.host(), new SSLContextBuilder().build());
 
-            builder.setHandler(handler())
+            builder.setHandler(handler(config))
                 // undertow accepts incoming connection very quick, backlog is hard to be filled even under load test, this setting is more for DDOS protection
                 // and not necessary under cloud env, here to set to match linux default value
                 // to use larger value, it requires to update kernel accordingly, e.g. sysctl -w net.core.somaxconn=1024 && sysctl -w net.ipv4.tcp_max_syn_backlog=4096
@@ -68,19 +67,25 @@ public class HTTPServer {
                 // refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout
                 .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620_000)         // 620s
                 .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10_000)            // 10s
-                .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, maxEntitySize)
+                .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, config.maxEntitySize)
                 .setServerOption(UndertowOptions.RECORD_REQUEST_START_TIME, Boolean.TRUE);
+
+            Xnio xnio = Xnio.getInstance(Undertow.class.getClassLoader());
+            builder.setWorker(xnio.createWorkerBuilder()
+                .setWorkerIoThreads(Math.max(Runtime.getRuntime().availableProcessors(), 2))
+                .setExternalExecutorService(handler.worker)
+                .build());
 
             server = builder.build();
             server.start();
         } finally {
-            logger.info("http server started, httpPort={}, httpsPort={}, gzip={}, elapsed={}", httpPort, httpsPort, gzip, watch.elapsed());
+            logger.info("http server started, http={}, https={}, gzip={}, elapsed={}", httpHost, httpsHost, config.gzip, watch.elapsed());
         }
     }
 
-    private HttpHandler handler() {
-        HttpHandler handler = new HTTPIOHandler(this.handler, shutdownHandler, maxEntitySize);
-        if (gzip) {
+    private HttpHandler handler(HTTPServerConfig config) {
+        HttpHandler handler = new HTTPIOHandler(this.handler, shutdownHandler, config.maxEntitySize);
+        if (config.gzip) {
             // only support gzip, deflate is less popular
             handler = new EncodingHandler(handler, new ContentEncodingRepository()
                 .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, new GZipPredicate()));
@@ -102,7 +107,7 @@ public class HTTPServer {
             boolean success = shutdownHandler.awaitTermination(timeoutInMs);
             if (!success) {
                 logger.warn(errorCode("FAILED_TO_STOP"), "failed to wait active http requests to complete");
-                server.getWorker().shutdownNow();
+                handler.worker.shutdownNow();
             } else {
                 logger.info("active http requests completed");
             }

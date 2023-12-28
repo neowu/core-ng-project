@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class EventControllerTest extends IntegrationTest {
     @Mock
-    private Request request;
+    Request request;
 
     @Test
     void checkOriginWithWildcard() {
@@ -51,8 +51,8 @@ class EventControllerTest extends IntegrationTest {
         controller.checkOrigin("https://api.example.com");
 
         assertThatThrownBy(() -> controller.checkOrigin("https://example1.com"))
-                .isInstanceOf(ForbiddenException.class)
-                .hasMessageContaining("access denied");
+            .isInstanceOf(ForbiddenException.class)
+            .hasMessageContaining("access denied");
     }
 
     @Test
@@ -60,7 +60,7 @@ class EventControllerTest extends IntegrationTest {
         when(request.header("Origin")).thenReturn(Optional.empty());
         var controller = new EventController(List.of("*"), null);
         assertThatThrownBy(() -> controller.options(request))
-                .isInstanceOf(ForbiddenException.class);
+            .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
@@ -78,7 +78,7 @@ class EventControllerTest extends IntegrationTest {
         when(request.header("Origin")).thenReturn(Optional.of("localhost"));
         var controller = new EventController(List.of("*"), null);
         assertThat(controller.options(request).header("Access-Control-Allow-Methods"))
-                .hasValueSatisfying(methods -> assertThat(methods).contains("POST"));
+            .hasValueSatisfying(methods -> assertThat(methods).contains("POST"));
     }
 
     @Test
@@ -112,7 +112,7 @@ class EventControllerTest extends IntegrationTest {
     @Test
     void sendEventRequest() {
         var event = new Event();
-        event.date = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC"));
+        event.date = ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC);
         event.result = Result.OK;
         event.action = "action";
         event.elapsedTime = 10L;
@@ -134,8 +134,8 @@ class EventControllerTest extends IntegrationTest {
         when(request.body()).thenReturn(Optional.empty());
         when(request.header(HTTPHeaders.CONTENT_TYPE)).thenReturn(Optional.of(ContentType.APPLICATION_JSON.toString()));
         assertThatThrownBy(() -> controller.sendEventRequest(request))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("body must not be null");
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("body must not be null");
 
         when(request.header(HTTPHeaders.CONTENT_TYPE)).thenReturn(Optional.of(ContentType.TEXT_PLAIN.toString()));
         assertThat(controller.sendEventRequest(request)).isNull();

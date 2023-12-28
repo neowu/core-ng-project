@@ -42,7 +42,7 @@
       "name": "ErrorCode",
       "type": "enum",
       "fields": null,
-      "enumConstants": [{"name": "ERROR_2", "value": "ERROR_2"}]
+      "enumConstants": [{"name": "ERROR_1", "value": "ERROR_1_CHANGED"}, {"name": "ERROR_3", "value": "ERROR_3"}]
     }
   ]
 }

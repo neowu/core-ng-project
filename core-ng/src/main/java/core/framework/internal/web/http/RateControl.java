@@ -6,32 +6,28 @@ import core.framework.web.exception.TooManyRequestsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author neo
  */
 public class RateControl {
     private final Logger logger = LoggerFactory.getLogger(RateControl.class);
-    private final int maxEntries;
 
-    public Map<String, RateConfig> config;
-    private LRUMap<String, Rate> rates;
+    private Map<String, RateConfig> config;
+    private Map<String, Rate> rates;
 
-    public RateControl(int maxEntries) {
-        this.maxEntries = maxEntries;
+    public void maxEntries(int entries) {
+        synchronized (this) {
+            rates = new LRUMap<>(entries);
+        }
     }
 
     // config is always called during initialization, so no concurrency issue
-    public void config(String group, int maxPermits, int fillRate, TimeUnit unit) {
-        synchronized (this) {
-            if (config == null) {
-                config = Maps.newHashMap();
-                rates = new LRUMap<>(maxEntries);
-            }
-        }
-        double fillRatePerNano = ratePerNano(fillRate, unit);
+    public void config(String group, int maxPermits, int fillRate, Duration interval) {
+        if (config == null) config = Maps.newHashMap();
+        double fillRatePerNano = ratePerNano(fillRate, interval);
         RateConfig previous = config.put(group, new RateConfig(maxPermits, fillRatePerNano));
         if (previous != null) throw new Error("found duplicate group, group=" + group);
     }
@@ -44,8 +40,12 @@ public class RateControl {
         }
     }
 
-    double ratePerNano(int rate, TimeUnit unit) {
-        return rate / (double) unit.toNanos(1);
+    public boolean hasGroup(String group) {
+        return config != null && config.containsKey(group);
+    }
+
+    double ratePerNano(int rate, Duration interval) {
+        return rate / (double) interval.toNanos();
     }
 
     boolean acquire(String group, String clientIP) {
@@ -65,14 +65,7 @@ public class RateControl {
         return rate.acquire(currentTime, config.maxPermits, config.fillRatePerNano);
     }
 
-    static final class RateConfig {
-        final int maxPermits;
-        final double fillRatePerNano;
-
-        RateConfig(int maxPermits, double fillRatePerNano) {
-            this.maxPermits = maxPermits;
-            this.fillRatePerNano = fillRatePerNano;
-        }
+    record RateConfig(int maxPermits, double fillRatePerNano) {
     }
 
     static final class Rate {

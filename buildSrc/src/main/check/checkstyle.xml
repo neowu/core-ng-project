@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN" "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<!--refer to http://checkstyle.sourceforge.net/availablechecks.html-->
+<module name="Checker">
+    <module name="OrderedProperties"/>                      <!--Detects if keys in properties files are in correct order.-->
+
+    <module name="TreeWalker">
+        <!--Annotations:-->
+        <module name="AnnotationLocation">                  <!--Check location of annotation on language elements.-->
+            <property name="allowSamelineParameterizedAnnotation" value="true"/>
+        </module>
+        <module name="AnnotationUseStyle"/>                 <!--This check controls the style with the usage of annotations.-->
+        <module name="SuppressWarnings">                    <!--Verifies unchecked can only used on variable, parameter and method-->
+            <property name="format" value="^unchecked$"/>
+            <property name="tokens" value="CLASS_DEF,INTERFACE_DEF,ENUM_DEF,ANNOTATION_DEF,ANNOTATION_FIELD_DEF,ENUM_CONSTANT_DEF"/>
+        </module>
+        <module name="SuppressWarningsHolder"/>
+
+        <!--Block Checks:-->
+        <module name="AvoidNestedBlocks"/>
+        <module name="EmptyBlock"/>
+        <module name="EmptyCatchBlock"/>
+        <module name="LeftCurly"/>                          <!--Checks the placement of left curly braces on types, methods and other blocks:-->
+        <module name="RightCurly"/>                         <!--Checks the placement of right curly braces.-->
+
+        <!--Class Design:-->
+        <module name="FinalClass"/>                         <!--Checks that a class which has only private constructors is declared as final. Doesn't check for classes nested in interfaces or annotations, as they are always final there.-->
+        <module name="InnerTypeLast"/>                      <!--Check nested (inner) classes/interfaces are declared at the bottom of the class after all method and field declarations.-->
+        <module name="InterfaceIsType"/>                    <!--Implements Bloch, Effective Java, Item 17 - Use Interfaces only to define types.-->
+        <module name="MutableException"/>
+        <module name="OneTopLevelClass"/>
+        <module name="PublicReferenceToPrivateTypeCheck"/>  <!--provided by sevntu-checkstyle-->
+
+        <!--Coding:-->
+        <module name="AvoidConstantAsFirstOperandInConditionCheck"/>    <!--provided by sevntu-checkstyle-->
+        <module name="AvoidDoubleBraceInitialization"/>                 <!--Detects double brace initialization-->
+        <module name="AvoidHidingCauseException"/>                      <!--provided by sevntu-checkstyle-->
+        <module name="AvoidNoArgumentSuperConstructorCall"/>            <!--Checks if call to superclass constructor without arguments is present.-->
+        <module name="CustomDeclarationOrder">                          <!--provided by sevntu-checkstyle-->
+            <property name="customDeclarationOrder"
+                      value="Field(static .*) ### Method(static .*) ### DeclareAnonClassField(.*)
+                      ### Field(.*) ### Ctor(.*) ### MainMethod(.*) ### Method(.*)
+                      ### InnerEnum(.*) ### InnerInterface(.*) ### InnerClass(.*)"/>
+        </module>
+        <module name="DefaultComesLast"/>
+        <module name="DiamondOperatorForVariableDefinitionCheck"/>      <!--provided by sevntu-checkstyle-->
+        <module name="EmptyStatement"/>                 <!--Detects empty statements (standalone ';').-->
+        <module name="EmptyPublicCtorInClassCheck"/>    <!--provided by sevntu-checkstyle-->
+        <module name="EqualsAvoidNull"/>                <!--Checks that any combination of String literals with optional assignment is on the left side of an equals() comparison.-->
+        <module name="EqualsHashCode"/>                 <!--Checks that classes that override equals() also override hashCode().-->
+        <module name="FallThrough"/>
+        <module name="IllegalInstantiation"/>           <!--Checks for illegal instantiations where a factory method is preferred.-->
+        <module name="InnerAssignment"/>
+        <module name="MapIterationInForEachLoop"/>                      <!--provided by sevntu-checkstyle-->
+        <module name="MissingSwitchDefault"/>           <!--Checks that switch statement has "default" clause.-->
+        <module name="MoveVariableInsideIfCheck"/>      <!--provided by sevntu-checkstyle-->
+        <module name="MultipleVariableDeclarations"/>   <!--Checks that each variable declaration is in its own statement and on its own line.-->
+        <module name="NestedForDepth"/>                 <!--Restricts nested for blocks to a specified depth (default = 1).-->
+        <module name="NestedIfDepth"/>                  <!--Restricts nested if-else blocks to a specified depth (default = 1).-->
+        <module name="NestedTryDepth">                  <!--Restricts nested try-catch-finally blocks to a specified depth (default = 1).-->
+            <property name="max" value="0"/>
+        </module>
+        <module name="NoArrayTrailingComma"/>           <!--Checks that array initialization do not contain a trailing comma.-->
+        <module name="NoClone"/>
+        <module name="NoEnumTrailingComma"/>            <!--Checks that enum definition does not contain a trailing comma.-->
+        <module name="NoFinalizer"/>
+        <module name="OneStatementPerLine">                 <!--Checks there is only one statement per line.-->
+            <property name="treatTryResourcesAsStatement" value="true"/>
+        </module>
+        <module name="OverloadMethodsDeclarationOrder"/>    <!--Checks that overload methods are grouped together.-->
+        <module name="ParameterAssignment"/>
+        <module name="SimplifyBooleanExpression"/>          <!--Checks for overly complicated boolean expressions.-->
+        <module name="SimplifyBooleanReturn"/>              <!--Checks for overly complicated boolean return statements.-->
+        <module name="StringLiteralEquality"/>
+        <module name="UnnecessaryParentheses"/>             <!--Checks if unnecessary parentheses are used in a statement or expression.-->
+        <module name="UnnecessarySemicolonAfterOuterTypeDeclaration"/>
+        <module name="UnnecessarySemicolonAfterTypeMemberDeclaration"/>
+        <module name="UnnecessarySemicolonInEnumeration"/>
+        <module name="UnnecessarySemicolonInTryWithResources"/>
+
+        <!--Imports:-->
+        <module name="AvoidStarImport"/>
+        <module name="IllegalImport"/>
+        <module name="RedundantImport"/>            <!--Checks for imports that are redundant.-->
+        <module name="UnusedImports"/>              <!--Checks for unused import statements.-->
+
+        <!--Miscellaneous:-->
+        <module name="Indentation"/>
+        <module name="OuterTypeFilename"/>
+        <module name="UncommentedMain">             <!--Detects uncommented main methods.-->
+            <property name="excludedClasses" value="\.Main$"/>
+        </module>
+        <module name="UpperEll"/>
+
+        <!--Modifiers:-->
+        <module name="RedundantModifier"/>          <!--Checks for redundant modifiers in interface and annotation definitions.-->
+        <module name="ModifierOrder"/>              <!--Checks that the order of modifiers conforms to the suggestions in the Java Language specification, sections 8.1.1, 8.3.1 and 8.4.3.-->
+
+        <!--Naming Conventions:-->
+        <module name="ClassTypeParameterName"/>
+        <module name="ConstantName"/>
+        <module name="InterfaceTypeParameterName"/>
+        <module name="LambdaParameterName"/>
+        <module name="LocalFinalVariableName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="MethodTypeParameterName"/>
+        <module name="PackageName">
+            <property name="format" value="^[a-z][a-z0-9\.]*$"/>
+        </module>
+        <module name="PatternVariableName"/>
+        <module name="ParameterName"/>
+        <module name="StaticVariableName"/>
+        <module name="TypeName"/>
+        <module name="EnumValueNameCheck"/>         <!--provided by sevntu-checkstyle-->
+
+        <!--Size Violations:-->
+        <module name="AnonInnerLength">             <!--Checks for long anonymous inner classes.-->
+            <property name="max" value="15"/>
+        </module>
+        <module name="ExecutableStatementCount">    <!--Restricts the number of executable statements to a specified limit-->
+            <property name="max" value="40"/>
+        </module>
+        <module name="MethodLength">                <!--Checks for long methods.-->
+            <property name="countEmpty" value="false"/>
+            <property name="max" value="50"/>
+        </module>
+        <module name="ParameterNumber">             <!--Checks the number of parameters that a method or constructor has.-->
+            <property name="max" value="6"/>
+        </module>
+
+        <!--Whitespace:-->
+        <module name="EmptyForInitializerPad"/>
+        <module name="GenericWhitespace"/>          <!--Checks that the whitespace around the Generic tokens < and > are correct to the typical convention.-->
+        <module name="MethodParamPad"/>             <!--Checks the padding between the identifier of a method definition, constructor definition, method call, or constructor invocation; and the left parenthesis of the parameter list. -->
+        <module name="NoLineWrap"/>
+        <module name="NoWhitespaceAfter"/>          <!--Checks that there is no whitespace after a token.-->
+        <module name="NoWhitespaceBefore">          <!--Checks that there is no whitespace before a token.-->
+            <property name="allowLineBreaks" value="true"/>
+        </module>
+        <module name="NoWhitespaceBeforeCaseDefaultColon"/> <!--Checks that there is no whitespace before the colon in a switch block.-->
+        <module name="OperatorWrap"/>               <!--Checks line wrapping for operators.-->
+        <module name="ParenPad"/>
+        <module name="SeparatorWrap">               <!--check dot should in new line-->
+            <property name="tokens" value="DOT"/>
+            <property name="option" value="nl"/>
+        </module>
+        <module name="SeparatorWrap">               <!--check comma should at end of line-->
+            <property name="tokens" value="COMMA"/>
+            <property name="option" value="eol"/>
+        </module>
+        <module name="SingleSpaceSeparator"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>            <!--Checks that a token is followed by whitespace, with the exception that it does not check for whitespace after the semicolon of an empty for iterator.-->
+        <module name="WhitespaceAround"/>           <!--Checks that a token is surrounded by whitespace. Empty constructor and method bodies (blocks) of the form-->
+    </module>
+
+    <!--Size Violations:-->
+    <module name="FileLength">                      <!--Checks for long source files.-->
+        <property name="max" value="450"/>
+        <property name="fileExtensions" value="java"/>
+    </module>
+
+    <!--Whitespace:-->
+    <module name="FileTabCharacter"/>               <!--Checks to see if a file contains a tab character.-->
+
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="module\-info\.java$"/>
+    </module>
+
+    <module name="SuppressWarningsFilter"/>
+</module>

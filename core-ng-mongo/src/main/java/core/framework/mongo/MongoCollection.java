@@ -13,7 +13,7 @@ public interface MongoCollection<T> {
     long count(Count count);
 
     default long count(Bson filter) {
-        Count count = new Count();
+        var count = new Count();
         count.filter = filter;
         return count(count);
     }
@@ -25,7 +25,7 @@ public interface MongoCollection<T> {
     Optional<T> get(Get get);
 
     default Optional<T> get(Object id) {
-        Get get = new Get();
+        var get = new Get();
         get.id = id;
         return get(get);
     }
@@ -33,7 +33,7 @@ public interface MongoCollection<T> {
     Optional<T> findOne(FindOne findOne);
 
     default Optional<T> findOne(Bson filter) {
-        FindOne findOne = new FindOne();
+        var findOne = new FindOne();
         findOne.filter = filter;
         return findOne(findOne);
     }
@@ -41,7 +41,7 @@ public interface MongoCollection<T> {
     List<T> find(Query query);
 
     default List<T> find(Bson filter) {
-        Query query = new Query();
+        var query = new Query();
         query.filter = filter;
         return find(query);
     }
@@ -49,8 +49,6 @@ public interface MongoCollection<T> {
     void forEach(Query query, Consumer<T> consumer);    // mongo driver fetches results in batch
 
     <V> List<V> aggregate(Aggregate<V> aggregate);
-
-    <V> List<V> mapReduce(MapReduce<V> mapReduce);
 
     void replace(T entity);
 

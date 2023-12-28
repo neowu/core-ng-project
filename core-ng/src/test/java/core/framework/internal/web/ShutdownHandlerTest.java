@@ -30,7 +30,7 @@ class ShutdownHandlerTest {
         assertThat(handler.handle(exchange)).isFalse();
         handler.exchangeEvent(null, () -> {
         });
-        assertThat(handler.activeRequests).hasValue(0);
+        assertThat(handler.activeRequests.get()).isEqualTo(0);
     }
 
     @Test
@@ -45,19 +45,20 @@ class ShutdownHandlerTest {
 
     @Test
     void awaitTermination() throws InterruptedException {
-        handler.activeRequests.getAndIncrement();
+        handler.activeRequests.increase();
         handler.awaitTermination(-1);
     }
 
     @Test
     void maxActiveRequests() {
-        handler.activeRequests.set(2);
+        handler.activeRequests.increase();
+        handler.activeRequests.increase();
         handler.handle(exchange);
-        handler.activeRequests.decrementAndGet();
-        assertThat(handler.maxActiveRequests()).isEqualTo(3);
-        assertThat(handler.maxActiveRequests()).isEqualTo(2);
+        handler.activeRequests.decrease();
+        assertThat(handler.activeRequests.max()).isEqualTo(3);
+        assertThat(handler.activeRequests.max()).isEqualTo(2);
 
         handler.handle(exchange);
-        assertThat(handler.maxActiveRequests()).isEqualTo(3);
+        assertThat(handler.activeRequests.max()).isEqualTo(3);
     }
 }

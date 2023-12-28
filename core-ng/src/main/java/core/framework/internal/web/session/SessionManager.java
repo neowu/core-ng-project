@@ -46,9 +46,8 @@ public class SessionManager implements SessionContext {
 
     public void save(RequestImpl request, Response response, ActionLog actionLog) {
         // request.session can be null or ReadOnlySession for websocket, only regular http request may generate session
-        if (request.session instanceof SessionImpl) {
-            SessionImpl session = (SessionImpl) request.session;
-            if (!session.saved) save(session, response, actionLog);
+        if (request.session instanceof SessionImpl session && !session.saved) {
+            save(session, response, actionLog);
         }
     }
 

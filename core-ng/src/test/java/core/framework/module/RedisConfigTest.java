@@ -24,14 +24,13 @@ class RedisConfigTest {
     @Test
     void validate() {
         assertThatThrownBy(() -> config.validate())
-                .hasMessageContaining("redis host must be configured");
+            .hasMessageContaining("redis host must be configured");
     }
 
     @Test
     void client() {
         config.host("localhost");
         config.poolSize(0, 0);
-        config.slowOperationThreshold(Duration.ofSeconds(1));
         config.timeout(Duration.ofSeconds(5));
         assertThat(config.client()).isNotNull();
 

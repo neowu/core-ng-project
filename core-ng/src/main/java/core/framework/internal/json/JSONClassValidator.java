@@ -25,15 +25,6 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 public class JSONClassValidator implements ClassVisitor {
-    public static ClassValidator classValidator(Class<?> instanceClass) {
-        var validator = new ClassValidator(instanceClass);
-        validator.allowedValueClasses = Set.of(String.class, Boolean.class,
-                Integer.class, Long.class, Double.class, BigDecimal.class,
-                LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class, LocalTime.class);
-        validator.allowChild = true;
-        return validator;
-    }
-
     public static void validateEnum(Class<?> enumClass) {
         Set<String> enumValues = Sets.newHashSet();
         List<Field> fields = Classes.enumConstantFields(enumClass);
@@ -51,7 +42,10 @@ public class JSONClassValidator implements ClassVisitor {
     private final Map<String, Set<String>> visitedProperties = Maps.newHashMap();
 
     public JSONClassValidator(Class<?> instanceClass) {
-        validator = classValidator(instanceClass);
+        validator = new ClassValidator(instanceClass);
+        validator.allowedValueClasses = Set.of(String.class, Boolean.class,
+            Integer.class, Long.class, Double.class, BigDecimal.class,
+            LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class, LocalTime.class);
         validator.visitor = this;
     }
 

@@ -2,6 +2,7 @@ package core.framework.internal.async;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.log.ActionLogContext;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -38,6 +39,15 @@ class ExecutorTaskTest {
             .hasMessageContaining("task failed")
             .hasMessageContaining("id=")
             .hasMessageContaining("action=action");
+    }
+
+    @Test
+    void call() throws Exception {
+        var task = new ExecutorTask<>(() -> {
+            assertThat(ActionLogContext.get("thread")).hasSize(1);
+            return Boolean.TRUE;
+        }, new LogManager(), context(null));
+        assertThat(task.call()).isTrue();
     }
 
     @Test

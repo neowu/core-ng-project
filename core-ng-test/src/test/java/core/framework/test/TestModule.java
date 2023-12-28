@@ -5,6 +5,8 @@ import core.framework.http.HTTPClient;
 import core.framework.kafka.Message;
 import core.framework.scheduler.Job;
 import core.framework.test.db.TestDBEntity;
+import core.framework.test.db.TestDBEntityWithJSON;
+import core.framework.test.db.TestDBProjection;
 import core.framework.test.db.TestDBView;
 import core.framework.test.inject.TestBean;
 import core.framework.test.kafka.TestMessage;
@@ -50,10 +52,10 @@ public class TestModule extends AbstractTestModule {
         bind(new TestBean(requiredProperty("test.inject-test.property")));
 
         configureJob();
-        configureExecutor();
 
         highCPUUsageThreshold(0.8);
         highHeapUsageThreshold(0.8);
+        highMemUsageThreshold(0.8);
 
         onShutdown(() -> {
         });
@@ -72,11 +74,6 @@ public class TestModule extends AbstractTestModule {
         cache().add(TestDBEntity.class, Duration.ofHours(6));
     }
 
-    private void configureExecutor() {
-        executor().add();
-        executor().add("name", 1);
-    }
-
     private void configureSite() {
         site().session().redis("localhost");
         site().session().timeout(Duration.ofMinutes(30));
@@ -88,8 +85,8 @@ public class TestModule extends AbstractTestModule {
     }
 
     private void configureHTTP() {
-        http().httpPort(8080);
-        http().httpsPort(8443);
+        http().listenHTTP("8080");
+        http().listenHTTPS("0.0.0.0:8443");
         http().gzip();
         http().maxForwardedIPs(2);
         http().maxProcessTime(Duration.ofSeconds(30));
@@ -103,7 +100,7 @@ public class TestModule extends AbstractTestModule {
         kafka().uri("localhost:9092");
         kafka().maxRequestSize(2 * 1024 * 1024);
         kafka().longConsumerDelayThreshold(Duration.ofSeconds(60));
-        kafka().poolSize(1);
+        kafka().concurrency(1);
         kafka().groupId("test");
         kafka().publish("topic", TestMessage.class);
         kafka().subscribe("topic1", TestMessage.class, (List<Message<TestMessage>> messages) -> {
@@ -116,12 +113,12 @@ public class TestModule extends AbstractTestModule {
         db().url("jdbc:mysql://localhost:3306/test");
         db().isolationLevel(IsolationLevel.READ_UNCOMMITTED);
         db().timeout(Duration.ofSeconds(10));
-        db().slowOperationThreshold(Duration.ofSeconds(5));
+        db().poolSize(5, 5);
         db().longTransactionThreshold(Duration.ofSeconds(5));
-        db().tooManyRowsReturnedThreshold(1000);
-        db().maxOperations(5000);
         db().repository(TestDBEntity.class);
+        db().repository(TestDBEntityWithJSON.class);
         db().view(TestDBView.class);
+        db().view(TestDBProjection.class);
         initDB().createSchema();
     }
 
@@ -129,6 +126,7 @@ public class TestModule extends AbstractTestModule {
         schedule().timeZone(ZoneId.of("UTC"));
         Job job = new TestJob();
         schedule().fixedRate("fixed-rate-job", job, Duration.ofSeconds(10));
+        schedule().hourlyAt("hourly-job", job, 30, 0);
         schedule().dailyAt("daily-job", job, LocalTime.NOON);
         schedule().weeklyAt("weekly-job", job, DayOfWeek.MONDAY, LocalTime.NOON);
         schedule().monthlyAt("monthly-job", job, 1, LocalTime.NOON);

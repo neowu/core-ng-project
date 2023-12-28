@@ -41,29 +41,33 @@ final class RowMapperBuilder<T> {
         for (Field field : Classes.instanceFields(entityClass)) {
             String fieldName = field.getName();
             Class<?> fieldClass = field.getType();
-            String column = field.getDeclaredAnnotation(Column.class).name();
+            Column column = field.getDeclaredAnnotation(Column.class);
+            String columnName = column.name();
+
             if (Integer.class.equals(fieldClass)) {
-                builder.indent(1).append("entity.{} = resultSet.getInt(\"{}\");\n", fieldName, column);
+                builder.indent(1).append("entity.{} = resultSet.getInt(\"{}\");\n", fieldName, columnName);
             } else if (String.class.equals(fieldClass)) {
-                builder.indent(1).append("entity.{} = resultSet.getString(\"{}\");\n", fieldName, column);
+                builder.indent(1).append("entity.{} = resultSet.getString(\"{}\");\n", fieldName, columnName);
             } else if (Boolean.class.equals(fieldClass)) {
-                builder.indent(1).append("entity.{} = resultSet.getBoolean(\"{}\");\n", fieldName, column);
+                builder.indent(1).append("entity.{} = resultSet.getBoolean(\"{}\");\n", fieldName, columnName);
             } else if (Long.class.equals(fieldClass)) {
-                builder.indent(1).append("entity.{} = resultSet.getLong(\"{}\");\n", fieldName, column);
+                builder.indent(1).append("entity.{} = resultSet.getLong(\"{}\");\n", fieldName, columnName);
             } else if (LocalDateTime.class.equals(fieldClass)) {
-                builder.indent(1).append("entity.{} = resultSet.getLocalDateTime(\"{}\");\n", fieldName, column);
+                builder.indent(1).append("entity.{} = resultSet.getLocalDateTime(\"{}\");\n", fieldName, columnName);
             } else if (LocalDate.class.equals(fieldClass)) {
-                builder.indent(1).append("entity.{} = resultSet.getLocalDate(\"{}\");\n", fieldName, column);
+                builder.indent(1).append("entity.{} = resultSet.getLocalDate(\"{}\");\n", fieldName, columnName);
             } else if (ZonedDateTime.class.equals(fieldClass)) {
-                builder.indent(1).append("entity.{} = resultSet.getZonedDateTime(\"{}\");\n", fieldName, column);
+                builder.indent(1).append("entity.{} = resultSet.getZonedDateTime(\"{}\");\n", fieldName, columnName);
             } else if (fieldClass.isEnum()) {
                 registerEnumClass(fieldClass);
                 this.builder.addField("private final {} {}Mappings = new {}({});", type(DBEnumMapper.class), fieldName, type(DBEnumMapper.class), variable(fieldClass));
-                builder.indent(1).append("entity.{} = ({}){}Mappings.getEnum(resultSet.getString(\"{}\"));\n", fieldName, type(fieldClass), fieldName, column);
+                builder.indent(1).append("entity.{} = ({}){}Mappings.getEnum(resultSet.getString(\"{}\"));\n", fieldName, type(fieldClass), fieldName, columnName);
             } else if (Double.class.equals(fieldClass)) {
-                builder.indent(1).append("entity.{} = resultSet.getDouble(\"{}\");\n", fieldName, column);
+                builder.indent(1).append("entity.{} = resultSet.getDouble(\"{}\");\n", fieldName, columnName);
             } else if (BigDecimal.class.equals(fieldClass)) {
-                builder.indent(1).append("entity.{} = resultSet.getBigDecimal(\"{}\");\n", fieldName, column);
+                builder.indent(1).append("entity.{} = resultSet.getBigDecimal(\"{}\");\n", fieldName, columnName);
+            } else if (column.json()) {
+                builder.indent(1).append("entity.{} = ({}) {}.fromJSON(resultSet.getString(\"{}\"), {});\n", fieldName, type(field.getType()), type(JSONHelper.class), columnName, variable(field.getGenericType()));
             }
         }
         builder.indent(1).append("return entity;\n");

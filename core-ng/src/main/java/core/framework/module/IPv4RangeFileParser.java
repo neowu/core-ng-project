@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -33,8 +32,8 @@ public final class IPv4RangeFileParser {
         try (InputStream stream = ClasspathResources.stream(classpath);
              var reader = new BufferedReader(new InputStreamReader(stream, UTF_8))) {
             return reader.lines()
-                         .filter(line -> !line.isBlank() && line.charAt(0) != '#')
-                         .collect(Collectors.toList());
+                .filter(line -> !line.isBlank() && line.charAt(0) != '#')
+                .toList();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

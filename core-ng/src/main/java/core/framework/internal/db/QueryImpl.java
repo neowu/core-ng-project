@@ -51,38 +51,43 @@ public class QueryImpl<T> implements Query<T> {
     }
 
     @Override
-    public void skip(int skip) {
+    public void skip(Integer skip) {
         this.skip = skip;
     }
 
     @Override
-    public void limit(int limit) {
+    public void limit(Integer limit) {
+        if (limit != null && limit <= 0) throw new Error("limit must be greater than 0, limit=" + limit);
         this.limit = limit;
     }
 
     @Override
     public List<T> fetch() {
         if (groupBy != null) throw new Error("fetch must not be used with groupBy, groupBy=" + groupBy);
-        if (limit != null && limit == 0) return List.of();  // for pagination search api returns records and count, sometimes it passes limit = 0 to get count only
         String sql = selectQuery.fetchSQL(whereClause, sort, skip, limit);
-        Object[] params = selectQuery.fetchParams(this.params, skip, limit);
+        Object[] params = selectQuery.params(this.params, skip, limit);
         return database.select(sql, entityClass, params);
     }
 
     @Override
     public Optional<T> fetchOne() {
         if (groupBy != null) throw new Error("fetch must not be used with groupBy, groupBy=" + groupBy);
-        if (limit != null && limit == 0) return Optional.empty();
         String sql = selectQuery.fetchSQL(whereClause, sort, skip, limit);
-        Object[] params = selectQuery.fetchParams(this.params, skip, limit);
+        Object[] params = selectQuery.params(this.params, skip, limit);
         return database.selectOne(sql, entityClass, params);
     }
 
     @Override
-    public <P> Optional<P> project(String projection, Class<P> viewClass) {
-        // project ignores skip and limit, and not report error, mainly for pagination search
-        String sql = selectQuery.projectionSQL(projection, whereClause, groupBy);
-        Object[] params = this.params.toArray();
+    public <P> List<P> project(String projection, Class<P> viewClass) {
+        String sql = selectQuery.sql(projection, whereClause, groupBy, sort, skip, limit);
+        Object[] params = selectQuery.params(this.params, skip, limit);
+        return database.select(sql, viewClass, params);
+    }
+
+    @Override
+    public <P> Optional<P> projectOne(String projection, Class<P> viewClass) {
+        String sql = selectQuery.sql(projection, whereClause, groupBy, sort, skip, limit);
+        Object[] params = selectQuery.params(this.params, skip, limit);
         return database.selectOne(sql, viewClass, params);
     }
 }

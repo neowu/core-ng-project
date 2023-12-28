@@ -20,16 +20,24 @@ class ValidatorTest {
     @Test
     void validate() {
         assertThatThrownBy(() -> validator.validate(null, false))
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("bean must not be null");
+            .isInstanceOf(ValidationException.class)
+            .hasMessageContaining("bean must not be null");
 
         assertThatThrownBy(() -> validator.validate(new TestBean(), false))
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("value=field must not be null");
+            .isInstanceOf(ValidationException.class)
+            .hasMessageContaining("value=field must not be null")
+            .hasMessageContaining("array=field must not be null")
+            .hasMessageContaining("lock=field must not be null");
     }
 
     public static class TestBean {
         @NotNull
         public String value;
+
+        @NotNull
+        public String[] array;
+
+        @NotNull
+        public Object lock;
     }
 }

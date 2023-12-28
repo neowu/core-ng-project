@@ -21,15 +21,18 @@ import static core.framework.internal.asm.Literal.type;
 class InsertQueryBuilder<T> {
     final DynamicInstanceBuilder<InsertQueryParamBuilder<T>> builder;
     private final Class<T> entityClass;
+    private final Dialect dialect;
     private final List<String> primaryKeyFieldNames = Lists.newArrayList();
 
     private String generatedColumn;
-    private List<String> paramFieldNames;
-    private String sql;
-    private String upsertClause;
+    private List<ParamField> paramFields;
+    private String insertSQL;
+    private String insertIgnoreSQL;
+    private String upsertSQL;
 
-    InsertQueryBuilder(Class<T> entityClass) {
+    InsertQueryBuilder(Class<T> entityClass, Dialect dialect) {
         this.entityClass = entityClass;
+        this.dialect = dialect;
         builder = new DynamicInstanceBuilder<>(InsertQueryParamBuilder.class, entityClass.getSimpleName());
     }
 
@@ -37,31 +40,37 @@ class InsertQueryBuilder<T> {
         buildSQL();
         builder.addMethod(applyMethod());
         InsertQueryParamBuilder<T> paramBuilder = builder.build();
-        return new InsertQuery<>(sql, upsertClause, generatedColumn, paramBuilder);
+        return new InsertQuery<>(insertSQL, insertIgnoreSQL, upsertSQL, generatedColumn, paramBuilder);
     }
 
     private void buildSQL() {
         List<Field> fields = Classes.instanceFields(entityClass);
         int size = fields.size();
-        paramFieldNames = new ArrayList<>(size);
+        paramFields = new ArrayList<>(size);
         List<String> columns = new ArrayList<>(size);
         List<String> params = new ArrayList<>(size);
         List<String> updates = new ArrayList<>(size);
         for (Field field : fields) {
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
-            String column = field.getDeclaredAnnotation(Column.class).name();
+            Column column = field.getDeclaredAnnotation(Column.class);
+            String columnName = column.name();
             if (primaryKey != null) {
                 if (primaryKey.autoIncrement()) {
-                    generatedColumn = column;
+                    generatedColumn = columnName;
                     continue;
                 }
                 primaryKeyFieldNames.add(field.getName());    // pk fields is only needed for assigned id
             } else {
-                // since MySQL 8.0.20, VALUES(column) syntax is deprecated, currently gcloud MySQL is still on 8.0.18
-                updates.add(Strings.format("{} = VALUES({})", column, column));
+                if (dialect == Dialect.MYSQL) {
+                    // VALUES(column) syntax is deprecated since MySQL 8.0.20, this is to keep compatible with old MySQL (gcloud still has 8.0.18)
+                    // will update to new syntax in future
+                    updates.add(Strings.format("{} = VALUES({})", columnName, columnName));
+                } else if (dialect == Dialect.POSTGRESQL) {
+                    updates.add(Strings.format("{} = EXCLUDED.{}", columnName, columnName));
+                }
             }
-            paramFieldNames.add(field.getName());
-            columns.add(column);
+            paramFields.add(new ParamField(field.getName(), column.json()));
+            columns.add(columnName);
             params.add("?");
         }
 
@@ -71,12 +80,24 @@ class InsertQueryBuilder<T> {
             .append(") VALUES (")
             .appendCommaSeparatedValues(params)
             .append(')');
-        sql = builder.build();
+        insertSQL = builder.build();
 
-        var upsertBuilder = new CodeBuilder()
-            .append(" ON DUPLICATE KEY UPDATE ")
-            .appendCommaSeparatedValues(updates);
-        upsertClause = upsertBuilder.build();
+        if (generatedColumn != null) return;  // auto-increment entity doesn't need insert ignore and upsert, refer to core.framework.internal.db.RepositoryImpl.insertIgnore
+
+        if (dialect == Dialect.MYSQL) {
+            insertIgnoreSQL = new StringBuilder(insertSQL).insert(6, " IGNORE").toString();
+        } else if (dialect == Dialect.POSTGRESQL) {
+            insertIgnoreSQL = insertSQL + " ON CONFLICT DO NOTHING";
+        }
+
+        if (dialect == Dialect.MYSQL) {
+            builder.append(" ON DUPLICATE KEY UPDATE ")
+                .appendCommaSeparatedValues(updates);
+        } else {
+            builder.append(" ON CONFLICT (").appendCommaSeparatedValues(primaryKeyFieldNames).append(") DO UPDATE SET ")
+                .appendCommaSeparatedValues(updates);
+        }
+        upsertSQL = builder.build();
     }
 
     private String applyMethod() {
@@ -92,10 +113,14 @@ class InsertQueryBuilder<T> {
             }
         }
 
-        builder.indent(1).append("Object[] params = new Object[{}];\n", paramFieldNames.size());
+        builder.indent(1).append("Object[] params = new Object[{}];\n", paramFields.size());
         int index = 0;
-        for (String name : paramFieldNames) {
-            builder.indent(1).append("params[{}] = entity.{};\n", index, name);
+        for (ParamField field : paramFields) {
+            if (field.json) {
+                builder.indent(1).append("params[{}] = {}.toJSON(entity.{});\n", index, type(JSONHelper.class), field.name);
+            } else {
+                builder.indent(1).append("params[{}] = entity.{};\n", index, field.name);
+            }
             index++;
         }
 
@@ -103,5 +128,8 @@ class InsertQueryBuilder<T> {
             .append("}");
 
         return builder.build();
+    }
+
+    private record ParamField(String name, boolean json) {
     }
 }

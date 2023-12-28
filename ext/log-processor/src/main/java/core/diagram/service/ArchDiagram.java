@@ -33,7 +33,7 @@ public class ArchDiagram {
     public void load(SearchResponse<ActionDocument> response) {
         var apps = response.aggregations.get("app").sterms().buckets().array();
         for (var appBucket : apps) {
-            load(appBucket.key(), appBucket.aggregations().get("action").sterms().buckets().array());
+            load(appBucket.key().stringValue(), appBucket.aggregations().get("action").sterms().buckets().array());
         }
     }
 
@@ -41,11 +41,11 @@ public class ArchDiagram {
         if (excludeApps.contains(app)) return;
 
         for (StringTermsBucket actionBucket : actions) {
-            String action = actionBucket.key();
+            String action = actionBucket.key().stringValue();
             long totalCount = actionBucket.docCount();
             List<StringTermsBucket> clients = actionBucket.aggregations().get("client").sterms().buckets().array();
             for (StringTermsBucket clientBucket : clients) {
-                String client = clientBucket.key();
+                String client = clientBucket.key().stringValue();
                 long count = clientBucket.docCount();
                 loadAction(app, action, client, count);
             }
@@ -87,7 +87,7 @@ public class ArchDiagram {
         for (String app : apps()) {
             if (excludeApps.contains(app)) continue;
             if (app.startsWith("_direct_")) {
-                dot.append("{} [label=direct, shape=point];\n", app);
+                dot.append("\"{}\" [label=direct, shape=point];\n", app);
                 continue;
             }
             String color = color(app);

@@ -18,8 +18,9 @@ public final class ByteArrayBody implements Body {
     }
 
     @Override
-    public void send(Sender sender, ResponseHandlerContext context) {
+    public long send(Sender sender, ResponseHandlerContext context) {
         LOGGER.debug("[response] body=bytes[{}]", bytes.length);
         sender.send(ByteBuffer.wrap(bytes));
+        return bytes.length;
     }
 }

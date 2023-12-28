@@ -64,6 +64,7 @@ final class Protocol {
 
     static class Command {
         static final byte[] AUTH = Strings.bytes("AUTH");
+        static final byte[] INFO = Strings.bytes("INFO");
 
         static final byte[] GET = Strings.bytes("GET");
         static final byte[] SET = Strings.bytes("SET");
@@ -97,16 +98,11 @@ final class Protocol {
         static final byte[] LPOP = Strings.bytes("LPOP");
         static final byte[] LTRIM = Strings.bytes("LTRIM");
 
-        static final byte[] SUBSCRIBE = Strings.bytes("SUBSCRIBE");
-        static final byte[] PUBLISH = Strings.bytes("PUBLISH");
-
-        static final byte[] INFO = Strings.bytes("INFO");
-        static final byte[] QUIT = Strings.bytes("QUIT");
-
         static final byte[] ZADD = Strings.bytes("ZADD");
+        static final byte[] ZINCRBY = Strings.bytes("ZINCRBY");
         static final byte[] ZRANGE = Strings.bytes("ZRANGE");
-        static final byte[] ZRANGEBYSCORE = Strings.bytes("ZRANGEBYSCORE");
         static final byte[] ZREM = Strings.bytes("ZREM");
+        static final byte[] ZPOPMIN = Strings.bytes("ZPOPMIN");
     }
 
     static class Keyword {
@@ -116,5 +112,6 @@ final class Protocol {
         static final byte[] PX = Strings.bytes("PX");
         static final byte[] LIMIT = Strings.bytes("LIMIT");
         static final byte[] WITHSCORES = Strings.bytes("WITHSCORES");
+        static final byte[] BYSCORE = Strings.bytes("BYSCORE");
     }
 }

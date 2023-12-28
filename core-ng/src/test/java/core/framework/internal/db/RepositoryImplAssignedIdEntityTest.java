@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -179,7 +178,7 @@ class RepositoryImplAssignedIdEntityTest {
     @Test
     void batchInsert() {
         List<AssignedIdEntity> entities = Lists.newArrayList();
-        for (int i = 1; i < 100; i++) {
+        for (int i = 1; i < 5; i++) {
             AssignedIdEntity entity = entity(String.valueOf(i), "value" + i, 10 + i);
             entities.add(entity);
         }
@@ -205,9 +204,9 @@ class RepositoryImplAssignedIdEntityTest {
             entities.add(entity);
             entities.add(entity);
         }
-        boolean[] results = repository.batchInsertIgnore(entities);
+        boolean result = repository.batchInsertIgnore(entities);
 
-        assertThat(results).hasSize(10).contains(true, false, true, false, true, false, true, false, true, false);
+        assertThat(result).isTrue();
         assertThat(repository.get("0")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
         assertThat(repository.get("1")).get().usingRecursiveComparison().isEqualTo(entities.get(2));
     }
@@ -219,10 +218,10 @@ class RepositoryImplAssignedIdEntityTest {
             AssignedIdEntity entity = entity(String.valueOf(i), "value" + i, 10 + i);
             entities.add(entity);
         }
-        boolean[] inserts = repository.batchUpsert(entities);
+        boolean updated = repository.batchUpsert(entities);
+        assertThat(updated).isTrue();
         assertThat(repository.get("0")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
         assertThat(repository.get("4")).get().usingRecursiveComparison().isEqualTo(entities.get(4));
-        assertThat(inserts).containsExactly(true, true, true, true, true);
 
         entities.get(0).intField = 2;
         entities.get(4).intField = 2;
@@ -235,19 +234,18 @@ class RepositoryImplAssignedIdEntityTest {
     @Test
     void batchDelete() {
         List<AssignedIdEntity> entities = Lists.newArrayList();
-        for (int i = 100; i < 200; i++) {
+        for (int i = 0; i < 5; i++) {
             AssignedIdEntity entity = entity(String.valueOf(i), "value" + i, 10 + i);
             entities.add(entity);
         }
         repository.batchInsert(entities);
 
-        boolean[] results = repository.batchDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
-        assertThat(results).hasSize(100).doesNotContain(false);
+        boolean result = repository.batchDelete(entities.stream().map(entity -> entity.id).toList());
+        assertThat(result).isTrue();
 
         assertThat(repository.get(entities.get(0).id)).isNotPresent();
         assertThat(repository.get(entities.get(1).id)).isNotPresent();
     }
-
 
     @Test
     void batchDeleteWithEmptyPrimaryKeys() {
@@ -259,7 +257,7 @@ class RepositoryImplAssignedIdEntityTest {
     @Test
     void selectWithGroupBy() {
         List<AssignedIdEntity> entities = Lists.newArrayList();
-        for (int i = 200; i < 250; i++) {
+        for (int i = 0; i < 5; i++) {
             AssignedIdEntity entity = entity(String.valueOf(i), "group", 1);
             entities.add(entity);
         }
@@ -268,9 +266,8 @@ class RepositoryImplAssignedIdEntityTest {
         Query<AssignedIdEntity> query = repository.select();
         query.where("string_field = ?", "group");
         query.groupBy("string_field");
-        Optional<Integer> sum = query.project("sum(int_field)", Integer.class);
-
-        assertThat(sum).hasValue(50);
+        Optional<Integer> sum = query.projectOne("sum(int_field)", Integer.class);
+        assertThat(sum).hasValue(5);
 
         assertThatThrownBy(query::fetch)
             .isInstanceOf(Error.class)
@@ -280,7 +277,7 @@ class RepositoryImplAssignedIdEntityTest {
     @Test
     void select() {
         List<AssignedIdEntity> entities = Lists.newArrayList();
-        for (int i = 300; i < 350; i++) {
+        for (int i = 300; i < 310; i++) {
             AssignedIdEntity entity = entity(String.valueOf(i), "value" + i, i);
             entities.add(entity);
         }
@@ -296,31 +293,54 @@ class RepositoryImplAssignedIdEntityTest {
         assertThat(results.get(0).intField).isEqualTo(305);
         assertThat(results.get(4).intField).isEqualTo(309);
 
-        query.where("string_field like ?", "value32%");
+        query.where("string_field like ?", "value30%");
         query.skip(0);
-        query.limit(100);
+        query.limit(10);
 
         results = query.fetch();
         assertThat(results).hasSize(10);
-        assertThat(results.get(0).intField).isEqualTo(320);
-        assertThat(results.get(4).intField).isEqualTo(324);
+        assertThat(results.get(0).intField).isEqualTo(300);
+        assertThat(results.get(4).intField).isEqualTo(304);
     }
 
     @Test
     void count() {
         List<AssignedIdEntity> entities = Lists.newArrayList();
-        for (int i = 400; i < 450; i++) {
+        for (int i = 100; i < 120; i++) {
             AssignedIdEntity entity = entity(String.valueOf(i), "value" + i, i);
             entities.add(entity);
         }
         repository.batchInsert(entities);
 
         Query<AssignedIdEntity> query = repository.select();
-        query.orderBy("int_field");
-        assertThat(query.count()).isEqualTo(50);
+        assertThat(query.count()).isEqualTo(20);
 
-        query.where("string_field like ?", "value42%");
+        query.where("string_field like ?", "value10%");
         assertThat(query.count()).isEqualTo(10);
+    }
+
+    @Test
+    void projectOne() {
+        List<AssignedIdEntity> entities = Lists.newArrayList();
+        for (int i = 0; i < 10; i++) {
+            AssignedIdEntity entity = entity(String.valueOf(i), "value" + i % 3, i);
+            entities.add(entity);
+        }
+        repository.batchInsert(entities);
+
+        Query<AssignedIdEntity> query = repository.select();
+        query.limit(1);
+        query.orderBy("id desc");
+        AssignedIdEntity entity = query.projectOne("id, string_field, int_field", AssignedIdEntity.class).orElseThrow();
+        assertThat(entity.id).isEqualTo("9");
+        assertThat(entity.stringField).isEqualTo("value0");
+        assertThat(entity.intField).isEqualTo(9);
+
+        query.skip(1);
+        entity = query.projectOne("id, string_field, int_field", AssignedIdEntity.class).orElseThrow();
+        assertThat(entity.id).isEqualTo("8");
+        assertThat(entity.stringField).isEqualTo("value2");
+        assertThat(entity.intField).isEqualTo(8);
     }
 
     private AssignedIdEntity entity(String id, String stringField, int intField) {

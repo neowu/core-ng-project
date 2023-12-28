@@ -19,9 +19,10 @@ public final class BeanBody implements Body {
     }
 
     @Override
-    public void send(Sender sender, ResponseHandlerContext context) {
+    public long send(Sender sender, ResponseHandlerContext context) {
         byte[] body = context.writer.toJSON(bean);
         LOGGER.debug("[response] body={}", new BytesLogParam(body));
         sender.send(ByteBuffer.wrap(body));
+        return body.length;
     }
 }

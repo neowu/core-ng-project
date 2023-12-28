@@ -47,6 +47,7 @@ public interface Repository<T> {
 
     // use update carefully, it will update all the columns according to the entity fields, includes null fields
     // generally it's recommended to use partialUpdate if only few columns need to be updated and with optimistic lock
+    // return true if the row actually changed
     boolean update(T entity);
 
     // only update non-null fields, return true if the row actually changed
@@ -61,12 +62,19 @@ public interface Repository<T> {
 
     Optional<long[]> batchInsert(List<T> entities);
 
-    // return whether each inserted successfully
-    boolean[] batchInsertIgnore(List<T> entities);
+    // return true if any row inserted
+    // this is drawback of MySQL thin driver, though expected behavior
+    // with batch insert ignore (or insert on duplicate key), MySQL thin driver fills entire affectedRows array with same value, java.sql.Statement.SUCCESS_NO_INFO if updated count > 0
+    // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts Line 758
+    boolean batchInsertIgnore(List<T> entities);
 
+    // return true if any row changed (inserted or updated)
+    // with batch, mysql treats both 1 (inserted) or 2 (updated) as java.sql.Statement.SUCCESS_NO_INFO
     // batch performance is significantly better than single call, try to do batch if possible on data sync
-    // return true if the new row inserted
-    boolean[] batchUpsert(List<T> entities);
+    boolean batchUpsert(List<T> entities);
 
-    boolean[] batchDelete(List<?> primaryKeys);
+    // return true if any row deleted
+    // use Transaction if size of primaryKeys is too large, to avoid mysql create transaction for each statement
+    // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executePreparedBatchAsMultiStatement, mysql driver simply sends multiple queries with ';' as one statement
+    boolean batchDelete(List<?> primaryKeys);
 }

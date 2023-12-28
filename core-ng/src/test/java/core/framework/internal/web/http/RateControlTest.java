@@ -1,9 +1,10 @@
 package core.framework.internal.web.http;
 
+import core.framework.internal.web.http.RateControl.Rate;
 import core.framework.web.exception.TooManyRequestsException;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -14,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RateControlTest {
     @Test
     void acquire() {
-        RateControl.Rate rate = new RateControl.Rate(1);
+        var rate = new Rate(1);
         rate.lastUpdateTime = 100;
         boolean result = rate.acquire(101, 2, 1);
         assertThat(result).isTrue();
@@ -34,20 +35,23 @@ class RateControlTest {
 
     @Test
     void ratePerNano() {
-        RateControl limiter = new RateControl(1);
-        assertThat(limiter.ratePerNano(100, TimeUnit.MICROSECONDS)).isEqualTo(0.1);
-        assertThat(limiter.ratePerNano(1, TimeUnit.SECONDS)).isEqualTo(0.000000001);
-        assertThat(limiter.ratePerNano(100, TimeUnit.NANOSECONDS)).isEqualTo(100);
+        var control = new RateControl();
+        control.maxEntries(1);
+        assertThat(control.ratePerNano(100_000, Duration.ofMillis(1))).isEqualTo(0.1);
+        assertThat(control.ratePerNano(1, Duration.ofSeconds(1))).isEqualTo(0.000000001);
+        assertThat(control.ratePerNano(100, Duration.ofNanos(1))).isEqualTo(100);
+        assertThat(control.ratePerNano(100, Duration.ofMinutes(5))).isEqualTo(100 / (5 * 60 * 1_000_000_000D));
     }
 
     @Test
     void validateRate() {
-        RateControl control = new RateControl(1);
-        control.config("group", 1, 1, TimeUnit.DAYS);
+        var control = new RateControl();
+        control.maxEntries(1);
+        control.config("group", 1, 1, Duration.ofHours(24));
         control.validateRate("group", "10.0.0.1");
 
         assertThatThrownBy(() -> control.validateRate("group", "10.0.0.1"))
-                .isInstanceOf(TooManyRequestsException.class)
-                .hasMessageContaining("exceeded");
+            .isInstanceOf(TooManyRequestsException.class)
+            .hasMessageContaining("exceeded");
     }
 }

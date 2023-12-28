@@ -55,6 +55,9 @@ public final class RequestParser {
         String method = exchange.getRequestMethod().toString();
         actionLog.context.put("method", List.of(method));
 
+        String path = exchange.getRequestPath();
+        request.path = path.isEmpty() ? "/" : path; // according to https://www.rfc-editor.org/rfc/rfc2616#section-5.1.2, empty path must be normalized as '/'
+
         request.requestURL = requestURL(request, exchange);
         putContext(actionLog, "request_url", request.requestURL);   // record request url even if attacker passes long string
         logger.debug("[request] method={}, requestURL={}", method, request.requestURL);
@@ -104,6 +107,9 @@ public final class RequestParser {
         String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
         request.clientIP = clientIPParser.parse(remoteAddress, xForwardedFor);
         actionLog.context.put("client_ip", List.of(request.clientIP));
+        if (clientIPParser.hasMoreThanMaxForwardedIPs(xForwardedFor)) {
+            actionLog.context.put("x_forwarded_for", List.of(xForwardedFor));
+        }
         logger.debug("[request] remoteAddress={}, clientIP={}", remoteAddress, request.clientIP);
     }
 
@@ -202,11 +208,17 @@ public final class RequestParser {
 
     int port(int requestPort, String xForwardedPort) {
         if (xForwardedPort != null) {
-            int index = xForwardedPort.indexOf(',');
-            if (index > 0)
-                return Integer.parseInt(xForwardedPort.substring(0, index));
-            else
-                return Integer.parseInt(xForwardedPort);
+            try {
+                int index = xForwardedPort.indexOf(',');
+                if (index > 0) {
+                    return Integer.parseInt(xForwardedPort.substring(0, index));
+                } else {
+                    return Integer.parseInt(xForwardedPort);
+                }
+            } catch (NumberFormatException e) {
+                // to protect X-Forwarded-Port spoofing
+                throw new BadRequestException("invalid port", "INVALID_HTTP_REQUEST", e);
+            }
         }
         return requestPort;
     }

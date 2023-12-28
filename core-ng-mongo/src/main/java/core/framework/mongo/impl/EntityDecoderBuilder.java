@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -61,15 +63,17 @@ final class EntityDecoderBuilder<T> {
             .indent(2).append("String fieldName = reader.readName();\n")
             .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
 
+        builder.indent(2).append("switch (fieldName) {\n");
         for (Field field : Classes.instanceFields(entityClass)) {
-            builder.indent(2).append("if ({}.equals(fieldName)) {\n", variable(mongoField(field)));
+            builder.indent(3).append("case {}: {\n", variable(mongoField(field)));
 
-            String variable = decodeValue(builder, field.getGenericType(), 3);
-            builder.indent(3).append("entity.{} = {};\n", field.getName(), variable);
+            String variable = decodeValue(builder, field.getGenericType(), 4);
+            builder.indent(4).append("entity.{} = {};\n", field.getName(), variable);
 
-            builder.indent(3).append("continue;\n")
-                .indent(2).append("}\n");
+            builder.indent(4).append("continue;\n")
+                .indent(3).append("}\n");
         }
+        builder.indent(2).append("}\n");    // not generate default branch to ignore unmatched field from mongo (to keep backward compatible, e.g. cleanup field)
 
         builder.indent(2).append("logger.warn({}, fieldPath, reader.getCurrentBsonType());\n", variable("undefined field, field={}, type={}"));
         builder.indent(2).append("reader.skipValue();\n");
@@ -167,12 +171,16 @@ final class EntityDecoderBuilder<T> {
             builder.append("java.time.LocalDateTime {} = wrapper.readLocalDateTime(fieldPath);\n", variable);
         } else if (ZonedDateTime.class.equals(valueType)) {
             builder.append("java.time.ZonedDateTime {} = wrapper.readZonedDateTime(fieldPath);\n", variable);
+        } else if (LocalDate.class.equals(valueType)) {
+            builder.append("java.time.LocalDate {} = wrapper.readLocalDate(fieldPath);\n", variable);
         } else if (GenericTypes.rawClass(valueType).isEnum()) {
             Class<?> valueClass = GenericTypes.rawClass(valueType);
             String enumCodecVariable = registerEnumCodec(valueClass);
             builder.append("{} {} = ({}) {}.read(reader, fieldPath);\n", type(valueClass), variable, type(valueClass), enumCodecVariable);
         } else if (Double.class.equals(valueType)) {
             builder.append("java.lang.Double {} = wrapper.readDouble(fieldPath);\n", variable);
+        } else if (BigDecimal.class.equals(valueType)) {
+            builder.append("java.math.BigDecimal {} = wrapper.readBigDecimal(fieldPath);\n", variable);
         } else if (ObjectId.class.equals(valueType)) {
             builder.append("org.bson.types.ObjectId {} = wrapper.readObjectId(fieldPath);\n", variable);
         } else if (Boolean.class.equals(valueType)) {

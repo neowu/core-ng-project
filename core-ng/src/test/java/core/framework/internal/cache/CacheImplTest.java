@@ -71,14 +71,14 @@ class CacheImplTest {
     @Test
     void loaderReturnsNull() {
         assertThatThrownBy(() -> cache.get("key", key -> null))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("value must not be null");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("value must not be null");
     }
 
     @Test
     void getAllWhenMiss() {
         var values = Map.of("name:key1", cacheItem("v1"),
-                "name:key3", cacheItem("v3"));
+            "name:key3", cacheItem("v3"));
         when(cacheStore.getAll(new String[]{"name:key1", "name:key2", "name:key3"}, cache.context)).thenReturn(values);
 
         TestCache item2 = cacheItem("v2");
@@ -88,13 +88,13 @@ class CacheImplTest {
         assertThat(results.get("key2").stringField).isEqualTo("v2");
         assertThat(results.get("key3").stringField).isEqualTo("v3");
 
-        verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && "v2".equals(argument.get(0).value.stringField)), eq(Duration.ofHours(1)), eq(cache.context));
+        verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && "v2".equals(argument.get(0).value().stringField)), eq(Duration.ofHours(1)), eq(cache.context));
     }
 
     @Test
     void getAllWhenHit() {
         var values = Map.of("name:key1", cacheItem("v1"),
-                "name:key2", cacheItem("v2"));
+            "name:key2", cacheItem("v2"));
         when(cacheStore.getAll(new String[]{"name:key1", "name:key2"}, cache.context)).thenReturn(values);
 
         Map<String, TestCache> results = cache.getAll(Arrays.asList("key1", "key2"), key -> null);
@@ -114,13 +114,13 @@ class CacheImplTest {
     @Test
     void putAll() {
         cache.putAll(Map.of("key1", cacheItem("v1"),
-                "key2", cacheItem("v2")));
+            "key2", cacheItem("v2")));
 
         verify(cacheStore).putAll(argThat(argument -> {
-            Set<String> keys = argument.stream().map(entry -> entry.key).collect(Collectors.toSet());
+            Set<String> keys = argument.stream().map(CacheStore.Entry::key).collect(Collectors.toSet());
             return argument.size() == 2
-                    && keys.contains("name:key1")
-                    && keys.contains("name:key2");
+                   && keys.contains("name:key1")
+                   && keys.contains("name:key2");
         }), eq(Duration.ofHours(1)), eq(cache.context));
     }
 

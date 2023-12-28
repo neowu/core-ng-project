@@ -28,7 +28,15 @@ public class LogForwardConfig {
         @NotNull
         @Size(min = 1)
         @Property(name = "apps")
-        public List<String> apps = List.of();   // apps must not be empty, as if we forwards all apps, the app consumes forwarded log will generates action-log back, to create a infinite loop
+        public List<String> apps = List.of();   // apps must not be empty, as if we forward all apps, the app consumes forwarded log will generate action-log and write back, results in an infinite loop
+
+        @NotNull
+        @Property(name = "results")
+        public List<String> results = List.of();
+
+        @NotNull
+        @Property(name = "ignoreActions")
+        public List<String> ignoreActions = List.of();
 
         @NotNull
         @Property(name = "ignoreErrorCodes")

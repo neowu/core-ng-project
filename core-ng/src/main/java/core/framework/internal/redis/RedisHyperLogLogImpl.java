@@ -42,9 +42,8 @@ public class RedisHyperLogLogImpl implements RedisHyperLogLog {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, 0, values.length);
             logger.debug("pfadd, key={}, values={}, size={}, elapsed={}", key, new ArrayLogParam(values), values.length, elapsed);
-            redis.checkSlowOperation(elapsed);
+            ActionLogContext.track("redis", elapsed, 0, values.length);
         }
     }
 
@@ -65,9 +64,8 @@ public class RedisHyperLogLogImpl implements RedisHyperLogLog {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, 1, 0);
             logger.debug("pfcount, keys={}, returnedValue={}, elapsed={}", keys, count, elapsed);
-            redis.checkSlowOperation(elapsed);
+            ActionLogContext.track("redis", elapsed, 1, 0);
         }
     }
 

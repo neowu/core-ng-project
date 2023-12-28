@@ -25,6 +25,10 @@ public class MonitorConfig {
     @Property(name = "kafka")
     public Map<String, KafkaConfig> kafka = Map.of();
 
+    @NotNull
+    @Property(name = "mongo")
+    public Map<String, MongoConfig> mongo = Map.of();
+
     @Property(name = "kube")
     public KubeConfig kube;
 
@@ -48,6 +52,12 @@ public class MonitorConfig {
         @NotNull
         @Property(name = "host")
         public String host;                             // only need to put one host per cluster
+
+        @NotNull
+        @Min(0)
+        @Max(1)
+        @Property(name = "highCPUUsageThreshold")
+        public Double highCPUUsageThreshold = 0.5;
 
         @NotNull
         @Min(0)
@@ -77,7 +87,19 @@ public class MonitorConfig {
         @NotNull
         @Min(0)
         @Property(name = "highDiskSizeThreshold")
-        public Long highDiskSizeThreshold = 50_000_000_000L;    // use 50G as default
+        public Long highDiskSizeThreshold = 50_000_000_000L;    // use 50G as default, kafka jmx doesn't provide disk limit, usually in cloud/kube env, pod pvc disk usage can be monitored by cloud monitoring as well
+    }
+
+    public static class MongoConfig {
+        @NotNull
+        @Property(name = "host")
+        public String host;
+
+        @NotNull
+        @Min(0)
+        @Max(1)
+        @Property(name = "highDiskUsageThreshold")
+        public Double highDiskUsageThreshold = 0.7;
     }
 
     public static class KubeConfig {

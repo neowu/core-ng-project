@@ -53,10 +53,12 @@ public final class MockRedisList implements RedisList {
         if (value == null) return List.of();
         List<String> list = value.list();
         int size = list.size();
-        int startIndex = start < 0 ? 0 : (int) start;
-        if (startIndex > size) startIndex = size;
+        int startIndex = start < 0 ? (int) start + size : (int) start;
+        if (startIndex < 0) startIndex = 0;
+        else if (startIndex > size) startIndex = size;
         int endIndex = stop < 0 ? (int) stop + size : (int) stop;
-        if (endIndex >= size) endIndex = size - 1;
+        if (endIndex < 0) endIndex = -1;
+        else if (endIndex >= size) endIndex = size - 1;
         return List.copyOf(list.subList(startIndex, endIndex + 1));
     }
 

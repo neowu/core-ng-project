@@ -13,15 +13,17 @@ import java.util.List;
  */
 final class SelectQuery<T> {
     final String getSQL;
+    final Dialect dialect;
     private final String table;
     private final String columns;
     int primaryKeyColumns;
 
-    SelectQuery(Class<T> entityClass) {
+    SelectQuery(Class<T> entityClass, Dialect dialect) {
         table = entityClass.getDeclaredAnnotation(Table.class).name();
         List<Field> fields = Classes.instanceFields(entityClass);
         columns = columns(fields);
         getSQL = getSQL(fields);
+        this.dialect = dialect;
     }
 
     private String getSQL(List<Field> fields) {
@@ -49,22 +51,26 @@ final class SelectQuery<T> {
         return builder.toString();
     }
 
-    String projectionSQL(String projection, StringBuilder where, String groupBy) {
-        StringBuilder builder = new StringBuilder("SELECT ").append(projection).append(" FROM ").append(table);
+    String fetchSQL(StringBuilder where, String sort, Integer skip, Integer limit) {
+        return sql(columns, where, null, sort, skip, limit);
+    }
+
+    String sql(String projection, StringBuilder where, String groupBy, String sort, Integer skip, Integer limit) {
+        var builder = new StringBuilder("SELECT ").append(projection).append(" FROM ").append(table);
         if (where.length() > 0) builder.append(" WHERE ").append(where);
         if (groupBy != null) builder.append(" GROUP BY ").append(groupBy);
-        return builder.toString();
-    }
-
-    String fetchSQL(StringBuilder where, String sort, Integer skip, Integer limit) {
-        var builder = new StringBuilder("SELECT ").append(columns).append(" FROM ").append(table);
-        if (where.length() > 0) builder.append(" WHERE ").append(where);
         if (sort != null) builder.append(" ORDER BY ").append(sort);
-        if (skip != null || limit != null) builder.append(" LIMIT ?,?");
+        if (skip != null || limit != null) {
+            if (dialect == Dialect.MYSQL) {
+                builder.append(" LIMIT ?,?");
+            } else if (dialect == Dialect.POSTGRESQL) {
+                builder.append(" OFFSET ? LIMIT ?");
+            }
+        }
         return builder.toString();
     }
 
-    Object[] fetchParams(List<Object> params, Integer skip, Integer limit) {
+    Object[] params(List<Object> params, Integer skip, Integer limit) {
         if (skip != null && limit == null) throw new Error("limit must not be null if skip is not, skip=" + skip);
         if (skip == null && limit == null) return params.toArray();
 

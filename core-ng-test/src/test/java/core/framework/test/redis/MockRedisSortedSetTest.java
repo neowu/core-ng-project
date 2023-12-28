@@ -32,6 +32,16 @@ class MockRedisSortedSetTest {
     }
 
     @Test
+    void increaseScoreBy() {
+        assertThat(sortedSet.increaseScoreBy("key", "1", 1)).isEqualTo(1);
+        assertThat(sortedSet.increaseScoreBy("key", "1", 1)).isEqualTo(2);
+        assertThat(sortedSet.increaseScoreBy("key", "2", 2)).isEqualTo(2);
+        assertThat(sortedSet.increaseScoreBy("key", "2", 2)).isEqualTo(4);
+
+        assertThat(sortedSet.range("key", 0, -1)).containsExactly(entry("1", 2L), entry("2", 4L));
+    }
+
+    @Test
     void addOnlyIfAbsent() {
         assertThat(sortedSet.add("key1", Map.of("1", 1L), true)).isEqualTo(1);
         assertThat(sortedSet.add("key1", Map.of("1", 2L), true)).isEqualTo(0);
@@ -97,5 +107,30 @@ class MockRedisSortedSetTest {
         assertThat(sortedSet.range("key", -1, 5))
             .containsOnlyKeys(List.of("1", "2", "3", "4"));
         assertThat(sortedSet.range("key", 9, 10)).isEmpty();
+    }
+
+    @Test
+    void popMin() {
+        sortedSet.add("key", "1", 1);
+        sortedSet.add("key", "3", 3);
+        sortedSet.add("key", "2", 2);
+        sortedSet.add("key", "4", 4);
+
+        assertThat(sortedSet.popMin("key")).isEqualTo("1");
+        assertThat(sortedSet.popMin("key", 2)).containsExactly(entry("2", 2L), entry("3", 3L));
+        assertThat(sortedSet.popMin("key", 5)).containsExactly(entry("4", 4L));
+    }
+
+    @Test
+    void remove() {
+        sortedSet.add("key", "1", 1);
+        sortedSet.add("key", "3", 3);
+        sortedSet.add("key", "2", 2);
+        sortedSet.add("key", "4", 4);
+
+        assertThat(sortedSet.remove("key", "2", "3")).isEqualTo(2);
+        assertThat(sortedSet.remove("key", "4", "3")).isEqualTo(1);
+        assertThat(sortedSet.popMin("key")).isEqualTo("1");
+        assertThat(sortedSet.popMin("key")).isNull();
     }
 }

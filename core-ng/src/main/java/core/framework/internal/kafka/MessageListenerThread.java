@@ -1,9 +1,11 @@
 package core.framework.internal.kafka;
 
+import core.framework.internal.async.ThreadPools;
+import core.framework.internal.async.VirtualThread;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
-import core.framework.internal.log.Trace;
+import core.framework.internal.log.PerformanceWarning;
 import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.kafka.Message;
 import core.framework.util.Sets;
@@ -12,23 +14,23 @@ import core.framework.util.Threads;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.common.header.Header;
-import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 import static core.framework.log.Markers.errorCode;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -38,16 +40,24 @@ class MessageListenerThread extends Thread {
     private final MessageListener listener;
     private final LogManager logManager;
 
-    private final Object lock = new Object();
-    private final Consumer<byte[], byte[]> consumer;
+    private final Consumer<String, byte[]> consumer;
+    private final Builder.OfVirtual thread;
 
+    private final Semaphore semaphore;
+    private final int concurrency;
+
+    private final Object lock = new Object();
+    private volatile boolean shutdown;
     private volatile boolean processing;
 
-    MessageListenerThread(String name, Consumer<byte[], byte[]> consumer, MessageListener listener) {
+    MessageListenerThread(String name, Consumer<String, byte[]> consumer, MessageListener listener) {
         super(name);
         this.consumer = consumer;
         this.listener = listener;
         logManager = listener.logManager;
+        concurrency = listener.concurrency;
+        semaphore = new Semaphore(concurrency);
+        thread = ThreadPools.virtualThreadBuilder(name + "-");   // used in single thread, no need to use factory()
     }
 
     @Override
@@ -64,14 +74,15 @@ class MessageListenerThread extends Thread {
     }
 
     private void process() {
-        while (!listener.shutdown) {
+        while (!shutdown) {
             try {
-                ConsumerRecords<byte[], byte[]> records = consumer.poll(Duration.ofSeconds(30));    // consumer should call poll at least once every MAX_POLL_INTERVAL_MS
-                if (records.isEmpty()) continue;
-                processRecords(records);
+                Collection<KafkaMessages> allMessages = poll();   // consumer should call poll at least once every MAX_POLL_INTERVAL_MS
+                if (allMessages == null) continue;
+
+                processAll(allMessages);
             } catch (Throwable e) {
-                if (!listener.shutdown) {
-                    logger.error("failed to pull message, retry in 10 seconds", e);
+                if (!shutdown) {
+                    logger.error("failed to poll messages, retry in 10 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(10));
                 }
             }
@@ -81,102 +92,128 @@ class MessageListenerThread extends Thread {
         consumer.close();
     }
 
+    @Nullable
+    Collection<KafkaMessages> poll() {
+        ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofSeconds(30));
+        if (records.isEmpty()) return null;
+
+        Map<String, KafkaMessages> messageMappings = new LinkedHashMap<>();
+        for (ConsumerRecord<String, byte[]> record : records) {
+            String topic = record.topic();
+            KafkaMessages messages = messageMappings.computeIfAbsent(topic, KafkaMessages::new);
+            if (listener.bulkProcesses.containsKey(topic)) {
+                messages.addUnordered(record);  // bulk is processed in single thread
+                messages.bulk = true;
+            } else {
+                messages.addOrdered(record);
+            }
+        }
+        return messageMappings.values();
+    }
+
     void shutdown() {
-        // interrupt() will interrupt consumer coordinator,
+        shutdown = true;
+        // do not call interrupt(), it will interrupt consumer coordinator,
         // the only downside of not calling interrupt() is if thread is at process->exception->sleepRoughly, shutdown will have to wait until sleep ends
         consumer.wakeup();
     }
 
-    void awaitTermination(long timeoutInMs) throws InterruptedException {
+    boolean awaitTermination(long timeoutInMs) throws InterruptedException {
         long end = System.currentTimeMillis() + timeoutInMs;
         synchronized (lock) {
             while (processing) {
                 long left = end - System.currentTimeMillis();
                 if (left <= 0) {
-                    logger.warn(errorCode("FAILED_TO_STOP"), "failed to terminate kafka message listener thread, name={}", getName());
-                    break;
+                    return false;
                 }
                 lock.wait(left);
             }
+            return true;
         }
     }
 
-    private void processRecords(ConsumerRecords<byte[], byte[]> kafkaRecords) {
+    void processAll(Collection<KafkaMessages> allMessages) throws InterruptedException {
         var watch = new StopWatch();
         int count = 0;
         int size = 0;
+
+        for (KafkaMessages messages : allMessages) {
+            count += messages.count;
+            size += messages.size;
+
+            if (messages.bulk) {
+                MessageProcess<?> bulkProcess = listener.bulkProcesses.get(messages.topic);
+                processBulk(bulkProcess, messages);
+            } else {
+                MessageProcess<?> process = listener.processes.get(messages.topic);
+                processSingle(process, messages);
+            }
+        }
+
+        semaphore.acquire(concurrency);
         try {
-            Map<String, List<ConsumerRecord<byte[], byte[]>>> messages = new HashMap<>();     // record in one topic maintains order
-            for (ConsumerRecord<byte[], byte[]> record : kafkaRecords) {
-                messages.computeIfAbsent(record.topic(), key -> new ArrayList<>()).add(record);
-                count++;
-                size += record.value().length;
-            }
-            for (Map.Entry<String, List<ConsumerRecord<byte[], byte[]>>> entry : messages.entrySet()) {
-                String topic = entry.getKey();
-                List<ConsumerRecord<byte[], byte[]>> records = entry.getValue();
-                MessageProcess<?> process = listener.processes.get(topic);
-                if (process.bulkHandler != null) {
-                    handleBulk(topic, process, records);
-                } else {
-                    handle(topic, process, records);
-                }
-            }
-        } finally {
             consumer.commitAsync();
-            logger.info("process kafka records, count={}, size={}, elapsed={}", count, size, watch.elapsed());
+        } finally {
+            semaphore.release(concurrency);
+        }
+
+        logger.info("process kafka messages, count={}, size={}, elapsed={}", count, size, watch.elapsed());
+    }
+
+    private void processSingle(MessageProcess<?> process, KafkaMessages messages) throws InterruptedException {
+        for (KafkaMessage message : messages.unordered) {
+            semaphore.acquire();
+            thread.start(() -> {
+                try {
+                    VirtualThread.COUNT.increase();
+                    handleSingle(messages.topic, process, message);
+                } finally {
+                    VirtualThread.COUNT.decrease();
+                    semaphore.release();
+                }
+            });
+        }
+        for (KafkaMessage message : messages.ordered.values()) {
+            semaphore.acquire();
+            thread.start(() -> {
+                try {
+                    VirtualThread.COUNT.increase();
+                    handleSingle(messages.topic, process, message);
+                    if (message.subsequent != null) {
+                        for (KafkaMessage subsequent : message.subsequent) {
+                            handleSingle(messages.topic, process, subsequent);
+                        }
+                    }
+                } finally {
+                    VirtualThread.COUNT.decrease();
+                    semaphore.release();
+                }
+            });
         }
     }
 
-    <T> void handle(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records) {
-        for (ConsumerRecord<byte[], byte[]> record : records) {
-            ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
-            try {
-                initAction(actionLog, topic, process.handler.getClass().getCanonicalName());
-
-                actionLog.track("kafka", 0, 1, 0);
-
-                Headers headers = record.headers();
-                String trace = header(headers, MessageHeaders.HEADER_TRACE);
-                if (trace != null) actionLog.trace = Trace.parse(trace);
-                String correlationId = header(headers, MessageHeaders.HEADER_CORRELATION_ID);
-                if (correlationId != null) actionLog.correlationIds = List.of(correlationId);
-                String client = header(headers, MessageHeaders.HEADER_CLIENT);
-                if (client != null) actionLog.clients = List.of(client);
-                String refId = header(headers, MessageHeaders.HEADER_REF_ID);
-                if (refId != null) actionLog.refIds = List.of(refId);
-                logger.debug("[header] refId={}, client={}, correlationId={}, trace={}", refId, client, correlationId, trace);
-
-                String key = key(record);
-                actionLog.context.put("key", Collections.singletonList(key)); // key can be null
-
-                long timestamp = record.timestamp();
-                checkConsumerDelay(actionLog, timestamp, listener.longConsumerDelayThresholdInNano);
-
-                byte[] value = record.value();
-                logger.debug("[message] key={}, value={}, timestamp={}", key, new BytesLogParam(value), timestamp);
-                T message = process.reader.fromJSON(value);
-                process.validator.validate(message, false);
-                process.handler.handle(key, message);
-            } catch (Throwable e) {
-                logManager.logError(e);
-            } finally {
-                logManager.end("=== message handling end ===");
-            }
-        }
-    }
-
-    <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records) {
+    <T> void handleSingle(String topic, MessageProcess<T> process, KafkaMessage message) {
         ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
         try {
-            initAction(actionLog, topic, process.bulkHandler.getClass().getCanonicalName());
+            initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), process.warnings);
 
-            List<Message<T>> messages = messages(records, actionLog, process.reader);
-            for (Message<T> message : messages) {   // validate after fromJSON, so it can track refId/correlationId
-                process.validator.validate(message.value, false);
-            }
+            actionLog.track("kafka", 0, 1, 0);
 
-            process.bulkHandler.handle(messages);
+            if (message.trace != null) actionLog.trace = message.trace;
+            if (message.correlationId != null) actionLog.correlationIds = List.of(message.correlationId);
+            if (message.client != null) actionLog.clients = List.of(message.client);
+            if (message.refId != null) actionLog.refIds = List.of(message.refId);
+            logger.debug("[header] refId={}, client={}, correlationId={}, trace={}", message.refId, message.client, message.correlationId, message.trace);
+
+            actionLog.context.put("key", Collections.singletonList(message.key)); // key can be null
+
+            checkConsumerDelay(actionLog, message.timestamp, listener.longConsumerDelayThresholdInNano);
+
+            logger.debug("[message] key={}, value={}, timestamp={}", message.key, new BytesLogParam(message.value), message.timestamp);
+
+            T messageObject = process.reader.fromJSON(message.value);
+            process.validator.validate(messageObject, false);
+            process.handler().handle(message.key, messageObject);
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {
@@ -184,47 +221,70 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    private void initAction(ActionLog actionLog, String topic, String handler) {
+    private void processBulk(MessageProcess<?> bulkProcess, KafkaMessages messages) throws InterruptedException {
+        semaphore.acquire();
+        thread.start(() -> {
+            VirtualThread.COUNT.increase();
+            try {
+                handleBulk(messages.topic, bulkProcess, messages.unordered);
+            } finally {
+                VirtualThread.COUNT.decrease();
+                semaphore.release();
+            }
+        });
+    }
+
+    <T> void handleBulk(String topic, MessageProcess<T> process, List<KafkaMessage> messages) {
+        ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
+        try {
+            initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), process.warnings);
+
+            List<Message<T>> messageObjects = messages(messages, actionLog, process.reader);
+            for (Message<T> message : messageObjects) {   // validate after fromJSON, so it can track refId/correlationId
+                process.validator.validate(message.value, false);
+            }
+
+            process.bulkHandler().handle(messageObjects);
+        } catch (Throwable e) {
+            logManager.logError(e);
+        } finally {
+            logManager.end("=== message handling end ===");
+        }
+    }
+
+    private void initAction(ActionLog actionLog, String topic, String handler, PerformanceWarning[] warnings) {
         actionLog.action("topic:" + topic);
-        actionLog.maxProcessTime(listener.maxProcessTimeInNano);
+        actionLog.warningContext.maxProcessTimeInNano(listener.maxProcessTimeInNano);
         actionLog.context.put("topic", List.of(topic));
         actionLog.context.put("handler", List.of(handler));
         logger.debug("topic={}, handler={}", topic, handler);
+        if (warnings != null) actionLog.initializeWarnings(warnings);
     }
 
-    <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONReader<T> reader) throws IOException {
-        int size = records.size();
+    <T> List<Message<T>> messages(List<KafkaMessage> messages, ActionLog actionLog, JSONReader<T> reader) throws IOException {
+        int size = messages.size();
         actionLog.track("kafka", 0, size, 0);
-        List<Message<T>> messages = new ArrayList<>(size);
+        List<Message<T>> messageObjects = new ArrayList<>(size);
         Set<String> correlationIds = new HashSet<>();
         Set<String> clients = new HashSet<>();
         Set<String> refIds = new HashSet<>();
         Set<String> keys = Sets.newHashSetWithExpectedSize(size);
         long minTimestamp = Long.MAX_VALUE;
 
-        for (ConsumerRecord<byte[], byte[]> record : records) {
-            Headers headers = record.headers();
-            String trace = header(headers, MessageHeaders.HEADER_TRACE);
-            if (trace != null) actionLog.trace = Trace.parse(trace);   // trigger trace if any message is trace
-            String correlationId = header(headers, MessageHeaders.HEADER_CORRELATION_ID);
-            if (correlationId != null) correlationIds.add(correlationId);
-            String client = header(headers, MessageHeaders.HEADER_CLIENT);
-            if (client != null) clients.add(client);
-            String refId = header(headers, MessageHeaders.HEADER_REF_ID);
-            if (refId != null) refIds.add(refId);
+        for (KafkaMessage message : messages) {
+            if (message.trace != null) actionLog.trace = message.trace;   // trigger trace if any message is trace
+            if (message.correlationId != null) correlationIds.add(message.correlationId);
+            if (message.client != null) clients.add(message.client);
+            if (message.refId != null) refIds.add(message.refId);
+            keys.add(message.key);
 
-            String key = key(record);
-            keys.add(key);
-
-            byte[] value = record.value();
-            long timestamp = record.timestamp();
             logger.debug("[message] key={}, value={}, timestamp={}, refId={}, client={}, correlationId={}, trace={}",
-                key, new BytesLogParam(value), timestamp, refId, client, correlationId, trace);
+                message.key, new BytesLogParam(message.value), message.timestamp, message.refId, message.client, message.correlationId, message.trace);
 
-            if (minTimestamp > timestamp) minTimestamp = timestamp;
+            if (minTimestamp > message.timestamp) minTimestamp = message.timestamp;
 
-            T message = reader.fromJSON(value);
-            messages.add(new Message<>(key, message));
+            T messageObject = reader.fromJSON(message.value);
+            messageObjects.add(new Message<>(message.key, messageObject));
         }
         actionLog.context.put("key", new ArrayList<>(keys));    // keys could contain null
 
@@ -232,25 +292,18 @@ class MessageListenerThread extends Thread {
         if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);
         if (!refIds.isEmpty()) actionLog.refIds = List.copyOf(refIds);
         checkConsumerDelay(actionLog, minTimestamp, listener.longConsumerDelayThresholdInNano);
-        return messages;
-    }
-
-    String key(ConsumerRecord<byte[], byte[]> record) {
-        byte[] key = record.key();
-        return key == null ? null : new String(key, UTF_8);
-    }
-
-    String header(Headers headers, String key) {
-        Header header = headers.lastHeader(key);
-        if (header == null) return null;
-        return new String(header.value(), UTF_8);
+        return messageObjects;
     }
 
     void checkConsumerDelay(ActionLog actionLog, long timestamp, long longConsumerDelayThresholdInNano) {
         long delay = (actionLog.date.toEpochMilli() - timestamp) * 1_000_000;     // convert to nanoseconds
         logger.debug("consumerDelay={}", Duration.ofNanos(delay));
         actionLog.stats.put("consumer_delay", (double) delay);
-        if (delay > longConsumerDelayThresholdInNano) {
+        // refer to core.framework.internal.kafka.MessageListener.createConsumer, MAX_POLL_INTERVAL_MS_CONFIG = 30 mins
+        // log as error if delay > 15 mins
+        if (delay > 900_000_000_000L) {
+            logger.error(errorCode("LONG_CONSUMER_DELAY"), "consumer delay is too long, delay={}", Duration.ofNanos(delay));
+        } else if (delay > longConsumerDelayThresholdInNano) {
             logger.warn(errorCode("LONG_CONSUMER_DELAY"), "consumer delay is too long, delay={}", Duration.ofNanos(delay));
         }
     }

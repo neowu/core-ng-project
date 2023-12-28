@@ -16,6 +16,7 @@ public abstract class AbstractTestModule extends Module {
     public final void configure() throws Exception {
         logger.info("initialize test context");
         context = new TestModuleContext();
+        context.initialize();
         Runtime.getRuntime().addShutdownHook(new Thread(context.shutdownHook, "shutdown")); // register shutdown hook for integration test, to clean up external resources if needed
 
         logger.info("initialize application");

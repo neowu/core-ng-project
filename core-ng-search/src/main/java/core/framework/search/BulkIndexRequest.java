@@ -10,4 +10,6 @@ public class BulkIndexRequest<T> {
     @Nullable
     public String index;
     public Map<String, T> sources;
+    @Nullable
+    public Boolean refresh; // whether refresh index after operation, by default, changes only visible after index settings->refresh_interval
 }

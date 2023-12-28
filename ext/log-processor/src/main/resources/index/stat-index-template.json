@@ -7,6 +7,7 @@
       "refresh_interval": "${REFRESH_INTERVAL}"
     },
     "mappings": {
+      "date_detection": false,
       "dynamic_templates": [
         {
           "stats": {

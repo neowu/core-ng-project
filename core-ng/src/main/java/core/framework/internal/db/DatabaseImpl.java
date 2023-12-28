@@ -1,7 +1,6 @@
 package core.framework.internal.db;
 
-import com.mysql.cj.conf.PropertyDefinitions;
-import com.mysql.cj.conf.PropertyKey;
+import core.framework.db.CloudAuthProvider;
 import core.framework.db.Database;
 import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
@@ -30,39 +29,37 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import static core.framework.log.Markers.errorCode;
-
 /**
  * @author neo
  */
 public final class DatabaseImpl implements Database {
     static {
-        // disable unnecessary mysql connection cleanup thread to reduce overhead
-        System.setProperty(PropertyDefinitions.SYSP_disableAbandonedConnectionCleanup, "true");
+        // disable unnecessary mysql connection cleanup thread to reduce overhead, refer to PropertyDefinitions.SYSP_disableAbandonedConnectionCleanup
+        System.setProperty("com.mysql.cj.disableAbandonedConnectionCleanup", "true");
     }
 
     public final Pool<Connection> pool;
     public final DatabaseOperation operation;
-
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
     private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
+
     public String user;
     public String password;
-    public int maxOperations = 5000;  // max db calls per action, if exceeds, it indicates either wrong impl (e.g. infinite loop with db calls) or bad practice (not CD friendly), better split into multiple actions
-    public int tooManyRowsReturnedThreshold = 1000;
-    public long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
+    public CloudAuthProvider authProvider;
     public IsolationLevel isolationLevel;
+
     private String url;
     private Properties driverProperties;
     private Duration timeout;
     private Driver driver;
+    private Dialect dialect;
 
     public DatabaseImpl(String name) {
         initializeRowMappers();
 
         pool = new Pool<>(this::createConnection, name);
         pool.size(5, 50);    // default optimization for AWS medium/large instances
-        pool.maxIdleTime = Duration.ofHours(1);  // make sure db server does not kill connection shorter than this, e.g. MySQL default wait_timeout is 8 hours
+        pool.maxIdleTime = Duration.ofHours(2);  // make sure db server does not kill connection shorter than this, e.g. MySQL default wait_timeout is 8 hours
         pool.validator(connection -> connection.isValid(1), Duration.ofSeconds(30));
 
         operation = new DatabaseOperation(pool);
@@ -85,8 +82,13 @@ public final class DatabaseImpl implements Database {
         if (url == null) throw new Error("url must not be null");
         Properties driverProperties = this.driverProperties;
         if (driverProperties == null) {
-            driverProperties = driverProperties(url, user, password);
+            driverProperties = driverProperties(url);
             this.driverProperties = driverProperties;
+        }
+        if (authProvider != null) {
+            // properties are thread safe, it's ok to set user/password with multiple threads
+            driverProperties.setProperty("user", authProvider.user());
+            driverProperties.setProperty("password", authProvider.accessToken());
         }
         Connection connection = null;
         try {
@@ -99,30 +101,48 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    Properties driverProperties(String url, String user, String password) {
+    Properties driverProperties(String url) {
         var properties = new Properties();
-        if (user != null) properties.setProperty("user", user);
-        if (password != null) properties.setProperty("password", password);
+        if (authProvider == null && user != null) properties.setProperty("user", user);
+        if (authProvider == null && password != null) properties.setProperty("password", password);
         if (url.startsWith("jdbc:mysql:")) {
-            String timeoutValue = String.valueOf(timeout.toMillis());
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
-            properties.setProperty(PropertyKey.connectTimeout.getKeyName(), timeoutValue);
-            properties.setProperty(PropertyKey.socketTimeout.getKeyName(), timeoutValue);
+            properties.setProperty("connectTimeout", String.valueOf(timeout.toMillis()));
+            // add 10s for socket timeout which is read timeout, as all queries have queryTimeout, MySQL will send "KILL QUERY" command to MySQL server
+            // otherwise we will see socket timeout exception (com.mysql.cj.exceptions.StatementIsClosedException: No operations allowed after statement closed)
+            // refer to com.mysql.cj.CancelQueryTaskImpl
+            properties.setProperty("socketTimeout", String.valueOf(timeout.toMillis() + 10_000));
+            // refer to https://dev.mysql.com/doc/c-api/8.0/en/mysql-affected-rows.html
             // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-connp-props-connection.html#cj-conn-prop_useAffectedRows
             // Don't set the CLIENT_FOUND_ROWS flag when connecting to the server (not JDBC-compliant, will break most applications that rely on "found" rows vs. "affected rows" for DML statements),
             // but does cause "correct" update counts from "INSERT ... ON DUPLICATE KEY UPDATE" statements to be returned by the server.
-            properties.setProperty(PropertyKey.useAffectedRows.getKeyName(), "true");
+            properties.setProperty("useAffectedRows", "true");
             // refer to com.mysql.cj.protocol.a.NativeProtocol.configureTimeZone,
             // force to UTC, generally on cloud it defaults to UTC, this setting is to make local match cloud
-            properties.setProperty(PropertyKey.connectionTimeZone.getKeyName(), "UTC");
-            properties.setProperty(PropertyKey.rewriteBatchedStatements.getKeyName(), "true");
-            properties.setProperty(PropertyKey.queryInterceptors.getKeyName(), MySQLQueryInterceptor.class.getName());
-            properties.setProperty(PropertyKey.logger.getKeyName(), "Slf4JLogger");
+            properties.setProperty("connectionTimeZone", "UTC");
+            properties.setProperty("rewriteBatchedStatements", "true");
+            properties.setProperty("queryInterceptors", MySQLQueryInterceptor.class.getName());
+            properties.setProperty("logger", "Slf4JLogger");
+            properties.setProperty("cachePrepStmts", "true");
+
             int index = url.indexOf('?');
             // mysql with ssl has overhead, usually we ensure security on arch level, e.g. gcloud sql proxy or firewall rule
-            if (index == -1 || url.indexOf("useSSL=", index + 1) == -1) properties.setProperty(PropertyKey.useSSL.getKeyName(), "false");
-            // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-charsets.html
-            if (index == -1 || url.indexOf("characterEncoding=", index + 1) == -1) properties.setProperty(PropertyKey.characterEncoding.getKeyName(), "utf-8");
+            // with gcloud iam / clear_text_password plugin, ssl is required
+            // refer to https://cloud.google.com/sql/docs/mysql/authentication
+            if (authProvider != null) {
+                properties.setProperty("sslMode", "PREFERRED");
+                properties.setProperty(CloudAuthProvider.Provider.CLOUD_AUTH, "true");
+            } else if (index == -1 || url.indexOf("sslMode=", index + 1) == -1) {
+                properties.setProperty("sslMode", "DISABLED");
+            }
+            // refer to https://dev.mysql.com/doc/connector-j/en/connector-j-reference-charsets.html
+            if (index == -1 || url.indexOf("characterEncoding=", index + 1) == -1)
+                properties.setProperty("characterEncoding", "utf-8");
+        } else if (url.startsWith("jdbc:postgresql:")) {
+            // refer to org.postgresql.PGProperty
+            properties.setProperty("connectTimeout", String.valueOf(timeout.toSeconds()));
+            properties.setProperty("socketTimeout", String.valueOf(timeout.toSeconds()));
+            properties.setProperty("reWriteBatchedInserts", "true");
         }
         return properties;
     }
@@ -147,8 +167,13 @@ public final class DatabaseImpl implements Database {
 
     private Driver driver(String url) {
         if (url.startsWith("jdbc:mysql:")) {
+            dialect = Dialect.MYSQL;
             return createDriver("com.mysql.cj.jdbc.Driver");
+        } else if (url.startsWith("jdbc:postgresql:")) {
+            dialect = Dialect.POSTGRESQL;
+            return createDriver("org.postgresql.Driver");
         } else if (url.startsWith("jdbc:hsqldb:")) {
+            dialect = Dialect.MYSQL;    // unit test use mysql dialect
             return createDriver("org.hsqldb.jdbc.JDBCDriver");
         } else {
             throw new Error("not supported database, url=" + url);
@@ -166,7 +191,7 @@ public final class DatabaseImpl implements Database {
     public <T> void view(Class<T> viewClass) {
         var watch = new StopWatch();
         try {
-            new DatabaseClassValidator(viewClass).validateViewClass();
+            new DatabaseClassValidator(viewClass, true).validate();
             registerViewClass(viewClass);
         } finally {
             logger.info("register db view, viewClass={}, elapsed={}", viewClass.getCanonicalName(), watch.elapsed());
@@ -176,9 +201,9 @@ public final class DatabaseImpl implements Database {
     public <T> Repository<T> repository(Class<T> entityClass) {
         var watch = new StopWatch();
         try {
-            new DatabaseClassValidator(entityClass).validateEntityClass();
+            new DatabaseClassValidator(entityClass, false).validate();
             registerViewClass(entityClass);
-            return new RepositoryImpl<>(this, entityClass);
+            return new RepositoryImpl<>(this, entityClass, dialect);
         } finally {
             logger.info("register db entity, entityClass={}, elapsed={}", entityClass.getCanonicalName(), watch.elapsed());
         }
@@ -192,8 +217,7 @@ public final class DatabaseImpl implements Database {
     @Override
     public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
         var watch = new StopWatch();
-        validateAsterisk(sql);
-        validateStringValue(sql);
+        validateSQL(sql);
         int returnedRows = 0;
         try {
             List<T> results = operation.select(sql, rowMapper(viewClass), params);
@@ -202,16 +226,14 @@ public final class DatabaseImpl implements Database {
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("select, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
-            track(elapsed, returnedRows, 0, 1);
-            checkTooManyRowsReturned(returnedRows); // check returnedRows after sql debug log, to make log easier to read
+            track(elapsed, returnedRows, 0, 1);   // check after sql debug log, to make log easier to read
         }
     }
 
     @Override
     public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
         var watch = new StopWatch();
-        validateAsterisk(sql);
-        validateStringValue(sql);
+        validateSQL(sql);
         int returnedRows = 0;
         try {
             Optional<T> result = operation.selectOne(sql, rowMapper(viewClass), params);
@@ -227,7 +249,7 @@ public final class DatabaseImpl implements Database {
     @Override
     public int execute(String sql, Object... params) {
         var watch = new StopWatch();
-        validateStringValue(sql);
+        validateSQL(sql);
         int affectedRows = 0;
         try {
             affectedRows = operation.update(sql, params);
@@ -242,7 +264,7 @@ public final class DatabaseImpl implements Database {
     @Override
     public int[] batchExecute(String sql, List<Object[]> params) {
         var watch = new StopWatch();
-        validateStringValue(sql);
+        validateSQL(sql);
         if (params.isEmpty()) throw new Error("params must not be empty");
         int affectedRows = 0;
         try {
@@ -278,36 +300,17 @@ public final class DatabaseImpl implements Database {
         rowMappers.put(viewClass, mapper);
     }
 
-    private void checkTooManyRowsReturned(int size) {
-        if (size > tooManyRowsReturnedThreshold) {
-            logger.warn(errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
-        }
-    }
-
     void track(long elapsed, int readRows, int writeRows, int queries) {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {
             actionLog.stats.compute("db_queries", (k, oldValue) -> (oldValue == null) ? queries : oldValue + queries);
-            int operations = actionLog.track("db", elapsed, readRows, writeRows);
-            checkOperations(actionLog, elapsed, operations);
+            actionLog.track("db", elapsed, readRows, writeRows);
         }
     }
 
-    private void checkOperations(ActionLog actionLog, long elapsed, int operations) {
-        if (operations > maxOperations) {
-            if (actionLog.remainingProcessTimeInNano() <= 0) {
-                // break if it took long and execute too many db queries
-                throw new Error("too many db operations, operations=" + operations);
-            } else {
-                logger.warn(errorCode("TOO_MANY_DB_OPERATIONS"), "too many db operations, operations={}", operations);
-            }
-        }
-        if (elapsed > slowOperationThresholdInNanos) {
-            logger.warn(errorCode("SLOW_DB"), "slow db operation, elapsed={}", Duration.ofNanos(elapsed));
-        }
-    }
-
-    void validateAsterisk(String sql) {
+    void validateSQL(String sql) {
+        // validate asterisk
+        // execute() could have select part, e.g. insert into select
         int index = sql.indexOf('*');
         while (index > -1) {   // check whether it's wildcard or multiply operator
             int length = sql.length();
@@ -323,11 +326,10 @@ public final class DatabaseImpl implements Database {
                 throw new Error("sql must not contain wildcard(*), please only select columns needed, sql=" + sql);
             index = sql.indexOf('*', index + 1);
         }
-    }
 
-    // by this way, it also disallows functions with string values, e.g. IFNULL(column, 'value'), but it usually can be prevented by different design,
-    // and we prefer to simplify db usage if possible, and shift complexity to application layer
-    private void validateStringValue(String sql) {
+        // validate string value
+        // by this way, it also disallows functions with string values, e.g. IFNULL(column, 'value'), but it usually can be prevented by different design,
+        // and we prefer to simplify db usage if possible, and shift complexity to application layer
         if (sql.indexOf('\'') != -1)
             throw new Error("sql must not contain single quote('), please use prepared statement and question mark(?), sql=" + sql);
     }

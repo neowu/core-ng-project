@@ -84,20 +84,24 @@ public class BeanFactory {
     }
 
     private Object lookupValue(Field field) {
-        Named name = field.getDeclaredAnnotation(Named.class);
+        Named named = field.getDeclaredAnnotation(Named.class);
         Type fieldType = stripOwnerType(field.getGenericType());
-        return bean(fieldType, name == null ? null : name.value());
+
+        String name = named == null ? null : named.value();
+        Object bean = beans.get(new Key(fieldType, name));
+        if (bean == null) throw new Error(format("can not resolve dependency, type={}, name={}, field={}", fieldType.getTypeName(), name, Fields.path(field)));
+        return bean;
     }
 
     private Type stripOwnerType(Type paramType) {    // type from field/method params could has owner type, which is not used in bind/key
-        if (paramType instanceof ParameterizedType)
-            return Types.generic((Class<?>) ((ParameterizedType) paramType).getRawType(), ((ParameterizedType) paramType).getActualTypeArguments());
+        if (paramType instanceof ParameterizedType parameterizedType)
+            return Types.generic((Class<?>) parameterizedType.getRawType(), parameterizedType.getActualTypeArguments());
         return paramType;
     }
 
     private boolean isTypeOf(Object instance, Type type) {
-        if (type instanceof Class) return ((Class<?>) type).isInstance(instance);
-        if (type instanceof ParameterizedType) return isTypeOf(instance, ((ParameterizedType) type).getRawType());
+        if (type instanceof Class<?> classType) return classType.isInstance(instance);
+        if (type instanceof ParameterizedType parameterizedType) return isTypeOf(instance, parameterizedType.getRawType());
         throw new Error("not supported type, type=" + type.getTypeName());
     }
 }

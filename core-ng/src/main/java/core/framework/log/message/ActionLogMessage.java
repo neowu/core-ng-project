@@ -2,6 +2,7 @@ package core.framework.log.message;
 
 import core.framework.api.json.Property;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ public class ActionLogMessage {
     @Property(name = "trace_log")
     public String traceLog;
 
+    @Nullable
     public String firstContextValue(String key) {
         List<String> values = context.get(key);
         if (values == null) return null;
