@@ -2,6 +2,8 @@
 
 ### 9.0.4 (12/20/2023 - )
 
+* jre: published neowu/jre:21.0.1
+
 ### 9.0.3 (12/12/2023 - 12/19/2023)
 
 * kafka: updated client to 3.6.1
