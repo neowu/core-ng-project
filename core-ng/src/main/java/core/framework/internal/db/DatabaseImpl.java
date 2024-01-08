@@ -121,7 +121,6 @@ public final class DatabaseImpl implements Database {
             // force to UTC, generally on cloud it defaults to UTC, this setting is to make local match cloud
             properties.setProperty("connectionTimeZone", "UTC");
             properties.setProperty("rewriteBatchedStatements", "true");
-            properties.setProperty("queryInterceptors", MySQLQueryInterceptor.class.getName());
             properties.setProperty("logger", "Slf4JLogger");
             properties.setProperty("cachePrepStmts", "true");
 
