@@ -249,16 +249,16 @@ public class DatabaseOperation {
         if (statement instanceof QueryDiagnostic diagnostic) {
             boolean noIndexUsed = diagnostic.noIndexUsed();
             boolean badIndexUsed = diagnostic.noGoodIndexUsed();
-            if (noIndexUsed || badIndexUsed) {
-                ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
-                boolean warning = actionLog == null || !actionLog.warningContext.suppressSlowSQLWarning;
-                String message = noIndexUsed ? "no index used" : "bad index used";
-                String sqlValue = diagnostic.sql();
-                if (warning) {
-                    logger.warn(errorCode("SLOW_SQL"), "{}, sql={}", message, sqlValue);
-                } else {
-                    logger.debug("{}, sql={}", message, sqlValue);
-                }
+            if (!noIndexUsed && !badIndexUsed) return;
+
+            ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+            boolean warning = actionLog == null || !actionLog.warningContext.suppressSlowSQLWarning;
+            String message = noIndexUsed ? "no index used" : "bad index used";
+            String sqlValue = diagnostic.sql();
+            if (warning) {
+                logger.warn(errorCode("SLOW_SQL"), "{}, sql={}", message, sqlValue);
+            } else {
+                logger.debug("{}, sql={}", message, sqlValue);
             }
         }
     }
