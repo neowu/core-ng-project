@@ -4,7 +4,7 @@
 
 * jre: published neowu/jre:21.0.1
 * mysql: aggressively simplified mysql jdbc driver, removed unused features
-  > moved slow query log to driver code, decoupled core-ng and mysql classes
+  > add slow query support, decoupled core-ng and mysql classes
   > must use "core.framework.mysql:mysql-connector-j:8.2.0-r3"
 
 ### 9.0.3 (12/12/2023 - 12/19/2023)
