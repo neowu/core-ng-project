@@ -41,8 +41,8 @@ class DatabaseOperationTest {
     void logSlowQuery() {
         QueryDiagnostic diagnostic = (QueryDiagnostic) statement;
         when(diagnostic.sql()).thenReturn("sql");
-        when(diagnostic.noIndexUsed()).thenReturn(false);
-        when(diagnostic.noGoodIndexUsed()).thenReturn(true);
+        when(diagnostic.noIndexUsed()).thenReturn(Boolean.FALSE);
+        when(diagnostic.noGoodIndexUsed()).thenReturn(Boolean.TRUE);
 
         operation.logSlowQuery(statement);
     }
@@ -51,8 +51,8 @@ class DatabaseOperationTest {
     void suppressSlowSQLWarning() {
         QueryDiagnostic diagnostic = (QueryDiagnostic) statement;
         when(diagnostic.sql()).thenReturn("sql");
-        when(diagnostic.noIndexUsed()).thenReturn(true);
-        when(diagnostic.noGoodIndexUsed()).thenReturn(false);
+        when(diagnostic.noIndexUsed()).thenReturn(Boolean.TRUE);
+        when(diagnostic.noGoodIndexUsed()).thenReturn(Boolean.FALSE);
 
         Database.suppressSlowSQLWarning(true);
         operation.logSlowQuery(statement);
