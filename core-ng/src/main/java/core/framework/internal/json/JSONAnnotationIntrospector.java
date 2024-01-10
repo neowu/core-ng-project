@@ -3,11 +3,13 @@ package core.framework.internal.json;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.PropertyName;
+import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.introspect.Annotated;
+import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import core.framework.api.json.Property;
 
 import java.io.Serial;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,12 +31,12 @@ public class JSONAnnotationIntrospector extends AnnotationIntrospector {
     }
 
     @Override
-    public String[] findEnumValues(Class<?> enumType, Enum<?>[] enumValues, String[] names) {
+    public String[] findEnumValues(MapperConfig<?> config, AnnotatedClass annotatedClass, Enum<?>[] enumValues, String[] names) {
         Map<String, String> mappings = null;
-        for (Field field : enumType.getDeclaredFields()) {
-            if (!field.isEnumConstant()) continue;
+        for (AnnotatedField field : annotatedClass.fields()) {
+            if (!field.getAnnotated().isEnumConstant()) continue;
 
-            Property enumValue = field.getDeclaredAnnotation(Property.class);
+            Property enumValue = field.getAnnotation(Property.class);
             if (enumValue == null) continue;
 
             String value = enumValue.name();
