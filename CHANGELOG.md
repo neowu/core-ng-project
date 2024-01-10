@@ -1,5 +1,10 @@
 ## Change log
 
+### 9.0.5 (1/10/2024 - )
+
+* json: update jackson to 2.16.1
+  > refer to https://cowtowncoder.medium.com/jackson-2-16-rc1-overview-55dbb90c22d9
+
 ### 9.0.4 (12/20/2023 - 1/9/2024)
 
 * jre: published neowu/jre:21.0.1

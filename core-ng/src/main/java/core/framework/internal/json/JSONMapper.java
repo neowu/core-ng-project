@@ -1,7 +1,9 @@
 package core.framework.internal.json;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.core.StreamWriteFeature;
+import com.fasterxml.jackson.core.util.JsonRecyclerPools;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,7 +61,12 @@ public class JSONMapper {
 
     // expose builder, to allow app build its own JSON mapper to parse external json, e.g. can be less strict
     public static JsonMapper.Builder builder() {
-        return JsonMapper.builder()
+        JsonFactory jsonFactory = JsonFactory.builder()
+            .recyclerPool(JsonRecyclerPools.sharedLockFreePool())
+            .build();
+
+        // refer to com.fasterxml.jackson.databind.ObjectMapper.DEFAULT_BASE for default settings, e.g. cacheProvider
+        return JsonMapper.builder(jsonFactory)
             .addModule(timeModule())
             .defaultDateFormat(new StdDateFormat())
             // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
