@@ -239,14 +239,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     public boolean batchDelete(List<?> primaryKeys) {
         var watch = new StopWatch();
         if (primaryKeys.isEmpty()) throw new Error("primaryKeys must not be empty");
-        List<Object[]> params = new ArrayList<>(primaryKeys.size());
-        for (Object primaryKey : primaryKeys) {
-            if (primaryKey instanceof final Object[] keys) {
-                params.add(keys);
-            } else {
-                params.add(new Object[]{primaryKey});
-            }
-        }
+        List<Object[]> params = batchDeleteParams(primaryKeys);
         int deletedRows = 0;
         try {
             int[] affectedRows = database.operation.batchUpdate(deleteSQL, params);
@@ -259,5 +252,21 @@ public final class RepositoryImpl<T> implements Repository<T> {
             logger.debug("batchDelete, sql={}, params={}, size={}, elapsed={}", deleteSQL, new SQLBatchParams(database.operation.enumMapper, params), size, elapsed);
             database.track(elapsed, 0, deletedRows, size);
         }
+    }
+
+    List<Object[]> batchDeleteParams(List<?> primaryKeys) {
+        List<Object[]> params = new ArrayList<>(primaryKeys.size());
+        for (Object primaryKey : primaryKeys) {
+            if (primaryKey instanceof final Object[] keys) {
+                if (selectQuery.primaryKeyColumns != keys.length)
+                    throw new Error(Strings.format("the length of primary keys must match columns, primaryKeys={}, columns={}", keys.length, selectQuery.primaryKeyColumns));
+                params.add(keys);
+            } else {
+                if (selectQuery.primaryKeyColumns != 1)
+                    throw new Error(Strings.format("the length of primary keys must match columns, primaryKeys={}, columns={}", 1, selectQuery.primaryKeyColumns));
+                params.add(new Object[]{primaryKey});
+            }
+        }
+        return params;
     }
 }

@@ -122,4 +122,19 @@ class RepositoryImplCompositeKeyEntityTest {
         assertThat(repository.get(entity1.id1, entity1.id2)).isNotPresent();
         assertThat(repository.get(entity2.id1, entity2.id2)).isNotPresent();
     }
+
+    @Test
+    void batchDeleteParams() {
+        assertThatThrownBy(() -> {
+            var impl = (RepositoryImpl<CompositeKeyEntity>) repository;
+            impl.batchDeleteParams(List.of(1, 2, 3));
+        }).isInstanceOf(Error.class)
+            .hasMessageContaining("the length of primary keys must match columns");
+
+        assertThatThrownBy(() -> {
+            var impl = (RepositoryImpl<CompositeKeyEntity>) repository;
+            impl.batchDeleteParams(List.of(new Object[]{1, 1, 1}));
+        }).isInstanceOf(Error.class)
+            .hasMessageContaining("the length of primary keys must match columns");
+    }
 }
