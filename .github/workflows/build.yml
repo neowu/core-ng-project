@@ -13,7 +13,7 @@ jobs:
       with:
         distribution: temurin
         java-version: 21
-    - uses: gradle/gradle-build-action@v2
+    - uses: gradle/gradle-build-action@v2.11.1
     - run: ./gradlew check
     - run: ./gradlew testCodeCoverageReport
     - uses: codecov/codecov-action@v3
