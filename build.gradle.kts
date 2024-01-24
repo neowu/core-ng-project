@@ -104,7 +104,7 @@ project("core-ng-search-test") {
         implementation("org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}")    // used by elasticsearch scaled_float
         implementation("org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}")
         implementation("org.codelibs.elasticsearch.module:analysis-common:${elasticVersion}")  // used by elasticsearch stemmer
-        implementation("org.codelibs.elasticsearch.module:reindex:${elasticVersion}")          // used by elasticsearch deleteByQuery
+        implementation("org.codelibs.elasticsearch.module:reindex:${elasticVersion}@jar")          // used by elasticsearch deleteByQuery
     }
 }
 

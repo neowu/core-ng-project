@@ -7,7 +7,8 @@
 * mysql: updated and patched to 8.3.0
   > use "core.framework.mysql:mysql-connector-j:8.3.0"
 * search: update es to 8.12.0
-  > !!! local node doesn't work with jdk 21.0.2, 21.0.1 works, check later
+  > !!! integration test breaks with JDK 21.0.2, refer to https://github.com/elastic/elasticsearch/pull/104347
+  > !!! to run with JDK 21.0.2, workaround is to create EsExecutors.java and apply the fix locally
 
 ### 9.0.4 (12/20/2023 - 1/9/2024)
 
