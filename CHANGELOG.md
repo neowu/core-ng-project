@@ -4,6 +4,10 @@
 
 * json: update jackson to 2.16.1
   > refer to https://cowtowncoder.medium.com/jackson-2-16-rc1-overview-55dbb90c22d9
+* mysql: updated and patched to 8.3.0
+  > use "core.framework.mysql:mysql-connector-j:8.3.0"
+* search: update es to 8.12.0
+  > !!! local node doesn't work with jdk 21.0.2, 21.0.1 works, check later
 
 ### 9.0.4 (12/20/2023 - 1/9/2024)
 

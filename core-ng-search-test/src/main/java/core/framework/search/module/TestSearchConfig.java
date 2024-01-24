@@ -18,18 +18,6 @@ public class TestSearchConfig extends SearchConfig {
     // this can be avoided by designing test differently
     private static HttpHost localESHost;
 
-    static {
-        // refer to io.netty.util.NettyRuntime.AvailableProcessorsHolder.setAvailableProcessors
-        // refer to org.elasticsearch.transport.netty4.Netty4Utils.setAvailableProcessors
-        // netty only allows set available processors once
-        System.setProperty("es.set.netty.runtime.available.processors", "false");
-
-        // disable warning from org.elasticsearch.node.Node
-        // refer to org.elasticsearch.node.Node deprecationLogger/no-jdk
-        // org.elasticsearch.monitor.jvm.JvmInfo Line 144
-        System.setProperty("es.bundled_jdk", "true");
-    }
-
     @Override
     protected void initialize(ModuleContext context, String name) {
         super.initialize(context, name);

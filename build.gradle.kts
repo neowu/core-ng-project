@@ -19,7 +19,7 @@ subprojects {
     }
 }
 
-val elasticVersion = "8.11.1"
+val elasticVersion = "8.12.0"
 val kafkaVersion = "3.6.1"
 val jacksonVersion = "2.16.1"
 val junitVersion = "5.10.1"
@@ -100,7 +100,7 @@ project("core-ng-search-test") {
         implementation(project(":core-ng-test"))
         implementation(project(":core-ng-search"))
         implementation("org.elasticsearch:elasticsearch:${elasticVersion}")
-        implementation("core.framework.elasticsearch.module:transport-netty4:${elasticVersion}")
+        implementation("org.elasticsearch.plugin:transport-netty4:${elasticVersion}")
         implementation("core.framework.elasticsearch.module:mapper-extras:${elasticVersion}")    // used by elasticsearch scaled_float
         implementation("core.framework.elasticsearch.module:lang-painless:${elasticVersion}")
         implementation("core.framework.elasticsearch.module:analysis-common:${elasticVersion}")  // used by elasticsearch stemmer
