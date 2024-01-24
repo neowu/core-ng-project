@@ -25,7 +25,7 @@ public class LocalNode extends Node {
                         MapperExtrasPlugin.class,         // for scaled_float type
                         PainlessPlugin.class,
                         CommonAnalysisPlugin.class,       // for stemmer analysis
-                        ReindexPlugin.class));
+                        ReindexPlugin.class));            // for delete_by_query
             }
         }, true));
     }

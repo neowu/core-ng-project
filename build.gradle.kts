@@ -11,9 +11,9 @@ subprojects {
 
     repositories {
         maven {
-            url = uri("https://neowu.github.io/maven-repo/")
+            url = uri("https://maven.codelibs.org/")
             content {
-                includeGroupByRegex("core\\.framework.*")       // for elasticsearch modules dependencies
+                includeGroup("org.codelibs.elasticsearch.module")
             }
         }
     }
@@ -101,10 +101,10 @@ project("core-ng-search-test") {
         implementation(project(":core-ng-search"))
         implementation("org.elasticsearch:elasticsearch:${elasticVersion}")
         implementation("org.elasticsearch.plugin:transport-netty4:${elasticVersion}")
-        implementation("core.framework.elasticsearch.module:mapper-extras:${elasticVersion}")    // used by elasticsearch scaled_float
-        implementation("core.framework.elasticsearch.module:lang-painless:${elasticVersion}")
-        implementation("core.framework.elasticsearch.module:analysis-common:${elasticVersion}")  // used by elasticsearch stemmer
-        implementation("core.framework.elasticsearch.module:reindex:${elasticVersion}")          // used by elasticsearch deleteByQuery
+        implementation("org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}")    // used by elasticsearch scaled_float
+        implementation("org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}")
+        implementation("org.codelibs.elasticsearch.module:analysis-common:${elasticVersion}")  // used by elasticsearch stemmer
+        implementation("org.codelibs.elasticsearch.module:reindex:${elasticVersion}")          // used by elasticsearch deleteByQuery
     }
 }
 

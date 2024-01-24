@@ -36,7 +36,7 @@ public class LocalElasticSearch {
             settings.put(ClusterName.CLUSTER_NAME_SETTING.getKey(), "test")
                 .put(Node.NODE_NAME_SETTING.getKey(), "test")
                 .put(Environment.PATH_HOME_SETTING.getKey(), dataPath)
-                .put(NetworkService.GLOBAL_NETWORK_BIND_HOST_SETTING.getKey(), "_local_")
+                .put(NetworkService.GLOBAL_NETWORK_BIND_HOST_SETTING.getKey(), NetworkService.DEFAULT_NETWORK_HOST)
                 .put(DiscoveryModule.DISCOVERY_TYPE_SETTING.getKey(), DiscoveryModule.SINGLE_NODE_DISCOVERY_TYPE)
                 .put(EsExecutors.NODE_PROCESSORS_SETTING.getKey(), 1)
                 .put(HierarchyCircuitBreakerService.USE_REAL_MEMORY_USAGE_SETTING.getKey(), false);

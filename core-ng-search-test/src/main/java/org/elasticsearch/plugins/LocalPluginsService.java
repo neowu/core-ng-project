@@ -1,6 +1,6 @@
 package org.elasticsearch.plugins;
 
-import org.elasticsearch.Build;
+import org.elasticsearch.Version;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.jdk.ModuleQualifiedExportsService;
 
@@ -27,7 +27,7 @@ public class LocalPluginsService extends PluginsService {
                 pluginClass.getName(),
                 "classpath plugin",
                 "NA",
-                Build.current().version(),
+                Version.CURRENT.toString(),
                 "21",
                 pluginClass.getName(),
                 null,
