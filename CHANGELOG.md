@@ -6,9 +6,19 @@
   > refer to https://cowtowncoder.medium.com/jackson-2-16-rc1-overview-55dbb90c22d9
 * mysql: updated and patched to 8.3.0
   > use "core.framework.mysql:mysql-connector-j:8.3.0"
-* search: update es to 8.12.0
+* search: update es to 8.12.0, switch es module repo to codelibs
   > !!! integration test breaks with JDK 21.0.2, refer to https://github.com/elastic/elasticsearch/pull/104347
   > !!! to run with JDK 21.0.2, workaround is to create EsExecutors.java and apply the fix locally
+  > !!! add codelib maven repo to project
+
+```kotlin
+maven {
+    url = uri("https://maven.codelibs.org/")
+    content {
+        includeGroup("org.codelibs.elasticsearch.module")
+    }
+}
+```
 
 ### 9.0.4 (12/20/2023 - 1/9/2024)
 

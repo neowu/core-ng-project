@@ -101,10 +101,10 @@ project("core-ng-search-test") {
         implementation(project(":core-ng-search"))
         implementation("org.elasticsearch:elasticsearch:${elasticVersion}")
         implementation("org.elasticsearch.plugin:transport-netty4:${elasticVersion}")
-        implementation("org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}")    // used by elasticsearch scaled_float
+        implementation("org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}")         // used by elasticsearch scaled_float
         implementation("org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}")
-        implementation("org.codelibs.elasticsearch.module:analysis-common:${elasticVersion}")  // used by elasticsearch stemmer
-        implementation("org.codelibs.elasticsearch.module:reindex:${elasticVersion}@jar")          // used by elasticsearch deleteByQuery
+        implementation("org.codelibs.elasticsearch.module:analysis-common:${elasticVersion}")       // used by elasticsearch stemmer
+        implementation("org.codelibs.elasticsearch.module:reindex:${elasticVersion}@jar")           // used by elasticsearch deleteByQuery
     }
 }
 
