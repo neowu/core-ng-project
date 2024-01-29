@@ -6,13 +6,13 @@
   > refer to https://cowtowncoder.medium.com/jackson-2-16-rc1-overview-55dbb90c22d9
 * mysql: updated and patched to 8.3.0
   > use "core.framework.mysql:mysql-connector-j:8.3.0"
-* search: update es to 8.12.0, switch es module repo to codelibs
-  > !!! integration test breaks with JDK 21.0.2, refer to https://github.com/elastic/elasticsearch/pull/104347
-  > !!! to run with JDK 21.0.2, workaround is to create EsExecutors.java and apply the fix locally
-  > !!! add codelib maven repo to project
 * db: support azure IAM auth
   > azure mysql flexible server supports IAM service account auth, to use access token instead of user/password
   > set db user to "iam/azure" to use azure iam auth
+* search: update es to 8.12.0, switch es module repo to codelibs
+  > !!! integration test breaks with JDK 21.0.2 (even with old version of es lib), refer to https://github.com/elastic/elasticsearch/pull/104347
+  > !!! to run with JDK 21.0.2, workaround is to create EsExecutors.java and apply the fix locally
+  > !!! add codelib maven repo to project
 
 ```kotlin
 maven {

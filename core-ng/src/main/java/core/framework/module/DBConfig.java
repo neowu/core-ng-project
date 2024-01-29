@@ -61,25 +61,25 @@ public class DBConfig extends Config {
     }
 
     public void user(String user) {
-        if ("iam/gcloud".equals(user)) {
+        if (user.startsWith("iam/")) {
             CloudAuthProvider provider = CloudAuthProvider.Provider.get();
             if (provider == null) {
-                provider = new GCloudAuthProvider();
+                provider = provider(user);
                 CloudAuthProvider.Provider.set(provider);
             }
             database.authProvider = provider;
-            context.logManager.maskFields("access_token");  // mask token from IAM http response
-        } else if ("iam/azure".equals(user)) {
-            CloudAuthProvider provider = CloudAuthProvider.Provider.get();
-            if (provider == null) {
-                provider = new AzureAuthProvider();
-                CloudAuthProvider.Provider.set(provider);
-            }
-            database.authProvider = provider;
-            context.logManager.maskFields("access_token");  // mask token from IAM http response
+            context.logManager.maskFields("access_token");  // mask token from IAM http response, gcloud/azure all use JWT token
         } else {
             database.user = user;
         }
+    }
+
+    private CloudAuthProvider provider(String user) {
+        return switch (user) {
+            case "iam/gcloud" -> new GCloudAuthProvider();
+            case "iam/azure" -> new AzureAuthProvider();
+            case null, default -> throw new Error("unsupported cloud provider, value=" + user);
+        };
     }
 
     public void password(String password) {
