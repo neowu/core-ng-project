@@ -225,7 +225,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     private boolean batchUpdated(int[] affectedRows) {
-        // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts Line 758
+        // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchWithMultiValuesClause Line 612
         // only need to check first value
         // HSQL actually returns accurate affected rows for batch, so also check if > 0 to make unit test correct
         for (int affectedRow : affectedRows) {

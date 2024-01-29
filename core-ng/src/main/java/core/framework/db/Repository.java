@@ -65,7 +65,7 @@ public interface Repository<T> {
     // return true if any row inserted
     // this is drawback of MySQL thin driver, though expected behavior
     // with batch insert ignore (or insert on duplicate key), MySQL thin driver fills entire affectedRows array with same value, java.sql.Statement.SUCCESS_NO_INFO if updated count > 0
-    // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchedInserts Line 758
+    // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchWithMultiValuesClause Line 612
     boolean batchInsertIgnore(List<T> entities);
 
     // return true if any row changed (inserted or updated)

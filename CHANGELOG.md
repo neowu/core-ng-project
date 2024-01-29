@@ -1,11 +1,13 @@
 ## Change log
 
+### 9.0.6 (1/29/2024 - )
+
 ### 9.0.5 (1/10/2024 - 1/29/2024)
 
 * json: update jackson to 2.16.1
   > refer to https://cowtowncoder.medium.com/jackson-2-16-rc1-overview-55dbb90c22d9
 * mysql: updated and patched to 8.3.0
-  > use "core.framework.mysql:mysql-connector-j:8.3.0"
+  > use "core.framework.mysql:mysql-connector-j:8.3.0-r1"
 * db: support azure IAM auth
   > azure mysql flexible server supports IAM service account auth, to use access token instead of user/password
   > set db user to "iam/azure" to use azure iam auth
