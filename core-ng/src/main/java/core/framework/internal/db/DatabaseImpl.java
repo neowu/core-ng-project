@@ -127,6 +127,7 @@ public final class DatabaseImpl implements Database {
             int index = url.indexOf('?');
             // mysql with ssl has overhead, usually we ensure security on arch level, e.g. gcloud sql proxy or firewall rule
             // with gcloud iam / clear_text_password plugin, ssl is required
+            // with azure iam / clear_text_password plugin, ssl is also required
             // refer to https://cloud.google.com/sql/docs/mysql/authentication
             if (authProvider != null) {
                 properties.setProperty("sslMode", "PREFERRED");
