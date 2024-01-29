@@ -10,6 +10,9 @@
   > !!! integration test breaks with JDK 21.0.2, refer to https://github.com/elastic/elasticsearch/pull/104347
   > !!! to run with JDK 21.0.2, workaround is to create EsExecutors.java and apply the fix locally
   > !!! add codelib maven repo to project
+* db: support azure IAM auth
+  > azure mysql flexible server supports IAM service account auth, to use access token instead of user/password
+  > set db user to "iam/azure" to use azure iam auth
 
 ```kotlin
 maven {

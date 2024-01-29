@@ -5,6 +5,7 @@ import core.framework.db.Database;
 import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.internal.db.DatabaseImpl;
+import core.framework.internal.db.cloud.AzureAuthProvider;
 import core.framework.internal.db.cloud.GCloudAuthProvider;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
@@ -64,6 +65,14 @@ public class DBConfig extends Config {
             CloudAuthProvider provider = CloudAuthProvider.Provider.get();
             if (provider == null) {
                 provider = new GCloudAuthProvider();
+                CloudAuthProvider.Provider.set(provider);
+            }
+            database.authProvider = provider;
+            context.logManager.maskFields("access_token");  // mask token from IAM http response
+        } else if ("iam/azure".equals(user)) {
+            CloudAuthProvider provider = CloudAuthProvider.Provider.get();
+            if (provider == null) {
+                provider = new AzureAuthProvider();
                 CloudAuthProvider.Provider.set(provider);
             }
             database.authProvider = provider;
