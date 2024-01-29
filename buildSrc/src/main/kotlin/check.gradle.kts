@@ -20,6 +20,7 @@ subprojects {
     checkstyle {
         dependencies {
             checkstyle("com.puppycrawl.tools:checkstyle:10.13.0")
+            checkstyle("org.codehaus.plexus:plexus-container-default:2.1.1")
             checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
         }
 
