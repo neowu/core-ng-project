@@ -105,6 +105,7 @@ project("core-ng-search-test") {
         implementation("org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}")
         implementation("org.codelibs.elasticsearch.module:analysis-common:${elasticVersion}")       // used by elasticsearch stemmer
         implementation("org.codelibs.elasticsearch.module:reindex:${elasticVersion}@jar")           // used by elasticsearch deleteByQuery
+        compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.3")   // TODO: remove once https://github.com/elastic/elasticsearch/pull/104347 released
     }
 }
 

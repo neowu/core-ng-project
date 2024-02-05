@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ExecutorIntegrationTest extends IntegrationTest {
+class ExecutorIntegrationTest extends IntegrationTest {
     @Inject
     Executor executor;
 
