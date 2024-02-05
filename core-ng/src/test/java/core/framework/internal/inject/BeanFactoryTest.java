@@ -52,7 +52,7 @@ class BeanFactoryTest {
 
     @Test
     void bindGeneric() {
-        beanFactory.bind(Types.list(String.class), null, new ArrayList<String>());
+        beanFactory.bind(Types.list(String.class), null, new ArrayList<>());
 
         beanFactory.bind(Types.supplier(String.class), null, (Supplier<String>) () -> null);
     }

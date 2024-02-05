@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class LRUMapTest {
     @Test
     void removeEldestEntry() {
-        LRUMap<String, String> map = new LRUMap<>(3);
+        var map = new LRUMap<String, String>(3);
         map.put("1", "1");
         map.put("2", "2");
         map.put("3", "3");

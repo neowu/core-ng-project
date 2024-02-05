@@ -18,9 +18,9 @@ public final class WebSocketCloseCodes {
 
     // as websocket does not have restful convention, here only supports general cases
     static int closeCode(Throwable e) {
-        if (e instanceof TooManyRequestsException) return WebSocketCloseCodes.TRY_AGAIN_LATER;
-        if (e instanceof BadRequestException) return WebSocketCloseCodes.POLICY_VIOLATION;
-        if (e instanceof UnauthorizedException) return WebSocketCloseCodes.POLICY_VIOLATION;
-        return WebSocketCloseCodes.INTERNAL_ERROR;
+        if (e instanceof TooManyRequestsException) return TRY_AGAIN_LATER;
+        if (e instanceof BadRequestException) return POLICY_VIOLATION;
+        if (e instanceof UnauthorizedException) return POLICY_VIOLATION;
+        return INTERNAL_ERROR;
     }
 }

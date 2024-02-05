@@ -51,9 +51,9 @@ public final class Encodings {
                     if (b2 >= 0 && URI_UNESCAPED.get(b2)) {
                         builder.append((char) b2);
                     } else {
-                        builder.append('%');
-                        builder.append(HEX_CHARS[(b2 >> 4) & 0xF]);
-                        builder.append(HEX_CHARS[b2 & 0xF]);
+                        builder.append('%')
+                            .append(HEX_CHARS[(b2 >> 4) & 0xF])
+                            .append(HEX_CHARS[b2 & 0xF]);
                     }
                 }
                 return builder.toString();

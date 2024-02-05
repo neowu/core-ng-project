@@ -33,8 +33,8 @@ class RedisInputStream {
                 if (value2 == '\n') {
                     break;
                 }
-                builder.append((char) value1);
-                builder.append((char) value2);
+                builder.append((char) value1)
+                    .append((char) value2);
             } else {
                 builder.append((char) value1);
             }

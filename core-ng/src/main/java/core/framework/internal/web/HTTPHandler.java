@@ -144,19 +144,19 @@ public class HTTPHandler implements HttpHandler {
     }
 
     void linkContext(ActionLog actionLog, HeaderMap headers) {
-        String client = headers.getFirst(HTTPHandler.HEADER_CLIENT);
+        String client = headers.getFirst(HEADER_CLIENT);
         if (client != null) actionLog.clients = List.of(client);
 
-        String refId = headers.getFirst(HTTPHandler.HEADER_REF_ID);
+        String refId = headers.getFirst(HEADER_REF_ID);
         if (refId != null) actionLog.refIds = List.of(refId);
 
-        String correlationId = headers.getFirst(HTTPHandler.HEADER_CORRELATION_ID);
+        String correlationId = headers.getFirst(HEADER_CORRELATION_ID);
         if (correlationId != null) actionLog.correlationIds = List.of(correlationId);
 
         String trace = headers.getFirst(HEADER_TRACE);
         if (trace != null) actionLog.trace = Trace.parse(trace);
 
-        actionLog.warningContext.maxProcessTimeInNano(maxProcessTime(headers.getFirst(HTTPHandler.HEADER_TIMEOUT)));
+        actionLog.warningContext.maxProcessTimeInNano(maxProcessTime(headers.getFirst(HEADER_TIMEOUT)));
     }
 
     long maxProcessTime(String timeout) {

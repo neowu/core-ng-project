@@ -57,7 +57,7 @@ final class SelectQuery<T> {
 
     String sql(String projection, StringBuilder where, String groupBy, String sort, Integer skip, Integer limit) {
         var builder = new StringBuilder("SELECT ").append(projection).append(" FROM ").append(table);
-        if (where.length() > 0) builder.append(" WHERE ").append(where);
+        if (!where.isEmpty()) builder.append(" WHERE ").append(where);
         if (groupBy != null) builder.append(" GROUP BY ").append(groupBy);
         if (sort != null) builder.append(" ORDER BY ").append(sort);
         if (skip != null || limit != null) {
