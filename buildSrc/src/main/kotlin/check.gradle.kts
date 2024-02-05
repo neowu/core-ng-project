@@ -63,7 +63,7 @@ subprojects {
 
     spotbugs {
         dependencies {
-            spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.0")
+            spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.4")
         }
 
         toolVersion = "4.8.3"
