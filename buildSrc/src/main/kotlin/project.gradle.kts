@@ -28,7 +28,7 @@ subprojects {
         mavenLocal()
     }
 
-    layout.buildDirectory.set(file("$rootDir/build/${rootDir.toPath().relativize(projectDir.toPath())}"))
+    layout.buildDirectory = file("$rootDir/build/${rootDir.toPath().relativize(projectDir.toPath())}")
 
     tasks.named<Test>("test") {
         useJUnitPlatform()
@@ -61,7 +61,7 @@ subprojects {
 
         tasks.withType<Jar> {
             // resolve jar name collision of child projects with same name under different parents
-            archiveBaseName.set("${project.group}.${archiveBaseName.get()}")
+            archiveBaseName = "${project.group}.${archiveBaseName.get()}"
 
             manifest {
                 attributes["Implementation-Title"] = project.name

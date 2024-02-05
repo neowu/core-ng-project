@@ -54,6 +54,11 @@ subprojects {
         tasks.withType<Pmd> {
             group = "verification"
         }
+
+        dependencies {
+            pmd("net.sourceforge.pmd:pmd-java:6.55.0")
+            pmd("org.ow2.asm:asm:9.6")
+        }
     }
 
     spotbugs {
@@ -61,10 +66,10 @@ subprojects {
             spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.0")
         }
 
-        toolVersion.set("4.8.3")
+        toolVersion = "4.8.3"
         reportLevel = Confidence.LOW
-        extraArgs.set(listOf("-longBugCodes"))
-        includeFilter.set(rootProject.file("buildSrc/src/main/check/spotbugs.xml"))
+        extraArgs = listOf("-longBugCodes")
+        includeFilter = rootProject.file("buildSrc/src/main/check/spotbugs.xml")
     }
 
     jacoco {
@@ -72,10 +77,10 @@ subprojects {
 
         tasks.named<JacocoReport>("testCodeCoverageReport") {
             reports {
-                xml.required.set(true)
-                xml.outputLocation.set(layout.buildDirectory.file("reports/jacoco/report.xml").get())
-                html.required.set(true)
-                csv.required.set(false)
+                xml.required = true
+                xml.outputLocation = layout.buildDirectory.file("reports/jacoco/report.xml").get()
+                html.required = true
+                csv.required = false
             }
         }
     }

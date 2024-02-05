@@ -3,7 +3,7 @@ plugins {
 }
 
 application {
-    mainClass.set("Main")
+    mainClass = "Main"
 }
 
 tasks.named<ProcessResources>("processResources") {
@@ -22,7 +22,7 @@ tasks.named<Test>("test") {
 }
 
 tasks.named<Tar>("distTar") {
-    archiveFileName.set("${archiveBaseName.get()}.${archiveExtension.get()}")
+    archiveFileName = "${archiveBaseName.get()}.${archiveExtension.get()}"
 }
 
 tasks.named<Zip>("distZip") {

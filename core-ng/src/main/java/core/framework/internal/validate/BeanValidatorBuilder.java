@@ -12,7 +12,6 @@ import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.reflect.Classes;
 import core.framework.internal.reflect.Fields;
 import core.framework.internal.reflect.GenericTypes;
-import core.framework.util.Strings;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -185,7 +184,7 @@ public class BeanValidatorBuilder {
             }
         } catch (ReflectiveOperationException e) {
             String path = parentField == null ? null : Fields.path(parentField);
-            throw new Error(Strings.format("failed to validate class, field={}, error={}", path, e.getMessage()), e);
+            throw new Error(format("failed to validate class, field={}, error={}", path, e.getMessage()), e);
         }
     }
 
