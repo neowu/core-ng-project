@@ -70,8 +70,7 @@ public class HTTPServer {
                 .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, config.maxEntitySize)
                 .setServerOption(UndertowOptions.RECORD_REQUEST_START_TIME, Boolean.TRUE);
 
-            Xnio xnio = Xnio.getInstance(Thread.currentThread().getContextClassLoader());
-            builder.setWorker(xnio.createWorkerBuilder()
+            builder.setWorker(Xnio.getInstance().createWorkerBuilder()
                 .setWorkerIoThreads(Math.max(Runtime.getRuntime().availableProcessors(), 2))
                 .setExternalExecutorService(handler.worker)
                 .build());
