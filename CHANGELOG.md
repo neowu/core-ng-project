@@ -2,6 +2,8 @@
 
 ### 9.0.6 (1/29/2024 - )
 
+* executor: tweak shutdown handling, print all tasks not complete
+
 ### 9.0.5 (1/10/2024 - 1/29/2024)
 
 * json: update jackson to 2.16.1

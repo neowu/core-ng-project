@@ -2,6 +2,7 @@ package core.framework.internal.async;
 
 import core.framework.async.Executor;
 import core.framework.async.Task;
+import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +10,9 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
@@ -24,10 +27,12 @@ import static core.framework.log.Markers.errorCode;
  */
 public final class ExecutorImpl implements Executor {
     private final Logger logger = LoggerFactory.getLogger(ExecutorImpl.class);
-    private final ReentrantLock lock = new ReentrantLock();
     private final ExecutorService executor;
     private final LogManager logManager;
     private final long maxProcessTimeInNano;
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Set<String> runningTasks = ConcurrentHashMap.newKeySet();     // track running tasks, used to print tasks failed to complete on shutdown
+
     volatile ScheduledExecutorService scheduler;
 
     public ExecutorImpl(ExecutorService executor, LogManager logManager, long maxProcessTimeInNano) {
@@ -55,8 +60,8 @@ public final class ExecutorImpl implements Executor {
     public void awaitTermination(long timeoutInMs) throws InterruptedException {
         boolean success = executor.awaitTermination(timeoutInMs, TimeUnit.MILLISECONDS);
         if (!success) {
-            List<Runnable> canceledTasks = executor.shutdownNow();    // only return tasks not started yet
-            logger.warn(errorCode("FAILED_TO_STOP"), "failed to terminate executor, canceledTasks={}", canceledTasks);
+            executor.shutdownNow();
+            logger.warn(errorCode("FAILED_TO_STOP"), "failed to terminate executor, canceledTasks={}", runningTasks);
         } else {
             logger.info("executor stopped");
         }
@@ -111,22 +116,21 @@ public final class ExecutorImpl implements Executor {
     }
 
     private <T> Future<T> submitTask(ExecutorTask<T> execution) {
+        String task = execution.toString();     // task is action:actionId which is unique
         try {
+            runningTasks.add(task);
             return executor.submit(execution);
         } catch (RejectedExecutionException e) {    // with current executor impl, rejection only happens when shutdown
             logger.warn(errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", execution.action(), e);
+            runningTasks.remove(task);
             return new CancelledFuture<>();
         }
     }
 
     private <T> ExecutorTask<T> execution(String actionId, String action, Instant startTime, Callable<T> task) {
-        var context = new ExecutorTask.TaskContext();
-        context.actionId = actionId;
-        context.action = action;
-        context.startTime = startTime;
-        context.parentActionLog = LogManager.CURRENT_ACTION_LOG.get();
-        context.maxProcessTimeInNano = maxProcessTimeInNano;
-        return new ExecutorTask<>(task, logManager, context);
+        var context = new ExecutorTask.TaskContext(actionId, action, startTime, maxProcessTimeInNano, runningTasks);
+        ActionLog parentActionLog = LogManager.CURRENT_ACTION_LOG.get();
+        return new ExecutorTask<>(task, logManager, context, parentActionLog);
     }
 
     class DelayedTask implements Callable<Void> {
