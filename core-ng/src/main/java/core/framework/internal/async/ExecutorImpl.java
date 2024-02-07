@@ -4,6 +4,7 @@ import core.framework.async.Executor;
 import core.framework.async.Task;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.util.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +13,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
@@ -31,7 +31,7 @@ public final class ExecutorImpl implements Executor {
     private final LogManager logManager;
     private final long maxProcessTimeInNano;
     private final ReentrantLock lock = new ReentrantLock();
-    private final Set<String> runningTasks = ConcurrentHashMap.newKeySet();     // track running tasks, used to print tasks failed to complete on shutdown
+    private final Set<String> runningTasks = Sets.newConcurrentHashSet();     // track running tasks, used to print tasks failed to complete on shutdown
 
     volatile ScheduledExecutorService scheduler;
 
@@ -61,10 +61,11 @@ public final class ExecutorImpl implements Executor {
         boolean success = executor.awaitTermination(timeoutInMs, TimeUnit.MILLISECONDS);
         if (!success) {
             executor.shutdownNow();
-            logger.warn(errorCode("FAILED_TO_STOP"), "failed to terminate executor, canceledTasks={}", runningTasks);
-        } else {
-            logger.info("executor stopped");
+            if (!runningTasks.isEmpty()) {
+                logger.error(errorCode("FAILED_TO_STOP"), "failed to terminate executor, canceledTasks={}", runningTasks);
+            }
         }
+        logger.info("executor stopped");
     }
 
     @Override

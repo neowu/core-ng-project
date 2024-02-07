@@ -19,7 +19,7 @@ public final class LoggerImpl extends AbstractLogger {
         for (int i = 0; i < tokens.length; i++) {
             String token = tokens[i];
             if (i > 0) builder.append('.');
-            if (i < abbrCount && token.length() >= 1) {
+            if (i < abbrCount && !token.isEmpty()) {
                 builder.append(token.charAt(0));
             } else {
                 builder.append(token);
