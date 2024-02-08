@@ -6,6 +6,8 @@
 * jre: published neowu/jre:21.0.2
 * db: validate enum must have @Property for json field List<Enum>
   > to make it consistent with JSON serialization and ensure refactoring safety
+* search: update es to 8.12.1
+  > the JDK 21.0.2 issue is fixed
 
 ### 9.0.5 (1/10/2024 - 1/29/2024)
 

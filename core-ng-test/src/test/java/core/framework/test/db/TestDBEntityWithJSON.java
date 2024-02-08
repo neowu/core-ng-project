@@ -26,16 +26,16 @@ public class TestDBEntityWithJSON {
     @Column(name = "int_list", json = true)
     public List<Integer> intList;
 
-    public static class TestJSON {
-        @NotNull
-        @Property(name = "data")
-        public String data;
-    }
-
     public enum TestEnum {
         @Property(name = "VALUE1")
         VALUE1,
         @Property(name = "VALUE2")
         VALUE2
+    }
+
+    public static class TestJSON {
+        @NotNull
+        @Property(name = "data")
+        public String data;
     }
 }

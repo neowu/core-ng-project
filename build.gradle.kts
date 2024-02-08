@@ -19,7 +19,7 @@ subprojects {
     }
 }
 
-val elasticVersion = "8.12.0"
+val elasticVersion = "8.12.1"
 val kafkaVersion = "3.6.1"
 val jacksonVersion = "2.16.1"
 val junitVersion = "5.10.1"
@@ -105,7 +105,6 @@ project("core-ng-search-test") {
         implementation("org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}")
         implementation("org.codelibs.elasticsearch.module:analysis-common:${elasticVersion}")       // used by elasticsearch stemmer
         implementation("org.codelibs.elasticsearch.module:reindex:${elasticVersion}@jar")           // used by elasticsearch deleteByQuery
-        compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.3")   // TODO: remove once https://github.com/elastic/elasticsearch/pull/104347 released
     }
 }
 
