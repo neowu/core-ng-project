@@ -4,6 +4,8 @@
 
 * executor: tweak shutdown handling, print all tasks not complete
 * jre: published neowu/jre:21.0.2
+* db: validate enum must have @Property for json field List<Enum>
+  > to make it consistent with JSON serialization and ensure refactoring safety
 
 ### 9.0.5 (1/10/2024 - 1/29/2024)
 

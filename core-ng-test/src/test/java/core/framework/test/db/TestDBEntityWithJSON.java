@@ -21,7 +21,7 @@ public class TestDBEntityWithJSON {
     public TestJSON jsonField;
 
     @Column(name = "enum_list", json = true)
-    public List<TestDBEntity.TestEnum> enumList;
+    public List<TestEnum> enumList;
 
     @Column(name = "int_list", json = true)
     public List<Integer> intList;
@@ -30,5 +30,12 @@ public class TestDBEntityWithJSON {
         @NotNull
         @Property(name = "data")
         public String data;
+    }
+
+    public enum TestEnum {
+        @Property(name = "VALUE1")
+        VALUE1,
+        @Property(name = "VALUE2")
+        VALUE2
     }
 }

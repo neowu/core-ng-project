@@ -20,6 +20,7 @@ class DatabaseClassValidatorTest {
         new DatabaseClassValidator(AssignedIdEntity.class, false).validate();
         new DatabaseClassValidator(AutoIncrementIdEntity.class, false).validate();
         new DatabaseClassValidator(CompositeKeyEntity.class, false).validate();
+        new DatabaseClassValidator(JSONEntity.class, false).validate();
     }
 
     @Test

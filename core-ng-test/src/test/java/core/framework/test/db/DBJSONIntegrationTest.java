@@ -33,7 +33,7 @@ class DBJSONIntegrationTest extends IntegrationTest {
     void insert() {
         var entity = new TestDBEntityWithJSON();
         entity.id = UUID.randomUUID().toString();
-        entity.enumList = List.of(TestDBEntity.TestEnum.VALUE1);
+        entity.enumList = List.of(TestDBEntityWithJSON.TestEnum.VALUE1);
         entity.intList = List.of(1, 2, 3, 4, 5);
         entity.jsonField = new TestDBEntityWithJSON.TestJSON();
         entity.jsonField.data = "test";
@@ -53,7 +53,7 @@ class DBJSONIntegrationTest extends IntegrationTest {
         assertThat(selectedEntity).get()
             .usingRecursiveComparison().isEqualTo(entity);
 
-        entity.enumList = List.of(TestDBEntity.TestEnum.VALUE1);
+        entity.enumList = List.of(TestDBEntityWithJSON.TestEnum.VALUE2);
         entity.intList = List.of(1, 2, 3, 4, 5);
         entity.jsonField = new TestDBEntityWithJSON.TestJSON();
         entity.jsonField.data = "test";

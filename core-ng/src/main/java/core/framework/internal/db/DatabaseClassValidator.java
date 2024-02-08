@@ -116,10 +116,16 @@ final class DatabaseClassValidator {
         if (GenericTypes.isList(fieldType)) {
             if (!GenericTypes.isGenericList(fieldType))
                 throw new Error("db json list field must be List<T> and T must be enum or value class, field=" + Fields.path(field));
+
             Class<?> valueClass = GenericTypes.listValueClass(fieldType);
-            if (!valueClass.isEnum() && !allowedValueClasses.contains(valueClass)) {
-                throw new Error("db json list field must be List<T> and T must be enum or value class, field=" + Fields.path(field));
+            if (valueClass.isEnum()) {
+                JSONClassValidator.validateEnum(valueClass);
+                return;
             }
+            // use db.allowedValues not json.allowedValues to keep json db field consistent with db entity
+            if (allowedValueClasses.contains(valueClass)) return;
+
+            throw new Error("db json list field must be List<T> and T must be enum or value class, field=" + Fields.path(field));
         } else {
             Class<?> fieldClass = GenericTypes.rawClass(fieldType);
             if (fieldClass.isEnum() || allowedValueClasses.contains(fieldClass))

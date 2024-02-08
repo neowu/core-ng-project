@@ -20,13 +20,21 @@ public class JSONEntity {
     public TestJSON jsonField;
 
     @Column(name = "enum_list", json = true)
-    public List<TestEnum> enumList;
+    public List<TestJSONEnum> enumList;
 
     @Column(name = "int_list", json = true)
     public List<Integer> intList;
 
+    public enum TestJSONEnum {
+        @Property(name = "DB_V1")
+        V1,
+        @Property(name = "DB_V2")
+        V2
+    }
+
     public static class TestJSON {
         @Property(name = "data")
         public String data;
+
     }
 }

@@ -9,9 +9,9 @@ core-ng is a webapp framework, it's designed to support our own projects.
 ```
 repositories {
     maven {
-        url 'https://neowu.github.io/maven-repo/'
+        url = uri("https://neowu.github.io/maven-repo/")
         content {
-            includeGroupByRegex 'core\\.framework.*'
+            includeGroupByRegex("core\\.framework.*")
         }
     }
     maven {
