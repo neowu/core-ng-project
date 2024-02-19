@@ -7,7 +7,7 @@ apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
-    version = "9.0.6"
+    version = "9.0.7"
 
     repositories {
         maven {

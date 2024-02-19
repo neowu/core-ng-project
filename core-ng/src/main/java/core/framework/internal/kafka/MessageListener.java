@@ -83,7 +83,7 @@ public class MessageListener {
             try {
                 boolean success = thread.awaitTermination(timeoutInMs);
                 if (!success) {
-                    logger.warn(errorCode("FAILED_TO_STOP"), "failed to terminate kafka listener, name={}", name);
+                    logger.error(errorCode("FAILED_TO_STOP"), "failed to terminate kafka listener, name={}", name);
                 } else {
                     logger.info("kafka listener stopped, uri={}, topics={}, name={}", uri, topics, name);
                 }

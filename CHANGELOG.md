@@ -1,5 +1,9 @@
 ## Change log
 
+### 9.0.7 (2/19/2024 - )
+
+* message: change message listener FAILED_TO_STOP from warning to error
+
 ### 9.0.6 (1/29/2024 - 2/19/2024)
 
 * executor: tweak shutdown handling, print all tasks not complete
