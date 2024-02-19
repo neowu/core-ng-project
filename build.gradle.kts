@@ -22,9 +22,9 @@ subprojects {
 val elasticVersion = "8.12.1"
 val kafkaVersion = "3.6.1"
 val jacksonVersion = "2.16.1"
-val junitVersion = "5.10.1"
+val junitVersion = "5.10.2"
 val mockitoVersion = "5.10.0"
-val assertjVersion = "3.25.2"
+val assertjVersion = "3.25.3"
 
 project("core-ng-api") {
     apply(plugin = "lib")
@@ -34,12 +34,12 @@ project("core-ng") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng-api"))
-        api("org.slf4j:slf4j-api:2.0.11")
+        api("org.slf4j:slf4j-api:2.0.12")
         implementation("org.javassist:javassist:3.30.2-GA")
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
-        implementation("com.squareup.okhttp3:okhttp:4.11.0")
-        implementation("io.undertow:undertow-core:2.3.10.Final")
+        implementation("com.squareup.okhttp3:okhttp:4.12.0")
+        implementation("io.undertow:undertow-core:2.3.11.Final")
         implementation("org.apache.kafka:kafka-clients:${kafkaVersion}@jar")
         implementation("org.xerial.snappy:snappy-java:1.1.10.5")      // used by kafka message compression
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")

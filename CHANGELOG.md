@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.0.6 (1/29/2024 - )
+### 9.0.6 (1/29/2024 - 2/19/2024)
 
 * executor: tweak shutdown handling, print all tasks not complete
 * jre: published neowu/jre:21.0.2
