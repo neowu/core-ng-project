@@ -39,7 +39,7 @@ project("core-ng") {
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
         implementation("com.squareup.okhttp3:okhttp:4.12.0")
-        implementation("io.undertow:undertow-core:2.3.11.Final")
+        implementation("io.undertow:undertow-core:2.3.10.Final")
         implementation("org.apache.kafka:kafka-clients:${kafkaVersion}@jar")
         implementation("org.xerial.snappy:snappy-java:1.1.10.5")      // used by kafka message compression
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")

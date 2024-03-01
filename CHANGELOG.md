@@ -1,17 +1,17 @@
 ## Change log
 
-### 9.0.7 (2/19/2024 - )
+### 9.0.7 (1/29/2024 - 3/1/2024)
 
 * message: change message listener FAILED_TO_STOP from warning to error
-
-### 9.0.6 (1/29/2024 - 2/19/2024)
-
 * executor: tweak shutdown handling, print all tasks not complete
 * jre: published neowu/jre:21.0.2
 * db: validate enum must have @Property for json field List<Enum>
   > to make it consistent with JSON serialization and ensure refactoring safety
 * search: update es to 8.12.1
   > the JDK 21.0.2 issue is fixed
+
+!!! undertow 2.3.11 has memory leak issue with virtual thread, will keep eye on it
+https://github.com/undertow-io/undertow/commit/c96363d683feb4b1066959d46be59cf2d59a7b7c
 
 ### 9.0.5 (1/10/2024 - 1/29/2024)
 
