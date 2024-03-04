@@ -1,5 +1,10 @@
 ## Change log
 
+### 9.0.8 (3/4/2024 - )
+
+* kafka: update to 3.7.0
+  > update kafka docker demo with official image, refer to docker/kafka/docker-compose.yml
+
 ### 9.0.7 (1/29/2024 - 3/1/2024)
 
 * message: change message listener FAILED_TO_STOP from warning to error

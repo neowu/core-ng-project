@@ -1,32 +1,34 @@
 version: "3"
 services:
   kafka:
-    image: neowu/kafka:3.6.0
+    image: apache/kafka:3.7.0
     ports:
     - 9092:9092
     - 1099:1099
     environment:
-    - KAFKA_NODE_ID=1
-    - KAFKA_CLUSTER_ID=lK_g8qooQNOD9klGoxLojA
-    - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.rmi.port=1099 -Djava.rmi.server.hostname=kafka.kafka.orb.local
-    - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
-    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://alpine:9092 --override num.partitions=3 --override controller.quorum.voters=1@kafka:9093
+      KAFKA_NODE_ID: 1
+      CLUSTER_ID: lK_g8qooQNOD9klGoxLojA
+      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.rmi.port=1099 -Djava.rmi.server.hostname=alpine
+      KAFKA_HEAP_OPTS: -Xms1G -Xmx1G
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://alpine:9092
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_GC_LOG_OPTS: " "
     volumes:
-    - data:/data
-#  kafka-2:
-#    image: neowu/kafka:3.6.0
-#    environment:
-#    - KAFKA_NODE_ID=1
-#    - KAFKA_CLUSTER_ID=FjC2JEw2S5C18hSjY1yEuA
-#    - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
-#    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka-2:9092 --override num.partitions=3 --override controller.quorum.voters=1@kafka:9093
+    - data:/var/lib/kafka/data
 #  mm:
 #    image: neowu/kafka:3.6.0
 #    volumes:
 #    - ./connect-mirror-maker.properties:/opt/kafka/config/connect-mirror-maker.properties
 #    entrypoint: ["/bin/bash", "-c", "/opt/kafka/bin/connect-mirror-maker.sh /opt/kafka/config/connect-mirror-maker.properties"]
 #    depends_on: [kafka, kafka-2]
-#  example of kafka with zookeeper
 volumes:
   data:
     external: false
