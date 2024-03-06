@@ -7,7 +7,7 @@ apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
-    version = "9.0.8"
+    version = "9.0.8-b0"
 
     repositories {
         maven {
@@ -19,7 +19,7 @@ subprojects {
     }
 }
 
-val elasticVersion = "8.12.1"
+val elasticVersion = "8.12.2"
 val kafkaVersion = "3.7.0"
 val jacksonVersion = "2.16.1"
 val junitVersion = "5.10.2"
@@ -38,7 +38,7 @@ project("core-ng") {
         implementation("org.javassist:javassist:3.30.2-GA")
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
-        implementation("com.squareup.okhttp3:okhttp:4.12.0")
+        implementation("com.squareup.okhttp3:okhttp:4.11.0")
         implementation("io.undertow:undertow-core:2.3.10.Final")
         implementation("org.apache.kafka:kafka-clients:${kafkaVersion}@jar")
         implementation("org.xerial.snappy:snappy-java:1.1.10.5")      // used by kafka message compression

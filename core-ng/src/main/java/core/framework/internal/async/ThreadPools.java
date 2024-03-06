@@ -14,7 +14,7 @@ public final class ThreadPools {
         // increase parallelism to allow more virtual thread unfriendly tasks to run
         // refer to java.lang.VirtualThread.createDefaultScheduler
         if (System.getProperty("jdk.virtualThreadScheduler.parallelism") == null) {
-            int parallelism = Math.max(Runtime.getRuntime().availableProcessors(), 16);
+            int parallelism = Math.max(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors() * 8);
             System.setProperty("jdk.virtualThreadScheduler.parallelism", String.valueOf(parallelism));
         }
     }

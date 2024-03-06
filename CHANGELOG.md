@@ -1,19 +1,19 @@
 ## Change log
 
-### 9.0.8 (3/4/2024 - )
+### 9.0.8-b0 (1/29/2024 - )
 
 * kafka: update to 3.7.0
   > update kafka docker demo with official image, refer to docker/kafka/docker-compose.yml
-
-### 9.0.7 (1/29/2024 - 3/1/2024)
-
 * message: change message listener FAILED_TO_STOP from warning to error
 * executor: tweak shutdown handling, print all tasks not complete
 * jre: published neowu/jre:21.0.2
 * db: validate enum must have @Property for json field List<Enum>
   > to make it consistent with JSON serialization and ensure refactoring safety
-* search: update es to 8.12.1
+* search: update es to 8.12.2
   > the JDK 21.0.2 issue is fixed
+* virtualThread: update jdk.virtualThreadScheduler.parallelism to cpu * 8
+* http: revert okHTTP to 4.11.0
+  > we see GC issue with 4.12.0 in virtual thread env, investigating
 
 !!! undertow 2.3.11 has memory leak issue with virtual thread, will keep eye on it
 https://github.com/undertow-io/undertow/commit/c96363d683feb4b1066959d46be59cf2d59a7b7c
