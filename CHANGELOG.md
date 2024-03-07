@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.0.8-b0 (1/29/2024 - )
+### 9.0.8 (1/29/2024 - 3/7/2024)
 
 * kafka: update to 3.7.0
   > update kafka docker demo with official image, refer to docker/kafka/docker-compose.yml
@@ -12,11 +12,66 @@
 * search: update es to 8.12.2
   > the JDK 21.0.2 issue is fixed
 * virtualThread: update jdk.virtualThreadScheduler.parallelism to cpu * 8
-* http: revert okHTTP to 4.11.0
-  > we see GC issue with 4.12.0 in virtual thread env, investigating
+* httpClient: revert okIO back to 3.2.0
+  > okIO 3.3.0 may cause virtual thread deadlock with Http2Writer
+  > will wait to see if future version JVM or okHTTP fix the issue
+* undertow: revert back to 2.3.10
+  > undertow 2.3.11 has memory leak issue with virtual thread, will keep eye on it
+  > https://github.com/undertow-io/undertow/commit/c96363d683feb4b1066959d46be59cf2d59a7b7c
 
-!!! undertow 2.3.11 has memory leak issue with virtual thread, will keep eye on it
-https://github.com/undertow-io/undertow/commit/c96363d683feb4b1066959d46be59cf2d59a7b7c
+!!! okIO issue
+https://github.com/square/okio/commit/f8434f575787198928a26334758ddbca9726b11c#diff-f63e8920e14cc4bf376a495cfcd1fbfa2eee7bbcdfec0ad10f2bc51237c59725
+for some reason, Http2Writer.flush (synchronized) -> AsyncTimeout$Companion.cancelScheduledTimeout (changed to reentrantLock)
+triggered VirtualThreads.park, make all other virtual threads which share same http2connection deadlocked
+
+```
+#20985 "kafka-listener-19336" virtual
+      java.base/jdk.internal.misc.Unsafe.park(Native Method)
+      java.base/java.lang.VirtualThread.parkOnCarrierThread(Unknown Source)
+      java.base/java.lang.VirtualThread.park(Unknown Source)
+      java.base/java.lang.System$2.parkVirtualThread(Unknown Source)
+      java.base/jdk.internal.misc.VirtualThreads.park(Unknown Source)
+      java.base/java.util.concurrent.locks.LockSupport.park(Unknown Source)
+      java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(Unknown Source)
+      java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(Unknown Source)
+      java.base/java.util.concurrent.locks.ReentrantLock$Sync.lock(Unknown Source)
+      java.base/java.util.concurrent.locks.ReentrantLock.lock(Unknown Source)
+      okio.AsyncTimeout$Companion.cancelScheduledTimeout(AsyncTimeout.kt:273)
+      okio.AsyncTimeout$Companion.access$cancelScheduledTimeout(AsyncTimeout.kt:204)
+      okio.AsyncTimeout.exit(AsyncTimeout.kt:62)
+      okio.AsyncTimeout$sink$1.write(AsyncTimeout.kt:341)
+      okio.RealBufferedSink.flush(RealBufferedSink.kt:268)
+      okhttp3.internal.http2.Http2Writer.flush(Http2Writer.kt:120)
+      okhttp3.internal.http2.Http2Connection.flush(Http2Connection.kt:408)
+      okhttp3.internal.http2.Http2Stream$FramingSink.close(Http2Stream.kt:624)
+      okio.ForwardingSink.close(ForwardingSink.kt:37)
+      okhttp3.internal.connection.Exchange$RequestBodySink.close(Exchange.kt:247)
+      okio.RealBufferedSink.close(RealBufferedSink.kt:287)
+
+// rest similar threads are all locked      
+#20984 "kafka-listener-19335" virtual
+      okhttp3.internal.http2.Http2Connection.newStream(Http2Connection.kt:240)
+      okhttp3.internal.http2.Http2Connection.newStream(Http2Connection.kt:225)
+      okhttp3.internal.http2.Http2ExchangeCodec.writeRequestHeaders(Http2ExchangeCodec.kt:76)
+      okhttp3.internal.connection.Exchange.writeRequestHeaders(Exchange.kt:63)
+#20974 "kafka-listener-19325" virtual
+      okhttp3.internal.http2.Http2Writer.flush(Http2Writer.kt:119)
+      okhttp3.internal.http2.Http2Connection.flush(Http2Connection.kt:408)
+      okhttp3.internal.http2.Http2Stream$FramingSink.close(Http2Stream.kt:624)
+      okio.ForwardingSink.close(ForwardingSink.kt:37)
+      okhttp3.internal.connection.Exchange$RequestBodySink.close(Exchange.kt:247)
+      okio.RealBufferedSink.close(RealBufferedSink.kt:287)
+      okhttp3.internal.http.CallServerInterceptor.intercept(CallServerInterceptor.kt:63)
+      okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+  #20995 "kafka-listener-19346" virtual
+      okhttp3.internal.http2.Http2Writer.data(Http2Writer.kt:150)
+      okhttp3.internal.http2.Http2Connection.writeData(Http2Connection.kt:332)
+      okhttp3.internal.http2.Http2Stream$FramingSink.emitFrame(Http2Stream.kt:565)
+      okhttp3.internal.http2.Http2Stream$FramingSink.close(Http2Stream.kt:612)
+      okio.ForwardingSink.close(ForwardingSink.kt:37)
+      okhttp3.internal.connection.Exchange$RequestBodySink.close(Exchange.kt:247)
+      okio.RealBufferedSink.close(RealBufferedSink.kt:287)      
+```
 
 ### 9.0.5 (1/10/2024 - 1/29/2024)
 
