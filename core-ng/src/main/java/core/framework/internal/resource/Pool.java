@@ -94,7 +94,7 @@ public class Pool<T extends AutoCloseable> {
             valid = false;
         }
         if (!valid) {
-            LOGGER.warn(errorCode("BROKEN_POOL_CONNECTION"), "connection is broken, try to reconnect immediately, pool=" + name);
+            LOGGER.warn(errorCode("BROKEN_POOL_CONNECTION"), "connection is broken, try to reconnect immediately, pool={}", name);
             closeItem(item);
         }
         return valid;
@@ -128,13 +128,15 @@ public class Pool<T extends AutoCloseable> {
     private PoolItem<T> createNewItem() {
         var watch = new StopWatch();
         size.incrementAndGet();
+        PoolItem<T> item = null;
         try {
-            return new PoolItem<>(factory.get());
+            item = new PoolItem<>(factory.get());
+            return item;
         } catch (Throwable e) {
             size.getAndDecrement();
             throw e;
         } finally {
-            LOGGER.debug("create new resource, pool={}, elapsed={}", name, watch.elapsed());
+            LOGGER.debug("create new resource, pool={}, item={}, elapsed={}", name, item == null ? null : item.resource, watch.elapsed());
         }
     }
 
@@ -181,6 +183,7 @@ public class Pool<T extends AutoCloseable> {
     }
 
     private void closeResource(PoolItem<T> item) {
+        LOGGER.debug("close resource, pool={}, item={}", name, item.resource);
         try {
             item.resource.close();
         } catch (Exception e) {
