@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author neo
@@ -15,12 +16,16 @@ import java.util.Map;
 public class RateControl {
     private final Logger logger = LoggerFactory.getLogger(RateControl.class);
 
+    private final ReentrantLock lock = new ReentrantLock();
     private Map<String, RateConfig> config;
     private Map<String, Rate> rates;
 
     public void maxEntries(int entries) {
-        synchronized (this) {
+        lock.lock();
+        try {
             rates = new LRUMap<>(entries);
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -58,8 +63,11 @@ public class RateControl {
 
         String key = group + "/" + clientIP;
         Rate rate;
-        synchronized (this) {
+        lock.lock();
+        try {
             rate = rates.computeIfAbsent(key, k -> new Rate(config.maxPermits));
+        } finally {
+            lock.unlock();
         }
         long currentTime = System.nanoTime();
         return rate.acquire(currentTime, config.maxPermits, config.fillRatePerNano);
@@ -69,8 +77,9 @@ public class RateControl {
     }
 
     static final class Rate {
-        volatile double currentPermits;
-        volatile long lastUpdateTime;
+        private final ReentrantLock lock = new ReentrantLock();
+        double currentPermits;
+        long lastUpdateTime;
 
         Rate(int currentPermits) {
             this.currentPermits = currentPermits;
@@ -79,7 +88,8 @@ public class RateControl {
 
         // under multi-thread condition, the order of acquires are not determined, currentTime can be earlier than lastUpdateTime (e.g. lastUpdateTime was updated by a later acquire first)
         boolean acquire(long currentTime, int maxPermits, double fillRatePerNano) {
-            synchronized (this) {
+            lock.lock();
+            try {
                 long timeElapsed = Math.max(0, currentTime - lastUpdateTime);
                 currentPermits = Math.min(maxPermits, currentPermits + fillRatePerNano * timeElapsed);
                 lastUpdateTime = lastUpdateTime + timeElapsed;
@@ -90,6 +100,8 @@ public class RateControl {
                 } else {
                     return false;
                 }
+            } finally {
+                lock.unlock();
             }
         }
     }
