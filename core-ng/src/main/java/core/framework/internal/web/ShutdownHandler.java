@@ -20,7 +20,7 @@ public class ShutdownHandler implements ExchangeCompletionListener {
     private final Logger logger = LoggerFactory.getLogger(ShutdownHandler.class);
 
     private final ReentrantLock lock = new ReentrantLock();
-    private final Condition activeRequestCondition = lock.newCondition();
+    private final Condition noMoreActiveRequest = lock.newCondition();
 
     private volatile boolean shutdown;
 
@@ -55,7 +55,7 @@ public class ShutdownHandler implements ExchangeCompletionListener {
                 if (left <= 0) {
                     return false;
                 }
-                activeRequestCondition.await(left, TimeUnit.MILLISECONDS);
+                noMoreActiveRequest.await(left, TimeUnit.MILLISECONDS);
             }
             return true;
         } finally {
@@ -68,17 +68,17 @@ public class ShutdownHandler implements ExchangeCompletionListener {
         try {
             int count = activeRequests.decrease();
             if (count <= 0 && shutdown) {
-                notifyActiveRequestCondition();
+                signal();
             }
         } finally {
             next.proceed();
         }
     }
 
-    private void notifyActiveRequestCondition() {
+    private void signal() {
         lock.lock();
         try {
-            activeRequestCondition.signalAll();
+            noMoreActiveRequest.signalAll();
         } finally {
             lock.unlock();
         }

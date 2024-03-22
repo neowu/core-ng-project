@@ -50,7 +50,7 @@ class MessageListenerThread extends Thread {
     private final int concurrency;
 
     private final ReentrantLock lock = new ReentrantLock();
-    private final Condition processingCondition = lock.newCondition();
+    private final Condition notProcessing = lock.newCondition();
     private boolean processing;
 
     private volatile boolean shutdown;
@@ -72,14 +72,14 @@ class MessageListenerThread extends Thread {
             process();
         } finally {
             processing = false;
-            notifyProcessingCondition();
+            signal();
         }
     }
 
-    private void notifyProcessingCondition() {
+    private void signal() {
         lock.lock();
         try {
-            processingCondition.signalAll();
+            notProcessing.signalAll();
         } finally {
             lock.unlock();
         }
@@ -139,7 +139,7 @@ class MessageListenerThread extends Thread {
                 if (left <= 0) {
                     return false;
                 }
-                processingCondition.await(left, TimeUnit.MILLISECONDS);
+                notProcessing.await(left, TimeUnit.MILLISECONDS);
             }
             return true;
         } finally {
