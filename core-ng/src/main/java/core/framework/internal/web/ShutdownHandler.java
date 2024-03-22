@@ -7,6 +7,10 @@ import io.undertow.util.StatusCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author neo
  */
@@ -14,7 +18,10 @@ public class ShutdownHandler implements ExchangeCompletionListener {
     final Counter activeRequests = new Counter();
 
     private final Logger logger = LoggerFactory.getLogger(ShutdownHandler.class);
-    private final Object lock = new Object();
+
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition activeRequestCondition = lock.newCondition();
+
     private volatile boolean shutdown;
 
     boolean handle(HttpServerExchange exchange) {
@@ -41,15 +48,18 @@ public class ShutdownHandler implements ExchangeCompletionListener {
 
     boolean awaitTermination(long timeoutInMs) throws InterruptedException {
         long end = System.currentTimeMillis() + timeoutInMs;
-        synchronized (lock) {
+        lock.lock();
+        try {
             while (activeRequests.get() > 0) {
                 long left = end - System.currentTimeMillis();
                 if (left <= 0) {
                     return false;
                 }
-                lock.wait(left);
+                activeRequestCondition.await(left, TimeUnit.MILLISECONDS);
             }
             return true;
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -58,12 +68,19 @@ public class ShutdownHandler implements ExchangeCompletionListener {
         try {
             int count = activeRequests.decrease();
             if (count <= 0 && shutdown) {
-                synchronized (lock) {
-                    lock.notifyAll();
-                }
+                notifyActiveRequestCondition();
             }
         } finally {
             next.proceed();
+        }
+    }
+
+    private void notifyActiveRequestCondition() {
+        lock.lock();
+        try {
+            activeRequestCondition.signalAll();
+        } finally {
+            lock.unlock();
         }
     }
 }

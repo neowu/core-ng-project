@@ -7,11 +7,14 @@ import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author neo
  */
 public class TestMongoConfig extends MongoConfig {
+    private static final ReentrantLock LOCK = new ReentrantLock();
+
     // only start one mongo server for testing to reduce resource overhead,
     // only breaking case is that multiple mongo() using same collection name, then if one unit test operates both MongoCollection may result in conflict or merged results
     // this can be avoided by designing test differently
@@ -27,13 +30,16 @@ public class TestMongoConfig extends MongoConfig {
     }
 
     private void startLocalMongoServer(ModuleContext context) {
-        synchronized (TestMongoConfig.class) {
+        LOCK.lock();
+        try {
             // in test env, config is initialized in order and within same thread, so no threading issue
             if (localMongoAddress == null) {
                 var server = new MongoServer(new MemoryBackend());
                 localMongoAddress = server.bind();
                 context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> server.shutdown());
             }
+        } finally {
+            LOCK.unlock();
         }
     }
 

@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static core.framework.log.Markers.errorCode;
 
@@ -46,9 +49,11 @@ class MessageListenerThread extends Thread {
     private final Semaphore semaphore;
     private final int concurrency;
 
-    private final Object lock = new Object();
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition processingCondition = lock.newCondition();
+    private boolean processing;
+
     private volatile boolean shutdown;
-    private volatile boolean processing;
 
     MessageListenerThread(String name, Consumer<String, byte[]> consumer, MessageListener listener) {
         super(name);
@@ -67,9 +72,16 @@ class MessageListenerThread extends Thread {
             process();
         } finally {
             processing = false;
-            synchronized (lock) {
-                lock.notifyAll();
-            }
+            notifyProcessingCondition();
+        }
+    }
+
+    private void notifyProcessingCondition() {
+        lock.lock();
+        try {
+            processingCondition.signalAll();
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -120,15 +132,18 @@ class MessageListenerThread extends Thread {
 
     boolean awaitTermination(long timeoutInMs) throws InterruptedException {
         long end = System.currentTimeMillis() + timeoutInMs;
-        synchronized (lock) {
+        lock.lock();
+        try {
             while (processing) {
                 long left = end - System.currentTimeMillis();
                 if (left <= 0) {
                     return false;
                 }
-                lock.wait(left);
+                processingCondition.await(left, TimeUnit.MILLISECONDS);
             }
             return true;
+        } finally {
+            lock.unlock();
         }
     }
 

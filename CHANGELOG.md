@@ -4,7 +4,7 @@
 
 * mysql: updated and patched to 8.3.0, fixed CJException should be wrapped as SQLException
   > make sure use "core.framework.mysql:mysql-connector-j:8.3.0-r2"
-* rate: RateControl, replace synchronized with ReentrantLock
+* thread: replace all synchronized with ReentrantLock/Condition, including RateControl/ShutdownHandling/Test
 
 ### 9.0.8 (1/29/2024 - 3/7/2024)
 

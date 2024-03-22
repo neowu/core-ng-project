@@ -9,10 +9,14 @@ import org.apache.logging.log4j.core.config.ConfigurationFactory;
 import org.elasticsearch.common.logging.internal.LoggerFactoryImpl;
 import org.elasticsearch.logging.internal.spi.LoggerFactory;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author neo
  */
 public class TestSearchConfig extends SearchConfig {
+    private static final ReentrantLock LOCK = new ReentrantLock();
+
     // only start one local node for testing to reduce resource overhead,
     // only breaking case is that multiple search() using same index name, then if one unit test operates both ElasticSearchType will result in conflict or merged results
     // this can be avoided by designing test differently
@@ -26,13 +30,16 @@ public class TestSearchConfig extends SearchConfig {
     }
 
     private void startLocalElasticSearch(ModuleContext context) {
-        synchronized (TestSearchConfig.class) {
+        LOCK.lock();
+        try {
             // in test env, config is initialized in order and within same thread, so no threading issue
             if (localESHost == null) {
                 var server = new LocalElasticSearch();
                 localESHost = server.start();
                 context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> server.close());
             }
+        } finally {
+            LOCK.unlock();
         }
     }
 
