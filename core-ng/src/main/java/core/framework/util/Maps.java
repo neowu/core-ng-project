@@ -38,7 +38,7 @@ public final class Maps {
         if (size < 3) {
             capacity = size + 1;
         } else {
-            capacity = (int) ((float) size / 0.75f + 1);
+            capacity = (int) (size / 0.75f + 1);
         }
         return capacity;
     }

@@ -36,6 +36,7 @@ public class ProducerMetrics implements Metrics {
     }
 
     // refer to https://docs.confluent.io/platform/current/kafka/monitoring.html#per-broker-metrics
+    @SuppressWarnings("PMD.UnusedAssignment")   // false positive
     public void set(Map<MetricName, ? extends Metric> kafkaMetrics) {
         for (Map.Entry<MetricName, ? extends Metric> entry : kafkaMetrics.entrySet()) {
             MetricName metricName = entry.getKey();

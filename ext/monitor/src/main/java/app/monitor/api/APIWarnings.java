@@ -36,7 +36,7 @@ public class APIWarnings {
     }
 
     public String errorMessage() {
-        var builder = new StringBuilder();
+        var builder = new StringBuilder(64);
         if (!errors.isEmpty()) {
             builder.append("*incompatible changes*\n");
             errors.forEach(error -> builder.append("* ").append(error).append('\n'));

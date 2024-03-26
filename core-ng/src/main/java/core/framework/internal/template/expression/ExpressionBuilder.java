@@ -61,27 +61,37 @@ public class ExpressionBuilder {
     }
 
     private Type returnType(Token token, Class<?> modelClass) {
-        switch (token) {
-            case MethodToken methodToken -> {
-                String methodName = methodToken.name;
-                Type returnType = methodReturnType(modelClass, methodName);
-                if (methodToken.next != null) {
-                    return returnType(methodToken.next, GenericTypes.rawClass(returnType));
-                }
-                return returnType;
-            }
-            case FieldToken fieldToken -> {
-                Type fieldType = fieldType(modelClass, fieldToken.name);
-                if (fieldToken.next != null) {
-                    return returnType(fieldToken.next, GenericTypes.rawClass(fieldType));
-                }
-                return fieldType;
-            }
-            case ValueToken valueToken -> {
-                return valueToken.type;
-            }
+        return switch (token) {
+            case MethodToken methodToken -> methodReturnType(modelClass, methodToken);
+            case FieldToken fieldToken -> fieldType(modelClass, fieldToken);
+            case ValueToken valueToken -> valueToken.type;
             default -> throw new Error("unexpected token, token=" + token);
+        };
+    }
+
+    private Type methodReturnType(Class<?> modelClass, MethodToken token) {
+        String methodName = token.name;
+        Type returnType = methodReturnType(modelClass, methodName);
+        if (token.next != null) {
+            return returnType(token.next, GenericTypes.rawClass(returnType));
         }
+        return returnType;
+    }
+
+    private Type methodReturnType(Class<?> modelClass, String methodName) {
+        Method[] methods = modelClass.getMethods();
+        for (Method method : methods) {
+            if (method.getName().equals(methodName)) return method.getGenericReturnType();
+        }
+        throw new Error(format("can not find method, class={}, method={}, expression={}, location={}", modelClass.getCanonicalName(), methodName, expressionSource, location));
+    }
+
+    private Type fieldType(Class<?> modelClass, FieldToken token) {
+        Type fieldType = fieldType(modelClass, token.name);
+        if (token.next != null) {
+            return returnType(token.next, GenericTypes.rawClass(fieldType));
+        }
+        return fieldType;
     }
 
     private Type fieldType(Class<?> modelClass, String fieldName) {
@@ -93,13 +103,5 @@ public class ExpressionBuilder {
             throw new Error(format("can not find field, class={}, field={}, expression={}, location={}",
                 modelClass, fieldName, expressionSource, location), e);
         }
-    }
-
-    private Type methodReturnType(Class<?> modelClass, String methodName) {
-        Method[] methods = modelClass.getMethods();
-        for (Method method : methods) {
-            if (method.getName().equals(methodName)) return method.getGenericReturnType();
-        }
-        throw new Error(format("can not find method, class={}, method={}, expression={}, location={}", modelClass.getCanonicalName(), methodName, expressionSource, location));
     }
 }

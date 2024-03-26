@@ -8,6 +8,7 @@ import core.framework.internal.util.LRUMap;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
  * @author ericchung, neo
  */
 public class AlertService {
-    private final LRUMap<String, AlertStat> stats = new LRUMap<>(1000);
+    private final Map<String, AlertStat> stats = new LRUMap<>(1000);
     private final ReentrantLock lock = new ReentrantLock();
     private final String kibanaURL;
     private final Matchers ignoredErrors;

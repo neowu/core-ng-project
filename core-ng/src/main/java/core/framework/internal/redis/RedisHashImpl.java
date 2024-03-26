@@ -58,6 +58,7 @@ public final class RedisHashImpl implements RedisHash {
         }
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl") // intentional, simplest way to unify control flow
     @Override
     public Map<String, String> getAll(String key) {
         var watch = new StopWatch();

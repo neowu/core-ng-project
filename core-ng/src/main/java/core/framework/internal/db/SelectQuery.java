@@ -27,7 +27,8 @@ final class SelectQuery<T> {
     }
 
     private String getSQL(List<Field> fields) {
-        var builder = new StringBuilder("SELECT ").append(columns).append(" FROM ").append(table).append(" WHERE ");
+        var builder = new StringBuilder(64);
+        builder.append("SELECT ").append(columns).append(" FROM ").append(table).append(" WHERE ");
         for (Field field : fields) {
             if (field.isAnnotationPresent(PrimaryKey.class)) {
                 Column column = field.getDeclaredAnnotation(Column.class);
@@ -56,7 +57,8 @@ final class SelectQuery<T> {
     }
 
     String sql(String projection, StringBuilder where, String groupBy, String sort, Integer skip, Integer limit) {
-        var builder = new StringBuilder("SELECT ").append(projection).append(" FROM ").append(table);
+        var builder = new StringBuilder(64);
+        builder.append("SELECT ").append(projection).append(" FROM ").append(table);
         if (!where.isEmpty()) builder.append(" WHERE ").append(where);
         if (groupBy != null) builder.append(" GROUP BY ").append(groupBy);
         if (sort != null) builder.append(" ORDER BY ").append(sort);
@@ -74,9 +76,10 @@ final class SelectQuery<T> {
         if (skip != null && limit == null) throw new Error("limit must not be null if skip is not, skip=" + skip);
         if (skip == null && limit == null) return params.toArray();
 
-        Integer skipValue = skip == null ? Integer.valueOf(0) : skip;
+        Integer skipValue = skip == null ? (Integer) 0 : skip;
         if (params.isEmpty()) return new Object[]{skipValue, limit};
         int length = params.size();
+        @SuppressWarnings("PMD.OptimizableToArrayCall")     // false positive, to create array with larger size
         Object[] results = params.toArray(new Object[params.size() + 2]);
         results[length] = skipValue;
         results[length + 1] = limit;

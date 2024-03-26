@@ -39,6 +39,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
         this.rateControl = rateControl;
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl") // intentional
     @Override
     public void handleEvent(WebSocketChannel channel) {
         try {
@@ -87,6 +88,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
         }
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl") // intentional
     private void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage textMessage, Throwable error) {
         @SuppressWarnings("unchecked")
         var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);

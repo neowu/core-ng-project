@@ -46,8 +46,11 @@ public class PropertyManager {
         int length = propertyKey.length();
         for (int i = 0; i < length; i++) {
             char ch = propertyKey.charAt(i);
-            if (ch == '.') builder.append('_');
-            else builder.append(ASCII.toUpperCase(ch));
+            if (ch == '.') {
+                builder.append('_');
+            } else {
+                builder.append(ASCII.toUpperCase(ch));
+            }
         }
         return builder.toString();
     }

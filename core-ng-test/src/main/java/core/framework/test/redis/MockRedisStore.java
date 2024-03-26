@@ -62,11 +62,15 @@ class MockRedisStore {
             return (Set<String>) value;
         }
 
+        @SuppressWarnings("PMD.LooseCoupling")
+            // intentional design
         SortedSet sortedSet() {
             assertThat(value).isInstanceOf(SortedSet.class);
             return (SortedSet) value;
         }
 
+        @SuppressWarnings("PMD.LooseCoupling")
+            // intentional design
         HyperLogLog hyperLogLog() {
             assertThat(value).isInstanceOf(HyperLogLog.class);
             return (HyperLogLog) value;

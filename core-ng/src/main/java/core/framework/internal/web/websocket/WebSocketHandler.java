@@ -110,7 +110,7 @@ public class WebSocketHandler {
     }
 
     public void shutdown() {
-        for (var channel : channels) {
+        for (WebSocketChannel channel : channels) {
             WebSockets.sendClose(WebSocketCloseCodes.SERVICE_RESTART, "server is shutting down", channel, ChannelCallback.INSTANCE);
         }
     }

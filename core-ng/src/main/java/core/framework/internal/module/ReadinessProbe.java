@@ -51,6 +51,7 @@ public final class ReadinessProbe {
         urls = null;    // release memory
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl") // intentional, simplest way to unify control flow
     private void sendHTTPRequest(String url, HTTPClient client, StopWatch watch) throws InterruptedException {
         var request = new HTTPRequest(HTTPMethod.GET, url);
         while (true) {

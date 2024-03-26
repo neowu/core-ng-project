@@ -177,7 +177,7 @@ public final class RequestParser {
     }
 
     void parseBody(RequestImpl request, HttpServerExchange exchange) throws Throwable {
-        var body = exchange.getAttachment(RequestBodyReader.REQUEST_BODY);
+        RequestBodyReader.RequestBody body = exchange.getAttachment(RequestBodyReader.REQUEST_BODY);
         if (body != null) {
             request.body = body.body();
             logger.debug("[request] body={}", BodyLogParam.of(request.body, request.contentType));

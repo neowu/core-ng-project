@@ -33,6 +33,7 @@ public final class ClassValidatorSupport {
     }
 
     // return fields to validate
+    @SuppressWarnings("PMD.UseArraysAsList")    // false positive
     public List<Field> declaredFields(Class<?> objectClass) {
         Field[] fields = objectClass.getDeclaredFields();
         List<Field> results = new ArrayList<>(fields.length);
@@ -41,7 +42,6 @@ public final class ClassValidatorSupport {
             if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers())) continue;  // ignore all static final field
 
             validateField(field);
-
             results.add(field);
         }
         return results;

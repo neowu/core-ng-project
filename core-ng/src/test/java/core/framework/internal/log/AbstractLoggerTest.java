@@ -16,6 +16,7 @@ class AbstractLoggerTest {
     @Mock(answer = Answers.CALLS_REAL_METHODS)
     AbstractLogger logger;
 
+    @SuppressWarnings("PMD.InvalidLogMessageFormat")    // test the target method intentionally
     @Test
     void logWithEmptyArguments() {
         Object[] arguments = new Object[0];

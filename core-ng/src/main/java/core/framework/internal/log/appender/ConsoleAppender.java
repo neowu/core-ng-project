@@ -17,21 +17,21 @@ import java.util.Map;
 public final class ConsoleAppender implements LogAppender {
     private static final String LOG_SPLITTER = " | ";
 
-    private final PrintStream stdout = System.out;
-    private final PrintStream stderr = System.err;
+    private static final PrintStream STDOUT = System.out;
+    private static final PrintStream STDERR = System.err;
 
     @Override
     public void append(ActionLogMessage message) {
-        stdout.println(message(message));
+        STDOUT.println(message(message));
 
         if (message.traceLog != null) {
-            stderr.println(message.traceLog);
+            STDERR.println(message.traceLog);
         }
     }
 
     @Override
     public void append(StatMessage message) {
-        stdout.println(message(message));
+        STDOUT.println(message(message));
     }
 
     String message(ActionLogMessage log) {
@@ -39,10 +39,10 @@ public final class ConsoleAppender implements LogAppender {
 
         var builder = new StringBuilder(512);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(log.date))
-                .append(LOG_SPLITTER).append(log.result)
-                .append(LOG_SPLITTER).append("elapsed=").append(format.format(log.elapsed.longValue()))
-                .append(LOG_SPLITTER).append("id=").append(log.id)
-                .append(LOG_SPLITTER).append("action=").append(log.action);
+            .append(LOG_SPLITTER).append(log.result)
+            .append(LOG_SPLITTER).append("elapsed=").append(format(format, log.elapsed))
+            .append(LOG_SPLITTER).append("id=").append(log.id)
+            .append(LOG_SPLITTER).append("action=").append(log.action);
 
         if (log.correlationIds != null) {
             builder.append(LOG_SPLITTER).append("correlation_id=");
@@ -51,7 +51,7 @@ public final class ConsoleAppender implements LogAppender {
         String errorCode = log.errorCode;
         if (errorCode != null) {
             builder.append(LOG_SPLITTER).append("error_code=").append(errorCode)
-                    .append(LOG_SPLITTER).append("error_message=").append(filterLineSeparator(log.errorMessage));
+                .append(LOG_SPLITTER).append("error_message=").append(filterLineSeparator(log.errorMessage));
         }
 
         for (Map.Entry<String, List<String>> entry : log.context.entrySet()) {
@@ -86,30 +86,34 @@ public final class ConsoleAppender implements LogAppender {
     String message(StatMessage message) {
         var builder = new StringBuilder(512);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(message.date))
-                .append(LOG_SPLITTER).append(message.result);
+            .append(LOG_SPLITTER).append(message.result);
 
         String errorCode = message.errorCode;
         if (errorCode != null) {
             builder.append(LOG_SPLITTER).append("error_code=").append(errorCode)
-                    .append(LOG_SPLITTER).append("error_message=").append(message.errorMessage);
+                .append(LOG_SPLITTER).append("error_message=").append(message.errorMessage);
         }
 
         var format = new DecimalFormat();
         for (Map.Entry<String, Double> entry : message.stats.entrySet()) {
             builder.append(LOG_SPLITTER)
-                    .append(entry.getKey()).append('=')
-                    .append(format.format(entry.getValue()));
+                .append(entry.getKey()).append('=')
+                .append(format.format(entry.getValue()));
         }
 
         if (message.info != null) {
             for (Map.Entry<String, String> entry : message.info.entrySet()) {
                 builder.append(LOG_SPLITTER)
-                        .append(entry.getKey()).append('=')
-                        .append(entry.getValue());
+                    .append(entry.getKey()).append('=')
+                    .append(entry.getValue());
             }
         }
 
         return builder.toString();
+    }
+
+    private String format(DecimalFormat format, long number) {
+        return format.format(number);
     }
 
     private void appendList(StringBuilder builder, List<String> items) {
@@ -127,8 +131,11 @@ public final class ConsoleAppender implements LogAppender {
         var builder = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
             char ch = value.charAt(i);
-            if (ch == '\n' || ch == '\r') builder.append(' ');
-            else builder.append(ch);
+            if (ch == '\n' || ch == '\r') {
+                builder.append(' ');
+            } else {
+                builder.append(ch);
+            }
         }
         return builder.toString();
     }

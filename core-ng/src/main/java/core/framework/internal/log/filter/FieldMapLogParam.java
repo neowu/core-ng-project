@@ -24,8 +24,11 @@ public class FieldMapLogParam implements LogParam {
             String key = entry.getKey();
             builder.append(key).append('=');
 
-            if (maskedFields.contains(key)) builder.append("******");
-            else builder.append(entry.getValue());
+            if (maskedFields.contains(key)) {
+                builder.append("******");
+            } else {
+                builder.append(entry.getValue());
+            }
 
             if (builder.length() > maxLength) {
                 builder.setLength(maxLength);

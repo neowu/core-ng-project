@@ -37,7 +37,7 @@ public class PropertyController implements Controller {
         }
         builder.append("\n# system properties\n");
         Properties properties = System.getProperties();
-        for (var key : new TreeSet<>(properties.stringPropertyNames())) { // sort by key
+        for (String key : new TreeSet<>(properties.stringPropertyNames())) { // sort by key
             String value = properties.getProperty(key);
             String maskedValue = mask(key, value);
             builder.append(key).append('=').append(maskedValue).append('\n');

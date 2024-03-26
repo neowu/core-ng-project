@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MockRedisHyperLogLog implements RedisHyperLogLog {
     private final MockRedisStore store;
 
-    public MockRedisHyperLogLog(MockRedisStore store) {
+    MockRedisHyperLogLog(MockRedisStore store) {
         this.store = store;
     }
 

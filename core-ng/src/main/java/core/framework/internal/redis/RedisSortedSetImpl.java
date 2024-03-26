@@ -169,6 +169,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         return connection.readArray();
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl") // intentional, simplest way to unify control flow
     @Override
     public Map<String, Long> popByScore(String key, long minScore, long maxScore, long limit) {
         var watch = new StopWatch();

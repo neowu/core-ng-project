@@ -36,6 +36,7 @@ public interface Query<T> {
         if (params == null || params.isEmpty()) throw new Error("params must not be empty");
         // efficient version of: where(Strings.format("{} IN ({})", field, params.stream().map(param -> "?").collect(Collectors.joining(", "))), params.toArray());
         int size = params.size();
+        @SuppressWarnings("PMD.InsufficientStringBufferDeclaration")    // false positive
         var builder = new StringBuilder(field.length() + size * 3 + 6);    // e.g. field in (?, ?, ?)
         builder.append(field).append(" IN (");
         for (int i = 0; i < size; i++) {

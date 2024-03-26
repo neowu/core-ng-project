@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author neo
@@ -63,7 +64,7 @@ public class ResponseHandler {
 
     private void putCookies(ResponseImpl response, HttpServerExchange exchange) {
         if (response.cookies != null) {
-            for (var entry : response.cookies.entrySet()) {
+            for (Map.Entry<CookieSpec, String> entry : response.cookies.entrySet()) {
                 CookieSpec spec = entry.getKey();
                 String value = entry.getValue();
                 CookieImpl cookie = cookie(spec, value);

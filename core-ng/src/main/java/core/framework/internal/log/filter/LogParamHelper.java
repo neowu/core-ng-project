@@ -6,8 +6,8 @@ package core.framework.internal.log.filter;
 public class LogParamHelper {
     public static void append(StringBuilder builder, String value, int maxLength) {
         if (value.length() > maxLength) {
-            builder.append(value, 0, maxLength);
-            builder.append("...(truncated)");
+            builder.append(value, 0, maxLength)
+                .append("...(truncated)");
         } else {
             builder.append(value);
         }
