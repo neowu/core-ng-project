@@ -38,7 +38,8 @@ public class HTTPErrorHandler {
 
     void handleError(Throwable e, HttpServerExchange exchange, RequestImpl request, ActionLog actionLog) {
         if (exchange.isResponseStarted()) {
-            logger.error("response was sent, discard the current http transaction");
+            // most likely caused by client abort
+            logger.warn("response was sent, discard the current http transaction");
             return;
         }
 

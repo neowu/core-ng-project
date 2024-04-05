@@ -51,6 +51,10 @@ public class WebSocketHandler {
 
     public boolean checkWebSocket(HTTPMethod method, HeaderMap headers) {
         if (method == HTTPMethod.GET && headers.getFirst(Headers.SEC_WEB_SOCKET_KEY) != null) {
+            if (!headers.contains(Headers.UPGRADE)) {
+                throw new BadRequestException("upgrade is not permitted", "INVALID_HTTP_REQUEST");
+            }
+
             String version = headers.getFirst(Headers.SEC_WEB_SOCKET_VERSION);
             if ("13".equals(version)) return true;  // only support latest ws version
             throw new BadRequestException("only support web socket version 13, version=" + version, "INVALID_HTTP_REQUEST");

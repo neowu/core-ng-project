@@ -46,7 +46,8 @@ class WebSocketHandlerTest {
     void checkWebSocket() {
         var headers = new HeaderMap()
                 .put(Headers.SEC_WEB_SOCKET_KEY, "xxx")
-                .put(Headers.SEC_WEB_SOCKET_VERSION, "13");
+            .put(Headers.SEC_WEB_SOCKET_VERSION, "13")
+            .put(Headers.UPGRADE, "websocket");
 
         assertThat(handler.checkWebSocket(HTTPMethod.GET, headers)).isTrue();
         assertThat(handler.checkWebSocket(HTTPMethod.PUT, headers)).isFalse();
@@ -54,6 +55,11 @@ class WebSocketHandlerTest {
         assertThatThrownBy(() -> handler.checkWebSocket(HTTPMethod.GET, headers.put(Headers.SEC_WEB_SOCKET_VERSION, "07")))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("only support web socket version 13");
+
+        headers.remove(Headers.UPGRADE);
+        assertThatThrownBy(() -> handler.checkWebSocket(HTTPMethod.GET, headers))
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("upgrade is not permitted");
     }
 
     @Test
