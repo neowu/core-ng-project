@@ -8,6 +8,7 @@
 * http: convert some http error as warning
   > undertow "UT000133: Request did not contain an Upgrade header, upgrade is not permitted"
   > "response was sent, discard the current http transaction"
+* search: update es to 8.13
 
 ### 9.0.8 (1/29/2024 - 3/7/2024)
 
