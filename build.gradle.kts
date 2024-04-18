@@ -19,11 +19,11 @@ subprojects {
     }
 }
 
-val elasticVersion = "8.13.0"
+val elasticVersion = "8.13.2"
 val kafkaVersion = "3.7.0"
-val jacksonVersion = "2.16.1"
+val jacksonVersion = "2.17.0"
 val junitVersion = "5.10.2"
-val mockitoVersion = "5.10.0"
+val mockitoVersion = "5.11.0"
 val assertjVersion = "3.25.3"
 
 project("core-ng-api") {
@@ -72,7 +72,7 @@ project("core-ng-mongo") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng"))
-        api("org.mongodb:mongodb-driver-sync:4.11.0")
+        api("org.mongodb:mongodb-driver-sync:5.0.1")
         testImplementation(project(":core-ng-test"))
     }
 }
@@ -82,7 +82,7 @@ project("core-ng-mongo-test") {
     dependencies {
         implementation(project(":core-ng-test"))
         implementation(project(":core-ng-mongo"))
-        implementation("de.bwaldvogel:mongo-java-server:1.44.0")
+        implementation("de.bwaldvogel:mongo-java-server:1.45.0")
     }
 }
 
