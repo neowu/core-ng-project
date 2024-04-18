@@ -19,8 +19,7 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle("com.puppycrawl.tools:checkstyle:10.14.0")
-            checkstyle("org.codehaus.plexus:plexus-container-default:2.1.1")
+            checkstyle("com.puppycrawl.tools:checkstyle:10.15.0")
             checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
         }
 
@@ -61,7 +60,7 @@ subprojects {
             spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.4")
         }
 
-        toolVersion = "4.8.3"
+        toolVersion = "4.8.4"
         reportLevel = Confidence.LOW
         extraArgs = listOf("-longBugCodes")
         includeFilter = rootProject.file("buildSrc/src/main/check/spotbugs.xml")
