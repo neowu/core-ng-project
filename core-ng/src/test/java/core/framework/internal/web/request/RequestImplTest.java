@@ -108,7 +108,7 @@ class RequestImplTest {
     void session() {
         request.scheme = "http";
 
-        assertThatThrownBy(() -> request.session())
+        assertThatThrownBy(request::session)
             .isInstanceOf(Error.class)
             .hasMessageContaining("session must be used with https");
     }

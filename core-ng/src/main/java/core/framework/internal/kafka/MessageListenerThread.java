@@ -65,7 +65,6 @@ class MessageListenerThread extends Thread {
         thread = ThreadPools.virtualThreadBuilder(name + "-");   // used in single thread, no need to use factory()
     }
 
-    @SuppressWarnings("PMD.UnusedAssignment")   // false positive
     @Override
     public void run() {
         try {

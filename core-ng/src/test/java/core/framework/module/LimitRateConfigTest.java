@@ -22,7 +22,7 @@ class LimitRateConfigTest {
 
     @Test
     void validate() {
-        assertThatThrownBy(() -> config.validate())
+        assertThatThrownBy(config::validate)
             .hasMessageContaining("limitRate is configured but no group added");
     }
 

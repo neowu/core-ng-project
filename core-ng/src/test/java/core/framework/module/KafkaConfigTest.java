@@ -27,7 +27,7 @@ class KafkaConfigTest {
 
     @Test
     void validate() {
-        assertThatThrownBy(() -> config.validate())
+        assertThatThrownBy(config::validate)
             .hasMessageContaining("no publisher/handler added");
     }
 }

@@ -21,11 +21,11 @@ class SearchConfigTest {
 
     @Test
     void validate() {
-        assertThatThrownBy(() -> config.validate())
+        assertThatThrownBy(config::validate)
             .hasMessageContaining("search host must be configured");
 
         config.host("localhost");
-        assertThatThrownBy(() -> config.validate())
+        assertThatThrownBy(config::validate)
             .hasMessageContaining("search is configured but no type added");
     }
 

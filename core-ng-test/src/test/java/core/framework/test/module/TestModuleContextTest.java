@@ -64,7 +64,7 @@ class TestModuleContextTest {
     @Test
     void validateOverrideBindings() {
         context.overrideBinding(Types.list(String.class), null, "value1");
-        assertThatThrownBy(() -> context.validate())
+        assertThatThrownBy(context::validate)
             .isInstanceOf(Error.class)
             .hasMessageContaining("found unnecessary override bindings");
     }

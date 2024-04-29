@@ -30,7 +30,7 @@ class CacheConfigTest {
 
     @Test
     void validate() {
-        assertThatThrownBy(() -> config.validate())
+        assertThatThrownBy(config::validate)
             .hasMessageContaining("cache is configured but no cache added");
     }
 
@@ -38,7 +38,7 @@ class CacheConfigTest {
     void local() {
         config.local();
 
-        assertThatThrownBy(() -> config.local())
+        assertThatThrownBy(config::local)
             .hasMessageContaining("cache store is already configured");
 
         assertThatThrownBy(() -> config.redis("localhost"))

@@ -33,7 +33,7 @@ public final class ClassValidatorSupport {
     }
 
     // return fields to validate
-    @SuppressWarnings("PMD.UseArraysAsList")    // false positive
+    @SuppressWarnings("PMD.UseArraysAsList")    // false positive, return filtered results
     public List<Field> declaredFields(Class<?> objectClass) {
         Field[] fields = objectClass.getDeclaredFields();
         List<Field> results = new ArrayList<>(fields.length);

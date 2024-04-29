@@ -46,7 +46,6 @@ public final class Hash {
         }
     }
 
-    @SuppressWarnings("PMD.StringInstantiation")    // TODO: remove after pmd 7.0.1
     private static String hex(byte[] bytes) {
         char[] chars = new char[bytes.length << 1];
         int index = 0;

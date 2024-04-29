@@ -25,7 +25,7 @@ class ReadOnlySessionTest {
 
     @Test
     void invalidate() {
-        assertThatThrownBy(() -> session.invalidate())
+        assertThatThrownBy(session::invalidate)
             .isInstanceOf(Error.class)
             .hasMessageContaining("readonly");
     }

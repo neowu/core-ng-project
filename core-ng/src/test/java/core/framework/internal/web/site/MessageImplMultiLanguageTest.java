@@ -70,7 +70,7 @@ class MessageImplMultiLanguageTest {
         properties.set("key4", "value4");
         message.messages.get("zh").add(properties);
 
-        assertThatThrownBy(() -> message.validateMessageKeys())
+        assertThatThrownBy(message::validateMessageKeys)
             .isInstanceOf(Error.class)
             .hasMessageContaining("message keys are missing for language")
             .hasMessageContaining("language=en_US");

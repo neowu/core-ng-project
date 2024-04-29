@@ -41,7 +41,7 @@ class RepositoryImplCompositeKeyEntityTest {
 
     @Test
     void get() {
-        assertThatThrownBy(() -> repository.get())
+        assertThatThrownBy(repository::get)
             .isInstanceOf(Error.class)
             .hasMessageContaining("the length of primary keys does not match columns");
 
@@ -133,7 +133,7 @@ class RepositoryImplCompositeKeyEntityTest {
 
         assertThatThrownBy(() -> {
             var impl = (RepositoryImpl<CompositeKeyEntity>) repository;
-            impl.batchDeleteParams(List.of(new Object[]{1, 1, 1}));
+            impl.batchDeleteParams(List.of(1, 1, 1));
         }).isInstanceOf(Error.class)
             .hasMessageContaining("the length of primary keys must match columns");
     }

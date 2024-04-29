@@ -21,12 +21,12 @@ class MongoConfigTest {
 
     @Test
     void validate() {
-        assertThatThrownBy(() -> config.validate())
+        assertThatThrownBy(config::validate)
             .hasMessageContaining("mongo uri must be configured");
 
         config.uri = "mongodb://uri/db";
 
-        assertThatThrownBy(() -> config.validate())
+        assertThatThrownBy(config::validate)
             .hasMessageContaining("no collection/view added");
     }
 

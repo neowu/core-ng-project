@@ -23,7 +23,7 @@ class RedisConfigTest {
 
     @Test
     void validate() {
-        assertThatThrownBy(() -> config.validate())
+        assertThatThrownBy(config::validate)
             .hasMessageContaining("redis host must be configured");
     }
 

@@ -20,11 +20,11 @@ class DBConfigTest {
 
     @Test
     void validate() {
-        assertThatThrownBy(() -> config.validate())
+        assertThatThrownBy(config::validate)
                 .hasMessageContaining("db url must be configured");
 
         config.url("jdbc:hsqldb:mem:.");
-        assertThatThrownBy(() -> config.validate())
+        assertThatThrownBy(config::validate)
                 .hasMessageContaining("db is configured but no repository/view added");
     }
 }
