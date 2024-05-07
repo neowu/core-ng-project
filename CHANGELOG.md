@@ -2,6 +2,9 @@
 
 ### 9.0.10 (4/29/2024 - )
 
+* mysql: updated and patched to 8.4.0-r1
+  > use "core.framework.mysql:mysql-connector-j:8.4.0-r1"
+
 ### 9.0.9 (3/20/2024 - 4/18/2024)
 
 * mysql: updated and patched to 8.3.0, fixed CJException should be wrapped as SQLException
