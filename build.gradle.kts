@@ -34,7 +34,7 @@ project("core-ng") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng-api"))
-        api("org.slf4j:slf4j-api:2.0.12")
+        api("org.slf4j:slf4j-api:2.0.13")
         implementation("org.javassist:javassist:3.30.2-GA")
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
