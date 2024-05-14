@@ -55,7 +55,8 @@ public class MessageProducer {
                 ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L,                      // 5s
                 ProducerConfig.MAX_BLOCK_MS_CONFIG, 30_000L,                                 // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
                 ProducerConfig.MAX_REQUEST_SIZE_CONFIG, maxRequestSize,
-                ProducerConfig.AUTO_INCLUDE_JMX_REPORTER_CONFIG, Boolean.FALSE);
+                ProducerConfig.AUTO_INCLUDE_JMX_REPORTER_CONFIG, Boolean.FALSE,
+                ProducerConfig.ENABLE_METRICS_PUSH_CONFIG, Boolean.FALSE);
 
             var serializer = new ByteArraySerializer();
             var producer = new KafkaProducer<>(config, serializer, serializer);

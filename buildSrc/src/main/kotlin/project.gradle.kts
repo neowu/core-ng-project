@@ -81,6 +81,7 @@ allprojects {
         module {
             outputDir = file("${rootDir}/build/${rootDir.toPath().relativize(projectDir.toPath())}/idea/production")
             testOutputDir = file("${rootDir}/build/${rootDir.toPath().relativize(projectDir.toPath())}/idea/test")
+            isDownloadSources = true
         }
     }
 }
