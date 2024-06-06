@@ -8,15 +8,6 @@ apply(plugin = "project")
 subprojects {
     group = "core.framework"
     version = "9.0.10"
-
-    repositories {
-        maven {
-            url = uri("https://maven.codelibs.org/")
-            content {
-                includeGroup("org.codelibs.elasticsearch.module")
-            }
-        }
-    }
 }
 
 val elasticVersion = "8.13.2"
