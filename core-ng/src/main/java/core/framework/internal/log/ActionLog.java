@@ -154,7 +154,7 @@ public final class ActionLog {
     }
 
     public String correlationId() {
-        if (correlationIds != null && correlationIds.size() == 1) return correlationIds.get(0);
+        if (correlationIds != null && correlationIds.size() == 1) return correlationIds.getFirst();
         return id; // if there are multiple correlationIds (in batch), use current id as following correlationId
     }
 

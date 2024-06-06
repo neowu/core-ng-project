@@ -19,7 +19,7 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle("com.puppycrawl.tools:checkstyle:10.15.0")
+            checkstyle("com.puppycrawl.tools:checkstyle:10.17.0")
             checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
         }
 
@@ -47,7 +47,7 @@ subprojects {
     pmd {
         ruleSets = listOf()
         ruleSetFiles = rootProject.files("buildSrc/src/main/check/pmd.xml")
-        toolVersion = "7.1.0"
+        toolVersion = "7.2.0"
         isConsoleOutput = true
 
         tasks.withType<Pmd> {
@@ -60,14 +60,14 @@ subprojects {
             spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.4")
         }
 
-        toolVersion = "4.8.4"
+        toolVersion = "4.8.5"
         reportLevel = Confidence.LOW
         extraArgs = listOf("-longBugCodes")
         includeFilter = rootProject.file("buildSrc/src/main/check/spotbugs.xml")
     }
 
     jacoco {
-        toolVersion = "0.8.10"
+        toolVersion = "0.8.12"
 
         tasks.named<JacocoReport>("testCodeCoverageReport") {
             reports {

@@ -36,6 +36,7 @@
         <module name="AvoidDoubleBraceInitialization"/>                 <!--Detects double brace initialization-->
         <module name="AvoidHidingCauseException"/>                      <!--provided by sevntu-checkstyle-->
         <module name="AvoidNoArgumentSuperConstructorCall"/>            <!--Checks if call to superclass constructor without arguments is present.-->
+        <module name="ConstructorsDeclarationGrouping"/>                <!--Checks that all constructors are grouped together.-->
         <module name="CustomDeclarationOrder">                          <!--provided by sevntu-checkstyle-->
             <property name="customDeclarationOrder"
                       value="Field(static .*) ### Method(static .*) ### DeclareAnonClassField(.*)
