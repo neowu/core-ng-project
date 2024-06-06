@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * @author neo
  */
-interface SessionStore {
+public interface SessionStore {
     Map<String, String> getAndRefresh(String sessionId, String domain, Duration timeout);
 
     void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration timeout);

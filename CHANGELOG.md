@@ -5,6 +5,7 @@
 * mysql: updated and patched to 8.4.0-r2
   > use "core.framework.mysql:mysql-connector-j:8.4.0-r2"
 * kafka: disabled client metric push
+* kafka: respect @IOWarnings in /topic/:topic/key/:key/handle KafkaController
 
 ### 9.0.9 (3/20/2024 - 4/18/2024)
 

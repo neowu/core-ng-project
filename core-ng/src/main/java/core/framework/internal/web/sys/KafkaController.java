@@ -64,8 +64,10 @@ public class KafkaController {
         MessageProcess<Object> bulkProcess = (MessageProcess<Object>) listener.bulkProcesses.get(topic);
         if (process != null) {
             Object message = message(topic, key, body, process, actionLog);
+            if (process.warnings != null) actionLog.initializeWarnings(process.warnings);
             process.handler().handle(key, message);
         } else if (bulkProcess != null) {
+            if (bulkProcess.warnings != null) actionLog.initializeWarnings(bulkProcess.warnings);
             Object message = message(topic, key, body, bulkProcess, actionLog);
             bulkProcess.bulkHandler().handle(List.of(new Message<>(key, message)));
         } else {
