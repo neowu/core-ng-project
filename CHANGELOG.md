@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.0.10 (4/29/2024 - )
+### 9.0.10 (4/29/2024 - 6/7/2024)
 
 * mysql: updated and patched to 8.4.0-r2
   > use "core.framework.mysql:mysql-connector-j:8.4.0-r2"
