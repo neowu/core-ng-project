@@ -38,6 +38,7 @@ public class LocalPluginsService extends PluginsService {
                 false);
             plugins.add(new LoadedPlugin(descriptor, plugin, Thread.currentThread().getContextClassLoader(), ModuleLayer.boot()));
         }
+        loadExtensions(plugins);
     }
 
     @Override

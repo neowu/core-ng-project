@@ -10,9 +10,9 @@ subprojects {
     version = "9.0.10"
 }
 
-val elasticVersion = "8.13.2"
+val elasticVersion = "8.14.0"
 val kafkaVersion = "3.7.0"
-val jacksonVersion = "2.17.0"
+val jacksonVersion = "2.17.1"
 val junitVersion = "5.10.2"
 val mockitoVersion = "5.11.0"
 val assertjVersion = "3.25.3"
@@ -63,7 +63,7 @@ project("core-ng-mongo") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng"))
-        api("org.mongodb:mongodb-driver-sync:5.0.1")
+        api("org.mongodb:mongodb-driver-sync:5.1.0")
         testImplementation(project(":core-ng-test"))
     }
 }
