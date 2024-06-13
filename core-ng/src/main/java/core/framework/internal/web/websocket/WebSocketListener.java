@@ -1,5 +1,6 @@
 package core.framework.internal.web.websocket;
 
+import core.framework.internal.async.VirtualThread;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.web.http.RateControl;
@@ -90,6 +91,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
 
     @SuppressWarnings("PMD.ExceptionAsFlowControl") // intentional
     private void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage textMessage, Throwable error) {
+        VirtualThread.COUNT.increase();     // refer to line 56, full text message is handled by getWorker()
         @SuppressWarnings("unchecked")
         var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
         ActionLog actionLog = logManager.begin("=== ws message handling begin ===", null);
@@ -113,6 +115,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
             }
         } finally {
             logManager.end("=== ws message handling end ===");
+            VirtualThread.COUNT.decrease();
         }
     }
 
@@ -143,7 +146,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
 
             // close reason classified as text message, in theory it is not supposed to be put in context (which is only for keyword and searchable)
             // but close action usually won't trigger warnings/trace, so we have to put it on context with restriction
-            if (reason != null && reason.length() > 0) actionLog.context("close_reason", Strings.truncate(reason, ActionLog.MAX_CONTEXT_VALUE_LENGTH));
+            if (reason != null && !reason.isEmpty()) actionLog.context("close_reason", Strings.truncate(reason, ActionLog.MAX_CONTEXT_VALUE_LENGTH));
             actionLog.track("ws", 0, reason == null ? 0 : 1 + reason.length(), 0);   // size = code (1 int) + reason
 
             wrapper.handler.listener.onClose(wrapper, code, reason);
