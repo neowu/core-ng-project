@@ -52,9 +52,7 @@ public class ServerSentEventHandler {
         if (sink.flush()) {
             exchange.dispatch(() -> handle(exchange, sink));
         } else {
-            ChannelListener<StreamSinkChannel> listener = ChannelListeners.flushingChannelListener(channel -> {
-                    exchange.dispatch(() -> handle(exchange, sink));
-                },
+            ChannelListener<StreamSinkChannel> listener = ChannelListeners.flushingChannelListener(channel -> exchange.dispatch(() -> handle(exchange, sink)),
                 (channel, e) -> {
                     logger.warn("failed to establish sse connection, error={}", e.getMessage(), e);
                     IoUtils.safeClose(exchange.getConnection());

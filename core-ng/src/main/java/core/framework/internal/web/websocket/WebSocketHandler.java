@@ -90,37 +90,7 @@ public class WebSocketHandler implements HttpHandler {
 
             request.session = ReadOnlySession.of(sessionManager.load(request, actionLog));  // load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
 
-            var webSocketExchange = new AsyncWebSocketHttpServerExchange(exchange, channels);
-            exchange.upgradeChannel((connection, httpServerExchange) -> {
-                WebSocketChannel channel = handshake.createChannel(webSocketExchange, connection, webSocketExchange.getBufferPool());
-                // not set idle timeout for channel, e.g. channel.setIdleTimeout(timeout);
-                // in cloud env, timeout is set on LB (azure AG, or gcloud LB), usually use 300s timeout
-                try {
-                    var wrapper = new ChannelImpl<>(channel, context, handler);
-                    wrapper.action = action;
-                    wrapper.clientIP = request.clientIP();
-                    wrapper.refId = actionLog.id;   // with ws, correlationId and refId are same as parent http action id
-                    wrapper.trace = actionLog.trace;
-                    actionLog.context("channel", wrapper.id);
-
-                    channel.setAttribute(CHANNEL_KEY, wrapper);
-                    channel.addCloseTask(listener.closeListener);
-                    context.add(wrapper);
-
-                    channel.getReceiveSetter().set(listener);
-                    channel.resumeReceives();
-
-                    channels.add(channel);
-
-                    handler.listener.onConnect(request, wrapper);
-                    actionLog.context("room", wrapper.rooms.toArray()); // may join room onConnect
-                } catch (Throwable e) {
-                    // upgrade is handled by io.undertow.server.protocol.http.HttpReadListener.exchangeComplete, and it catches all exceptions during onConnect
-                    logManager.logError(e);
-                    WebSockets.sendClose(WebSocketCloseCodes.closeCode(e), e.getMessage(), channel, ChannelCallback.INSTANCE);
-                }
-            });
-            handshake.handshake(webSocketExchange);
+            upgrade(exchange, request, handler, actionLog);
         } catch (Throwable e) {
             logManager.logError(e);
             exchange.endExchange();
@@ -128,6 +98,40 @@ public class WebSocketHandler implements HttpHandler {
             logManager.end("=== websocket upgrade end ===");
             VirtualThread.COUNT.decrease();
         }
+    }
+
+    private void upgrade(HttpServerExchange exchange, RequestImpl request, ChannelHandler<Object, Object> handler, ActionLog actionLog) {
+        var webSocketExchange = new AsyncWebSocketHttpServerExchange(exchange, channels);
+        exchange.upgradeChannel((connection, httpServerExchange) -> {
+            WebSocketChannel channel = handshake.createChannel(webSocketExchange, connection, webSocketExchange.getBufferPool());
+            // not set idle timeout for channel, e.g. channel.setIdleTimeout(timeout);
+            // in cloud env, timeout is set on LB (azure AG, or gcloud LB), usually use 300s timeout
+            try {
+                var wrapper = new ChannelImpl<>(channel, context, handler);
+                wrapper.action = actionLog.action;
+                wrapper.clientIP = request.clientIP();
+                wrapper.refId = actionLog.id;   // with ws, correlationId and refId are same as parent http action id
+                wrapper.trace = actionLog.trace;
+                actionLog.context("channel", wrapper.id);
+
+                channel.setAttribute(CHANNEL_KEY, wrapper);
+                channel.addCloseTask(listener.closeListener);
+                context.add(wrapper);
+
+                channel.getReceiveSetter().set(listener);
+                channel.resumeReceives();
+
+                channels.add(channel);
+
+                handler.listener.onConnect(request, wrapper);
+                actionLog.context("room", wrapper.rooms.toArray()); // may join room onConnect
+            } catch (Throwable e) {
+                // upgrade is handled by io.undertow.server.protocol.http.HttpReadListener.exchangeComplete, and it catches all exceptions during onConnect
+                logManager.logError(e);
+                WebSockets.sendClose(WebSocketCloseCodes.closeCode(e), e.getMessage(), channel, ChannelCallback.INSTANCE);
+            }
+        });
+        handshake.handshake(webSocketExchange);
     }
 
     void validateWebSocketHeaders(HeaderMap headers) {

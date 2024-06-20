@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class ServerSentEventChannelCloseHandler<T> implements ExchangeCompletionListener {
-    private final static Logger LOGGER = LoggerFactory.getLogger(ServerSentEventChannelCloseHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerSentEventChannelCloseHandler.class);
     final ServerSentEventContextImpl<T> context;
     private final LogManager logManager;
     private final ServerSentEventChannelImpl<T> channel;
