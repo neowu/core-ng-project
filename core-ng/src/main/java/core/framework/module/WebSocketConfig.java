@@ -5,8 +5,10 @@ import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.HTTPIOHandler;
 import core.framework.internal.web.websocket.ChannelHandler;
+import core.framework.internal.web.websocket.WebSocketContextImpl;
 import core.framework.internal.web.websocket.WebSocketHandler;
 import core.framework.internal.web.websocket.WebSocketMetrics;
+import core.framework.util.Types;
 import core.framework.web.websocket.ChannelListener;
 import core.framework.web.websocket.WebSocketContext;
 import org.slf4j.Logger;
@@ -50,7 +52,6 @@ public final class WebSocketConfig extends Config {
 
         if (context.httpServer.webSocketHandler == null) {
             context.httpServer.webSocketHandler = new WebSocketHandler(context.logManager, context.httpServer.siteManager.sessionManager, context.httpServer.handlerContext);
-            context.beanFactory.bind(WebSocketContext.class, null, context.httpServer.webSocketHandler.context);
 
             context.collector.metrics.add(new WebSocketMetrics(context.httpServer.webSocketHandler));
         }
@@ -60,7 +61,9 @@ public final class WebSocketConfig extends Config {
         context.apiController.beanClasses.add(clientMessageClass);
         context.apiController.beanClasses.add(serverMessageClass);
 
-        var handler = new ChannelHandler<>(clientMessageClass, serverMessageClass, listener);
+        WebSocketContextImpl<V> webSocketContext = new WebSocketContextImpl<>();
+        context.beanFactory.bind(Types.generic(WebSocketContext.class, serverMessageClass), null, webSocketContext);
+        var handler = new ChannelHandler<>(clientMessageClass, serverMessageClass, listener, webSocketContext);
         context.httpServer.webSocketHandler.add(path, handler);
     }
 }

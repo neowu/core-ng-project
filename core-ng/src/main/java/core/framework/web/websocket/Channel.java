@@ -5,16 +5,16 @@ import javax.annotation.Nullable;
 /**
  * @author neo
  */
-public interface Channel<V> {
-    void send(V message);
+public interface Channel<T> {
+    void send(T message);
 
     Context context();
 
     void close();
 
-    void join(String room);
+    void join(String group);
 
-    void leave(String room);
+    void leave(String group);
 
     interface Context {
         @Nullable

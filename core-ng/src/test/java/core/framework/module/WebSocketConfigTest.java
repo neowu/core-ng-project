@@ -4,6 +4,7 @@ import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.HTTPIOHandler;
 import core.framework.internal.web.websocket.TestChannelListener;
 import core.framework.internal.web.websocket.TestWebSocketMessage;
+import core.framework.util.Types;
 import core.framework.web.websocket.WebSocketContext;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,8 @@ class WebSocketConfigTest {
             .hasMessageContaining("listener class must not be anonymous class or lambda");
 
         config.listen("/ws2", TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener());
-        var webSocketContext = (WebSocketContext) config.context.beanFactory.bean(WebSocketContext.class, null);
+        @SuppressWarnings("unchecked")
+        var webSocketContext = (WebSocketContext<TestWebSocketMessage>) config.context.beanFactory.bean(Types.generic(WebSocketContext.class, TestWebSocketMessage.class), null);
         assertThat(webSocketContext).isNotNull();
         assertThat(config.context.apiController.beanClasses).contains(TestWebSocketMessage.class);
     }

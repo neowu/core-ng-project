@@ -22,23 +22,23 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelImpl.class);
+
     final String id = UUID.randomUUID().toString();
+    final Set<String> groups = Sets.newConcurrentHashSet();
     final long startTime = System.nanoTime();
-    final Set<String> rooms = Sets.newConcurrentHashSet();
+
     final ChannelHandler<T, V> handler;
     private final WebSocketChannel channel;
     private final Map<String, Object> context = new ConcurrentHashMap<>();
-    private final WebSocketContextImpl webSocketContext;
-    String action;
+    String path;
     String clientIP;
     String refId;
     Trace trace;
     @Nullable
     CloseMessage closeMessage;
 
-    ChannelImpl(WebSocketChannel channel, WebSocketContextImpl webSocketContext, ChannelHandler<T, V> handler) {
+    ChannelImpl(WebSocketChannel channel, ChannelHandler<T, V> handler) {
         this.channel = channel;
-        this.webSocketContext = webSocketContext;
         this.handler = handler;
     }
 
@@ -75,13 +75,13 @@ public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
     }
 
     @Override
-    public void join(String room) {
-        webSocketContext.join(this, room);
+    public void join(String group) {
+        handler.webSocketContext.join(this, group);
     }
 
     @Override
-    public void leave(String room) {
-        webSocketContext.leave(this, room);
+    public void leave(String group) {
+        handler.webSocketContext.leave(this, group);
     }
 
     @Override

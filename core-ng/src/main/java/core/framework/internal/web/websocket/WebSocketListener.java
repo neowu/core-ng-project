@@ -27,16 +27,16 @@ import java.util.List;
  */
 final class WebSocketListener implements ChannelListener<WebSocketChannel> {
     private static final long MAX_TEXT_MESSAGE_SIZE = 10_000_000;     // limit max text message sent by client to 10M
-    private final long maxProcessTimeInNano = Duration.ofSeconds(300).toNanos();    // generally we set 300s on LB for websocket timeout
     private final Logger logger = LoggerFactory.getLogger(WebSocketListener.class);
+
     private final LogManager logManager;
-    private final WebSocketContextImpl context;
     private final RateControl rateControl;
+    private final long maxProcessTimeInNano = Duration.ofSeconds(300).toNanos();    // generally we set 300s on LB for websocket timeout
+
     CloseListener closeListener = new CloseListener();
 
-    WebSocketListener(LogManager logManager, WebSocketContextImpl context, RateControl rateControl) {
+    WebSocketListener(LogManager logManager, RateControl rateControl) {
         this.logManager = logManager;
-        this.context = context;
         this.rateControl = rateControl;
     }
 
@@ -96,7 +96,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
         var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
         ActionLog actionLog = logManager.begin("=== ws message handling begin ===", null);
         try {
-            actionLog.action(wrapper.action);
+            actionLog.action("ws:" + wrapper.path);
             linkContext(channel, wrapper, actionLog);
             if (error != null) throw error;
 
@@ -136,8 +136,8 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
         var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
         ActionLog actionLog = logManager.begin("=== websocket close begin ===", null);
         try {
-            actionLog.action(wrapper.action + ":close");
-            context.remove(wrapper);    // context.remove() does not cleanup wrapper.rooms, so can be logged below
+            actionLog.action("ws:" + wrapper.path + ":close");
+            wrapper.handler.webSocketContext.remove(wrapper);    // context.remove() does not cleanup wrapper.rooms, so can be logged below
             linkContext(channel, wrapper, actionLog);
 
             int code = wrapper.closeMessage == null ? WebSocketCloseCodes.ABNORMAL_CLOSURE : wrapper.closeMessage.getCode();
@@ -177,7 +177,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
         logger.debug("[channel] remoteAddress={}", channel.getSourceAddress().getAddress().getHostAddress());
         actionLog.context("client_ip", wrapper.clientIP);
         actionLog.context("listener", wrapper.handler.listener.getClass().getCanonicalName());
-        actionLog.context("room", wrapper.rooms.toArray());
+        if (!wrapper.groups.isEmpty()) actionLog.context("group", wrapper.groups.toArray());
     }
 
     class CloseListener implements ChannelListener<WebSocketChannel> {

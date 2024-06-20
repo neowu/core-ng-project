@@ -12,38 +12,38 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author neo
  */
 class WebSocketContextImplTest {
-    private WebSocketContextImpl context;
+    private WebSocketContextImpl<TestWebSocketMessage> context;
 
     @BeforeEach
     void createWebSocketContextImpl() {
-        context = new WebSocketContextImpl();
+        context = new WebSocketContextImpl<>();
     }
 
     @Test
     void join() {
-        var channel = new ChannelImpl<TestWebSocketMessage, TestWebSocketMessage>(null, context, null);
-        channel.join("room1");
-        List<Channel<TestWebSocketMessage>> room = context.room("room1");
-        assertThat(room).containsOnly(channel);
+        var channel = channel();
+        channel.join("group1");
+        List<Channel<TestWebSocketMessage>> group = context.group("group1");
+        assertThat(group).containsOnly(channel);
 
-        channel.leave("room1");
-        assertThat(context.room("room1")).isEmpty();
+        channel.leave("group1");
+        assertThat(context.group("group1")).isEmpty();
     }
 
     @Test
     void remove() {
-        var channel = new ChannelImpl<TestWebSocketMessage, TestWebSocketMessage>(null, context, null);
-        channel.join("room1");
-        channel.join("room2");
+        var channel = channel();
+        channel.join("group1");
+        channel.join("group2");
 
         context.remove(channel);
-        assertThat(context.room("room1")).isEmpty();
-        assertThat(context.room("room2")).isEmpty();
+        assertThat(context.group("group1")).isEmpty();
+        assertThat(context.group("group2")).isEmpty();
     }
 
     @Test
     void all() {
-        var channel = new ChannelImpl<TestWebSocketMessage, TestWebSocketMessage>(null, context, null);
+        var channel = channel();
         context.add(channel);
 
         List<Channel<TestWebSocketMessage>> all = context.all();
@@ -51,5 +51,9 @@ class WebSocketContextImplTest {
 
         context.remove(channel);
         assertThat(context.all()).isEmpty();
+    }
+
+    private ChannelImpl<TestWebSocketMessage, TestWebSocketMessage> channel() {
+        return new ChannelImpl<>(null, new ChannelHandler<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), context));
     }
 }

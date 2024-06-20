@@ -36,7 +36,6 @@ import static core.framework.util.Strings.format;
  */
 public class WebSocketHandler implements HttpHandler {
     static final String CHANNEL_KEY = "CHANNEL";
-    public final WebSocketContextImpl context = new WebSocketContextImpl();
 
     // passes to AsyncWebSocketHttpServerExchange as peerConnections, channel will remove self on close
     // refer to io.undertow.websockets.core.WebSocketChannel.WebSocketChannel
@@ -55,7 +54,7 @@ public class WebSocketHandler implements HttpHandler {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
         this.handlerContext = handlerContext;
-        listener = new WebSocketListener(logManager, context, handlerContext.rateControl);
+        listener = new WebSocketListener(logManager, handlerContext.rateControl);
     }
 
     public boolean check(HttpString method, HeaderMap headers) {
@@ -83,8 +82,7 @@ public class WebSocketHandler implements HttpHandler {
             ChannelHandler<Object, Object> handler = (ChannelHandler<Object, Object>) handlers.get(path);
             if (handler == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
 
-            String action = "ws:" + path;
-            actionLog.action(action + ":open");
+            actionLog.action("ws:" + path + ":open");
 
             handlerContext.rateControl.validateRate(WebSocketConfig.WS_OPEN_GROUP, request.clientIP());
 
@@ -107,8 +105,8 @@ public class WebSocketHandler implements HttpHandler {
             // not set idle timeout for channel, e.g. channel.setIdleTimeout(timeout);
             // in cloud env, timeout is set on LB (azure AG, or gcloud LB), usually use 300s timeout
             try {
-                var wrapper = new ChannelImpl<>(channel, context, handler);
-                wrapper.action = actionLog.action;
+                var wrapper = new ChannelImpl<>(channel, handler);
+                wrapper.path = request.path();
                 wrapper.clientIP = request.clientIP();
                 wrapper.refId = actionLog.id;   // with ws, correlationId and refId are same as parent http action id
                 wrapper.trace = actionLog.trace;
@@ -116,7 +114,7 @@ public class WebSocketHandler implements HttpHandler {
 
                 channel.setAttribute(CHANNEL_KEY, wrapper);
                 channel.addCloseTask(listener.closeListener);
-                context.add(wrapper);
+                handler.webSocketContext.add(wrapper);
 
                 channel.getReceiveSetter().set(listener);
                 channel.resumeReceives();
@@ -124,7 +122,7 @@ public class WebSocketHandler implements HttpHandler {
                 channels.add(channel);
 
                 handler.listener.onConnect(request, wrapper);
-                actionLog.context("room", wrapper.rooms.toArray()); // may join room onConnect
+                if (!wrapper.groups.isEmpty()) actionLog.context("group", wrapper.groups.toArray()); // may join room onConnect
             } catch (Throwable e) {
                 // upgrade is handled by io.undertow.server.protocol.http.HttpReadListener.exchangeComplete, and it catches all exceptions during onConnect
                 logManager.logError(e);

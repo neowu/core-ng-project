@@ -15,7 +15,7 @@ class ChannelHandlerTest {
 
     @BeforeEach
     void createChannelHandler() {
-        handler = new ChannelHandler<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener());
+        handler = new ChannelHandler<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), null);
     }
 
     @Test
@@ -23,23 +23,16 @@ class ChannelHandlerTest {
         var message = new TestWebSocketMessage();
         message.message = "value";
         assertThat(handler.toServerMessage(message)).isEqualTo("{\"message\":\"value\"}");
-
-        assertThatThrownBy(() -> handler.toServerMessage(new MismatchTestMessage()))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("message class does not match");
     }
 
     @Test
     void fromClientMessage() {
         assertThatThrownBy(() -> handler.fromClientMessage("message"))
-                .isInstanceOf(BadRequestException.class)
-                .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("INVALID_WS_MESSAGE"));
+            .isInstanceOf(BadRequestException.class)
+            .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("INVALID_WS_MESSAGE"));
 
         assertThatThrownBy(() -> handler.fromClientMessage("{}"))
-                .isInstanceOf(BadRequestException.class)
-                .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("VALIDATION_ERROR"));
-    }
-
-    static class MismatchTestMessage extends TestWebSocketMessage {
+            .isInstanceOf(BadRequestException.class)
+            .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("VALIDATION_ERROR"));
     }
 }

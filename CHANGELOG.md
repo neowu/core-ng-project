@@ -7,6 +7,9 @@
   > use "core.framework.mysql:mysql-connector-j:8.4.0-r4"
   > fixed native_auth_plugin, was configured as clear_text_plugin (not impact cloud env)
 * sse: support server sent event
+* ws: API changed !!! check all compilation errors
+  > renamed all "room" to "group"
+  > change WebSocketContext to WebSocketContext<T>, to support multiple websocket endpoints, be consistent with sse
 
 ### 9.0.10 (4/29/2024 - 6/7/2024)
 
