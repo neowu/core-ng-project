@@ -6,6 +6,7 @@ import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.HTTPIOHandler;
 import core.framework.internal.web.sse.ServerSentEventContextImpl;
 import core.framework.internal.web.sse.ServerSentEventHandler;
+import core.framework.internal.web.sse.ServerSentEventMetrics;
 import core.framework.util.Types;
 import core.framework.web.sse.ServerSentEventContext;
 import core.framework.web.sse.ServerSentEventListener;
@@ -22,6 +23,7 @@ public class ServerSentEventConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(ServerSentEventConfig.class);
 
     ModuleContext context;
+    ServerSentEventMetrics metrics;
 
     @Override
     protected void initialize(ModuleContext context, @Nullable String name) {
@@ -47,6 +49,8 @@ public class ServerSentEventConfig extends Config {
 
         if (context.httpServer.sseHandler == null) {
             context.httpServer.sseHandler = new ServerSentEventHandler(context.logManager, context.httpServer.siteManager.sessionManager, context.httpServer.handlerContext);
+            metrics = new ServerSentEventMetrics();
+            context.collector.metrics.add(metrics);
         }
 
         context.beanClassValidator.validate(eventClass);
@@ -55,5 +59,6 @@ public class ServerSentEventConfig extends Config {
         var sseContext = new ServerSentEventContextImpl<T>();
         context.httpServer.sseHandler.add(path, eventClass, listener, sseContext);
         context.beanFactory.bind(Types.generic(ServerSentEventContext.class, eventClass), null, sseContext);
+        metrics.contexts.add(sseContext);
     }
 }

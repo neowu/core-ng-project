@@ -11,8 +11,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerSentEventContextImpl<T> implements ServerSentEventContext<T> {
+    final Map<String, ServerSentEventChannel<T>> channels = new ConcurrentHashMap<>();
+
     private final Logger logger = LoggerFactory.getLogger(ServerSentEventContextImpl.class);
-    private final Map<String, ServerSentEventChannel<T>> channels = new ConcurrentHashMap<>();
     private final Map<String, Map<String, ServerSentEventChannel<T>>> groups = new ConcurrentHashMap<>();
 
     @Override
