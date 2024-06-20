@@ -51,6 +51,6 @@ class WebSocketConfigTest {
     @Test
     void validate() {
         config.validate();
-        assertThat(config.context.httpServer.handler.rateControl.hasGroup(WebSocketConfig.WS_OPEN_GROUP)).isTrue();
+        assertThat(config.context.httpServer.handlerContext.rateControl.hasGroup(WebSocketConfig.WS_OPEN_GROUP)).isTrue();
     }
 }

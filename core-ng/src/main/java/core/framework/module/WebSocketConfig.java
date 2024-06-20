@@ -32,8 +32,8 @@ public final class WebSocketConfig extends Config {
 
     @Override
     protected void validate() {
-        if (!context.httpServer.handler.rateControl.hasGroup(WS_OPEN_GROUP)) {
-            context.httpServer.handler.rateControl.config(WS_OPEN_GROUP, 10, 10, Duration.ofSeconds(30));
+        if (!context.httpServer.handlerContext.rateControl.hasGroup(WS_OPEN_GROUP)) {
+            context.httpServer.handlerContext.rateControl.config(WS_OPEN_GROUP, 10, 10, Duration.ofSeconds(30));
         }
     }
 
@@ -48,11 +48,11 @@ public final class WebSocketConfig extends Config {
         logger.info("ws, path={}, clientMessageClass={}, serverMessageClass={}, listener={}",
             path, clientMessageClass.getCanonicalName(), serverMessageClass.getCanonicalName(), listener.getClass().getCanonicalName());
 
-        if (context.httpServer.handler.webSocketHandler == null) {
-            context.httpServer.handler.webSocketHandler = new WebSocketHandler(context.logManager, context.httpServer.siteManager.sessionManager, context.httpServer.handler.rateControl);
-            context.beanFactory.bind(WebSocketContext.class, null, context.httpServer.handler.webSocketHandler.context);
+        if (context.httpServer.webSocketHandler == null) {
+            context.httpServer.webSocketHandler = new WebSocketHandler(context.logManager, context.httpServer.siteManager.sessionManager, context.httpServer.handlerContext);
+            context.beanFactory.bind(WebSocketContext.class, null, context.httpServer.webSocketHandler.context);
 
-            context.collector.metrics.add(new WebSocketMetrics(context.httpServer.handler.webSocketHandler));
+            context.collector.metrics.add(new WebSocketMetrics(context.httpServer.webSocketHandler));
         }
 
         context.beanClassValidator.validate(clientMessageClass);
@@ -61,6 +61,6 @@ public final class WebSocketConfig extends Config {
         context.apiController.beanClasses.add(serverMessageClass);
 
         var handler = new ChannelHandler<>(clientMessageClass, serverMessageClass, listener);
-        context.httpServer.handler.webSocketHandler.add(path, handler);
+        context.httpServer.webSocketHandler.add(path, handler);
     }
 }

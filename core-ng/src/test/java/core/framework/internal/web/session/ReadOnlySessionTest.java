@@ -1,6 +1,5 @@
-package core.framework.internal.web.websocket;
+package core.framework.internal.web.session;
 
-import core.framework.internal.web.session.SessionImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +14,7 @@ class ReadOnlySessionTest {
 
     @BeforeEach
     void createReadOnlySession() {
-        session = new ReadOnlySession(new SessionImpl("localhost"));
+        session = ReadOnlySession.of(new SessionImpl("localhost"));
     }
 
     @Test

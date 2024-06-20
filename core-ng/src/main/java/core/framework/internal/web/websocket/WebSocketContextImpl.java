@@ -56,7 +56,13 @@ public class WebSocketContextImpl implements WebSocketContext {
         for (String room : channel.rooms) {
             Map<String, Channel<?>> roomChannels = rooms.get(room);
             roomChannels.remove(channel.id);
-            if (roomChannels.isEmpty()) rooms.remove(room); // cleanup room if it has no channels
+
+            // cleanup group if it has no channels, and thread safe
+            if (roomChannels.isEmpty()) {
+                var previous = rooms.remove(room);
+                // in case another channel was added before removal by another thread
+                if (!previous.isEmpty()) rooms.computeIfAbsent(room, key -> new ConcurrentHashMap<>()).putAll(previous);
+            }
         }
     }
 }

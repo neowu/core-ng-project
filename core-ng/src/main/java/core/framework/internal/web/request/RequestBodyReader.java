@@ -75,11 +75,11 @@ public final class RequestBodyReader implements ChannelListener<StreamSourceChan
         if (contentLength >= 0) {
             if (bytesRead + position > contentLength) throw new Error("body exceeds expected content length, expected=" + contentLength);
         } else {
-            if (body == null) { // undertow buffer is 16k, if there is no content length, in most of cases, it's best just to create exact buffer as first read thru
+            if (body == null) { // undertow buffer is 16k, if there is no content length, in most cases, it's best just to create exact buffer as first read thru
                 body = new byte[bytesRead];
             } else {
                 int newLength = position + bytesRead;   // without content length, position will always be current length,
-                byte[] bytes = new byte[newLength];     // just expend to exact read size, which is simplest way for best scenario
+                byte[] bytes = new byte[newLength];     // just expend to exact read size, which is the simplest way for best scenario
                 System.arraycopy(body, 0, bytes, 0, position);
                 body = bytes;
             }

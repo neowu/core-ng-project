@@ -52,7 +52,7 @@ public final class HTTPConfig extends Config {
 
     // register http body bean and query param bean
     private void registerBean(Class<?> beanClass) {
-        RequestBeanReader reader = context.httpServer.handler.requestBeanReader;
+        RequestBeanReader reader = context.httpServer.handlerContext.requestBeanReader;
         if (RequestBeanReader.isQueryParamBean(beanClass)) {
             if (reader.containsQueryParam(beanClass)) {
                 throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
@@ -100,7 +100,7 @@ public final class HTTPConfig extends Config {
      */
     public void maxForwardedIPs(int maxIPs) {
         if (maxIPs < 1) throw new Error("maxIPs must be greater than 1, maxIPs=" + maxIPs);
-        context.httpServer.handler.requestParser.clientIPParser.maxForwardedIPs = maxIPs;
+        context.httpServer.handlerContext.requestParser.clientIPParser.maxForwardedIPs = maxIPs;
     }
 
     public AccessConfig access() {

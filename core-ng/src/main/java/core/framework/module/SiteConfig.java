@@ -30,7 +30,7 @@ public class SiteConfig extends Config {
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
-        context.httpServer.handler.requestParser.logSiteHeaders = true;
+        context.httpServer.handlerContext.requestParser.logSiteHeaders = true;
     }
 
     public SessionConfig session() {

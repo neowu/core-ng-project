@@ -55,10 +55,10 @@ public final class AccessConfig {
     }
 
     private IPv4AccessControl accessControl() {
-        if (context.httpServer.handler.accessControl == null) {
-            context.httpServer.handler.accessControl = new IPv4AccessControl();
+        if (context.httpServer.handlerContext.accessControl == null) {
+            context.httpServer.handlerContext.accessControl = new IPv4AccessControl();
         }
-        return context.httpServer.handler.accessControl;
+        return context.httpServer.handlerContext.accessControl;
     }
 
     String cidrsLogParam(List<String> cidrs, int maxSize) {

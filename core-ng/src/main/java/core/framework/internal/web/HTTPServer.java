@@ -1,7 +1,10 @@
 package core.framework.internal.web;
 
+import core.framework.internal.async.ThreadPools;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.web.site.SiteManager;
+import core.framework.internal.web.sse.ServerSentEventHandler;
+import core.framework.internal.web.websocket.WebSocketHandler;
 import core.framework.util.StopWatch;
 import core.framework.web.Interceptor;
 import io.undertow.Undertow;
@@ -14,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Options;
 import org.xnio.Xnio;
+
+import java.util.concurrent.ExecutorService;
 
 import static core.framework.log.Markers.errorCode;
 
@@ -30,14 +35,18 @@ public class HTTPServer {
     }
 
     public final SiteManager siteManager = new SiteManager();
+    public final HTTPHandlerContext handlerContext = new HTTPHandlerContext();
     public final HTTPHandler handler;
     final ShutdownHandler shutdownHandler = new ShutdownHandler();
-
     private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
+    private final ExecutorService worker = ThreadPools.virtualThreadExecutor("http-handler-");
+
+    public WebSocketHandler webSocketHandler;
+    public ServerSentEventHandler sseHandler;
     private Undertow server;
 
     public HTTPServer(LogManager logManager) {
-        handler = new HTTPHandler(logManager, siteManager.sessionManager, siteManager.templateManager);
+        handler = new HTTPHandler(logManager, siteManager.sessionManager, siteManager.templateManager, handlerContext);
     }
 
     public void start(HTTPServerConfig config) {
@@ -72,7 +81,7 @@ public class HTTPServer {
 
             builder.setWorker(Xnio.getInstance().createWorkerBuilder()
                 .setWorkerIoThreads(Math.max(Runtime.getRuntime().availableProcessors(), 2))
-                .setExternalExecutorService(handler.worker)
+                .setExternalExecutorService(worker)
                 .build());
 
             server = builder.build();
@@ -83,7 +92,7 @@ public class HTTPServer {
     }
 
     private HttpHandler handler(HTTPServerConfig config) {
-        HttpHandler handler = new HTTPIOHandler(this.handler, shutdownHandler, config.maxEntitySize);
+        HttpHandler handler = new HTTPIOHandler(this.handler, shutdownHandler, config.maxEntitySize, sseHandler, webSocketHandler);
         if (config.gzip) {
             // only support gzip, deflate is less popular
             handler = new EncodingHandler(handler, new ContentEncodingRepository()
@@ -96,8 +105,8 @@ public class HTTPServer {
         if (server != null) {
             logger.info("shutting down http server");
             shutdownHandler.shutdown();
-            if (handler.webSocketHandler != null)
-                handler.webSocketHandler.shutdown();
+            if (webSocketHandler != null) webSocketHandler.shutdown();
+            if (sseHandler != null) sseHandler.shutdown();
         }
     }
 
@@ -106,7 +115,7 @@ public class HTTPServer {
             boolean success = shutdownHandler.awaitTermination(timeoutInMs);
             if (!success) {
                 logger.warn(errorCode("FAILED_TO_STOP"), "failed to wait active http requests to complete");
-                handler.worker.shutdownNow();
+                worker.shutdownNow();
             } else {
                 logger.info("active http requests completed");
             }

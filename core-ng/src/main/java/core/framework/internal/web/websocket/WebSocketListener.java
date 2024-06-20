@@ -134,7 +134,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
     void onClose(WebSocketChannel channel) {
         @SuppressWarnings("unchecked")
         var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
-        ActionLog actionLog = logManager.begin("=== ws close begin ===", null);
+        ActionLog actionLog = logManager.begin("=== websocket close begin ===", null);
         try {
             actionLog.action(wrapper.action + ":close");
             context.remove(wrapper);    // context.remove() does not cleanup wrapper.rooms, so can be logged below
@@ -155,7 +155,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
         } finally {
             double duration = System.nanoTime() - wrapper.startTime;
             actionLog.stats.put("ws_duration", duration);
-            logManager.end("=== ws close end ===");
+            logManager.end("=== websocket close end ===");
         }
     }
 

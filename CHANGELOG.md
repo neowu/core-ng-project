@@ -3,6 +3,10 @@
 ### 9.1.0 (6/12/2024 - )
 
 * jre: published neowu/jre:21.0.3
+* mysql: updated and patched to 8.4.0-r4
+  > use "core.framework.mysql:mysql-connector-j:8.4.0-r4"
+  > fixed native_auth_plugin, was configured as clear_text_plugin (not impact cloud env)
+* sse: support server sent event
 
 ### 9.0.10 (4/29/2024 - 6/7/2024)
 

@@ -23,7 +23,7 @@ class HTTPIOHandlerTest {
 
     @BeforeEach
     void createHTTPIOHandler() {
-        handler = new HTTPIOHandler(null, null, 1000);
+        handler = new HTTPIOHandler(null, null, 1000, null, null);
     }
 
     @Test

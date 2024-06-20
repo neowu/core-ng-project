@@ -24,9 +24,11 @@ public class ShutdownHandler implements ExchangeCompletionListener {
 
     private volatile boolean shutdown;
 
-    boolean handle(HttpServerExchange exchange) {
-        activeRequests.increase();
-        exchange.addExchangeCompleteListener(this);
+    boolean handle(HttpServerExchange exchange, boolean active) {
+        if (active) { // do not count sse/ws requests
+            activeRequests.increase();
+            exchange.addExchangeCompleteListener(this);
+        }
 
         if (shutdown) {
             logger.warn("reject request due to server is shutting down, requestURL={}", exchange.getRequestURL());

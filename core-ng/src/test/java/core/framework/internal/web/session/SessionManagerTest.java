@@ -2,7 +2,6 @@ package core.framework.internal.web.session;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.web.request.RequestImpl;
-import core.framework.internal.web.websocket.ReadOnlySession;
 import core.framework.web.CookieSpec;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -102,7 +101,7 @@ class SessionManagerTest {
     void saveWithFailedToConnectWebSocket() {
         // on websocket onConnect flow, if any exceptions, it will trigger http error handler flow, with readonly session created by WebSocketHandler
         var request = new RequestImpl(null, null);
-        request.session = new ReadOnlySession(new SessionImpl("localhost"));
+        request.session = ReadOnlySession.of(new SessionImpl("localhost"));
         sessionManager.save(request, response, new ActionLog(null, null));
 
         verifyNoInteractions(response);
@@ -149,8 +148,8 @@ class SessionManagerTest {
     @Test
     void invalidate() {
         assertThatThrownBy(() -> sessionManager.invalidate(null, null))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("must not be null");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("must not be null");
     }
 
     @Test

@@ -1,10 +1,13 @@
 package core.framework.internal.web;
 
 import core.framework.internal.web.request.RequestBodyReader;
+import core.framework.internal.web.sse.ServerSentEventHandler;
+import core.framework.internal.web.websocket.WebSocketHandler;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.server.handlers.form.FormParserFactory;
+import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import org.slf4j.Logger;
@@ -20,17 +23,21 @@ public class HTTPIOHandler implements HttpHandler {
     public static final String HEALTH_CHECK_PATH = "/health-check";
     private final Logger logger = LoggerFactory.getLogger(HTTPIOHandler.class);
     private final FormParserFactory formParserFactory;
+    private final long maxEntitySize;
     private final HTTPHandler handler;
     private final ShutdownHandler shutdownHandler;
-    private final long maxEntitySize;
+    private final ServerSentEventHandler sseHandler;
+    private final WebSocketHandler webSocketHandler;
 
-    HTTPIOHandler(HTTPHandler handler, ShutdownHandler shutdownHandler, long maxEntitySize) {
+    HTTPIOHandler(HTTPHandler handler, ShutdownHandler shutdownHandler, long maxEntitySize, ServerSentEventHandler sseHandler, WebSocketHandler webSocketHandler) {
         this.handler = handler;
         this.shutdownHandler = shutdownHandler;
-        this.maxEntitySize = maxEntitySize;
         var builder = FormParserFactory.builder();
         builder.setDefaultCharset(UTF_8.name());
         formParserFactory = builder.build();
+        this.maxEntitySize = maxEntitySize;
+        this.sseHandler = sseHandler;
+        this.webSocketHandler = webSocketHandler;
     }
 
     @Override
@@ -44,10 +51,15 @@ public class HTTPIOHandler implements HttpHandler {
         long contentLength = exchange.getRequestContentLength();
         if (!checkContentLength(contentLength, exchange)) return;
 
-        boolean shutdown = shutdownHandler.handle(exchange);
+        HttpString method = exchange.getRequestMethod();
+        HeaderMap headers = exchange.getRequestHeaders();
+        boolean sse = sseHandler != null && sseHandler.check(method, headers);
+        boolean ws = webSocketHandler != null && webSocketHandler.check(method, headers);
+        boolean active = !sse && !ws;
+        boolean shutdown = shutdownHandler.handle(exchange, active);
         if (shutdown) return;
 
-        if (hasBody(contentLength, exchange.getRequestMethod())) {    // parse body early, not process until body is read (e.g. for chunked), to save one blocking thread during read
+        if (hasBody(contentLength, method)) {    // parse body early, not process until body is read (e.g. for chunked), to save one blocking thread during read
             FormDataParser parser = formParserFactory.createParser(exchange);   // no need to close, refer to io.undertow.server.handlers.form.MultiPartParserDefinition.create, it closes on ExchangeCompletionListener
             if (parser != null) {
                 parser.parse(handler);
@@ -64,7 +76,13 @@ public class HTTPIOHandler implements HttpHandler {
             }
         }
 
-        exchange.dispatch(handler.worker, handler);
+        if (active) {
+            exchange.dispatch(handler);
+        } else if (sse) {
+            sseHandler.handle(exchange);
+        } else {
+            exchange.dispatch(webSocketHandler);
+        }
     }
 
     // undertow is not handling max entity size checking correctly, it terminates request directly and bypass exchange.endExchange() in certain cases, and log errors in debug level
