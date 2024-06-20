@@ -16,4 +16,6 @@ jobs:
     - uses: gradle/gradle-build-action@v2.11.1
     - run: ./gradlew check
     - run: ./gradlew testCodeCoverageReport
-    - uses: codecov/codecov-action@v3
+    - uses: codecov/codecov-action@v4
+      with:
+        use_oidc: true
