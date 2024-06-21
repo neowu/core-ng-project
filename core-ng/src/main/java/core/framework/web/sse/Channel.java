@@ -1,6 +1,6 @@
 package core.framework.web.sse;
 
-public interface ServerSentEventChannel<T> {
+public interface Channel<T> {
     void send(String id, T event);
 
     default void send(T event) {

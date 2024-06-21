@@ -13,14 +13,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ServerSentEventChannelImplTest {
-    private ServerSentEventChannelImpl<TestEvent> channel;
+class ChannelImplTest {
+    private ChannelImpl<TestEvent> channel;
 
     @BeforeEach
     void createServerSentEventChannelImpl() {
         ServerConnection connection = mock(ServerConnection.class);
         when(connection.getIoThread()).thenReturn(mock(XnioIoThread.class));
-        channel = new ServerSentEventChannelImpl<>(new HttpServerExchange(connection), null, null, new ServerSentEventBuilder<>(TestEvent.class), null);
+        channel = new ChannelImpl<>(new HttpServerExchange(connection), null, new ChannelSupport<>(null, TestEvent.class, null), null);
     }
 
     @Test

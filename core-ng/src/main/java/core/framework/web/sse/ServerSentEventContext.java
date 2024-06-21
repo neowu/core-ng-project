@@ -3,7 +3,7 @@ package core.framework.web.sse;
 import java.util.List;
 
 public interface ServerSentEventContext<T> {
-    List<ServerSentEventChannel<T>> all();
+    List<Channel<T>> all();
 
-    List<ServerSentEventChannel<T>> group(String name);
+    List<Channel<T>> group(String name);
 }

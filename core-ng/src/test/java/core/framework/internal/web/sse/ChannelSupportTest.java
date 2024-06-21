@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ServerSentEventBuilderTest {
-    private ServerSentEventBuilder<TestEvent> builder;
+class ChannelSupportTest {
+    private ChannelSupport<TestEvent> builder;
 
     @BeforeEach
-    void createEventBuilder() {
-        builder = new ServerSentEventBuilder<>(TestEvent.class);
+    void createChannelSupport() {
+        builder = new ChannelSupport<>(null, TestEvent.class, null);
     }
 
     @Test

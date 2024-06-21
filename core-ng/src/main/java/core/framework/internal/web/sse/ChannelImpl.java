@@ -4,7 +4,7 @@ import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
-import core.framework.web.sse.ServerSentEventChannel;
+import core.framework.web.sse.Channel;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,6 @@ import org.xnio.channels.StreamSinkChannel;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channel;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
@@ -22,8 +21,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ServerSentEventChannelImpl<T> implements Channel, ServerSentEventChannel<T> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerSentEventChannelImpl.class);
+class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChannelImpl.class);
 
     final String id = UUID.randomUUID().toString();
     final Set<String> groups = Sets.newConcurrentHashSet();
@@ -33,27 +32,26 @@ public class ServerSentEventChannelImpl<T> implements Channel, ServerSentEventCh
     final WriteListener writeListener = new WriteListener();
     final Deque<byte[]> queue = new ConcurrentLinkedDeque<>();
 
-    private final ServerSentEventContextImpl<T> context;
+    private final ChannelSupport<T> support;
+
     private final ReentrantLock lock = new ReentrantLock();
     private final HttpServerExchange exchange;
     private final StreamSinkChannel sink;
-    private final ServerSentEventBuilder<T> builder;
 
     private volatile boolean closed = false;
 
-    public ServerSentEventChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ServerSentEventContextImpl<T> context, ServerSentEventBuilder<T> builder, String refId) {
+    public ChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ChannelSupport<T> support, String refId) {
         this.exchange = exchange;
-        this.context = context;
         this.sink = sink;
-        this.builder = builder;
+        this.support = support;
         this.refId = refId;
     }
 
     @Override
     public void send(String id, T event) {
         var watch = new StopWatch();
-        byte[] data = builder.data(event);
-        byte[] message = builder.message(id, data);
+        byte[] data = support.data(event);
+        byte[] message = support.message(id, data);
         try {
             send(message);
         } finally {
@@ -91,12 +89,12 @@ public class ServerSentEventChannelImpl<T> implements Channel, ServerSentEventCh
 
     @Override
     public void join(String group) {
-        context.join(this, group);
+        support.context.join(this, group);
     }
 
     @Override
     public void leave(String group) {
-        context.leave(this, group);
+        support.context.leave(this, group);
     }
 
     ByteBuffer poll() {

@@ -11,6 +11,7 @@ import core.framework.module.WebSocketConfig;
 import core.framework.util.Sets;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.NotFoundException;
+import core.framework.web.websocket.ChannelListener;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
@@ -43,7 +44,7 @@ public class WebSocketHandler implements HttpHandler {
 
     private final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
     private final Handshake handshake = new Hybi13Handshake();
-    private final Map<String, ChannelSupport<?, ?>> handlers = new HashMap<>();
+    private final Map<String, ChannelSupport<?, ?>> supports = new HashMap<>();
 
     private final LogManager logManager;
     private final WebSocketListener listener;
@@ -79,8 +80,8 @@ public class WebSocketHandler implements HttpHandler {
 
             String path = request.path();
             @SuppressWarnings("unchecked")
-            ChannelSupport<Object, Object> handler = (ChannelSupport<Object, Object>) handlers.get(path);
-            if (handler == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
+            ChannelSupport<Object, Object> support = (ChannelSupport<Object, Object>) supports.get(path);
+            if (support == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
 
             actionLog.action("ws:" + path + ":open");
 
@@ -88,7 +89,7 @@ public class WebSocketHandler implements HttpHandler {
 
             request.session = ReadOnlySession.of(sessionManager.load(request, actionLog));  // load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
 
-            upgrade(exchange, request, handler, actionLog);
+            upgrade(exchange, request, support, actionLog);
         } catch (Throwable e) {
             logManager.logError(e);
             exchange.endExchange();
@@ -150,8 +151,8 @@ public class WebSocketHandler implements HttpHandler {
         }
     }
 
-    public void add(String path, ChannelSupport<?, ?> handler) {
-        ChannelSupport<?, ?> previous = handlers.putIfAbsent(path, handler);
-        if (previous != null) throw new Error(format("found duplicate channel listener, path={}, previousListener={}", path, previous.listener.getClass().getCanonicalName()));
+    public <T, V> void add(String path, Class<T> clientMessageClass, Class<V> serverMessageClass, ChannelListener<T, V> listener, WebSocketContextImpl<V> context) {
+        ChannelSupport<?, ?> previous = supports.putIfAbsent(path, new ChannelSupport<>(clientMessageClass, serverMessageClass, listener, context));
+        if (previous != null) throw new Error(format("found duplicate websocket listener, path={}, previousListener={}", path, previous.listener.getClass().getCanonicalName()));
     }
 }

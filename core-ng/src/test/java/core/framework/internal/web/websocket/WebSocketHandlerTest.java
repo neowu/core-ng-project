@@ -32,11 +32,10 @@ class WebSocketHandlerTest {
 
     @Test
     void add() {
-        ChannelSupport<?, ?> handler = new ChannelSupport<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), new WebSocketContextImpl<>());
-        this.handler.add("/ws", handler);
-        assertThatThrownBy(() -> this.handler.add("/ws", handler))
+        this.handler.add("/ws", TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), null);
+        assertThatThrownBy(() -> this.handler.add("/ws", TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), null))
             .isInstanceOf(Error.class)
-            .hasMessageContaining("found duplicate channel listener");
+            .hasMessageContaining("found duplicate websocket listener");
     }
 
     @Test

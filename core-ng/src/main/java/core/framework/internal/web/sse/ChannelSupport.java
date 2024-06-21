@@ -3,12 +3,17 @@ package core.framework.internal.web.sse;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
 import core.framework.util.Strings;
+import core.framework.web.sse.ChannelListener;
 
-public class ServerSentEventBuilder<T> {
+class ChannelSupport<T> {
+    final ChannelListener<T> listener;
+    final ServerSentEventContextImpl<T> context;
     private final JSONWriter<T> writer;
     private final Validator<T> validator;
 
-    ServerSentEventBuilder(Class<T> eventClass) {
+    ChannelSupport(ChannelListener<T> listener, Class<T> eventClass, ServerSentEventContextImpl<T> context) {
+        this.listener = listener;
+        this.context = context;
         writer = new JSONWriter<>(eventClass);
         validator = Validator.of(eventClass);
     }

@@ -10,7 +10,7 @@ import core.framework.internal.web.session.SessionManager;
 import core.framework.module.ServerSentEventConfig;
 import core.framework.util.Strings;
 import core.framework.web.exception.NotFoundException;
-import core.framework.web.sse.ServerSentEventListener;
+import core.framework.web.sse.ChannelListener;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
@@ -18,7 +18,6 @@ import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xnio.ChannelListener;
 import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
 import org.xnio.channels.StreamSinkChannel;
@@ -33,7 +32,7 @@ public class ServerSentEventHandler {
     private final LogManager logManager;
     private final SessionManager sessionManager;
     private final HTTPHandlerContext handlerContext;
-    private final Map<String, ServerSentEventListenerHolder<?>> holders = new HashMap<>();
+    private final Map<String, ChannelSupport<?>> supports = new HashMap<>();
 
     public ServerSentEventHandler(LogManager logManager, SessionManager sessionManager, HTTPHandlerContext handlerContext) {
         this.logManager = logManager;
@@ -52,7 +51,7 @@ public class ServerSentEventHandler {
         if (sink.flush()) {
             exchange.dispatch(() -> handle(exchange, sink));
         } else {
-            ChannelListener<StreamSinkChannel> listener = ChannelListeners.flushingChannelListener(channel -> exchange.dispatch(() -> handle(exchange, sink)),
+            var listener = ChannelListeners.flushingChannelListener(channel -> exchange.dispatch(() -> handle(exchange, sink)),
                 (channel, e) -> {
                     logger.warn("failed to establish sse connection, error={}", e.getMessage(), e);
                     IoUtils.safeClose(exchange.getConnection());
@@ -77,24 +76,24 @@ public class ServerSentEventHandler {
 
             String path = request.path();
             @SuppressWarnings("unchecked")
-            ServerSentEventListenerHolder<Object> holder = (ServerSentEventListenerHolder<Object>) holders.get(path);
-            if (holder == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
+            ChannelSupport<Object> support = (ChannelSupport<Object>) supports.get(path);
+            if (support == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
 
             actionLog.action("sse:" + path + ":open");
             handlerContext.rateControl.validateRate(ServerSentEventConfig.SSE_CONNECT_GROUP, request.clientIP());
 
-            var channel = new ServerSentEventChannelImpl<>(exchange, sink, holder.context, holder.builder, actionLog.id);
+            var channel = new ChannelImpl<>(exchange, sink, support, actionLog.id);
             actionLog.context("channel", channel.id);
             sink.getWriteSetter().set(channel.writeListener);
-            holder.context.add(channel);
-            exchange.addExchangeCompleteListener(new ServerSentEventChannelCloseHandler<>(logManager, channel, holder.context));
+            support.context.add(channel);
+            exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support.context));
 
             channel.send(Strings.bytes("retry:15000\n\n"));
 
             request.session = ReadOnlySession.of(sessionManager.load(request, actionLog));
             String lastEventId = exchange.getRequestHeaders().getLast(LAST_EVENT_ID);
             if (lastEventId != null) actionLog.context("last_event_id", lastEventId);
-            holder.listener.onConnect(request, channel, lastEventId);
+            support.listener.onConnect(request, channel, lastEventId);
             if (!channel.groups.isEmpty()) actionLog.context("group", channel.groups.toArray()); // may join group onConnect
         } catch (Throwable e) {
             logManager.logError(e);
@@ -105,15 +104,15 @@ public class ServerSentEventHandler {
         }
     }
 
-    public <T> void add(String path, Class<T> eventClass, ServerSentEventListener<T> listener, ServerSentEventContextImpl<T> context) {
-        var previous = holders.put(path, new ServerSentEventListenerHolder<>(listener, eventClass, context));
+    public <T> void add(String path, Class<T> eventClass, ChannelListener<T> listener, ServerSentEventContextImpl<T> context) {
+        var previous = supports.put(path, new ChannelSupport<>(listener, eventClass, context));
         if (previous != null) throw new Error("found duplicate sse listener, path=" + path);
     }
 
     public void shutdown() {
         logger.info("close sse connections");
-        for (ServerSentEventListenerHolder<?> holder : holders.values()) {
-            for (var channel : holder.context.all()) {
+        for (ChannelSupport<?> support : supports.values()) {
+            for (var channel : support.context.all()) {
                 channel.close();
             }
         }

@@ -8,8 +8,8 @@ import core.framework.internal.web.sse.ServerSentEventContextImpl;
 import core.framework.internal.web.sse.ServerSentEventHandler;
 import core.framework.internal.web.sse.ServerSentEventMetrics;
 import core.framework.util.Types;
+import core.framework.web.sse.ChannelListener;
 import core.framework.web.sse.ServerSentEventContext;
-import core.framework.web.sse.ServerSentEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ public class ServerSentEventConfig extends Config {
         }
     }
 
-    public <T> void listen(String path, Class<T> eventClass, ServerSentEventListener<T> listener) {
+    public <T> void listen(String path, Class<T> eventClass, ChannelListener<T> listener) {
         if (HTTPIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
         if (path.contains("/:")) throw new Error("listener path must be static, path=" + path);
 

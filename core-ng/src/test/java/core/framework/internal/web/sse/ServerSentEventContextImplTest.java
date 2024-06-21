@@ -1,6 +1,6 @@
 package core.framework.internal.web.sse;
 
-import core.framework.web.sse.ServerSentEventChannel;
+import core.framework.web.sse.Channel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,9 +21,9 @@ class ServerSentEventContextImplTest {
 
     @Test
     void join() {
-        var channel = new ServerSentEventChannelImpl<>(null, null, context, null, null);
+        final var channel = channel();
         channel.join("group1");
-        List<ServerSentEventChannel<TestEvent>> group = context.group("group1");
+        List<Channel<TestEvent>> group = context.group("group1");
         assertThat(group).containsOnly(channel);
 
         channel.leave("group1");
@@ -32,7 +32,7 @@ class ServerSentEventContextImplTest {
 
     @Test
     void remove() {
-        var channel = new ServerSentEventChannelImpl<>(null, null, context, null, null);
+        final var channel = channel();
         channel.join("group1");
         channel.join("group2");
 
@@ -43,13 +43,17 @@ class ServerSentEventContextImplTest {
 
     @Test
     void all() {
-        var channel = new ServerSentEventChannelImpl<>(null, null, context, null, null);
+        final var channel = channel();
         context.add(channel);
 
-        List<ServerSentEventChannel<TestEvent>> all = context.all();
+        List<Channel<TestEvent>> all = context.all();
         assertThat(all).containsOnly(channel);
 
         context.remove(channel);
         assertThat(context.all()).isEmpty();
+    }
+
+    private ChannelImpl<TestEvent> channel() {
+        return new ChannelImpl<>(null, null, new ChannelSupport<>(null, TestEvent.class, context), null);
     }
 }
