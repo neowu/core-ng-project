@@ -38,8 +38,10 @@ class ChannelImplTest {
 
     @Test
     void send() {
+        long oldTime = channel.lastSentTime;
         channel.send(new TestEvent());
 
         assertThat(channel.queue.size()).isEqualTo(1);
+        assertThat(channel.lastSentTime).isGreaterThan(oldTime);
     }
 }

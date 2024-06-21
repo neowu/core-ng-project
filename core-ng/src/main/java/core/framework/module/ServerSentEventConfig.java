@@ -60,5 +60,6 @@ public class ServerSentEventConfig extends Config {
         context.httpServer.sseHandler.add(path, eventClass, listener, sseContext);
         context.beanFactory.bind(Types.generic(ServerSentEventContext.class, eventClass), null, sseContext);
         metrics.contexts.add(sseContext);
+        context.backgroundTask().scheduleWithFixedDelay(sseContext::keepAlive, Duration.ofSeconds(15));
     }
 }

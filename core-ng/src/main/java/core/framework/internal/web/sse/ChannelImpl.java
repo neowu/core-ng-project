@@ -28,6 +28,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
     final Set<String> groups = Sets.newConcurrentHashSet();
     final String refId;
     final long startTime = System.nanoTime();
+    long lastSentTime = startTime;
 
     final WriteListener writeListener = new WriteListener();
     final Deque<byte[]> queue = new ConcurrentLinkedDeque<>();
@@ -54,6 +55,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
         byte[] message = support.message(id, data);
         try {
             send(message);
+            lastSentTime = System.nanoTime();
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("sse", elapsed, 0, message.length);

@@ -1,5 +1,6 @@
 package core.framework.internal.web.sse;
 
+import core.framework.util.Strings;
 import core.framework.web.sse.Channel;
 import core.framework.web.sse.ServerSentEventContext;
 import org.slf4j.Logger;
@@ -57,6 +58,17 @@ public class ServerSentEventContextImpl<T> implements ServerSentEventContext<T> 
                 var previous = groups.remove(group);
                 // in case another channel was added before removal by another thread
                 if (!previous.isEmpty()) groups.computeIfAbsent(group, key -> new ConcurrentHashMap<>()).putAll(previous);
+            }
+        }
+    }
+
+    public void keepAlive() {
+        logger.info("keepalive sse connections");
+        long now = System.nanoTime();
+        for (Channel<T> channel : channels.values()) {
+            ChannelImpl<?> impl = (ChannelImpl<?>) channel;
+            if (now - impl.lastSentTime >= 15_000_000_000L) {
+                impl.send(Strings.bytes(":\n"));
             }
         }
     }
