@@ -5,11 +5,11 @@ import core.framework.web.sse.ServerSentEventListener;
 class ServerSentEventListenerHolder<T> {
     final ServerSentEventListener<T> listener;
     final ServerSentEventContextImpl<T> context;
-    final EventBuilder<T> eventBuilder;
+    final ServerSentEventBuilder<T> builder;
 
     ServerSentEventListenerHolder(ServerSentEventListener<T> listener, Class<T> eventClass, ServerSentEventContextImpl<T> context) {
         this.listener = listener;
         this.context = context;
-        this.eventBuilder = new EventBuilder<>(eventClass);
+        this.builder = new ServerSentEventBuilder<>(eventClass);
     }
 }

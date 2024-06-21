@@ -23,7 +23,7 @@ public class ServerSentEventConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(ServerSentEventConfig.class);
 
     ModuleContext context;
-    ServerSentEventMetrics metrics;
+    private ServerSentEventMetrics metrics;
 
     @Override
     protected void initialize(ModuleContext context, @Nullable String name) {

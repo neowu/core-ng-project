@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class EventBuilderTest {
-    private EventBuilder<TestEvent> builder;
+class ServerSentEventBuilderTest {
+    private ServerSentEventBuilder<TestEvent> builder;
 
     @BeforeEach
     void createEventBuilder() {
-        builder = new EventBuilder<>(TestEvent.class);
+        builder = new ServerSentEventBuilder<>(TestEvent.class);
     }
 
     @Test

@@ -32,7 +32,7 @@ class WebSocketHandlerTest {
 
     @Test
     void add() {
-        ChannelHandler<?, ?> handler = new ChannelHandler<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), new WebSocketContextImpl<>());
+        ChannelSupport<?, ?> handler = new ChannelSupport<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), new WebSocketContextImpl<>());
         this.handler.add("/ws", handler);
         assertThatThrownBy(() -> this.handler.add("/ws", handler))
             .isInstanceOf(Error.class)

@@ -15,10 +15,10 @@ import java.io.IOException;
 /**
  * @author neo
  */
-public class ChannelHandler<T, V> {
+public class ChannelSupport<T, V> {
     final ChannelListener<T, V> listener;
     final LimitRate limitRate;  // only supported annotation currently
-    final WebSocketContextImpl<V> webSocketContext;
+    final WebSocketContextImpl<V> context;
 
     private final JSONReader<T> clientMessageReader;
     private final Validator<T> clientMessageValidator;
@@ -26,14 +26,14 @@ public class ChannelHandler<T, V> {
     private final JSONWriter<V> serverMessageWriter;
     private final Validator<V> serverMessageValidator;
 
-    public ChannelHandler(Class<T> clientMessageClass, Class<V> serverMessageClass, ChannelListener<T, V> listener, WebSocketContextImpl<V> webSocketContext) {
+    public ChannelSupport(Class<T> clientMessageClass, Class<V> serverMessageClass, ChannelListener<T, V> listener, WebSocketContextImpl<V> context) {
         clientMessageReader = JSONMapper.reader(clientMessageClass);
         clientMessageValidator = Validator.of(clientMessageClass);
 
         serverMessageWriter = JSONMapper.writer(serverMessageClass);
         serverMessageValidator = Validator.of(serverMessageClass);
 
-        this.webSocketContext = webSocketContext;
+        this.context = context;
         this.listener = listener;
         try {
             limitRate = listener.getClass().getDeclaredMethod("onMessage", Channel.class, Object.class).getDeclaredAnnotation(LimitRate.class);

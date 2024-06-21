@@ -31,16 +31,16 @@ public class WebSocketContextImpl<T> implements WebSocketContext<T> {
         return new ArrayList<>(channels.values());
     }
 
-    void join(ChannelImpl<?, T> channel, String room) {
-        logger.debug("join room, channel={}, room={}", channel.id, room);
-        channel.groups.add(room);
-        groups.computeIfAbsent(room, key -> new ConcurrentHashMap<>()).put(channel.id, channel);
+    void join(ChannelImpl<?, T> channel, String group) {
+        logger.debug("join group, channel={}, group={}", channel.id, group);
+        channel.groups.add(group);
+        groups.computeIfAbsent(group, key -> new ConcurrentHashMap<>()).put(channel.id, channel);
     }
 
-    void leave(ChannelImpl<?, T> channel, String room) {
-        logger.debug("leave room, channel={}, room={}", channel.id, room);
-        channel.groups.remove(room);
-        Map<String, Channel<T>> channels = groups.get(room);
+    void leave(ChannelImpl<?, T> channel, String group) {
+        logger.debug("leave group, channel={}, group={}", channel.id, group);
+        channel.groups.remove(group);
+        Map<String, Channel<T>> channels = groups.get(group);
         if (channels != null) channels.remove(channel.id);
     }
 

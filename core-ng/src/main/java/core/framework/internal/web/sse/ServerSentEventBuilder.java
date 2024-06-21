@@ -4,11 +4,11 @@ import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
 import core.framework.util.Strings;
 
-public class EventBuilder<T> {
+public class ServerSentEventBuilder<T> {
     private final JSONWriter<T> writer;
     private final Validator<T> validator;
 
-    EventBuilder(Class<T> eventClass) {
+    ServerSentEventBuilder(Class<T> eventClass) {
         writer = new JSONWriter<>(eventClass);
         validator = Validator.of(eventClass);
     }

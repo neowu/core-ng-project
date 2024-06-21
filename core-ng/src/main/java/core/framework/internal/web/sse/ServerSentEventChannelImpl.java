@@ -9,7 +9,6 @@ import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.ChannelListener;
-import org.xnio.IoUtils;
 import org.xnio.channels.StreamSinkChannel;
 
 import java.io.IOException;
@@ -28,7 +27,9 @@ public class ServerSentEventChannelImpl<T> implements Channel, ServerSentEventCh
 
     final String id = UUID.randomUUID().toString();
     final Set<String> groups = Sets.newConcurrentHashSet();
+    final String refId;
     final long startTime = System.nanoTime();
+
     final WriteListener writeListener = new WriteListener();
     final Deque<byte[]> queue = new ConcurrentLinkedDeque<>();
 
@@ -36,22 +37,23 @@ public class ServerSentEventChannelImpl<T> implements Channel, ServerSentEventCh
     private final ReentrantLock lock = new ReentrantLock();
     private final HttpServerExchange exchange;
     private final StreamSinkChannel sink;
-    private final EventBuilder<T> eventBuilder;
+    private final ServerSentEventBuilder<T> builder;
 
-    volatile boolean closed = false;
+    private volatile boolean closed = false;
 
-    public ServerSentEventChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ServerSentEventContextImpl<T> context, EventBuilder<T> eventBuilder) {
+    public ServerSentEventChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ServerSentEventContextImpl<T> context, ServerSentEventBuilder<T> builder, String refId) {
         this.exchange = exchange;
         this.context = context;
         this.sink = sink;
-        this.eventBuilder = eventBuilder;
+        this.builder = builder;
+        this.refId = refId;
     }
 
     @Override
     public void send(String id, T event) {
         var watch = new StopWatch();
-        byte[] data = eventBuilder.data(event);
-        byte[] message = eventBuilder.message(id, data);
+        byte[] data = builder.data(event);
+        byte[] message = builder.message(id, data);
         try {
             send(message);
         } finally {
@@ -159,7 +161,7 @@ public class ServerSentEventChannelImpl<T> implements Channel, ServerSentEventCh
                 }
             } catch (IOException e) {
                 LOGGER.warn("failed to write sse message, error={}", e.getMessage(), e);
-                IoUtils.safeClose(ServerSentEventChannelImpl.this);
+                exchange.endExchange();
             } finally {
                 lock.unlock();
             }

@@ -10,7 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ChannelImplTest {
     @Test
     void context() {
-        var channel = new ChannelImpl<>(null, new ChannelHandler<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), new WebSocketContextImpl<>()));
+        WebSocketContextImpl<TestWebSocketMessage> context = new WebSocketContextImpl<>();
+        var channel = new ChannelImpl<>(null, new ChannelSupport<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), context));
         channel.context().put("k1", "v1");
         assertThat(channel.context().get("k1")).isEqualTo("v1");
 

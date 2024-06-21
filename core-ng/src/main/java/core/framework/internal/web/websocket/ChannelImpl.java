@@ -26,8 +26,8 @@ public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
     final String id = UUID.randomUUID().toString();
     final Set<String> groups = Sets.newConcurrentHashSet();
     final long startTime = System.nanoTime();
+    final ChannelSupport<T, V> support;
 
-    final ChannelHandler<T, V> handler;
     private final WebSocketChannel channel;
     private final Map<String, Object> context = new ConcurrentHashMap<>();
     String path;
@@ -37,15 +37,15 @@ public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
     @Nullable
     CloseMessage closeMessage;
 
-    ChannelImpl(WebSocketChannel channel, ChannelHandler<T, V> handler) {
+    ChannelImpl(WebSocketChannel channel, ChannelSupport<T, V> support) {
         this.channel = channel;
-        this.handler = handler;
+        this.support = support;
     }
 
     @Override
     public void send(V message) {
         var watch = new StopWatch();
-        String text = handler.toServerMessage(message);
+        String text = support.toServerMessage(message);
 
         // refer to io.undertow.websockets.core.WebSocketChannel.send(WebSocketFrameType),
         // in concurrent env, one thread can still get hold of channel from context right before channel close listener removes it from context
@@ -76,12 +76,12 @@ public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
 
     @Override
     public void join(String group) {
-        handler.webSocketContext.join(this, group);
+        support.context.join(this, group);
     }
 
     @Override
     public void leave(String group) {
-        handler.webSocketContext.leave(this, group);
+        support.context.leave(this, group);
     }
 
     @Override

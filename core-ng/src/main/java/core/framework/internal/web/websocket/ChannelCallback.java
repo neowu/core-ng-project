@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author neo
  */
-public class ChannelCallback implements WebSocketCallback<Void> {
+class ChannelCallback implements WebSocketCallback<Void> {
     static final ChannelCallback INSTANCE = new ChannelCallback();
     private final Logger logger = LoggerFactory.getLogger(ChannelCallback.class);
 

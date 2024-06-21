@@ -83,11 +83,11 @@ public class ServerSentEventHandler {
             actionLog.action("sse:" + path + ":open");
             handlerContext.rateControl.validateRate(ServerSentEventConfig.SSE_CONNECT_GROUP, request.clientIP());
 
-            var channel = new ServerSentEventChannelImpl<>(exchange, sink, holder.context, holder.eventBuilder);
+            var channel = new ServerSentEventChannelImpl<>(exchange, sink, holder.context, holder.builder, actionLog.id);
             actionLog.context("channel", channel.id);
             sink.getWriteSetter().set(channel.writeListener);
             holder.context.add(channel);
-            exchange.addExchangeCompleteListener(new ServerSentEventChannelCloseHandler<>(logManager, channel, holder.context, actionLog.id));
+            exchange.addExchangeCompleteListener(new ServerSentEventChannelCloseHandler<>(logManager, channel, holder.context));
 
             channel.send(Strings.bytes("retry:15000\n\n"));
 

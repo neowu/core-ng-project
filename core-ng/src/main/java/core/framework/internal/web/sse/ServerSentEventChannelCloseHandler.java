@@ -14,25 +14,21 @@ public class ServerSentEventChannelCloseHandler<T> implements ExchangeCompletion
     final ServerSentEventContextImpl<T> context;
     private final LogManager logManager;
     private final ServerSentEventChannelImpl<T> channel;
-    private final String refId;
 
-    public ServerSentEventChannelCloseHandler(LogManager logManager, ServerSentEventChannelImpl<T> channel, ServerSentEventContextImpl<T> context, String refId) {
+    public ServerSentEventChannelCloseHandler(LogManager logManager, ServerSentEventChannelImpl<T> channel, ServerSentEventContextImpl<T> context) {
         this.logManager = logManager;
         this.channel = channel;
         this.context = context;
-        this.refId = refId;
     }
 
     @Override
     public void exchangeEvent(HttpServerExchange exchange, NextListener next) {
-        channel.closed = true;
-
         ActionLog actionLog = logManager.begin("=== sse close begin ===", null);
         try {
             actionLog.action("sse:" + exchange.getRequestPath() + ":close");
             actionLog.context("channel", channel.id);
-            LOGGER.debug("refId={}", refId);
-            List<String> refIds = List.of(refId);
+            LOGGER.debug("refId={}", channel.refId);
+            List<String> refIds = List.of(channel.refId);
             actionLog.refIds = refIds;
             actionLog.correlationIds = refIds;
             if (!channel.groups.isEmpty()) actionLog.context("group", channel.groups.toArray());

@@ -4,7 +4,7 @@ import core.framework.internal.inject.InjectValidator;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.HTTPIOHandler;
-import core.framework.internal.web.websocket.ChannelHandler;
+import core.framework.internal.web.websocket.ChannelSupport;
 import core.framework.internal.web.websocket.WebSocketContextImpl;
 import core.framework.internal.web.websocket.WebSocketHandler;
 import core.framework.internal.web.websocket.WebSocketMetrics;
@@ -63,7 +63,7 @@ public final class WebSocketConfig extends Config {
 
         WebSocketContextImpl<V> webSocketContext = new WebSocketContextImpl<>();
         context.beanFactory.bind(Types.generic(WebSocketContext.class, serverMessageClass), null, webSocketContext);
-        var handler = new ChannelHandler<>(clientMessageClass, serverMessageClass, listener, webSocketContext);
+        var handler = new ChannelSupport<>(clientMessageClass, serverMessageClass, listener, webSocketContext);
         context.httpServer.webSocketHandler.add(path, handler);
     }
 }

@@ -10,28 +10,28 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author neo
  */
-class ChannelHandlerTest {
-    private ChannelHandler<TestWebSocketMessage, TestWebSocketMessage> handler;
+class ChannelSupportTest {
+    private ChannelSupport<TestWebSocketMessage, TestWebSocketMessage> holder;
 
     @BeforeEach
     void createChannelHandler() {
-        handler = new ChannelHandler<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), null);
+        holder = new ChannelSupport<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), null);
     }
 
     @Test
     void toServerMessage() {
         var message = new TestWebSocketMessage();
         message.message = "value";
-        assertThat(handler.toServerMessage(message)).isEqualTo("{\"message\":\"value\"}");
+        assertThat(holder.toServerMessage(message)).isEqualTo("{\"message\":\"value\"}");
     }
 
     @Test
     void fromClientMessage() {
-        assertThatThrownBy(() -> handler.fromClientMessage("message"))
+        assertThatThrownBy(() -> holder.fromClientMessage("message"))
             .isInstanceOf(BadRequestException.class)
             .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("INVALID_WS_MESSAGE"));
 
-        assertThatThrownBy(() -> handler.fromClientMessage("{}"))
+        assertThatThrownBy(() -> holder.fromClientMessage("{}"))
             .isInstanceOf(BadRequestException.class)
             .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("VALIDATION_ERROR"));
     }

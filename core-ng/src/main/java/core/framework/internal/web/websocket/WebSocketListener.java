@@ -92,8 +92,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
     @SuppressWarnings("PMD.ExceptionAsFlowControl") // intentional
     private void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage textMessage, Throwable error) {
         VirtualThread.COUNT.increase();     // refer to line 56, full text message is handled by getWorker()
-        @SuppressWarnings("unchecked")
-        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
+        var wrapper = wrapper(channel);
         ActionLog actionLog = logManager.begin("=== ws message handling begin ===", null);
         try {
             actionLog.action("ws:" + wrapper.path);
@@ -106,8 +105,8 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
 
             validateRate(wrapper);
 
-            Object message = wrapper.handler.fromClientMessage(data);
-            wrapper.handler.listener.onMessage(wrapper, message);
+            Object message = wrapper.support.fromClientMessage(data);
+            wrapper.support.listener.onMessage(wrapper, message);
         } catch (Throwable e) {
             logManager.logError(e);
             if (!channel.isCloseFrameSent()) {
@@ -120,8 +119,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
     }
 
     private void onFullCloseMessage(WebSocketChannel channel, BufferedBinaryMessage message) {
-        @SuppressWarnings("unchecked")
-        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
+        final var wrapper = wrapper(channel);
         try (var data = message.getData()) {
             var closeMessage = new CloseMessage(data.getResource());
             wrapper.closeMessage = closeMessage;
@@ -131,37 +129,9 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
         }
     }
 
-    void onClose(WebSocketChannel channel) {
-        @SuppressWarnings("unchecked")
-        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
-        ActionLog actionLog = logManager.begin("=== websocket close begin ===", null);
-        try {
-            actionLog.action("ws:" + wrapper.path + ":close");
-            wrapper.handler.webSocketContext.remove(wrapper);    // context.remove() does not cleanup wrapper.rooms, so can be logged below
-            linkContext(channel, wrapper, actionLog);
-
-            int code = wrapper.closeMessage == null ? WebSocketCloseCodes.ABNORMAL_CLOSURE : wrapper.closeMessage.getCode();
-            String reason = wrapper.closeMessage == null ? null : wrapper.closeMessage.getReason();
-            actionLog.context("close_code", code);
-
-            // close reason classified as text message, in theory it is not supposed to be put in context (which is only for keyword and searchable)
-            // but close action usually won't trigger warnings/trace, so we have to put it on context with restriction
-            if (reason != null && !reason.isEmpty()) actionLog.context("close_reason", Strings.truncate(reason, ActionLog.MAX_CONTEXT_VALUE_LENGTH));
-            actionLog.track("ws", 0, reason == null ? 0 : 1 + reason.length(), 0);   // size = code (1 int) + reason
-
-            wrapper.handler.listener.onClose(wrapper, code, reason);
-        } catch (Throwable e) {
-            logManager.logError(e);
-        } finally {
-            double duration = System.nanoTime() - wrapper.startTime;
-            actionLog.stats.put("ws_duration", duration);
-            logManager.end("=== websocket close end ===");
-        }
-    }
-
     private void validateRate(ChannelImpl<?, ?> wrapper) {
-        if (wrapper.handler.limitRate != null) {
-            rateControl.validateRate(wrapper.handler.limitRate.value(), wrapper.clientIP);
+        if (wrapper.support.limitRate != null) {
+            rateControl.validateRate(wrapper.support.limitRate.value(), wrapper.clientIP);
         }
     }
 
@@ -176,14 +146,46 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
         logger.debug("[channel] url={}", channel.getUrl());
         logger.debug("[channel] remoteAddress={}", channel.getSourceAddress().getAddress().getHostAddress());
         actionLog.context("client_ip", wrapper.clientIP);
-        actionLog.context("listener", wrapper.handler.listener.getClass().getCanonicalName());
+        actionLog.context("listener", wrapper.support.listener.getClass().getCanonicalName());
         if (!wrapper.groups.isEmpty()) actionLog.context("group", wrapper.groups.toArray());
+    }
+
+    @SuppressWarnings("unchecked")
+    private ChannelImpl<Object, Object> wrapper(WebSocketChannel channel) {
+        return (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
     }
 
     class CloseListener implements ChannelListener<WebSocketChannel> {
         @Override
         public void handleEvent(WebSocketChannel channel) {
-            channel.getWorker().execute(() -> onClose(channel));
+            channel.getWorker().execute(() -> {
+                VirtualThread.COUNT.increase();
+                var wrapper = wrapper(channel);
+                ActionLog actionLog = logManager.begin("=== websocket close begin ===", null);
+                try {
+                    actionLog.action("ws:" + wrapper.path + ":close");
+                    wrapper.support.context.remove(wrapper);    // context.remove() does not cleanup wrapper.groups, so can be logged below
+                    linkContext(channel, wrapper, actionLog);
+
+                    int code = wrapper.closeMessage == null ? WebSocketCloseCodes.ABNORMAL_CLOSURE : wrapper.closeMessage.getCode();
+                    String reason = wrapper.closeMessage == null ? null : wrapper.closeMessage.getReason();
+                    actionLog.context("close_code", code);
+
+                    // close reason classified as text message, in theory it is not supposed to be put in context (which is only for keyword and searchable)
+                    // but close action usually won't trigger warnings/trace, so we have to put it on context with restriction
+                    if (reason != null && !reason.isEmpty()) actionLog.context("close_reason", Strings.truncate(reason, ActionLog.MAX_CONTEXT_VALUE_LENGTH));
+                    actionLog.track("ws", 0, reason == null ? 0 : 1 + reason.length(), 0);   // size = code (1 int) + reason
+
+                    wrapper.support.listener.onClose(wrapper, code, reason);
+                } catch (Throwable e) {
+                    logManager.logError(e);
+                } finally {
+                    double duration = System.nanoTime() - wrapper.startTime;
+                    actionLog.stats.put("ws_duration", duration);
+                    logManager.end("=== websocket close end ===");
+                    VirtualThread.COUNT.decrease();
+                }
+            });
         }
     }
 

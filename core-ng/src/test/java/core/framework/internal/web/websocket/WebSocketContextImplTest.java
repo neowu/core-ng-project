@@ -54,6 +54,6 @@ class WebSocketContextImplTest {
     }
 
     private ChannelImpl<TestWebSocketMessage, TestWebSocketMessage> channel() {
-        return new ChannelImpl<>(null, new ChannelHandler<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), context));
+        return new ChannelImpl<>(null, new ChannelSupport<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener(), context));
     }
 }

@@ -21,7 +21,7 @@ class ServerSentEventContextImplTest {
 
     @Test
     void join() {
-        var channel = new ServerSentEventChannelImpl<>(null, null, context, null);
+        var channel = new ServerSentEventChannelImpl<>(null, null, context, null, null);
         channel.join("group1");
         List<ServerSentEventChannel<TestEvent>> group = context.group("group1");
         assertThat(group).containsOnly(channel);
@@ -32,7 +32,7 @@ class ServerSentEventContextImplTest {
 
     @Test
     void remove() {
-        var channel = new ServerSentEventChannelImpl<>(null, null, context, null);
+        var channel = new ServerSentEventChannelImpl<>(null, null, context, null, null);
         channel.join("group1");
         channel.join("group2");
 
@@ -43,7 +43,7 @@ class ServerSentEventContextImplTest {
 
     @Test
     void all() {
-        var channel = new ServerSentEventChannelImpl<>(null, null, context, null);
+        var channel = new ServerSentEventChannelImpl<>(null, null, context, null, null);
         context.add(channel);
 
         List<ServerSentEventChannel<TestEvent>> all = context.all();

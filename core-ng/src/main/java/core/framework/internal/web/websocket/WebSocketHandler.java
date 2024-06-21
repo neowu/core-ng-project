@@ -43,7 +43,7 @@ public class WebSocketHandler implements HttpHandler {
 
     private final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
     private final Handshake handshake = new Hybi13Handshake();
-    private final Map<String, ChannelHandler<?, ?>> handlers = new HashMap<>();
+    private final Map<String, ChannelSupport<?, ?>> handlers = new HashMap<>();
 
     private final LogManager logManager;
     private final WebSocketListener listener;
@@ -79,7 +79,7 @@ public class WebSocketHandler implements HttpHandler {
 
             String path = request.path();
             @SuppressWarnings("unchecked")
-            ChannelHandler<Object, Object> handler = (ChannelHandler<Object, Object>) handlers.get(path);
+            ChannelSupport<Object, Object> handler = (ChannelSupport<Object, Object>) handlers.get(path);
             if (handler == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
 
             actionLog.action("ws:" + path + ":open");
@@ -98,14 +98,14 @@ public class WebSocketHandler implements HttpHandler {
         }
     }
 
-    private void upgrade(HttpServerExchange exchange, RequestImpl request, ChannelHandler<Object, Object> handler, ActionLog actionLog) {
+    private void upgrade(HttpServerExchange exchange, RequestImpl request, ChannelSupport<Object, Object> support, ActionLog actionLog) {
         var webSocketExchange = new AsyncWebSocketHttpServerExchange(exchange, channels);
         exchange.upgradeChannel((connection, httpServerExchange) -> {
             WebSocketChannel channel = handshake.createChannel(webSocketExchange, connection, webSocketExchange.getBufferPool());
             // not set idle timeout for channel, e.g. channel.setIdleTimeout(timeout);
             // in cloud env, timeout is set on LB (azure AG, or gcloud LB), usually use 300s timeout
             try {
-                var wrapper = new ChannelImpl<>(channel, handler);
+                var wrapper = new ChannelImpl<>(channel, support);
                 wrapper.path = request.path();
                 wrapper.clientIP = request.clientIP();
                 wrapper.refId = actionLog.id;   // with ws, correlationId and refId are same as parent http action id
@@ -114,15 +114,15 @@ public class WebSocketHandler implements HttpHandler {
 
                 channel.setAttribute(CHANNEL_KEY, wrapper);
                 channel.addCloseTask(listener.closeListener);
-                handler.webSocketContext.add(wrapper);
+                support.context.add(wrapper);
 
                 channel.getReceiveSetter().set(listener);
                 channel.resumeReceives();
 
                 channels.add(channel);
 
-                handler.listener.onConnect(request, wrapper);
-                if (!wrapper.groups.isEmpty()) actionLog.context("group", wrapper.groups.toArray()); // may join room onConnect
+                support.listener.onConnect(request, wrapper);
+                if (!wrapper.groups.isEmpty()) actionLog.context("group", wrapper.groups.toArray()); // may join group onConnect
             } catch (Throwable e) {
                 // upgrade is handled by io.undertow.server.protocol.http.HttpReadListener.exchangeComplete, and it catches all exceptions during onConnect
                 logManager.logError(e);
@@ -150,8 +150,8 @@ public class WebSocketHandler implements HttpHandler {
         }
     }
 
-    public void add(String path, ChannelHandler<?, ?> handler) {
-        ChannelHandler<?, ?> previous = handlers.putIfAbsent(path, handler);
+    public void add(String path, ChannelSupport<?, ?> handler) {
+        ChannelSupport<?, ?> previous = handlers.putIfAbsent(path, handler);
         if (previous != null) throw new Error(format("found duplicate channel listener, path={}, previousListener={}", path, previous.listener.getClass().getCanonicalName()));
     }
 }
