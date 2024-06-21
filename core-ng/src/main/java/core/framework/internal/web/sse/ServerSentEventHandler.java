@@ -82,7 +82,7 @@ public class ServerSentEventHandler {
             actionLog.action("sse:" + path + ":open");
             handlerContext.rateControl.validateRate(ServerSentEventConfig.SSE_CONNECT_GROUP, request.clientIP());
 
-            var channel = new ChannelImpl<>(exchange, sink, support, actionLog.id);
+            var channel = new ChannelImpl<>(exchange, sink, support.context, support.builder, actionLog.id);
             actionLog.context("channel", channel.id);
             sink.getWriteSetter().set(channel.writeListener);
             support.context.add(channel);

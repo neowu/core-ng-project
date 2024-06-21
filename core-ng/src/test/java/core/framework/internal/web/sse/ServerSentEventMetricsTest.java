@@ -17,7 +17,7 @@ class ServerSentEventMetricsTest {
     @Test
     void collect() {
         ServerSentEventContextImpl<Object> context = new ServerSentEventContextImpl<>();
-        context.add(new ChannelImpl<>(null, null, null, null));
+        context.add(new ChannelImpl<>(null, null, null, null, null));
         metrics.contexts.add(context);
 
         var stats = new Stats();

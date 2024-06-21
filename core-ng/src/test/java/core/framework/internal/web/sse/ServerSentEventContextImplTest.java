@@ -72,6 +72,6 @@ class ServerSentEventContextImplTest {
     }
 
     private ChannelImpl<TestEvent> channel() {
-        return new ChannelImpl<>(null, null, new ChannelSupport<>(null, TestEvent.class, context), null);
+        return new ChannelImpl<>(null, null, context, new ServerSentEventBuilder<>(TestEvent.class), null);
     }
 }

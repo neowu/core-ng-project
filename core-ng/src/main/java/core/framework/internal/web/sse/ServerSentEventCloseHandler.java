@@ -16,7 +16,7 @@ class ServerSentEventCloseHandler<T> implements ExchangeCompletionListener {
     private final LogManager logManager;
     private final ChannelImpl<T> channel;
 
-    public ServerSentEventCloseHandler(LogManager logManager, ChannelImpl<T> channel, ServerSentEventContextImpl<T> context) {
+    ServerSentEventCloseHandler(LogManager logManager, ChannelImpl<T> channel, ServerSentEventContextImpl<T> context) {
         this.logManager = logManager;
         this.channel = channel;
         this.context = context;

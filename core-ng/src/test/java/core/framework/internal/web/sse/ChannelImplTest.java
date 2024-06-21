@@ -20,7 +20,7 @@ class ChannelImplTest {
     void createServerSentEventChannelImpl() {
         ServerConnection connection = mock(ServerConnection.class);
         when(connection.getIoThread()).thenReturn(mock(XnioIoThread.class));
-        channel = new ChannelImpl<>(new HttpServerExchange(connection), null, new ChannelSupport<>(null, TestEvent.class, null), null);
+        channel = new ChannelImpl<>(new HttpServerExchange(connection), null, null, new ServerSentEventBuilder<>(TestEvent.class), null);
     }
 
     @Test

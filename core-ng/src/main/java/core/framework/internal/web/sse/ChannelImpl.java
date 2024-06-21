@@ -28,38 +28,38 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
     final Set<String> groups = Sets.newConcurrentHashSet();
     final String refId;
     final long startTime = System.nanoTime();
-    long lastSentTime = startTime;
 
     final WriteListener writeListener = new WriteListener();
     final Deque<byte[]> queue = new ConcurrentLinkedDeque<>();
 
-    private final ChannelSupport<T> support;
+    private final ServerSentEventContextImpl<T> context;
+    private final ServerSentEventBuilder<T> builder;
 
     private final ReentrantLock lock = new ReentrantLock();
     private final HttpServerExchange exchange;
     private final StreamSinkChannel sink;
 
+    long lastSentTime = startTime;
     private volatile boolean closed = false;
 
-    public ChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ChannelSupport<T> support, String refId) {
+    ChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ServerSentEventContextImpl<T> context, ServerSentEventBuilder<T> builder, String refId) {
         this.exchange = exchange;
         this.sink = sink;
-        this.support = support;
+        this.context = context;
+        this.builder = builder;
         this.refId = refId;
     }
 
     @Override
     public void send(String id, T event) {
         var watch = new StopWatch();
-        byte[] data = support.data(event);
-        byte[] message = support.message(id, data);
+        byte[] message = builder.build(id, event);
         try {
             send(message);
-            lastSentTime = System.nanoTime();
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("sse", elapsed, 0, message.length);
-            LOGGER.debug("send sse, channel={}, id={}, data={}, elapsed={}", this.id, id, new BytesLogParam(data), elapsed);
+            LOGGER.debug("send sse, channel={}, message={}, elapsed={}", this.id, new BytesLogParam(message), elapsed); // message is not in json format, not masked, assume sse won't send any sensitive data
         }
     }
 
@@ -67,6 +67,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
         if (closed) return;
 
         queue.add(data);
+        lastSentTime = System.nanoTime();
         exchange.getIoThread().execute(() -> writeListener.handleEvent(sink));
     }
 
@@ -91,12 +92,12 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
 
     @Override
     public void join(String group) {
-        support.context.join(this, group);
+        context.join(this, group);
     }
 
     @Override
     public void leave(String group) {
-        support.context.leave(this, group);
+        context.leave(this, group);
     }
 
     ByteBuffer poll() {
