@@ -75,11 +75,12 @@ public class DBConfig extends Config {
     }
 
     private CloudAuthProvider provider(String user) {
-        return switch (user) {
-            case "iam/gcloud" -> new GCloudAuthProvider();
-            case "iam/azure" -> new AzureAuthProvider();
-            case null, default -> throw new Error("unsupported cloud provider, value=" + user);
-        };
+        if ("iam/gcloud".equals(user)) {
+            return new GCloudAuthProvider();
+        } else if (user.startsWith("iam/azure/")) {
+            return new AzureAuthProvider(user);
+        }
+        throw new Error("unsupported cloud provider, value=" + user);
     }
 
     public void password(String password) {
