@@ -2,9 +2,8 @@ package core.framework.internal.web.sse;
 
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
-import core.framework.util.Strings;
 
-public class ServerSentEventBuilder<T> {
+class ServerSentEventBuilder<T> {
     private final JSONWriter<T> writer;
     private final Validator<T> validator;
 
@@ -13,33 +12,18 @@ public class ServerSentEventBuilder<T> {
         validator = Validator.of(eventClass);
     }
 
-    byte[] build(String id, T event) {
+    String build(String id, T event) {
         validator.validate(event, false);
-        byte[] data = writer.toJSON(event);
+        String data = writer.toJSONString(event);
+
         return build(id, data);
     }
 
-    byte[] build(String id, byte[] data) {
-        byte[] idBytes = id == null ? null : Strings.bytes(id);
-        byte[] message = new byte[data.length + 7 + (idBytes == null ? 0 : idBytes.length + 4)];
-        int index = 0;
-        if (idBytes != null) {
-            message[index++] = (byte) 'i';
-            message[index++] = (byte) 'd';
-            message[index++] = (byte) ':';
-            System.arraycopy(idBytes, 0, message, 3, idBytes.length);
-            index += idBytes.length;
-            message[index++] = (byte) '\n';
-        }
-        message[index++] = (byte) 'd';
-        message[index++] = (byte) 'a';
-        message[index++] = (byte) 't';
-        message[index++] = (byte) 'a';
-        message[index++] = (byte) ':';
-        System.arraycopy(data, 0, message, index, data.length);
-        index += data.length;
-        message[index++] = (byte) '\n';
-        message[index] = (byte) '\n';
-        return message;
+    String build(String id, String data) {
+        var builder = new StringBuilder(data.length() + 7 + (id == null ? 0 : id.length() + 4));
+        if (id != null) builder.append("id:").append(id).append('\n');
+        builder.append("data:").append(data).append("\n\n");
+
+        return builder.toString();
     }
 }

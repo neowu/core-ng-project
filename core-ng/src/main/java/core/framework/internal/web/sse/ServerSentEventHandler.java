@@ -8,7 +8,6 @@ import core.framework.internal.web.request.RequestImpl;
 import core.framework.internal.web.session.ReadOnlySession;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.module.ServerSentEventConfig;
-import core.framework.util.Strings;
 import core.framework.web.exception.NotFoundException;
 import core.framework.web.sse.ChannelListener;
 import io.undertow.server.HttpServerExchange;
@@ -88,7 +87,7 @@ public class ServerSentEventHandler {
             support.context.add(channel);
             exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support.context));
 
-            channel.send(Strings.bytes("retry:15000\n\n"));
+            channel.send("retry:15000\n\n");    // set browser retry to 15s
 
             request.session = ReadOnlySession.of(sessionManager.load(request, actionLog));
             String lastEventId = exchange.getRequestHeaders().getLast(LAST_EVENT_ID);

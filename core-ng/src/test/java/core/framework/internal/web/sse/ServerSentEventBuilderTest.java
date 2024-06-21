@@ -1,6 +1,5 @@
 package core.framework.internal.web.sse;
 
-import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,12 +14,11 @@ class ServerSentEventBuilderTest {
     }
 
     @Test
-    void message() {
-        assertThat(builder.build("001", Strings.bytes("message")))
+    void build() {
+        assertThat(builder.build("001", "message"))
             .asString().isEqualTo("id:001\ndata:message\n\n");
 
-        assertThat(builder.build(null, Strings.bytes("message")))
+        assertThat(builder.build(null, "message"))
             .asString().isEqualTo("data:message\n\n");
     }
-
 }

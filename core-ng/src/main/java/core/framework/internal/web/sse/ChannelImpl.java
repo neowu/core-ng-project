@@ -1,9 +1,9 @@
 package core.framework.internal.web.sse;
 
-import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
+import core.framework.util.Strings;
 import core.framework.web.sse.Channel;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
@@ -53,20 +53,20 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
     @Override
     public void send(String id, T event) {
         var watch = new StopWatch();
-        byte[] message = builder.build(id, event);
+        String message = builder.build(id, event);
         try {
             send(message);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("sse", elapsed, 0, message.length);
-            LOGGER.debug("send sse, channel={}, message={}, elapsed={}", this.id, new BytesLogParam(message), elapsed); // message is not in json format, not masked, assume sse won't send any sensitive data
+            ActionLogContext.track("sse", elapsed, 0, message.length());
+            LOGGER.debug("send sse, channel={}, message={}, elapsed={}", this.id, message, elapsed); // message is not in json format, not masked, assume sse won't send any sensitive data
         }
     }
 
-    void send(byte[] data) {
+    void send(String data) {
         if (closed) return;
 
-        queue.add(data);
+        queue.add(Strings.bytes(data));
         lastSentTime = System.nanoTime();
         exchange.getIoThread().execute(() -> writeListener.handleEvent(sink));
     }
