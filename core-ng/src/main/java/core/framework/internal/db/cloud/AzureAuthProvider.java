@@ -37,8 +37,8 @@ public class AzureAuthProvider implements CloudAuthProvider {
     String accessToken;
     long expirationTime;
 
-    public AzureAuthProvider(String iamUser) {
-        this.user = parse(iamUser);
+    public AzureAuthProvider(String user) {
+        this.user = user;
     }
 
     @Override
@@ -77,16 +77,16 @@ public class AzureAuthProvider implements CloudAuthProvider {
 
         String scope = OSS_RDBMS_SCOPE_MAP.get(azureAuthorityHost);
         String federatedToken = Files.text(Path.of(System.getenv(AZURE_FEDERATED_TOKEN_FILE)));
-        Map<String, String> formData = new LinkedHashMap<>();
-        formData.put("client_assertion", federatedToken);
-        formData.put("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-        formData.put("client_id", user());
-        formData.put("grant_type", "client_credentials");
-        formData.put("scope", scope);
+        Map<String, String> form = new LinkedHashMap<>();
+        form.put("client_assertion", federatedToken);
+        form.put("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+        form.put("client_id", user());
+        form.put("grant_type", "client_credentials");
+        form.put("scope", scope);
 
-        HTTPRequest httpRequest = new HTTPRequest(HTTPMethod.POST, azureAuthorityURL);
-        httpRequest.form(formData);
-        return httpRequest;
+        var request = new HTTPRequest(HTTPMethod.POST, azureAuthorityURL);
+        request.form(form);
+        return request;
     }
 
     private String parseAccessToken(String tokenJSON) {
@@ -99,13 +99,5 @@ public class AzureAuthProvider implements CloudAuthProvider {
         int startIndex = tokenJSON.indexOf("\"expires_in\":") + 13;
         int endIndex = tokenJSON.indexOf(',', startIndex);
         return Integer.parseInt(tokenJSON.substring(startIndex, endIndex));
-    }
-
-    private String parse(String iamUser) {
-        String user = iamUser.substring(10);
-        if (Strings.isBlank(user)) {
-            throw new Error("invalid Azure iam user, user=" + iamUser);
-        }
-        return user;
     }
 }

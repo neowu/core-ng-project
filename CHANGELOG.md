@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.1.0 (6/12/2024 - )
+### 9.1.0-b0 (6/12/2024 - )
 
 * jre: published neowu/jre:21.0.3
 * mysql: updated and patched to 8.4.0-r4
@@ -10,7 +10,7 @@
 * ws: API changed !!! check all compilation errors
   > renamed all "room" to "group"
   > change WebSocketContext to WebSocketContext<T>, to support multiple websocket endpoints, be consistent with sse
-* db: update azure IAM auth
+* db: add azure IAM auth support
   > update db user to "iam/azure/username" format
 
 ### 9.0.10 (4/29/2024 - 6/7/2024)

@@ -12,6 +12,7 @@ import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.internal.resource.PoolMetrics;
 import core.framework.util.Lists;
+import core.framework.util.Strings;
 import core.framework.util.Types;
 
 import java.time.Duration;
@@ -74,11 +75,15 @@ public class DBConfig extends Config {
         }
     }
 
-    private CloudAuthProvider provider(String user) {
+    CloudAuthProvider provider(String user) {
         if ("iam/gcloud".equals(user)) {
             return new GCloudAuthProvider();
         } else if (user.startsWith("iam/azure/")) {
-            return new AzureAuthProvider(user);
+            String iamUser = user.substring(10);
+            if (Strings.isBlank(iamUser)) {
+                throw new Error("invalid azure iam user, user=" + user);
+            }
+            return new AzureAuthProvider(iamUser);
         }
         throw new Error("unsupported cloud provider, value=" + user);
     }
