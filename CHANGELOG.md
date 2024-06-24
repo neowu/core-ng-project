@@ -10,6 +10,8 @@
 * ws: API changed !!! check all compilation errors
   > renamed all "room" to "group"
   > change WebSocketContext to WebSocketContext<T>, to support multiple websocket endpoints, be consistent with sse
+* db: update azure IAM auth
+  > update db user to "iam/azure/username" format
 
 ### 9.0.10 (4/29/2024 - 6/7/2024)
 

@@ -19,7 +19,6 @@ import java.util.Map;
  */
 public class AzureAuthProvider implements CloudAuthProvider {
     private static final String AZURE_AUTHORITY_HOST = "AZURE_AUTHORITY_HOST";
-    private static final String AZURE_CLIENT_ID = "AZURE_CLIENT_ID";
     private static final String AZURE_TENANT_ID = "AZURE_TENANT_ID";
     private static final String AZURE_FEDERATED_TOKEN_FILE = "AZURE_FEDERATED_TOKEN_FILE";
     //refers to com.azure.identity.extensions.implementation.token.AccessTokenResolverOptions
@@ -34,14 +33,16 @@ public class AzureAuthProvider implements CloudAuthProvider {
         .maxRetries(3)
         .retryWaitTime(Duration.ofMillis(50))
         .build();
+    private final String user;
     String accessToken;
     long expirationTime;
-    String user;
+
+    public AzureAuthProvider(String iamUser) {
+        this.user = parse(iamUser);
+    }
 
     @Override
     public String user() {
-        if (user == null)
-            user = clientId();
         return user;
     }
 
@@ -100,7 +101,11 @@ public class AzureAuthProvider implements CloudAuthProvider {
         return Integer.parseInt(tokenJSON.substring(startIndex, endIndex));
     }
 
-    String clientId() {
-        return System.getenv(AZURE_CLIENT_ID);
+    private String parse(String iamUser) {
+        String user = iamUser.substring(10);
+        if (Strings.isBlank(user)) {
+            throw new Error("invalid Azure iam user, user=" + iamUser);
+        }
+        return user;
     }
 }
