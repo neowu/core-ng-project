@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerSentEventContextImpl<T> implements ServerSentEventContext<T> {
     final Map<String, Channel<T>> channels = new ConcurrentHashMap<>();
-
     private final Logger logger = LoggerFactory.getLogger(ServerSentEventContextImpl.class);
     private final Map<String, Map<String, Channel<T>>> groups = new ConcurrentHashMap<>();
 
@@ -55,8 +54,9 @@ public class ServerSentEventContextImpl<T> implements ServerSentEventContext<T> 
             // cleanup group if it has no channels, and thread safe
             if (groupChannels.isEmpty()) {
                 var previous = groups.remove(group);
-                // in case another channel was added before removal by another thread
-                if (!previous.isEmpty()) groups.computeIfAbsent(group, key -> new ConcurrentHashMap<>()).putAll(previous);
+                // in case another channel was added before removal by another thread,
+                // previous will be null, if multiple channels close, all reach line 56 at same time
+                if (previous != null && !previous.isEmpty()) groups.computeIfAbsent(group, key -> new ConcurrentHashMap<>()).putAll(previous);
             }
         }
     }

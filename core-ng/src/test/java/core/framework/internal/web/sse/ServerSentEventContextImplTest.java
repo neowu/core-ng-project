@@ -36,11 +36,18 @@ class ServerSentEventContextImplTest {
 
     @Test
     void remove() {
-        var channel = channel();
-        channel.join("group1");
-        channel.join("group2");
+        var channel1 = channel();
+        channel1.join("group1");
+        channel1.join("group2");
+        var channel2 = channel();
+        channel2.join("group1");
+        channel2.join("group2");
 
-        context.remove(channel);
+        context.remove(channel1);
+        assertThat(context.group("group1")).hasSize(1);
+        assertThat(context.group("group2")).hasSize(1);
+
+        context.remove(channel2);
         assertThat(context.group("group1")).isEmpty();
         assertThat(context.group("group2")).isEmpty();
     }
