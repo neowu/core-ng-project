@@ -19,6 +19,7 @@ import java.util.Map;
  */
 public class AzureAuthProvider implements CloudAuthProvider {
     private static final String AZURE_AUTHORITY_HOST = "AZURE_AUTHORITY_HOST";
+    private static final String AZURE_CLIENT_ID = "AZURE_CLIENT_ID";
     private static final String AZURE_TENANT_ID = "AZURE_TENANT_ID";
     private static final String AZURE_FEDERATED_TOKEN_FILE = "AZURE_FEDERATED_TOKEN_FILE";
     //refers to com.azure.identity.extensions.implementation.token.AccessTokenResolverOptions
@@ -72,6 +73,7 @@ public class AzureAuthProvider implements CloudAuthProvider {
 
     private HTTPRequest exchangeRequest() {
         String azureAuthorityHost = System.getenv(AZURE_AUTHORITY_HOST);
+        String identityClientId = System.getenv(AZURE_CLIENT_ID);
         String identityTenantId = System.getenv(AZURE_TENANT_ID);
         String azureAuthorityURL = Strings.format("{}{}/oauth2/v2.0/token", azureAuthorityHost, identityTenantId);
 
@@ -80,7 +82,7 @@ public class AzureAuthProvider implements CloudAuthProvider {
         Map<String, String> form = new LinkedHashMap<>();
         form.put("client_assertion", federatedToken);
         form.put("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-        form.put("client_id", user());
+        form.put("client_id", identityClientId);
         form.put("grant_type", "client_credentials");
         form.put("scope", scope);
 
