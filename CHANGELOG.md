@@ -12,6 +12,8 @@
   > change WebSocketContext to WebSocketContext<T>, to support multiple websocket endpoints, be consistent with sse
 * db: add azure IAM auth support
   > update db user to "iam/azure/username" format
+* kafka: update to 3.7.1
+* monitor: refresh kube client auth token every 10 mins
 
 ### 9.0.10 (4/29/2024 - 6/7/2024)
 

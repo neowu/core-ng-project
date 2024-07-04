@@ -11,14 +11,18 @@ import core.framework.util.Files;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Instant;
 
 /**
  * @author neo
  */
 public class KubeClient {
     private final JSONReader<KubePodList> reader = new JSONReader<>(KubePodList.class);
+
+    Instant lastUpdateTime;
+    String token;
+
     private HTTPClient httpClient;
-    private String token;
 
     // only support Pod ServiceAccount auth within cluster
     public void initialize() {
@@ -26,13 +30,11 @@ public class KubeClient {
             .trust(Files.text(Path.of("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")))
             .maxRetries(3)
             .build();
-        // token will not be refreshed after pod created, if the token is changed somehow, it has to recreate pod
-        token = Files.text(Path.of("/var/run/secrets/kubernetes.io/serviceaccount/token"));
     }
 
     public KubePodList listPods(String namespace) throws IOException {
         var request = new HTTPRequest(HTTPMethod.GET, "https://kubernetes.default.svc/api/v1/namespaces/" + namespace + "/pods");
-        request.bearerAuth(token);
+        request.bearerAuth(token(Instant.now()));
         request.accept(ContentType.APPLICATION_JSON);
         HTTPResponse response = httpClient.execute(request);
         if (response.statusCode != HTTPStatus.OK.code) {
@@ -40,5 +42,20 @@ public class KubeClient {
         }
         // not using validation to reduce overhead
         return reader.fromJSON(response.body);
+    }
+
+    String token(Instant now) {
+        // cache token 600s, kube token expires in 3607s, and refreshes every 48~49 minutes
+        //   kube-api-access-8rm8j:
+        //    Type:                    Projected (a volume that contains injected data from multiple sources)
+        //    TokenExpirationSeconds:  3607
+        //    ConfigMapName:           kube-root-ca.crt
+        //    ConfigMapOptional:       <nil>
+        //    DownwardAPI:             true
+        if (lastUpdateTime == null || now.isAfter(lastUpdateTime.plusSeconds(600))) {
+            lastUpdateTime = now;
+            token = Files.text(Path.of("/var/run/secrets/kubernetes.io/serviceaccount/token"));
+        }
+        return token;
     }
 }
