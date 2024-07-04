@@ -19,6 +19,7 @@ import java.util.Map;
  */
 public class AzureAuthProvider implements CloudAuthProvider {
     private static final String AZURE_AUTHORITY_HOST = "AZURE_AUTHORITY_HOST";
+    private static final String AZURE_CLIENT_ID = "AZURE_CLIENT_ID";
     private static final String AZURE_TENANT_ID = "AZURE_TENANT_ID";
     private static final String AZURE_FEDERATED_TOKEN_FILE = "AZURE_FEDERATED_TOKEN_FILE";
     //refers to com.azure.identity.extensions.implementation.token.AccessTokenResolverOptions
@@ -70,17 +71,19 @@ public class AzureAuthProvider implements CloudAuthProvider {
         return response.text();
     }
 
-    private HTTPRequest exchangeRequest() {
-        String azureAuthorityHost = System.getenv(AZURE_AUTHORITY_HOST);
-        String identityTenantId = System.getenv(AZURE_TENANT_ID);
-        String azureAuthorityURL = Strings.format("{}{}/oauth2/v2.0/token", azureAuthorityHost, identityTenantId);
+    HTTPRequest exchangeRequest() {
+        String azureAuthorityHost = getEnv(AZURE_AUTHORITY_HOST);
+        String azureClientId = getEnv(AZURE_CLIENT_ID);
+        String azureTenantId = getEnv(AZURE_TENANT_ID);
+        String azureAuthorityURL = Strings.format("{}{}/oauth2/v2.0/token", azureAuthorityHost, azureTenantId);
+        String azureFederatedTokenFilePath = getEnv(AZURE_FEDERATED_TOKEN_FILE);
 
         String scope = OSS_RDBMS_SCOPE_MAP.get(azureAuthorityHost);
-        String federatedToken = Files.text(Path.of(System.getenv(AZURE_FEDERATED_TOKEN_FILE)));
+        String federatedToken = azureFederatedToken(azureFederatedTokenFilePath);
         Map<String, String> form = new LinkedHashMap<>();
         form.put("client_assertion", federatedToken);
         form.put("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-        form.put("client_id", user());
+        form.put("client_id", azureClientId);
         form.put("grant_type", "client_credentials");
         form.put("scope", scope);
 
@@ -99,5 +102,13 @@ public class AzureAuthProvider implements CloudAuthProvider {
         int startIndex = tokenJSON.indexOf("\"expires_in\":") + 13;
         int endIndex = tokenJSON.indexOf(',', startIndex);
         return Integer.parseInt(tokenJSON.substring(startIndex, endIndex));
+    }
+
+    String getEnv(String name) {
+        return System.getenv(name);
+    }
+
+    String azureFederatedToken(String azureFederatedTokenFilePath) {
+        return Files.text(Path.of(azureFederatedTokenFilePath));
     }
 }

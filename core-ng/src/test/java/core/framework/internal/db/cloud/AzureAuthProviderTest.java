@@ -1,9 +1,12 @@
 package core.framework.internal.db.cloud;
 
+import core.framework.http.HTTPRequest;
+import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
@@ -52,5 +55,28 @@ class AzureAuthProviderTest {
 
         assertThat(provider.parseExpirationTimeInSec(tokenJSON))
             .isEqualTo(86399);
+    }
+
+    @Test
+    void exchangeRequest() {
+        String mockedHost = "https://login.microsoftonline.com/";
+        String mockedClientId = "ac6ca327-xxxx-4406-b554-f7a128a15ccd";
+        String mockedTenantId = "b8b58c09-xxxx-404d-8960-9d2ae2605573";
+        String mockedTokenFilePath = "azure-auth-provider-test/azureFederatedToken";
+        String mockedToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IkNuSkVUenhHS09uUHd0SF9feEM4aExoMFVJb0FoQzI4emtlRFdhZ2________.eyJhdWQiOlsiYXBpOi8vQXp1cmVBRFRva2VuRXhjaGFuZ2UiXSwiZXhwIjoxNzE5OTc2NTIwLCJpYXQiOjE3MTk5NzI5MjAsImlzcyI6Imh0dHBzOi8vZWFzdHVzLm9pYy5wcm9kLWFrcy5henVyZS5jb20vYjhiNThjMDktYzVmMy00MDRkLTg5NjAtOWQyYWUyNjA1NTczLzE4N2YwNmFhLTlmMzItNGMwZi1iMzg3LThkY2ViOWVhMDBlMi8iLCJrdWJlcm5ldGVzLmlvIjp7Im5hbWVzcGFjZSI6ImRldi1wbGF0Zm9ybS1zZXJ2aWNlcyIsInBvZCI6eyJuYW1lIjoiYXBpLWRvYy1zZXJ2aWNlLTU1ZGNmZDc5OWQtOGw1cXIiLCJ1aWQiOiI0NGI4MWM2ZC0wM2JlLTQ5YzQtOWJjYi00ZjU3ZmE2NGE5NjkifSwic2VydmljZWFjY291bnQiOnsibmFtZSI6ImFwaS1kb2Mtc2VydmljZSIsInVpZCI6Ijk2YTEyMTY1LTRhZmItNDU5Yi1iZTFlLWZhYjMwOTEzNDhhYSJ9fSwibmJmIjoxNzE5OTcyOTIwLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGV2LXBsYXRmb3JtLXNlcnZpY2VzOmFwaS1kb2Mtc2Vy________.oS8v_7Z8UdclIC0AkhHQzQ2HzB39T1KBoSx6Gt0BYQsvsAugjDrKbO6qGN3eSs20BX3XnmW-2Q-Z4PREcf9q9KJEzBwGeNyj8Ti11Y9PHQjFKcu0aF0PEh6P34ypmm_s-dvtDOt2QVy7dHipuBj6GNYXs22ZQGZEfeWzsFwnFZORj8OGLKw-MY93chwBtAMEd8utD12T8ZbOq_YP7GIgFBD46ZbjXgcTggWdrTMJDzf92B2iI71XpFXnHG8VxOjpxd8fOo5J0iiq4BSh3SnVHyCKQg4Bfu8RB2ttMk1fvEXD6B4moy-gHjnlzwxIbVkgg0iJ6KWEkR8y-qwPbtntQ-SNwqcxGKtC8Re69nMRDmF8bWzzvnRPl5cRn4B8d4taswysCqS4Qt_Ywo0h-iznNaYQQr1_KykY6VpCtewUpCpjYKSOGeLUcno85aJo7YnNpAT53PCIweqsqcLXVL9r8TBcY2qHbcvCmJvemh-5bHNLFcuOAZ_bjsPDHPcuRLB1fq8MjSFdwMumPjeaGFBDb_EQ0UWCOxOnS956w39w5Jiv7wlbkacBeg3s5Jn4ic9ryBcPDQqjiVLuviSyRbHVhHxnMTi56qr-KF9-DqsFWI5yZkI-LwTb99TO1-qdVsml7DCvFp8ABb5_T2M29Z63G15gD10ZVmdJ1AB________";
+        doReturn(mockedHost).when(provider).getEnv("AZURE_AUTHORITY_HOST");
+        doReturn(mockedClientId).when(provider).getEnv("AZURE_CLIENT_ID");
+        doReturn(mockedTenantId).when(provider).getEnv("AZURE_TENANT_ID");
+        doReturn(mockedTokenFilePath).when(provider).getEnv("AZURE_FEDERATED_TOKEN_FILE");
+        doReturn(mockedToken).when(provider).azureFederatedToken(mockedTokenFilePath);
+
+        HTTPRequest httpRequest = provider.exchangeRequest();
+        assertThat(httpRequest.uri).isEqualTo(Strings.format("https://login.microsoftonline.com/b8b58c09-xxxx-404d-8960-9d2ae2605573/oauth2/v2.0/token"));
+        Map<String, String> form = httpRequest.form;
+        assertThat(form.get("client_assertion")).isEqualTo(mockedToken);
+        assertThat(form.get("client_assertion_type")).isEqualTo("urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+        assertThat(form.get("client_id")).isEqualTo(mockedClientId);
+        assertThat(form.get("grant_type")).isEqualTo("client_credentials");
+        assertThat(form.get("scope")).isEqualTo("https://ossrdbms-aad.database.windows.net/.default");
     }
 }
