@@ -72,11 +72,11 @@ public class AzureAuthProvider implements CloudAuthProvider {
     }
 
     HTTPRequest exchangeRequest() {
-        String azureAuthorityHost = getEnv(AZURE_AUTHORITY_HOST);
-        String azureClientId = getEnv(AZURE_CLIENT_ID);
-        String azureTenantId = getEnv(AZURE_TENANT_ID);
+        String azureAuthorityHost = env(AZURE_AUTHORITY_HOST);
+        String azureClientId = env(AZURE_CLIENT_ID);
+        String azureTenantId = env(AZURE_TENANT_ID);
         String azureAuthorityURL = Strings.format("{}{}/oauth2/v2.0/token", azureAuthorityHost, azureTenantId);
-        String azureFederatedTokenFilePath = getEnv(AZURE_FEDERATED_TOKEN_FILE);
+        String azureFederatedTokenFilePath = env(AZURE_FEDERATED_TOKEN_FILE);
 
         String scope = OSS_RDBMS_SCOPE_MAP.get(azureAuthorityHost);
         String federatedToken = azureFederatedToken(azureFederatedTokenFilePath);
@@ -104,7 +104,7 @@ public class AzureAuthProvider implements CloudAuthProvider {
         return Integer.parseInt(tokenJSON.substring(startIndex, endIndex));
     }
 
-    String getEnv(String name) {
+    String env(String name) {
         return System.getenv(name);
     }
 
