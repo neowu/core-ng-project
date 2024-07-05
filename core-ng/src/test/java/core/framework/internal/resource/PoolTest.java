@@ -112,7 +112,7 @@ class PoolTest {
     @Test
     void borrowWithTimeout() {
         pool.size(0, 0);
-        PoolException exception = catchThrowableOfType(pool::borrowItem, PoolException.class);
+        PoolException exception = catchThrowableOfType(PoolException.class, pool::borrowItem);
         assertThat(exception.errorCode()).isEqualTo("POOL_TIME_OUT");
     }
 
