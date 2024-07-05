@@ -1,4 +1,3 @@
-version: "3"
 services:
   roach1:
     image: cockroachdb/cockroach:v22.1.7
