@@ -20,3 +20,4 @@
   > The use of VALUES() to refer to the new row and columns is deprecated beginning with MySQL 8.0.20, and is subject to removal in a future version of MySQL.
 
 * sse/ws kibana dashboard review
+* support sse with POST?

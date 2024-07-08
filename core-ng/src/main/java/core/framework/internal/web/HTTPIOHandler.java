@@ -79,7 +79,7 @@ public class HTTPIOHandler implements HttpHandler {
         if (active) {
             exchange.dispatch(handler);
         } else if (sse) {
-            sseHandler.handle(exchange);
+            sseHandler.handleRequest(exchange); // not dispatch, continue in io thread
         } else {
             exchange.dispatch(webSocketHandler);
         }

@@ -10,6 +10,7 @@ import core.framework.internal.web.session.SessionManager;
 import core.framework.module.ServerSentEventConfig;
 import core.framework.web.exception.NotFoundException;
 import core.framework.web.sse.ChannelListener;
+import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
@@ -21,11 +22,10 @@ import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
 import org.xnio.channels.StreamSinkChannel;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServerSentEventHandler {
+public class ServerSentEventHandler implements HttpHandler {
     private static final HttpString LAST_EVENT_ID = new HttpString("Last-Event-ID");
     private final Logger logger = LoggerFactory.getLogger(ServerSentEventHandler.class);
     private final LogManager logManager;
@@ -43,7 +43,8 @@ public class ServerSentEventHandler {
         return Methods.GET.equals(method) && "text/event-stream".equals(headers.getFirst(Headers.ACCEPT));
     }
 
-    public void handle(HttpServerExchange exchange) throws IOException {
+    @Override
+    public void handleRequest(HttpServerExchange exchange) throws Exception {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/event-stream; charset=UTF-8");
         exchange.setPersistent(false);
         StreamSinkChannel sink = exchange.getResponseChannel();
@@ -79,7 +80,7 @@ public class ServerSentEventHandler {
             if (support == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
 
             actionLog.action("sse:" + path + ":open");
-            handlerContext.rateControl.validateRate(ServerSentEventConfig.SSE_CONNECT_GROUP, request.clientIP());
+            handlerContext.rateControl.validateRate(ServerSentEventConfig.SSE_OPEN_GROUP, request.clientIP());
 
             var channel = new ChannelImpl<>(exchange, sink, support.context, support.builder, actionLog.id);
             actionLog.context("channel", channel.id);

@@ -53,6 +53,6 @@ class ServerSentEventConfigTest {
     @Test
     void validate() {
         config.validate();
-        assertThat(config.context.httpServer.handlerContext.rateControl.hasGroup(ServerSentEventConfig.SSE_CONNECT_GROUP)).isTrue();
+        assertThat(config.context.httpServer.handlerContext.rateControl.hasGroup(ServerSentEventConfig.SSE_OPEN_GROUP)).isTrue();
     }
 }

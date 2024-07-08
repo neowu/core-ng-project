@@ -59,7 +59,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("sse", elapsed, 0, message.length());
-            LOGGER.debug("send sse, channel={}, message={}, elapsed={}", this.id, message, elapsed); // message is not in json format, not masked, assume sse won't send any sensitive data
+            LOGGER.debug("send sse data, channel={}, message={}, elapsed={}", this.id, message, elapsed); // message is not in json format, not masked, assume sse won't send any sensitive data
         }
     }
 
@@ -78,6 +78,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
 
     @Override
     public void close() {
+        LOGGER.debug("close sse connection, channel={}", id);
         try {
             lock.lock();
             if (closed) return;
