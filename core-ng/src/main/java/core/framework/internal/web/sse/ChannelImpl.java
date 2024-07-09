@@ -52,23 +52,23 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
 
     @Override
     public void send(String id, T event) {
-        var watch = new StopWatch();
-        String message = builder.build(id, event);
-        try {
-            send(message);
-        } finally {
-            long elapsed = watch.elapsed();
-            ActionLogContext.track("sse", elapsed, 0, message.length());
-            LOGGER.debug("send sse data, channel={}, message={}, elapsed={}", this.id, message, elapsed); // message is not in json format, not masked, assume sse won't send any sensitive data
-        }
+        String data = builder.build(id, event);
+        send(data);
     }
 
     void send(String data) {
         if (closed) return;
 
-        queue.add(Strings.bytes(data));
-        lastSentTime = System.nanoTime();
-        exchange.getIoThread().execute(() -> writeListener.handleEvent(sink));
+        var watch = new StopWatch();
+        try {
+            queue.add(Strings.bytes(data));
+            lastSentTime = System.nanoTime();
+            exchange.getIoThread().execute(() -> writeListener.handleEvent(sink));
+        } finally {
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("sse", elapsed, 0, data.length());
+            LOGGER.debug("send sse data, channel={}, data={}, elapsed={}", id, data, elapsed); // message is not in json format, not masked, assume sse won't send any sensitive data
+        }
     }
 
     @Override

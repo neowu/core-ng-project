@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.1.0-b1 (6/12/2024 - )
+### 9.1.0 (6/12/2024 - 7/9/2024)
 
 * jre: published neowu/jre:21.0.3
 * mysql: updated and patched to 8.4.0-r4
