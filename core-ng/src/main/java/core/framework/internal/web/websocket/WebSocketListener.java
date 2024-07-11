@@ -19,7 +19,6 @@ import org.xnio.ChannelListener;
 import org.xnio.IoUtils;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.List;
 
 /**
@@ -31,7 +30,6 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
 
     private final LogManager logManager;
     private final RateControl rateControl;
-    private final long maxProcessTimeInNano = Duration.ofSeconds(300).toNanos();    // generally we set 300s on LB for websocket timeout
 
     CloseListener closeListener = new CloseListener();
 
@@ -136,7 +134,7 @@ final class WebSocketListener implements ChannelListener<WebSocketChannel> {
     }
 
     private void linkContext(WebSocketChannel channel, ChannelImpl<?, ?> wrapper, ActionLog actionLog) {
-        actionLog.warningContext.maxProcessTimeInNano(maxProcessTimeInNano);
+        actionLog.warningContext.maxProcessTimeInNano(WebSocketHandler.MAX_PROCESS_TIME_IN_NANO);
         actionLog.trace = wrapper.trace;
         actionLog.context("channel", wrapper.id);
         logger.debug("refId={}", wrapper.refId);

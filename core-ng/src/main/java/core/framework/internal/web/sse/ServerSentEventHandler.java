@@ -22,10 +22,13 @@ import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
 import org.xnio.channels.StreamSinkChannel;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ServerSentEventHandler implements HttpHandler {
+    static final long MAX_PROCESS_TIME_IN_NANO = Duration.ofSeconds(300).toNanos();    // persistent connection, use longer max process time, and background task keeps pinging the connection
+
     private static final HttpString LAST_EVENT_ID = new HttpString("Last-Event-ID");
     private final Logger logger = LoggerFactory.getLogger(ServerSentEventHandler.class);
     private final LogManager logManager;
@@ -74,6 +77,7 @@ public class ServerSentEventHandler implements HttpHandler {
             handlerContext.requestParser.parse(request, exchange, actionLog);
             if (handlerContext.accessControl != null) handlerContext.accessControl.validate(request.clientIP());  // check ip before checking routing, return 403 asap
 
+            actionLog.warningContext.maxProcessTimeInNano(MAX_PROCESS_TIME_IN_NANO);
             String path = request.path();
             @SuppressWarnings("unchecked")
             ChannelSupport<Object> support = (ChannelSupport<Object>) supports.get(path);

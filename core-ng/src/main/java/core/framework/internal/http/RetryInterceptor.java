@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLException;
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 
@@ -100,6 +101,7 @@ public class RetryInterceptor implements Interceptor {
 
         // should not retry on connection reset, the request could be sent already, and server side may continue to complete it
         if (e instanceof SSLException && "Connection reset".equals(e.getMessage())) return false;
+        if (e instanceof SocketException && "Connection reset".equals(e.getMessage())) return false;
         if (e instanceof StreamResetException exception && exception.errorCode == ErrorCode.CANCEL) return false;
 
         // okHTTP uses both socket timeout and AsyncTimeout, it closes socket/connection when timeout is detected by background thread, so no need to close exchange

@@ -1,5 +1,9 @@
 ## Change log
 
+### 9.1.1 (7/11/2024 - )
+
+* ws/sse: updated max process time
+
 ### 9.1.0 (6/12/2024 - 7/9/2024)
 
 * jre: published neowu/jre:21.0.3

@@ -1,6 +1,6 @@
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.1
     ports:
     - 9200:9200
     environment:
@@ -11,7 +11,7 @@ services:
     - xpack.ml.enabled=false
     - ingest.geoip.downloader.enabled=false
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.14.0
+    image: docker.elastic.co/kibana/kibana:8.14.1
     ports:
     - 5601:5601
     environment:
@@ -29,7 +29,7 @@ services:
     depends_on:
     - elasticsearch
   kafka:
-    image: apache/kafka:3.7.0
+    image: apache/kafka:3.7.1
     ports:
     - 9092:9092
     - 1099:1099
@@ -51,7 +51,7 @@ services:
       KAFKA_LOG_DIRS: /var/lib/kafka/data/kafka
       KAFKA_GC_LOG_OPTS: " "
   log-processor:
-    image: neowu/log-processor:9.0.10
+    image: neowu/log-processor:9.1.0
     environment:
     - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092
@@ -63,7 +63,7 @@ services:
     - elasticsearch
     - kibana
   log-collector:
-    image: neowu/log-collector:9.0.10
+    image: neowu/log-collector:9.1.0
     environment:
     - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092

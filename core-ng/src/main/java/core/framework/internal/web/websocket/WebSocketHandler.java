@@ -26,6 +26,7 @@ import io.undertow.websockets.spi.AsyncWebSocketHttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,7 @@ import static core.framework.util.Strings.format;
  */
 public class WebSocketHandler implements HttpHandler {
     static final String CHANNEL_KEY = "CHANNEL";
+    static final long MAX_PROCESS_TIME_IN_NANO = Duration.ofSeconds(300).toNanos();    // persistent connection, use longer max process time, generally we set 300s on LB for websocket timeout
 
     // passes to AsyncWebSocketHttpServerExchange as peerConnections, channel will remove self on close
     // refer to io.undertow.websockets.core.WebSocketChannel.WebSocketChannel
@@ -78,6 +80,7 @@ public class WebSocketHandler implements HttpHandler {
             validateWebSocketHeaders(exchange.getRequestHeaders());
             if (handlerContext.accessControl != null) handlerContext.accessControl.validate(request.clientIP());
 
+            actionLog.warningContext.maxProcessTimeInNano(MAX_PROCESS_TIME_IN_NANO);
             String path = request.path();
             @SuppressWarnings("unchecked")
             ChannelSupport<Object, Object> support = (ChannelSupport<Object, Object>) supports.get(path);

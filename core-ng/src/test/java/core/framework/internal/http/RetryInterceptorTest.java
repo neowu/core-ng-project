@@ -295,10 +295,38 @@ class RetryInterceptorTest {
         at okhttp3.internal.connection.RealCall.execute(RealCall.kt:154)
         at core.framework.internal.http.HTTPClientImpl.execute(HTTPClientImpl.java:57)
     */
+    /*
+    Caused by: java.net.SocketException: Connection reset
+        at java.base/sun.nio.ch.NioSocketImpl.implRead(Unknown Source)
+        at java.base/sun.nio.ch.NioSocketImpl.read(Unknown Source)
+        at java.base/sun.nio.ch.NioSocketImpl$1.read(Unknown Source)
+        at java.base/java.net.Socket$SocketInputStream.read(Unknown Source)
+        at java.base/sun.security.ssl.SSLSocketInputRecord.read(Unknown Source)
+        at java.base/sun.security.ssl.SSLSocketInputRecord.readHeader(Unknown Source)
+        at java.base/sun.security.ssl.SSLSocketInputRecord.bytesInCompletePacket(Unknown Source)
+        at java.base/sun.security.ssl.SSLSocketImpl.readApplicationRecord(Unknown Source)
+        at java.base/sun.security.ssl.SSLSocketImpl$AppInputStream.read(Unknown Source)
+        at okio.InputStreamSource.read(JvmOkio.kt:94)
+        at okio.AsyncTimeout$source$1.read(AsyncTimeout.kt:125)
+        at okio.RealBufferedSource.request(RealBufferedSource.kt:206)
+        at okio.RealBufferedSource.require(RealBufferedSource.kt:199)
+        at okhttp3.internal.http2.Http2Reader.nextFrame(Http2Reader.kt:89)
+        at okhttp3.internal.http2.Http2Connection$ReaderRunnable.invoke(Http2Connection.kt:618)
+        at okhttp3.internal.http2.Http2Connection$ReaderRunnable.invoke(Http2Connection.kt:609)
+        at okhttp3.internal.concurrent.TaskQueue$execute$1.runOnce(TaskQueue.kt:98)
+        at okhttp3.internal.concurrent.TaskRunner.runTask(TaskRunner.kt:116)
+        at okhttp3.internal.concurrent.TaskRunner.access$runTask(TaskRunner.kt:42)
+        at okhttp3.internal.concurrent.TaskRunner$runnable$1.run(TaskRunner.kt:65)
+        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+        at java.base/java.lang.Thread.run(Unknown Source)
+    */
     @Test
     void shouldRetryWithConnectionReset() {
         assertThat(interceptor.shouldRetry(false, "GET", 1, new SSLException("Connection reset"))).isTrue();
+        assertThat(interceptor.shouldRetry(false, "GET", 1, new SocketException("Connection reset"))).isTrue();
         assertThat(interceptor.shouldRetry(false, "POST", 1, new SSLException("Connection reset"))).isFalse();
+        assertThat(interceptor.shouldRetry(false, "POST", 1, new SocketException("Connection reset"))).isFalse();
 
         assertThat(interceptor.shouldRetry(false, "POST", 1, new StreamResetException(ErrorCode.CANCEL))).isFalse();
     }
