@@ -134,10 +134,9 @@ class HTTPClientImplTest {
             .header("content-type", "text/event-stream")
             .body(ResponseBody.create(Strings.bytes("""
                 retry: 10000
-                                
+
                 id: 1
-                data: test
-                """), MediaType.get("text/event-stream")))
+                data: test"""), MediaType.get("text/event-stream")))
             .build();
         Call call = mock(Call.class);
         when(okHttpClient.newCall(any())).thenReturn(call);
