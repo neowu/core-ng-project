@@ -1,6 +1,7 @@
 package core.framework.internal.http;
 
 import core.framework.http.ContentType;
+import core.framework.http.EventSource;
 import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPHeaders;
 import core.framework.http.HTTPMethod;
@@ -61,17 +62,17 @@ class HTTPClientImplTest {
     @Test
     void httpRequestWithInvalidURL() {
         assertThatThrownBy(() -> httpClient.httpRequest(new HTTPRequest(HTTPMethod.HEAD, "//%%")))
-                .isInstanceOf(HTTPClientException.class)
-                .hasMessageContaining("uri is invalid");
+            .isInstanceOf(HTTPClientException.class)
+            .hasMessageContaining("uri is invalid");
     }
 
     @Test
     void response() throws IOException {
         Response httpResponse = new Response.Builder().request(new Request.Builder().url("http://localhost/uri").build())
-                .protocol(Protocol.HTTP_1_1).code(200).message("")
-                .header("content-type", "text/html")
-                .body(ResponseBody.create(Strings.bytes("<html/>"), MediaType.get("text/html")))
-                .build();
+            .protocol(Protocol.HTTP_1_1).code(200).message("")
+            .header("content-type", "text/html")
+            .body(ResponseBody.create(Strings.bytes("<html/>"), MediaType.get("text/html")))
+            .build();
 
         HTTPResponse response = httpClient.response(httpResponse);
         assertThat(response.statusCode).isEqualTo(200);
@@ -83,8 +84,8 @@ class HTTPClientImplTest {
     @Test
     void responseWith204() throws IOException {
         Response httpResponse = new Response.Builder().request(new Request.Builder().url("http://localhost/uri").build())
-                .protocol(Protocol.HTTP_2).code(204).message("")
-                .build();
+            .protocol(Protocol.HTTP_2).code(204).message("")
+            .build();
 
         HTTPResponse response = httpClient.response(httpResponse);
         assertThat(response.statusCode).isEqualTo(204);
@@ -96,10 +97,10 @@ class HTTPClientImplTest {
         assertThat(httpClient.mediaType(null)).isNull();
 
         assertThat(httpClient.mediaType(ContentType.APPLICATION_JSON))
-                .isSameAs(httpClient.mediaType(ContentType.APPLICATION_JSON));
+            .isSameAs(httpClient.mediaType(ContentType.APPLICATION_JSON));
 
         assertThat(httpClient.mediaType(ContentType.APPLICATION_FORM_URLENCODED).toString())
-                .isEqualTo(ContentType.APPLICATION_FORM_URLENCODED.mediaType);
+            .isEqualTo(ContentType.APPLICATION_FORM_URLENCODED.mediaType);
     }
 
     @Test
@@ -114,15 +115,40 @@ class HTTPClientImplTest {
     @Test
     void execute() throws IOException {
         Response httpResponse = new Response.Builder().request(new Request.Builder().url("http://localhost/uri").build())
-                .protocol(Protocol.HTTP_1_1).code(200).message("OK")
-                .header("content-type", "text/html")
-                .body(ResponseBody.create(Strings.bytes("<html/>"), MediaType.get("text/html")))
-                .build();
+            .protocol(Protocol.HTTP_1_1).code(200).message("OK")
+            .header("content-type", "text/html")
+            .body(ResponseBody.create(Strings.bytes("<html/>"), MediaType.get("text/html")))
+            .build();
         Call call = mock(Call.class);
         when(okHttpClient.newCall(any())).thenReturn(call);
         when(call.execute()).thenReturn(httpResponse);
 
         HTTPResponse response = httpClient.execute(new HTTPRequest(HTTPMethod.GET, "http://localhost/uri"));
         assertThat(response.statusCode).isEqualTo(200);
+    }
+
+    @Test
+    void sse() throws IOException {
+        Response httpResponse = new Response.Builder().request(new Request.Builder().url("http://localhost/sse").build())
+            .protocol(Protocol.HTTP_1_1).code(200).message("OK")
+            .header("content-type", "text/event-stream")
+            .body(ResponseBody.create(Strings.bytes("""
+                retry: 10000
+                                
+                id: 1
+                data: test
+                """), MediaType.get("text/event-stream")))
+            .build();
+        Call call = mock(Call.class);
+        when(okHttpClient.newCall(any())).thenReturn(call);
+        when(call.execute()).thenReturn(httpResponse);
+
+        try (EventSource response = httpClient.sse(new HTTPRequest(HTTPMethod.GET, "http://localhost/uri"))) {
+            assertThat(response.statusCode).isEqualTo(200);
+            for (EventSource.Event event : response) {
+                assertThat(event.id()).isEqualTo("1");
+                assertThat(event.data()).isEqualTo("test");
+            }
+        }
     }
 }

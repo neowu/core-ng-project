@@ -9,4 +9,6 @@ public interface HTTPClient {
     }
 
     HTTPResponse execute(HTTPRequest request);
+
+    EventSource sse(HTTPRequest request);
 }

@@ -1,6 +1,7 @@
 package core.framework.internal.http;
 
 import core.framework.http.ContentType;
+import core.framework.http.EventSource;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPHeaders;
@@ -70,21 +71,34 @@ public final class HTTPClientImpl implements HTTPClient {
         }
     }
 
-    long slowOperationThresholdInNanos(HTTPRequest request) {
-        if (request.slowOperationThreshold != null) return request.slowOperationThreshold.toNanos();
-        return slowOperationThresholdInNanos;
+    @Override
+    public EventSource sse(HTTPRequest request) {
+        var watch = new StopWatch();
+        request.headers.put(HTTPHeaders.ACCEPT, "text/event-stream");
+        int requestBodyLength = request.body == null ? 0 : request.body.length;
+        Request httpRequest = httpRequest(request);
+        try {
+            Response httpResponse = client.newCall(httpRequest).execute();
+            int statusCode = httpResponse.code();
+            logger.debug("[response] status={}", statusCode);
+            Map<String, String> headers = headers(httpResponse);
+            return new EventSource(statusCode, headers, httpResponse.body(), requestBodyLength, watch.elapsed());
+        } catch (IOException e) {
+            throw new HTTPClientException(Strings.format("http request failed, uri={}, error={}", request.uri, e.getMessage()), "HTTP_REQUEST_FAILED", e);
+        } finally {
+            long elapsed = watch.elapsed();
+            logger.debug("sse, elapsed={}", elapsed);
+            if (elapsed > slowOperationThresholdInNanos(request)) {
+                logger.warn(errorCode("SLOW_HTTP"), "slow http operation, method={}, uri={}, elapsed={}", request.method, request.uri, Duration.ofNanos(elapsed));
+            }
+        }
     }
 
     HTTPResponse response(Response httpResponse) throws IOException {
         int statusCode = httpResponse.code();
         logger.debug("[response] status={}", statusCode);
 
-        Map<String, String> headers = new TreeMap<>(CASE_INSENSITIVE_ORDER);
-        Headers httpHeaders = httpResponse.headers();
-        for (int i = 0; i < httpHeaders.size(); i++) {
-            headers.put(httpHeaders.name(i), httpHeaders.value(i));
-        }
-        logger.debug("[response] headers={}", new FieldMapLogParam(headers));
+        Map<String, String> headers = headers(httpResponse);
 
         byte[] body;
         if (statusCode == 204) {
@@ -141,6 +155,21 @@ public final class HTTPClientImpl implements HTTPClient {
         }
 
         return builder.build();
+    }
+
+    private Map<String, String> headers(Response httpResponse) {
+        Map<String, String> headers = new TreeMap<>(CASE_INSENSITIVE_ORDER);
+        Headers httpHeaders = httpResponse.headers();
+        for (int i = 0; i < httpHeaders.size(); i++) {
+            headers.put(httpHeaders.name(i), httpHeaders.value(i));
+        }
+        logger.debug("[response] headers={}", new FieldMapLogParam(headers));
+        return headers;
+    }
+
+    long slowOperationThresholdInNanos(HTTPRequest request) {
+        if (request.slowOperationThreshold != null) return request.slowOperationThreshold.toNanos();
+        return slowOperationThresholdInNanos;
     }
 
     @Nullable

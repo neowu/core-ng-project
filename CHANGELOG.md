@@ -1,9 +1,20 @@
 ## Change log
 
-### 9.1.1 (7/11/2024 - )
+### 9.1.1-b1 (7/11/2024 - )
 
 * ws/sse: updated max process time
 * kafka: update to 3.8.0
+* http_client: preliminary support for sse
+  > example usage:
+
+```
+var request = new HTTPRequest(HTTPMethod.GET, "https://localhost:8443/sse");
+try (EventSource source = client.sse(request)) {
+    for (EventSource.Event event : source) {
+        System.out.println(event.id() + " " + event.data());
+    }
+}
+```
 
 ### 9.1.0 (6/12/2024 - 7/9/2024)
 

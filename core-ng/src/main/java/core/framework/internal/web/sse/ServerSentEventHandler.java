@@ -92,7 +92,7 @@ public class ServerSentEventHandler implements HttpHandler {
             support.context.add(channel);
             exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support.context));
 
-            channel.send("retry:15000\n\n");    // set browser retry to 15s
+            channel.send("retry: 15000\n\n");    // set browser retry to 15s
 
             request.session = ReadOnlySession.of(sessionManager.load(request, actionLog));
             String lastEventId = exchange.getRequestHeaders().getLast(LAST_EVENT_ID);

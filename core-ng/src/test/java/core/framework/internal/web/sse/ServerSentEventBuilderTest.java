@@ -16,9 +16,9 @@ class ServerSentEventBuilderTest {
     @Test
     void build() {
         assertThat(builder.build("001", "message"))
-            .asString().isEqualTo("id:001\ndata:message\n\n");
+            .asString().isEqualTo("id: 001\ndata: message\n\n");
 
         assertThat(builder.build(null, "message"))
-            .asString().isEqualTo("data:message\n\n");
+            .asString().isEqualTo("data: message\n\n");
     }
 }
