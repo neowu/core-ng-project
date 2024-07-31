@@ -47,7 +47,7 @@ subprojects {
     pmd {
         ruleSets = listOf()
         ruleSetFiles = rootProject.files("buildSrc/src/main/check/pmd.xml")
-        toolVersion = "7.3.0"
+        toolVersion = "7.4.0"
         isConsoleOutput = true
 
         tasks.withType<Pmd> {
