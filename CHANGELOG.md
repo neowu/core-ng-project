@@ -4,7 +4,7 @@
 
 * ws/sse: updated max process time
 * kafka: update to 3.8.0
-* http_client: preliminary support for sse
+* http_client: preliminary sse support
   > example usage:
 
 ```

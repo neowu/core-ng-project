@@ -42,7 +42,8 @@ public class HTTPIOHandler implements HttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        if (HEALTH_CHECK_PATH.equals(exchange.getRequestPath())) {      // not treat health-check as action
+        String path = exchange.getRequestPath();
+        if (HEALTH_CHECK_PATH.equals(path)) {      // not treat health-check as action
             handler.addKeepAliveHeader(exchange);
             exchange.endExchange(); // end exchange will send 200 / content-length=0
             return;
@@ -53,7 +54,7 @@ public class HTTPIOHandler implements HttpHandler {
 
         HttpString method = exchange.getRequestMethod();
         HeaderMap headers = exchange.getRequestHeaders();
-        boolean sse = sseHandler != null && sseHandler.check(method, headers);
+        boolean sse = sseHandler != null && sseHandler.check(method, headers, path);
         boolean ws = webSocketHandler != null && webSocketHandler.check(method, headers);
         boolean active = !sse && !ws;
         boolean shutdown = shutdownHandler.handle(exchange, active);

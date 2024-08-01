@@ -38,6 +38,7 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
 
     @Override
     public void close() {
+        LOGGER.debug("[sse] close sse connection");
         ActionLogContext.track("sse", elapsed, responseBodyLength, requestBodyLength);
         body.close();
     }

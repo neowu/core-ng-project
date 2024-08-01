@@ -8,7 +8,6 @@ import core.framework.internal.web.request.RequestImpl;
 import core.framework.internal.web.session.ReadOnlySession;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.module.ServerSentEventConfig;
-import core.framework.web.exception.NotFoundException;
 import core.framework.web.sse.ChannelListener;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -42,13 +41,13 @@ public class ServerSentEventHandler implements HttpHandler {
         this.handlerContext = handlerContext;
     }
 
-    public boolean check(HttpString method, HeaderMap headers) {
-        return Methods.GET.equals(method) && "text/event-stream".equals(headers.getFirst(Headers.ACCEPT));
+    public boolean check(HttpString method, HeaderMap headers, String path) {
+        return Methods.GET.equals(method) && "text/event-stream".equals(headers.getFirst(Headers.ACCEPT)) && supports.containsKey(path);
     }
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/event-stream; charset=UTF-8");
+        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/event-stream");
         exchange.setPersistent(false);
         StreamSinkChannel sink = exchange.getResponseChannel();
         if (sink.flush()) {
@@ -64,7 +63,6 @@ public class ServerSentEventHandler implements HttpHandler {
         }
     }
 
-    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     void handle(HttpServerExchange exchange, StreamSinkChannel sink) {
         VirtualThread.COUNT.increase();
         long httpDelay = System.nanoTime() - exchange.getRequestStartTime();
@@ -80,9 +78,7 @@ public class ServerSentEventHandler implements HttpHandler {
             actionLog.warningContext.maxProcessTimeInNano(MAX_PROCESS_TIME_IN_NANO);
             String path = request.path();
             @SuppressWarnings("unchecked")
-            ChannelSupport<Object> support = (ChannelSupport<Object>) supports.get(path);
-            if (support == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
-
+            ChannelSupport<Object> support = (ChannelSupport<Object>) supports.get(path);   // ServerSentEventHandler.check() ensures path exists
             actionLog.action("sse:" + path + ":open");
             handlerContext.rateControl.validateRate(ServerSentEventConfig.SSE_OPEN_GROUP, request.clientIP());
 

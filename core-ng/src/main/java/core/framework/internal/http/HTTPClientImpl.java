@@ -82,9 +82,15 @@ public final class HTTPClientImpl implements HTTPClient {
             int statusCode = httpResponse.code();
             logger.debug("[response] status={}", statusCode);
             Map<String, String> headers = headers(httpResponse);
+            String contentType = headers.get(HTTPHeaders.CONTENT_TYPE);
+            if (statusCode != 200 || !"text/event-stream".equals(contentType)) {
+                byte[] body = body(httpResponse, statusCode);
+                logger.debug("[response] body={}", BodyLogParam.of(body, contentType == null ? null : ContentType.parse(contentType)));
+                throw new HTTPClientException(Strings.format("invalid sse response, statusCode={}, content-type={}", statusCode, contentType), "HTTP_REQUEST_FAILED");
+            }
             return new EventSource(statusCode, headers, httpResponse.body(), requestBodyLength, watch.elapsed());
         } catch (IOException e) {
-            throw new HTTPClientException(Strings.format("http request failed, uri={}, error={}", request.uri, e.getMessage()), "HTTP_REQUEST_FAILED", e);
+            throw new HTTPClientException(Strings.format("sse request failed, uri={}, error={}", request.uri, e.getMessage()), "HTTP_REQUEST_FAILED", e);
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("sse, elapsed={}", elapsed);
@@ -97,19 +103,8 @@ public final class HTTPClientImpl implements HTTPClient {
     HTTPResponse response(Response httpResponse) throws IOException {
         int statusCode = httpResponse.code();
         logger.debug("[response] status={}", statusCode);
-
         Map<String, String> headers = headers(httpResponse);
-
-        byte[] body;
-        if (statusCode == 204) {
-            // refer to https://tools.ietf.org/html/rfc7230#section-3.3.2, with 204, server won't send body and content-length, hence no need to read it, and body will be quietly closed by response.close()
-            body = new byte[0];
-        } else {
-            ResponseBody responseBody = httpResponse.body();
-            if (responseBody == null) throw new Error("unexpected response body"); // refer to okhttp3.Response.body(), call.execute always return non-null body except for cachedResponse/networkResponse
-            body = responseBody.bytes();
-        }
-
+        byte[] body = body(httpResponse, statusCode);
         var response = new HTTPResponse(statusCode, headers, body);
         logger.debug("[response] body={}", BodyLogParam.of(body, response.contentType));
         return response;
@@ -155,6 +150,19 @@ public final class HTTPClientImpl implements HTTPClient {
         }
 
         return builder.build();
+    }
+
+    private byte[] body(Response httpResponse, int statusCode) throws IOException {
+        byte[] body;
+        if (statusCode == 204) {
+            // refer to https://tools.ietf.org/html/rfc7230#section-3.3.2, with 204, server won't send body and content-length, hence no need to read it, and body will be quietly closed by response.close()
+            body = new byte[0];
+        } else {
+            ResponseBody responseBody = httpResponse.body();
+            if (responseBody == null) throw new Error("unexpected response body"); // refer to okhttp3.Response.body(), call.execute always return non-null body except for cachedResponse/networkResponse
+            body = responseBody.bytes();
+        }
+        return body;
     }
 
     private Map<String, String> headers(Response httpResponse) {
