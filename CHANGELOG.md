@@ -16,6 +16,8 @@ try (EventSource source = client.sse(request)) {
 }
 ```
 
+* uuid: added uuid v7, can be used as db friendly primary key
+
 ### 9.1.0 (6/12/2024 - 7/9/2024)
 
 * jre: published neowu/jre:21.0.3
