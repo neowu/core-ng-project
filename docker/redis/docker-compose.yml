@@ -1,10 +1,10 @@
 services:
   redis-1:
-    image: redis
+    image: redis:7.4
     ports:
     - 6379
   redis-2:
-    image: redis
+    image: redis:7.4
     ports:
     - 6379
 #  envoy:

@@ -76,8 +76,8 @@ public class LogProcessorApp extends App {
     private void configureKafka(Forwarders forwarders) {
         kafka().uri(requiredProperty("sys.kafka.uri"));
         kafka().concurrency(2);
-        kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get at least 1M message
-        kafka().maxPoll(2000, 3 * 1024 * 1024);     // get 3M message at max
+        kafka().minPoll(1024 * 1024, Duration.ofMillis(500));          // try to get at least 1M message
+        kafka().maxPoll(3000, 3 * 1024 * 1024);         // get 3M message at max
 
         kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(new ActionLogMessageHandler(forwarders.action)));
         kafka().subscribe(LogTopics.TOPIC_STAT, StatMessage.class, bind(StatMessageHandler.class));

@@ -1,7 +1,7 @@
 services:
   mongo:
-    image: mongo:6
-    command: [ "--dbpath", "/data/db", "--enableFreeMonitoring", "off", "--timeStampFormat", "iso8601-utc" ]
+    image: mongo:7
+    command: [ "--dbpath", "/data/db", "--timeStampFormat", "iso8601-utc" ]
     ports:
     - "27017:27017"
 
