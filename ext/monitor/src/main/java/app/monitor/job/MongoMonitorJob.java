@@ -41,7 +41,7 @@ public class MongoMonitorJob implements Job {
     }
 
     Stats collect() {
-        int objects = 0;
+        long objects = 0;
         double totalSize = 0;
         double diskUsed = 0;
         double diskMax = 0;
@@ -50,7 +50,8 @@ public class MongoMonitorJob implements Job {
         for (String db : dbs) {
             // e.g. Document{{db=admin, collections=1, views=0, objects=1, avgObjSize=59.0, dataSize=59.0, storageSize=20480.0, indexes=1, indexSize=20480.0, totalSize=40960.0, scaleFactor=1.0, fsUsedSize=1.05404416E9, fsTotalSize=5.2521566208E10, ok=1.0}}
             Document result = dbStats(db);
-            objects += result.getInteger("objects");
+            // mongo 6 returns Integer, while mongo 7 returns Long
+            objects += result.get("objects", Number.class).longValue();
             totalSize += result.getDouble("totalSize");
             if (diskUsed == 0) diskUsed = result.getDouble("fsUsedSize");
             if (diskMax == 0) diskMax = result.getDouble("fsTotalSize");

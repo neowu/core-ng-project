@@ -7,7 +7,7 @@ apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
-    version = "9.1.1-b1"
+    version = "9.1.1"
 }
 
 val elasticVersion = "8.14.0"
@@ -64,7 +64,7 @@ project("core-ng-mongo") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng"))
-        api("org.mongodb:mongodb-driver-sync:5.1.0")
+        api("org.mongodb:mongodb-driver-sync:5.1.2")
         testImplementation(project(":core-ng-test"))
     }
 }

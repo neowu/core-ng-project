@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.1.1-b1 (7/11/2024 - )
+### 9.1.1 (7/11/2024 - 8/7/2024)
 
 * ws/sse: updated max process time
 * kafka: update to 3.8.0
@@ -15,6 +15,8 @@ try (EventSource source = client.sse(request)) {
     }
 }
 ```
+
+* monitor: fix stats type for mongo 7
 
 * uuid: added uuid v7, can be used as db friendly primary key
 

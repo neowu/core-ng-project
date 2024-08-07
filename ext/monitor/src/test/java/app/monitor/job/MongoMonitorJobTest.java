@@ -38,8 +38,8 @@ class MongoMonitorJobTest {
     @Test
     void collect() {
         doReturn(List.of("local", "admin")).when(job).listDB();
-        doReturn(new Document(Map.of("objects", 1, "totalSize", 10D, "fsUsedSize", 20D, "fsTotalSize", 50D))).when(job).dbStats("local");
-        doReturn(new Document(Map.of("objects", 5, "totalSize", 15D, "fsUsedSize", 20D, "fsTotalSize", 50D))).when(job).dbStats("admin");
+        doReturn(new Document(Map.of("objects", 1L, "totalSize", 10D, "fsUsedSize", 20D, "fsTotalSize", 50D))).when(job).dbStats("local");
+        doReturn(new Document(Map.of("objects", 5L, "totalSize", 15D, "fsUsedSize", 20D, "fsTotalSize", 50D))).when(job).dbStats("admin");
 
         Stats stats = job.collect();
         assertThat(stats.stats).containsEntry("mongo_docs", 6D);
