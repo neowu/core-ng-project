@@ -47,7 +47,7 @@ class ElasticSearchAggregationIntegrationTest extends IntegrationTest {
     void cleanup() {
         var request = new DeleteByQueryRequest();
         request.query = new Query.Builder().matchAll(b -> b).build();
-        request.refresh = true;
+        request.refresh = Boolean.TRUE;
         documentType.deleteByQuery(request);
     }
 
