@@ -1,0 +1,21 @@
+{
+  "runtime_mappings": {
+    "composited_key": {
+      "type": "keyword",
+      "script": "emit(doc['key_1'].value + '|' + doc['key_2'].value)"
+    }
+  },
+  "aggregations": {
+    "composited_key": {
+      "terms": {
+        "field": "composited_key",
+        "order": [{"total_value": "desc"}]
+      },
+      "aggregations": {
+        "total_value": {
+          "sum": {"field": "value"}
+        }
+      }
+    }
+  }
+}

@@ -15,6 +15,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author neo
  */
 public class TestSearchConfig extends SearchConfig {
+    static {
+        // org.apache.lucene.store.MemorySegmentIndexInputProvider <init>
+        // INFO: Using MemorySegmentIndexInput with Java 21 or later; to disable start with -Dorg.apache.lucene.store.MMapDirectory.enableMemorySegments=false
+        System.setProperty("org.apache.lucene.store.MMapDirectory.enableMemorySegments", "false");
+    }
+
     private static final ReentrantLock LOCK = new ReentrantLock();
 
     // only start one local node for testing to reduce resource overhead,

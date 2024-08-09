@@ -1,5 +1,10 @@
 ## Change log
 
+### 9.1.2 (8/9/2024 - )
+
+* search: loading from json into search request
+  > for complex aggregation, refer to ElasticSearchAggregationIntegrationTest.java for usage
+
 ### 9.1.1 (7/11/2024 - 8/7/2024)
 
 * ws/sse: updated max process time
@@ -17,7 +22,6 @@ try (EventSource source = client.sse(request)) {
 ```
 
 * monitor: fix stats type for mongo 7
-
 * uuid: added uuid v7, can be used as db friendly primary key
 
 ### 9.1.0 (6/12/2024 - 7/9/2024)

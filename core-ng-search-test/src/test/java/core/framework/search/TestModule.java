@@ -1,5 +1,6 @@
 package core.framework.search;
 
+import core.framework.search.impl.TestAggregationDocument;
 import core.framework.search.impl.TestDocument;
 import core.framework.search.module.InitSearchConfig;
 import core.framework.search.module.SearchConfig;
@@ -18,11 +19,13 @@ public class TestModule extends AbstractTestModule {
         search.timeout(Duration.ofSeconds(5));
         search.maxResultWindow(1000);
         search.type(TestDocument.class);
+        search.type(TestAggregationDocument.class);
 
         InitSearchConfig initSearch = config(InitSearchConfig.class);
         initSearch.putIndex("document", "search-test/document-index.json");
         initSearch.putIndexTemplate("document", "search-test/document-index-template.json");
         initSearch.flush("document");
+        initSearch.putIndex("aggregation_document", "search-test/aggregation-document-index.json");
 
         // test multiple search in one app
         search = config(SearchConfig.class, "other");

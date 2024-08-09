@@ -1,0 +1,19 @@
+{
+  "mappings": {
+    "properties": {
+      "date": {
+        "type": "date",
+        "format": "strict_date_optional_time"
+      },
+      "key_1": {
+        "type": "keyword"
+      },
+      "key_2": {
+        "type": "keyword"
+      },
+      "value": {
+        "type": "integer"
+      }
+    }
+  }
+}

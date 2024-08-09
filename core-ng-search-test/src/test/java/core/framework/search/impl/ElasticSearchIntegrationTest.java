@@ -24,8 +24,6 @@ import core.framework.util.Maps;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
@@ -34,7 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static core.framework.search.query.Aggregations.sum;
 import static core.framework.search.query.Queries.match;
 import static core.framework.search.query.Queries.range;
 import static core.framework.search.query.Queries.term;
@@ -54,10 +51,10 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @AfterEach
     void cleanup() {
-        var request = new BulkDeleteRequest();
-        request.ids = range(0, 100).mapToObj(String::valueOf).toList();
-        request.refresh = Boolean.TRUE;
-        documentType.bulkDelete(request);
+        var request = new DeleteByQueryRequest();
+        request.query = new Query.Builder().matchAll(b -> b).build();
+        request.refresh = true;
+        documentType.deleteByQuery(request);
     }
 
     @Test
@@ -253,28 +250,6 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
         updated = documentType.partialUpdate("5", document);
         assertThat(updated).isFalse();
-    }
-
-    @Test
-    void aggregate() {
-        documentType.index("1", document("1", "value1", 0, 19.13, null, null));
-        documentType.index("2", document("2", "value1", 0, 0.01, null, null));
-        documentType.index("3", document("3", "value3", 0, 1.5, null, null));
-        elasticSearch.refreshIndex("document");
-
-        var request = new SearchRequest();
-        request.skip = 0;
-        request.limit = 1;
-        request.query = new Query.Builder().match(match("string_field", "value1")).build();
-        request.aggregations.put("totalValue", sum("double_field"));
-        SearchResponse<TestDocument> response = documentType.search(request);
-
-        assertThat(response.totalHits).isEqualTo(2);
-        assertThat(response.hits).hasSize(1);
-        assertThat(response.aggregations).containsKeys("totalValue");
-
-        var sum = BigDecimal.valueOf(response.aggregations.get("totalValue").sum().value()).setScale(4, RoundingMode.HALF_UP);
-        assertThat(sum).isEqualTo("19.1400");
     }
 
     @Test

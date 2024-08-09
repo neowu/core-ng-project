@@ -84,7 +84,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         int hits = 0;
         try {
             var searchRequest = co.elastic.clients.elasticsearch.core.SearchRequest.of(builder -> {
-                builder.index(index).query(request.query).aggregations(request.aggregations).sort(request.sorts)
+                builder.index(index).query(request.query).runtimeMappings(request.runtimeFields).aggregations(request.aggregations).sort(request.sorts)
                     .searchType(request.type)
                     .from(request.skip)
                     .size(request.limit)

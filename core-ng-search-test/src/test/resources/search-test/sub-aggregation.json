@@ -1,0 +1,23 @@
+{
+  "aggregations": {
+    "date": {
+      "date_histogram": {
+        "field": "date",
+        "calendar_interval": "day"
+      },
+      "aggregations": {
+        "key_1": {
+          "terms": {
+            "field": "key_1",
+            "order": [{"total_value": "desc"}]
+          },
+          "aggregations": {
+            "total_value": {
+              "sum": {"field": "value"}
+            }
+          }
+        }
+      }
+    }
+  }
+}
