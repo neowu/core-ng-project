@@ -56,7 +56,7 @@ public class DiagramService {
         request.query = new Query.Builder().ids(ids(List.of(id))).build();
         List<ActionDocument> documents = actionType.search(request).hits;
         if (documents.isEmpty()) throw new NotFoundException("action not found, id=" + id);
-        return documents.get(0);
+        return documents.getFirst();
     }
 
     private List<ActionDocument> findActionByCorrelationIds(List<String> correlationIds) {

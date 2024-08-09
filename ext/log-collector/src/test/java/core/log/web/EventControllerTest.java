@@ -152,7 +152,7 @@ class EventControllerTest extends IntegrationTest {
         when(request.cookie(new CookieSpec("visitor_id"))).thenReturn(Optional.of("value"));
         cookies = controller.cookies(request);
         assertThat(cookies).hasSize(1);
-        Cookie cookie = cookies.get(0);
+        Cookie cookie = cookies.getFirst();
         assertThat(cookie.name).isEqualTo("visitor_id");
         assertThat(cookie.value).isEqualTo("value");
     }

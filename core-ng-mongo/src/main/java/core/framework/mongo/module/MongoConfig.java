@@ -59,7 +59,7 @@ public class MongoConfig extends Config {
         if (!connectionString.isSrvProtocol()) {
             // mongodb+srv protocol is generally used by Mongo Atlas, as DNS seed list
             // readiness probe is mainly used by self-hosting mongo within kube, no need to check dns with srv
-            probe.hostURIs.add(connectionString.getHosts().get(0));
+            probe.hostURIs.add(connectionString.getHosts().getFirst());
         }
     }
 

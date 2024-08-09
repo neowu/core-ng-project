@@ -88,7 +88,7 @@ class CacheImplTest {
         assertThat(results.get("key2").stringField).isEqualTo("v2");
         assertThat(results.get("key3").stringField).isEqualTo("v3");
 
-        verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && "v2".equals(argument.get(0).value().stringField)), eq(Duration.ofHours(1)), eq(cache.context));
+        verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && "v2".equals(argument.getFirst().value().stringField)), eq(Duration.ofHours(1)), eq(cache.context));
     }
 
     @Test

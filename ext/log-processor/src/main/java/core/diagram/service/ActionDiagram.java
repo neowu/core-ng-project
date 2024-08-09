@@ -130,18 +130,18 @@ public class ActionDiagram {
     }
 
     private void buildActionInfo(CodeBuilder builder, List<ActionDocument> actions) {
-        ActionDocument firstAction = actions.get(0);
+        ActionDocument firstAction = actions.getFirst();
         List<String> controller = firstAction.context.get("controller");
         if (controller != null) {
-            builder.append("<tr><td>controller</td><td>{}</td></tr>\n", controller.get(0));
+            builder.append("<tr><td>controller</td><td>{}</td></tr>\n", controller.getFirst());
         }
         List<String> jobClass = firstAction.context.get("job_class");
         if (jobClass != null) {
-            builder.append("<tr><td>job class</td><td>{}</td></tr>\n", jobClass.get(0));
+            builder.append("<tr><td>job class</td><td>{}</td></tr>\n", jobClass.getFirst());
         }
         List<String> handler = firstAction.context.get("handler");
         if (handler != null) {
-            builder.append("<tr><td>handler</td><td>{}</td></tr>\n", handler.get(0));
+            builder.append("<tr><td>handler</td><td>{}</td></tr>\n", handler.getFirst());
         }
     }
 

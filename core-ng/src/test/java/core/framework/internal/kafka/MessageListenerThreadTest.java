@@ -57,7 +57,7 @@ class MessageListenerThreadTest {
         List<Message<TestMessage>> messages = thread.messages(List.of(new KafkaMessage(record)), actionLog, JSONMapper.reader(TestMessage.class));
 
         assertThat(messages).hasSize(1);
-        assertThat(messages.get(0).key).isEqualTo("key");
+        assertThat(messages.getFirst().key).isEqualTo("key");
         assertThat(actionLog.context.get("key")).containsExactly("key");
         assertThat(actionLog.clients).containsExactly("client");
         assertThat(actionLog.refIds).containsExactly("refId");
@@ -121,8 +121,8 @@ class MessageListenerThreadTest {
         thread.handleBulk("topic", new MessageProcess<>(bulkMessageHandler, TestMessage.class), List.of(new KafkaMessage(record)));
 
         verify(bulkMessageHandler).handle(argThat(value -> value.size() == 1
-                                                           && key.equals(value.get(0).key)
-                                                           && "value".equals(value.get(0).value.stringField)));
+                                                           && key.equals(value.getFirst().key)
+                                                           && "value".equals(value.getFirst().value.stringField)));
     }
 
     @Test

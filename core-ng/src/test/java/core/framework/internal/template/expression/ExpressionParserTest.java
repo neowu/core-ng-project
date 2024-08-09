@@ -84,7 +84,7 @@ class ExpressionParserTest {
         MethodToken m1 = (MethodToken) f2.next;
         assertEquals("m1", m1.name);
         assertEquals(3, m1.params.size());
-        FieldToken f3 = (FieldToken) m1.params.get(0);
+        FieldToken f3 = (FieldToken) m1.params.getFirst();
         assertEquals("f3", f3.name);
         MethodToken m2 = (MethodToken) f3.next;
         assertEquals("m2", m2.name);

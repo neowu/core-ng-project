@@ -51,8 +51,8 @@ class MessageListenerThreadProcessTest {
         when(consumer.poll(any())).thenReturn(new ConsumerRecords<>(entries));
 
         List<KafkaMessages> messages = new ArrayList<>(thread.poll());
-        assertThat(messages.get(0).topic).isEqualTo("topic1");
-        assertThat(messages.get(0).ordered.get("key2").subsequent).hasSize(1);
+        assertThat(messages.getFirst().topic).isEqualTo("topic1");
+        assertThat(messages.getFirst().ordered.get("key2").subsequent).hasSize(1);
 
         thread.processAll(messages);
         thread.shutdown();

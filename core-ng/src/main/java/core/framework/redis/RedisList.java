@@ -10,7 +10,7 @@ public interface RedisList {
     @Nullable
     default String pop(String key) {
         List<String> values = pop(key, 1);
-        return values.isEmpty() ? null : values.get(0);
+        return values.isEmpty() ? null : values.getFirst();
     }
 
     List<String> pop(String key, int size);

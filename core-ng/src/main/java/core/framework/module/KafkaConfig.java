@@ -55,7 +55,7 @@ public class KafkaConfig extends Config {
             throw new Error(format("kafka uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri));
         this.uri = new KafkaURI(uri);
         // in kube env, it's ok to just check first pod dns of stateful set
-        context.probe.hostURIs.add(this.uri.bootstrapURIs.get(0));
+        context.probe.hostURIs.add(this.uri.bootstrapURIs.getFirst());
     }
 
     // to make IoC simpler, each topic should have its own message class

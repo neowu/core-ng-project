@@ -140,7 +140,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             if (results.isEmpty()) return Optional.empty();
             if (results.size() > 1) throw new Error("more than one row returned");
             returnedDocs = 1;
-            return Optional.of(results.get(0));
+            return Optional.of(results.getFirst());
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("findOne, collection={}, filter={}, readPref={}, returnedDocs={}, elapsed={}",

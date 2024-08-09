@@ -148,10 +148,10 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void searchDateRange() {
         ZonedDateTime from = ZonedDateTime.now();
         ZonedDateTime to = from.plusDays(5);
-        documentType.index("1", document("1", "value1", 1, 0, from, LocalTime.of(12, 0)));
-        documentType.index("2", document("2", "value2", 1, 0, from.plusDays(1), LocalTime.of(13, 0)));
-        documentType.index("3", document("3", "value3", 1, 0, to, LocalTime.of(14, 0)));
-        documentType.index("4", document("4", "value4", 1, 0, to.plusDays(1), LocalTime.of(15, 0)));
+        documentType.index("1", document("1", "value1", 1, 1.1, from, LocalTime.of(12, 0)));
+        documentType.index("2", document("2", "value2", 1, 2.0, from.plusDays(1), LocalTime.of(13, 0)));
+        documentType.index("3", document("3", "value3", 1, 3.0, to, LocalTime.of(14, 0)));
+        documentType.index("4", document("4", "value4", 1, 4.0, to.plusDays(1), LocalTime.of(15, 0)));
         elasticSearch.refreshIndex("document");
 
         var request = new SearchRequest();

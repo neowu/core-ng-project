@@ -54,7 +54,7 @@ class APITypeParser {
             }
             var valueType = parseType(GenericTypes.mapValueType(type));
             definition.addParam(valueType.type);
-            if (valueType.params != null) definition.addParam(valueType.params.get(0));    // Map<T, List<V>> is most complex type
+            if (valueType.params != null) definition.addParam(valueType.params.getFirst());    // Map<T, List<V>> is most complex type
             return definition;
         }
         Class<?> rawClass = GenericTypes.rawClass(type);  // it must be class type at this point

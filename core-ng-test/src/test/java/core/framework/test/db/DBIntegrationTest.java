@@ -62,7 +62,7 @@ class DBIntegrationTest extends IntegrationTest {
         query.limit(5);
         List<TestDBEntity> entities = query.fetch();
         assertThat(entities).hasSize(5);
-        assertThat(entities.get(0).intField).isEqualTo(4);
+        assertThat(entities.getFirst().intField).isEqualTo(4);
 
         // with or condition
         query = repository.select();
@@ -72,7 +72,7 @@ class DBIntegrationTest extends IntegrationTest {
 
         entities = query.fetch();
         assertThat(entities).hasSize(1);
-        assertThat(entities.get(0).intField).isEqualTo(3);
+        assertThat(entities.getFirst().intField).isEqualTo(3);
     }
 
     @Test
@@ -81,7 +81,7 @@ class DBIntegrationTest extends IntegrationTest {
 
         List<TestDBEntity> entities = repository.select("string_field = ?", "value-10");
         assertThat(entities).hasSize(1);
-        assertThat(entities.get(0).intField).isEqualTo(10);
+        assertThat(entities.getFirst().intField).isEqualTo(10);
     }
 
     @Test
@@ -116,8 +116,8 @@ class DBIntegrationTest extends IntegrationTest {
         List<TestDBProjection> projections = query.project("string_field, sum(int_field) as sum_value", TestDBProjection.class);
 
         assertThat(projections).hasSize(5);
-        assertThat(projections.get(0).stringField).isEqualTo("value-9");
-        assertThat(projections.get(0).sum).isEqualTo(18);
+        assertThat(projections.getFirst().stringField).isEqualTo("value-9");
+        assertThat(projections.getFirst().sum).isEqualTo(18);
 
         query.where("string_field = ?", "value-8");
         // projectOne ignores sort, skip and limit

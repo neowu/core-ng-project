@@ -49,7 +49,7 @@ class KubeMonitorJobTest {
     @Test
     void checkWithCrashLoopBackOff() {
         var pod = pod("Running");
-        KubePodList.ContainerStatus status = pod.status.containerStatuses.get(0);
+        KubePodList.ContainerStatus status = pod.status.containerStatuses.getFirst();
         status.state.waiting = new KubePodList.ContainerStateWaiting();
         status.state.waiting.reason = "CrashLoopBackOff";
         status.state.waiting.message = "Back-off 5m0s restarting failed container";
@@ -61,7 +61,7 @@ class KubeMonitorJobTest {
     @Test
     void checkWithOOMKill() {
         var pod = pod("Running");
-        KubePodList.ContainerStatus status = pod.status.containerStatuses.get(0);
+        KubePodList.ContainerStatus status = pod.status.containerStatuses.getFirst();
         var lastState = new KubePodList.ContainerState();
         lastState.terminated = new KubePodList.ContainerStateTerminated();
         lastState.terminated.reason = "OOMKilled";
@@ -75,7 +75,7 @@ class KubeMonitorJobTest {
     @Test
     void checkWithFailedToStart() {
         var pod = pod("Running");
-        KubePodList.ContainerStatus status = pod.status.containerStatuses.get(0);
+        KubePodList.ContainerStatus status = pod.status.containerStatuses.getFirst();
         var lastState = new KubePodList.ContainerState();
         lastState.terminated = new KubePodList.ContainerStateTerminated();
         lastState.terminated.reason = "Error";
@@ -100,7 +100,7 @@ class KubeMonitorJobTest {
         assertThat(job.check(pod, startTime.plusMinutes(5))).isEqualTo("pod is not in ready state, uptime=PT5M");
 
         pod = pod("Running");
-        pod.status.containerStatuses.get(0).ready = Boolean.FALSE;
+        pod.status.containerStatuses.getFirst().ready = Boolean.FALSE;
         pod.status.startTime = startTime;
 
         assertThat(job.check(pod, startTime.plusMinutes(1))).isNull();
@@ -110,7 +110,7 @@ class KubeMonitorJobTest {
     @Test
     void checkWithImagePullBackOff() {
         var pod = pod("Pending");
-        KubePodList.ContainerStatus status = pod.status.containerStatuses.get(0);
+        KubePodList.ContainerStatus status = pod.status.containerStatuses.getFirst();
         status.state.waiting = new KubePodList.ContainerStateWaiting();
         status.state.waiting.reason = "ImagePullBackOff";
         status.state.waiting.message = "Back-off pulling image \"gcr.io/project/ops/debug:latest\"";

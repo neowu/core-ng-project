@@ -167,9 +167,9 @@ class MongoCollectionIntegrationTest extends IntegrationTest {
         List<TestMongoEntity> entities = entities();
         collection.bulkInsert(entities);
 
-        long updatedCount = collection.update(Filters.eq("string_field", entities.get(0).stringField), Updates.set("enum_field", TestMongoEntity.TestEnum.VALUE2));
+        long updatedCount = collection.update(Filters.eq("string_field", entities.getFirst().stringField), Updates.set("enum_field", TestMongoEntity.TestEnum.VALUE2));
         assertThat(updatedCount).isEqualTo(1);
-        assertThat(collection.get(entities.get(0).id)).get().satisfies(loadedEntity -> assertThat(loadedEntity.enumField).isEqualTo(TestMongoEntity.TestEnum.VALUE2));
+        assertThat(collection.get(entities.getFirst().id)).get().satisfies(loadedEntity -> assertThat(loadedEntity.enumField).isEqualTo(TestMongoEntity.TestEnum.VALUE2));
     }
 
     @Test

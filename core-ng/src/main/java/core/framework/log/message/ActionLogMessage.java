@@ -48,6 +48,6 @@ public class ActionLogMessage {
     public String firstContextValue(String key) {
         List<String> values = context.get(key);
         if (values == null) return null;
-        return values.get(0);
+        return values.getFirst();
     }
 }

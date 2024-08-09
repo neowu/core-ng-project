@@ -21,16 +21,16 @@ class HTMLParserTest {
         Document document = new HTMLParser(new StringTemplateSource("test", content)).parse();
         assertEquals(1, document.nodes.size());
 
-        Element html = (Element) document.nodes.get(0);
+        Element html = (Element) document.nodes.getFirst();
         assertEquals("html", html.name);
         assertEquals(1, html.nodes.size());
 
-        Element div = (Element) html.nodes.get(0);
+        Element div = (Element) html.nodes.getFirst();
         assertEquals("div", div.name);
         assertEquals(2, div.nodes.size());
         assertTrue(div.hasEndTag);
 
-        Element img = (Element) div.nodes.get(0);
+        Element img = (Element) div.nodes.getFirst();
         assertEquals("img", img.name);
         assertFalse(img.hasEndTag);
         assertEquals("//img.png", img.attributes.attributes.get("src").value);
@@ -46,7 +46,7 @@ class HTMLParserTest {
         Document document = new HTMLParser(new StringTemplateSource("test", content)).parse();
         assertEquals(1, document.nodes.size());
 
-        Element script = (Element) document.nodes.get(0);
+        Element script = (Element) document.nodes.getFirst();
         assertEquals("script", script.name);
         assertTrue(script.nodes.isEmpty());
     }
