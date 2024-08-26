@@ -12,10 +12,10 @@ subprojects {
 
 val elasticVersion = "8.14.0"
 val kafkaVersion = "3.8.0"
-val jacksonVersion = "2.17.1"
-val junitVersion = "5.10.3"
+val jacksonVersion = "2.17.2"
+val junitVersion = "5.11.0"
 val mockitoVersion = "5.12.0"
-val assertjVersion = "3.26.0"
+val assertjVersion = "3.26.3"
 
 project("core-ng-api") {
     apply(plugin = "lib")
@@ -25,7 +25,7 @@ project("core-ng") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng-api"))
-        api("org.slf4j:slf4j-api:2.0.13")
+        api("org.slf4j:slf4j-api:2.0.16")
         implementation("org.javassist:javassist:3.30.2-GA")
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
@@ -43,7 +43,7 @@ project("core-ng") {
         testImplementation("org.assertj:assertj-core:${assertjVersion}")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-        testRuntimeOnly("org.hsqldb:hsqldb:2.7.2")
+        testRuntimeOnly("org.hsqldb:hsqldb:2.7.3")
     }
 }
 
@@ -56,7 +56,7 @@ project("core-ng-test") {
         implementation(project(":core-ng"))
         implementation("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
         implementation("org.junit.platform:junit-platform-launcher")
-        testRuntimeOnly("org.hsqldb:hsqldb:2.7.2")
+        testRuntimeOnly("org.hsqldb:hsqldb:2.7.3")
     }
 }
 
