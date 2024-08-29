@@ -14,7 +14,7 @@ java {
 }
 
 dependencies {
-    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.7")
-    implementation("org.flywaydb:flyway-gradle-plugin:10.6.0")
-    implementation("org.flywaydb:flyway-mysql:10.6.0")
+    implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.20")
+    implementation("org.flywaydb:flyway-gradle-plugin:10.17.2")
+    implementation("org.flywaydb:flyway-mysql:10.17.2")
 }
