@@ -24,11 +24,6 @@ public class ArchDiagram {
     private final List<MessageSubscription> messageSubscriptions = new ArrayList<>();
     private final Map<String, Scheduler> schedulers = new HashMap<>();
     private final Map<String, String> colors = new HashMap<>();
-    private final Set<String> excludeApps;
-
-    public ArchDiagram(Set<String> excludeApps) {
-        this.excludeApps = excludeApps;
-    }
 
     public void load(SearchResponse<ActionDocument> response) {
         var apps = response.aggregations.get("app").sterms().buckets().array();
@@ -38,8 +33,6 @@ public class ArchDiagram {
     }
 
     private void load(String app, List<StringTermsBucket> actions) {
-        if (excludeApps.contains(app)) return;
-
         for (StringTermsBucket actionBucket : actions) {
             String action = actionBucket.key().stringValue();
             long totalCount = actionBucket.docCount();
@@ -85,7 +78,6 @@ public class ArchDiagram {
         dot.append("node [style=\"rounded, filled\", fontname=arial, fontsize=17, fontcolor=white];\n");
         dot.append("edge [arrowsize=0.5];\n");
         for (String app : apps()) {
-            if (excludeApps.contains(app)) continue;
             if (app.startsWith("_direct_")) {
                 dot.append("\"{}\" [label=direct, shape=point];\n", app);
                 continue;
@@ -98,18 +90,13 @@ public class ArchDiagram {
             dot.append("\"{}\" [label=\"{}\", shape=box, color=\"#6C757D\", fillcolor=\"#6C757D\", tooltip=\"{}\"];\n", subscription.topic, subscription.topic, tooltip(subscription));
         }
         for (APIDependency dependency : apiDependencies) {
-            if (!excludeApps.contains(dependency.client)) {     // excluded services are filtered on loading
-                String tooltip = tooltip(dependency);
-                dot.append("\"{}\" -> \"{}\" [color=\"{}\", weight=5, penwidth=2, tooltip=\"{}\"];\n", dependency.client, dependency.service, colors.get(dependency.client), tooltip);
-            }
-
+            String tooltip = tooltip(dependency);
+            dot.append("\"{}\" -> \"{}\" [color=\"{}\", weight=5, penwidth=2, tooltip=\"{}\"];\n", dependency.client, dependency.service, colors.get(dependency.client), tooltip);
         }
         for (MessageSubscription subscription : messageSubscriptions) {
             for (Map.Entry<String, Long> entry : subscription.publishers.entrySet()) {
                 String publisher = entry.getKey();
-                if (!excludeApps.contains(publisher)) {
-                    dot.append("\"{}\" -> \"{}\" [color=\"#495057\", style=dashed];\n", publisher, subscription.topic);
-                }
+                dot.append("\"{}\" -> \"{}\" [color=\"#495057\", style=dashed];\n", publisher, subscription.topic);
             }
             for (Map.Entry<String, Long> entry : subscription.consumers.entrySet()) {   // excluded consumers are filtered on loading
                 dot.append("\"{}\" -> \"{}\" [color=\"#ADB5BD\", style=dashed];\n", subscription.topic, entry.getKey());
@@ -226,12 +213,7 @@ public class ArchDiagram {
     }
 
     private String color(String app) {
-        String color = colors.get(app);
-        if (color == null) {
-            color = Colors.COLOR_PALETTE[colors.size() % Colors.COLOR_PALETTE.length];
-            colors.put(app, color);
-        }
-        return color;
+        return colors.computeIfAbsent(app, key -> Colors.COLOR_PALETTE[colors.size() % Colors.COLOR_PALETTE.length]);
     }
 
     private APIDependency apiDependency(String service, String client) {
@@ -263,16 +245,7 @@ public class ArchDiagram {
         }
     }
 
-    static class APICall {
-        final String method;
-        final String uri;
-        final long count;
-
-        APICall(String method, String uri, long count) {
-            this.method = method;
-            this.uri = uri;
-            this.count = count;
-        }
+    record APICall(String method, String uri, long count) {
     }
 
     static class MessageSubscription {

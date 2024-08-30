@@ -4,6 +4,7 @@
 
 * search: loading from json into search request
   > for complex aggregation, refer to ElasticSearchAggregationIntegrationTest.java for usage
+* log-processor: updated d3-graphviz, supports "includes" in `/diagram/arch`
 
 ### 9.1.1 (7/11/2024 - 8/7/2024)
 

@@ -7,8 +7,8 @@ import core.framework.web.Request;
 import core.framework.web.Response;
 import core.framework.web.exception.BadRequestException;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author neo
@@ -18,9 +18,13 @@ public class DiagramController {
     DiagramService diagramService;
 
     public Response arch(Request request) {
-        int hours = hours(request.queryParams());
-        Set<String> excludes = excludes(request.queryParams());
-        String dot = diagramService.arch(hours, excludes);
+        Map<String, String> params = request.queryParams();
+
+        int hours = intParam(params, "hours", 24);
+        List<String> includes = listParam(params, "includes");
+        List<String> excludes = listParam(params, "excludes");
+
+        String dot = diagramService.arch(hours, includes, excludes);
         var model = new DiagramModel();
         model.title = "System Architecture";
         model.dot = dot;
@@ -37,13 +41,13 @@ public class DiagramController {
         return Response.html("/template/diagram.html", model);
     }
 
-    private int hours(Map<String, String> params) {
-        String hours = params.get("hours");
-        return hours == null ? 24 : Integer.parseInt(hours);
+    int intParam(Map<String, String> params, String name, int defaultvalue) {
+        String hours = params.get(name);
+        return hours == null ? defaultvalue : Integer.parseInt(hours);
     }
 
-    private Set<String> excludes(Map<String, String> params) {
-        String excludes = params.get("excludes");
-        return excludes == null ? Set.of() : Set.of(Strings.split(excludes, ','));
+    List<String> listParam(Map<String, String> params, String paramName) {
+        String value = params.get(paramName);
+        return value == null ? List.of() : List.of(Strings.split(value, ','));
     }
 }
