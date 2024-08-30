@@ -41,9 +41,9 @@ public class DiagramController {
         return Response.html("/template/diagram.html", model);
     }
 
-    int intParam(Map<String, String> params, String name, int defaultvalue) {
+    int intParam(Map<String, String> params, String name, int defaultValue) {
         String hours = params.get(name);
-        return hours == null ? defaultvalue : Integer.parseInt(hours);
+        return hours == null ? defaultValue : Integer.parseInt(hours);
     }
 
     List<String> listParam(Map<String, String> params, String paramName) {
