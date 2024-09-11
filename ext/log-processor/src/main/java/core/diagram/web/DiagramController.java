@@ -46,8 +46,8 @@ public class DiagramController {
         return hours == null ? defaultValue : Integer.parseInt(hours);
     }
 
-    List<String> listParam(Map<String, String> params, String paramName) {
-        String value = params.get(paramName);
+    List<String> listParam(Map<String, String> params, String name) {
+        String value = params.get(name);
         return value == null ? List.of() : List.of(Strings.split(value, ','));
     }
 }

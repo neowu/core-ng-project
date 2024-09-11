@@ -32,10 +32,8 @@ project("core-ng") {
         implementation("com.squareup.okhttp3:okhttp:4.12.0@jar")
         implementation("com.squareup.okio:okio:3.2.0")      // okio 3.3.0 has synchronization issue with virtual thread
         implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
-        implementation("io.undertow:undertow-core:2.3.10.Final")    // undertow 2.3.11+ has memory leak issue
-        implementation("org.apache.kafka:kafka-clients:${kafkaVersion}@jar")
-        implementation("org.xerial.snappy:snappy-java:1.1.10.5")      // used by kafka message compression
-        implementation("com.github.luben:zstd-jni:1.5.6-4")           // strong referenced by kafka ProducerConfig / ZstdCompression
+        implementation("io.undertow:undertow-core:2.3.17.Final")
+        implementation("org.apache.kafka:kafka-clients:${kafkaVersion}")
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")
         compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.3")
         testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")

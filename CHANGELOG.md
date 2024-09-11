@@ -5,6 +5,9 @@
 * search: loading from json into search request
   > for complex aggregation, refer to ElasticSearchAggregationIntegrationTest.java for usage
 * log-processor: updated d3-graphviz, supports "includes" in `/diagram/arch`
+* undertow: update to 2.3.17
+  > io.undertow.server.DefaultByteBufferPool.threadLocalCache memory leak issue is fixed,
+  > though i think it's worse than native ThreadLocal impl (with one thread per task model), now it's using Collections.synchronizedMap(new WeakHashMap<>())
 
 ### 9.1.1 (7/11/2024 - 8/7/2024)
 

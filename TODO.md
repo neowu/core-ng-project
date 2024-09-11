@@ -25,3 +25,6 @@
   https://github.com/undertow-io/undertow/blob/main/core/src/main/java/io/undertow/server/DefaultByteBufferPool.java
 * track okHTTP fixed pin issue with virtual threads (looks like needs to wait until 5.0.0 released)
   https://github.com/square/okhttp/issues/8284
+
+
+* log diagram, fix d3 tooltip (generate separated json, and make d3 tooltip show other non-HTML info)
