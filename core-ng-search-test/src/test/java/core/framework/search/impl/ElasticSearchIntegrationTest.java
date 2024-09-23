@@ -27,13 +27,15 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static core.framework.search.query.Queries.dateRange;
 import static core.framework.search.query.Queries.match;
-import static core.framework.search.query.Queries.range;
+import static core.framework.search.query.Queries.numberRange;
 import static core.framework.search.query.Queries.term;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
@@ -122,7 +124,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
             .filter(f -> f.term(term("enum_field", JSON.toEnumValue(TestDocument.TestEnum.VALUE1))))).build();
 
         request.sorts.add(SortOptions.of(builder -> builder.script(s ->
-            s.script(script -> script.inline(i -> i.source("doc['int_field'].value * 3"))).type(ScriptSortType.Number))));
+            s.script(script -> script.source("doc['int_field'].value * 3")).type(ScriptSortType.Number))));
 
         SearchResponse<TestDocument> response = documentType.search(request);
 
@@ -146,8 +148,8 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     void searchDateRange() {
-        ZonedDateTime from = ZonedDateTime.now();
-        ZonedDateTime to = from.plusDays(5);
+        ZonedDateTime from = ZonedDateTime.now().withNano(999999999);
+        ZonedDateTime to = from.plusDays(5).truncatedTo(ChronoUnit.SECONDS);
         documentType.index("1", document("1", "value1", 1, 1.1, from, LocalTime.of(12, 0)));
         documentType.index("2", document("2", "value2", 1, 2.0, from.plusDays(1), LocalTime.of(13, 0)));
         documentType.index("3", document("3", "value3", 1, 3.0, to, LocalTime.of(14, 0)));
@@ -155,14 +157,14 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         elasticSearch.refreshIndex("document");
 
         var request = new SearchRequest();
-        request.query = new Query.Builder().range(range("zoned_date_time_field", from, to)).build();
+        request.query = new Query.Builder().range(dateRange("zoned_date_time_field", from, to)).build();
         request.sorts.add(Sorts.fieldSort("id", SortOrder.Asc));
         SearchResponse<TestDocument> response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(3);
         assertThat(response.hits.stream().map(document1 -> document1.stringField).collect(Collectors.toList()))
             .containsOnly("value1", "value2", "value3");
 
-        request.query = new Query.Builder().range(r -> r.field("local_time_field").gt(JsonData.of(LocalTime.of(13, 0)))).build();
+        request.query = new Query.Builder().range(r -> r.untyped(u -> u.field("local_time_field").gt(JsonData.of(LocalTime.of(13, 0))))).build();
         response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(2);
         assertThat(response.hits.stream().map(document -> document.stringField).collect(Collectors.toList()))
@@ -184,7 +186,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         elasticSearch.refreshIndex("document");
 
         var request = new DeleteByQueryRequest();
-        request.query = new Query.Builder().range(range("int_field", 1, 15)).build();
+        request.query = new Query.Builder().range(numberRange("int_field", 1, 15)).build();
         request.refresh = Boolean.TRUE;
         long deleted = documentType.deleteByQuery(request);
 

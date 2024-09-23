@@ -227,7 +227,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             Map<String, JsonData> params = request.params == null ? Map.of() : request.params.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, value -> JsonData.of(value.getValue())));
             UpdateResponse<T> response = elasticSearch.client.update(builder -> builder.index(index)
                 .id(request.id)
-                .script(s -> s.inline(i -> i.source(request.script).params(params)))
+                .script(s -> s.source(request.script).params(params))
                 .retryOnConflict(request.retryOnConflict), documentClass);
             updated = response.result() == Result.Updated;
             return updated;

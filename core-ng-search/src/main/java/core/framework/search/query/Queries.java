@@ -1,13 +1,16 @@
 package core.framework.search.query;
 
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.IdsQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.NumberRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
-import co.elastic.clients.json.JsonData;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -22,10 +25,19 @@ public class Queries {
         return new MatchQuery.Builder().field(field).query(FieldValue.of(value)).build();
     }
 
-    public static <T> RangeQuery range(String field, T from, T to) {
-        var builder = new RangeQuery.Builder().field(field);
-        if (from != null) builder.gte(JsonData.of(from));
-        if (to != null) builder.lte(JsonData.of(to));
+    public static RangeQuery dateRange(String field, ZonedDateTime from, ZonedDateTime to) {
+        var range = new DateRangeQuery.Builder().field(field);
+        if (from != null) range.gte(from.format(DateTimeFormatter.ISO_INSTANT));
+        if (to != null) range.lte(to.format(DateTimeFormatter.ISO_INSTANT));
+        var builder = new RangeQuery.Builder().date(range.build());
+        return builder.build();
+    }
+
+    public static RangeQuery numberRange(String field, Number from, Number to) {
+        var range = new NumberRangeQuery.Builder().field(field);
+        if (from != null) range.gte(from.doubleValue());
+        if (to != null) range.lte(to.doubleValue());
+        var builder = new RangeQuery.Builder().number(range.build());
         return builder.build();
     }
 
