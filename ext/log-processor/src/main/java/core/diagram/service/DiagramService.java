@@ -42,7 +42,7 @@ public class DiagramService {
 
     private BoolQuery.Builder filterActions(int hours, List<String> includeApps, List<String> excludeApps) {
         var boolQuery = new BoolQuery.Builder();
-        boolQuery.must(s -> s.range(Queries.dateRange("@timestamp", ZonedDateTime.now().minusHours(hours), null)));
+        boolQuery.must(s -> s.range(Queries.range("@timestamp", ZonedDateTime.now().minusHours(hours), null)));
         if (!includeApps.isEmpty()) {
             boolQuery.must(b -> b.bool(q -> q.should(s -> s.terms(terms("app", new ArrayList<>(includeApps))))
                 .should(s -> s.terms(terms("client", new ArrayList<>(includeApps))))));

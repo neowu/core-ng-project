@@ -17,6 +17,7 @@ import core.framework.search.ForEach;
 import core.framework.search.IntegrationTest;
 import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
+import core.framework.search.query.Queries;
 import core.framework.search.query.Sorts;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Lists;
@@ -33,9 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static core.framework.search.query.Queries.dateRange;
 import static core.framework.search.query.Queries.match;
-import static core.framework.search.query.Queries.numberRange;
 import static core.framework.search.query.Queries.term;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
@@ -157,7 +156,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         elasticSearch.refreshIndex("document");
 
         var request = new SearchRequest();
-        request.query = new Query.Builder().range(dateRange("zoned_date_time_field", from, to)).build();
+        request.query = new Query.Builder().range(Queries.range("zoned_date_time_field", from, to)).build();
         request.sorts.add(Sorts.fieldSort("id", SortOrder.Asc));
         SearchResponse<TestDocument> response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(3);
@@ -169,6 +168,13 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         assertThat(response.totalHits).isEqualTo(2);
         assertThat(response.hits.stream().map(document -> document.stringField).collect(Collectors.toList()))
             .containsOnly("value3", "value4");
+
+        request.query = new Query.Builder().range(Queries.range("zoned_date_time_field", from.toLocalDate(), to.toLocalDate())).build();
+        request.sorts.add(Sorts.fieldSort("id", SortOrder.Asc));
+        response = documentType.search(request);
+        assertThat(response.totalHits).isEqualTo(3);
+        assertThat(response.hits.stream().map(document1 -> document1.stringField).collect(Collectors.toList()))
+            .containsOnly("value1", "value2", "value3");
     }
 
     @Test
@@ -186,7 +192,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         elasticSearch.refreshIndex("document");
 
         var request = new DeleteByQueryRequest();
-        request.query = new Query.Builder().range(numberRange("int_field", 1, 15)).build();
+        request.query = new Query.Builder().range(Queries.range("int_field", 1, 15)).build();
         request.refresh = Boolean.TRUE;
         long deleted = documentType.deleteByQuery(request);
 

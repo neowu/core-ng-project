@@ -9,7 +9,6 @@
   > io.undertow.server.DefaultByteBufferPool.threadLocalCache memory leak issue is fixed,
   > though i think it's worse than native ThreadLocal impl (with one thread per task model), now it's using Collections.synchronizedMap(new WeakHashMap<>())
 * search: update es to 8.15.0
-  > Queries.range() changes to Queries.dateRange() and Queries.numberRange()
 
 ### 9.1.1 (7/11/2024 - 8/7/2024)
 
