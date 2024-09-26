@@ -1,5 +1,7 @@
 ## Change log
 
+### 9.1.3 (9/26/2024 - )
+
 ### 9.1.2 (8/9/2024 - 9/26/2024)
 
 * search: loading from json into search request

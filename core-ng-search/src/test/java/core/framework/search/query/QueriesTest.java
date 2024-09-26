@@ -25,4 +25,12 @@ class QueriesTest {
         assertThat(query.isIds()).isTrue();
         assertThat(query.ids().values()).isEqualTo(List.of("id1", "id2"));
     }
+
+    @Test
+    void matchPhrase() {
+        Query query = Queries.matchPhase("field", "query");
+        assertThat(query.isMatchPhrase()).isTrue();
+        assertThat(query.matchPhrase().field()).isEqualTo("field");
+        assertThat(query.matchPhrase().query()).isEqualTo("query");
+    }
 }

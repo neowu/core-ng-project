@@ -1,7 +1,6 @@
 package core.diagram.service;
 
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import core.framework.inject.Inject;
@@ -28,7 +27,7 @@ public class DiagramService {
     public String arch(int hours, List<String> includeApps, List<String> excludeApps) {
         var request = new SearchRequest();
         request.index = "action-*";
-        request.query = new Query.Builder().bool(b -> filterActions(hours, includeApps, excludeApps)).build();
+        request.query = query(hours, includeApps, excludeApps);
         request.limit = 0;
         request.aggregations.put("app", Aggregation.of(a -> a.terms(t -> t.field("app").size(100))
             .aggregations("action", sub1 -> sub1.terms(t -> t.field("action").size(500))
@@ -40,7 +39,7 @@ public class DiagramService {
         return diagram.dot();
     }
 
-    private BoolQuery.Builder filterActions(int hours, List<String> includeApps, List<String> excludeApps) {
+    private Query query(int hours, List<String> includeApps, List<String> excludeApps) {
         var query = QueryBuilders.bool().must(range("@timestamp", ZonedDateTime.now().minusHours(hours), null));
         if (!includeApps.isEmpty()) {
             query.must(b -> b.bool(q -> q.should(terms("app", includeApps))
@@ -49,7 +48,7 @@ public class DiagramService {
             query.mustNot(terms("app", excludeApps))
                 .mustNot(terms("client", excludeApps));
         }
-        return query;
+        return query.build()._toQuery();
     }
 
     public String action(String actionId) {
