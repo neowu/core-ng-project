@@ -1,6 +1,5 @@
 package core.log.kafka;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import core.framework.inject.Inject;
 import core.framework.kafka.Message;
 import core.framework.log.message.ActionLogMessage;
@@ -80,7 +79,7 @@ class ActionLogMessageHandlerTest extends IntegrationTest {
         String index = indexService.indexName("action", now);
         elasticSearch.refreshIndex(index);
         var request = new SearchRequest();
-        request.query = new Query.Builder().match(match("context.key", "value")).build();
+        request.query = match("context.key", "value");
         request.index = index;
         List<ActionDocument> actions = actionType.search(request).hits;
         assertThat(actions).hasSize(1);

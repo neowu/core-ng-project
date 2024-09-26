@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.1.2-b0 (8/9/2024 - )
+### 9.1.2 (8/9/2024 - 9/26/2024)
 
 * search: loading from json into search request
   > for complex aggregation, refer to ElasticSearchAggregationIntegrationTest.java for usage
@@ -9,6 +9,10 @@
   > io.undertow.server.DefaultByteBufferPool.threadLocalCache memory leak issue is fixed,
   > though i think it's worse than native ThreadLocal impl (with one thread per task model), now it's using Collections.synchronizedMap(new WeakHashMap<>())
 * search: update es to 8.15.0
+* tweak search query builder !!! breaking API change, just fix compiler error
+  > to construct SearchRequest.query, use one of following
+  > core.framework.search.query.Queries
+  > co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders
 
 ### 9.1.1 (7/11/2024 - 8/7/2024)
 

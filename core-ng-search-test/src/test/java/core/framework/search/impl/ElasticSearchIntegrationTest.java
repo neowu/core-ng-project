@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch._types.SearchType;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.json.JsonData;
 import core.framework.inject.Inject;
 import core.framework.json.JSON;
@@ -17,7 +18,6 @@ import core.framework.search.ForEach;
 import core.framework.search.IntegrationTest;
 import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
-import core.framework.search.query.Queries;
 import core.framework.search.query.Sorts;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Lists;
@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static core.framework.search.query.Queries.match;
+import static core.framework.search.query.Queries.range;
 import static core.framework.search.query.Queries.term;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
@@ -53,7 +54,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     @AfterEach
     void cleanup() {
         var request = new DeleteByQueryRequest();
-        request.query = new Query.Builder().matchAll(b -> b).build();
+        request.query = QueryBuilders.matchAll(m -> m);
         request.refresh = Boolean.TRUE;
         documentType.deleteByQuery(request);
     }
@@ -89,7 +90,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         List<TestDocument> results = Lists.newArrayList();
 
         ForEach<TestDocument> forEach = new ForEach<>();
-        forEach.query = new Query.Builder().matchAll(m -> m).build();
+        forEach.query = QueryBuilders.matchAll(m -> m);
         forEach.batchSize = 7;
         forEach.consumer = results::add;
 
@@ -119,8 +120,8 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         // test synonyms
         var request = new SearchRequest();
         request.type = SearchType.QueryThenFetch;
-        request.query = new Query.Builder().bool(b -> b.must(m -> m.match(match("string_field", "first")))
-            .filter(f -> f.term(term("enum_field", JSON.toEnumValue(TestDocument.TestEnum.VALUE1))))).build();
+        request.query = QueryBuilders.bool(b -> b.must(match("string_field", "first"))
+            .filter(term("enum_field", JSON.toEnumValue(TestDocument.TestEnum.VALUE1))));
 
         request.sorts.add(SortOptions.of(builder -> builder.script(s ->
             s.script(script -> script.source("doc['int_field'].value * 3")).type(ScriptSortType.Number))));
@@ -135,7 +136,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
         // test stemmer
         request = new SearchRequest();
-        request.query = new Query.Builder().match(match("string_field", "test")).build();
+        request.query = match("string_field", "test");
         response = documentType.search(request);
 
         assertThat(response.totalHits).isEqualTo(1);
@@ -156,20 +157,20 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         elasticSearch.refreshIndex("document");
 
         var request = new SearchRequest();
-        request.query = new Query.Builder().range(Queries.range("zoned_date_time_field", from, to)).build();
+        request.query = range("zoned_date_time_field", from, to);
         request.sorts.add(Sorts.fieldSort("id", SortOrder.Asc));
         SearchResponse<TestDocument> response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(3);
         assertThat(response.hits.stream().map(document1 -> document1.stringField).collect(Collectors.toList()))
             .containsOnly("value1", "value2", "value3");
 
-        request.query = new Query.Builder().range(r -> r.untyped(u -> u.field("local_time_field").gt(JsonData.of(LocalTime.of(13, 0))))).build();
+        request.query = QueryBuilders.range(r -> r.untyped(u -> u.field("local_time_field").gt(JsonData.of(LocalTime.of(13, 0)))));
         response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(2);
         assertThat(response.hits.stream().map(document -> document.stringField).collect(Collectors.toList()))
             .containsOnly("value3", "value4");
 
-        request.query = new Query.Builder().range(Queries.range("zoned_date_time_field", from.toLocalDate(), to.toLocalDate())).build();
+        request.query = range("zoned_date_time_field", from.toLocalDate(), to.toLocalDate());
         request.sorts.add(Sorts.fieldSort("id", SortOrder.Asc));
         response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(3);
@@ -192,7 +193,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         elasticSearch.refreshIndex("document");
 
         var request = new DeleteByQueryRequest();
-        request.query = new Query.Builder().range(Queries.range("int_field", 1, 15)).build();
+        request.query = range("int_field", 1, 15);
         request.refresh = Boolean.TRUE;
         long deleted = documentType.deleteByQuery(request);
 

@@ -7,7 +7,7 @@ apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
-    version = "9.1.2-b0"
+    version = "9.1.2"
 }
 
 val elasticVersion = "8.15.0"

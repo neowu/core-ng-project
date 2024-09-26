@@ -1,11 +1,11 @@
 package core.framework.search.query;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 /**
  * @author neo
@@ -13,8 +13,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 class QueriesTest {
     @Test
     void terms() {
-        TermsQuery terms = Queries.terms("field", List.of("value1", "value2"));
-        assertThat(terms.terms().value().get(0).stringValue()).isEqualTo("value1");
-        assertThat(terms.terms().value().get(1).stringValue()).isEqualTo("value2");
+        Query query = Queries.terms("field", List.of("value1", "value2"));
+        assertThat(query.isTerms()).isTrue();
+        assertThat(query.terms().terms().value().get(0).stringValue()).isEqualTo("value1");
+        assertThat(query.terms().terms().value().get(1).stringValue()).isEqualTo("value2");
+    }
+
+    @Test
+    void ids() {
+        Query query = Queries.ids(List.of("id1", "id2"));
+        assertThat(query.isIds()).isTrue();
+        assertThat(query.ids().values()).isEqualTo(List.of("id1", "id2"));
     }
 }

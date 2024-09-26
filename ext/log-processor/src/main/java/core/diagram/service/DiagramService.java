@@ -3,6 +3,7 @@ package core.diagram.service;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import core.framework.inject.Inject;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.SearchRequest;
@@ -12,10 +13,9 @@ import core.framework.web.exception.NotFoundException;
 import core.log.domain.ActionDocument;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-import static core.framework.search.query.Queries.ids;
+import static core.framework.search.query.Queries.range;
 import static core.framework.search.query.Queries.terms;
 
 /**
@@ -41,16 +41,15 @@ public class DiagramService {
     }
 
     private BoolQuery.Builder filterActions(int hours, List<String> includeApps, List<String> excludeApps) {
-        var boolQuery = new BoolQuery.Builder();
-        boolQuery.must(s -> s.range(Queries.range("@timestamp", ZonedDateTime.now().minusHours(hours), null)));
+        var query = QueryBuilders.bool().must(range("@timestamp", ZonedDateTime.now().minusHours(hours), null));
         if (!includeApps.isEmpty()) {
-            boolQuery.must(b -> b.bool(q -> q.should(s -> s.terms(terms("app", new ArrayList<>(includeApps))))
-                .should(s -> s.terms(terms("client", new ArrayList<>(includeApps))))));
+            query.must(b -> b.bool(q -> q.should(terms("app", includeApps))
+                .should(terms("client", includeApps))));
         } else if (!excludeApps.isEmpty()) {
-            boolQuery.mustNot(b -> b.terms(terms("app", new ArrayList<>(excludeApps))));
-            boolQuery.mustNot(b -> b.terms(terms("client", new ArrayList<>(excludeApps))));
+            query.mustNot(terms("app", excludeApps))
+                .mustNot(terms("client", excludeApps));
         }
-        return boolQuery;
+        return query;
     }
 
     public String action(String actionId) {
@@ -67,7 +66,7 @@ public class DiagramService {
     private ActionDocument getActionById(String id) {
         var request = new SearchRequest();
         request.index = "action-*";
-        request.query = new Query.Builder().ids(ids(List.of(id))).build();
+        request.query = Queries.ids(List.of(id));
         List<ActionDocument> documents = actionType.search(request).hits;
         if (documents.isEmpty()) throw new NotFoundException("action not found, id=" + id);
         return documents.getFirst();
@@ -76,7 +75,7 @@ public class DiagramService {
     private List<ActionDocument> findActionByCorrelationIds(List<String> correlationIds) {
         var request = new SearchRequest();
         request.index = "action-*";
-        request.query = new Query.Builder().terms(terms("correlation_id", correlationIds)).build();
+        request.query = terms("correlation_id", correlationIds);
         request.limit = 10000;
         return actionType.search(request).hits;
     }
