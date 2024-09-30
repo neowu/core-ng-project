@@ -144,7 +144,8 @@ public class BeanValidatorBuilder {
         if (pattern != null) {
             String patternFieldName = field.getName() + "Pattern" + (index++);
             String patternVariable = variable(pattern.value());
-            this.builder.addField("private final java.util.regex.Pattern {} = java.util.regex.Pattern.compile({});", patternFieldName, patternVariable);
+            int flags = pattern.ignoreCase() ? java.util.regex.Pattern.CASE_INSENSITIVE : 0;
+            this.builder.addField("private final java.util.regex.Pattern {} = java.util.regex.Pattern.compile({}, {});", patternFieldName, patternVariable, flags);
             builder.indent(2).append("if (!this.{}.matcher(bean.{}).matches()) errors.add({}, {}, java.util.Map.of(\"value\", bean.{}, \"pattern\", {}));\n",
                 patternFieldName, field.getName(), pathLiteral, variable(pattern.message()),
                 field.getName(), patternVariable);

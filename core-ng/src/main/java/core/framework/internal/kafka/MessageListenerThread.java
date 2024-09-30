@@ -109,6 +109,7 @@ class MessageListenerThread extends Thread {
         ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofSeconds(30));
         if (records.isEmpty()) return null;
 
+        // topic -> messages, use linked hash map to keep message in same order as polled from kafka
         Map<String, KafkaMessages> messageMappings = new LinkedHashMap<>();
         for (ConsumerRecord<String, byte[]> record : records) {
             String topic = record.topic();

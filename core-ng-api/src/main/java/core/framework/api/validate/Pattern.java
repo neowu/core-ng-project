@@ -14,5 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Pattern {
     String value();
 
+    boolean ignoreCase() default false;
+
     String message() default "field must match /{pattern}/, value={value}";
 }

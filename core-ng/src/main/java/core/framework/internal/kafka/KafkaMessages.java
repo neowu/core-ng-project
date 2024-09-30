@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 class KafkaMessages {
+    // key -> message, messages with same key will be processed in same thread
     final Map<String, KafkaMessage> ordered = new HashMap<>();
     final List<KafkaMessage> unordered = new ArrayList<>();
     final String topic;
@@ -23,6 +24,7 @@ class KafkaMessages {
     void addOrdered(ConsumerRecord<String, byte[]> record) {
         var message = new KafkaMessage(record);
         if (message.key != null) {
+            // only ensure message processing order by key, be aware of kafka ensures by partition, in practice, we only need key level ordering
             KafkaMessage root = ordered.get(message.key);
             if (root != null) root.addSubsequent(message);
             else ordered.put(message.key, message);

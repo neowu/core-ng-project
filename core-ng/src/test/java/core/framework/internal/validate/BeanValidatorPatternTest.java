@@ -22,6 +22,7 @@ class BeanValidatorPatternTest {
     void valid() {
         var bean = new Bean();
         bean.field1 = "abc-def";
+        bean.field4 = "Abc-Def";
 
         var errors = new ValidationErrors();
         validator.validate(bean, errors, false);
@@ -54,5 +55,8 @@ class BeanValidatorPatternTest {
 
         @Pattern(value = "[a-z0-9]+", message = "field3 must be [a-z0-9]+")
         public String field3;
+
+        @Pattern(value = "[a-z-]+", ignoreCase = true)
+        public String field4;
     }
 }
