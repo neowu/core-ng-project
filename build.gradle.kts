@@ -12,8 +12,8 @@ subprojects {
 
 val elasticVersion = "8.15.0"
 val jacksonVersion = "2.17.2"
-val junitVersion = "5.11.0"
-val mockitoVersion = "5.12.0"
+val junitVersion = "5.11.1"
+val mockitoVersion = "5.14.0"
 val assertjVersion = "3.26.3"
 
 project("core-ng-api") {
