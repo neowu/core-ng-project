@@ -169,7 +169,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void deleteIndex(String index) {
         var watch = new StopWatch();
         try {
-            client.indices().delete(builder -> builder.index(index).ignoreUnavailable(true));
+            client.indices().delete(builder -> builder.index(index).ignoreUnavailable(Boolean.TRUE));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {
