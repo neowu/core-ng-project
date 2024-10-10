@@ -31,6 +31,7 @@ class ElasticSearchTemplateIntegrationTest extends IntegrationTest {
     void deleteIndex() {
         index("document-2", "2", "text-2", 3);
         elasticSearch.deleteIndex("document-2");
+        elasticSearch.deleteIndex("document-2");
         assertThat(elasticSearch.state().metadata.indices).doesNotContainKeys("document-2");
     }
 
