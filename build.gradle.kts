@@ -30,7 +30,7 @@ project("core-ng") {
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
         implementation("com.squareup.okhttp3:okhttp:4.12.0@jar")
         implementation("com.squareup.okio:okio:3.2.0")      // okio 3.3.0 has synchronization issue with virtual thread
-        implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
+        implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.20")
         implementation("io.undertow:undertow-core:2.3.17.Final")
         implementation("org.apache.kafka:kafka-clients:3.8.0")
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")
