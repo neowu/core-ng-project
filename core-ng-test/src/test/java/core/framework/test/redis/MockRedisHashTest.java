@@ -3,6 +3,7 @@ package core.framework.test.redis;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,5 +60,12 @@ class MockRedisHashTest {
         result = redis.hash().increaseBy("key1", "field1", 1);
         assertThat(result).isEqualTo(2);
         assertThat(redis.hash().get("key1", "field1")).isEqualTo("2");
+    }
+
+    @Test
+    void expire() {
+        redis.hash().set("key1", "field1", "value1");
+        redis.hash().expire("key1", "field1", Duration.ZERO);
+        assertThat(redis.hash().get("key1", "field1")).isNull();
     }
 }

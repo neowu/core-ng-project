@@ -11,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static core.framework.internal.redis.RedisEncodings.decode;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,6 +48,10 @@ abstract class AbstractRedisOperationTest {
 
     void assertRequestEquals(String data) {
         assertThat(decode(request.toByteArray())).isEqualTo(data);
+    }
+
+    void assertRequestEquals(String... data) {
+        assertThat(decode(request.toByteArray())).isEqualTo(Arrays.stream(data).map(v -> v + "\r\n").collect(Collectors.joining()));
     }
 
     void response(String data) {

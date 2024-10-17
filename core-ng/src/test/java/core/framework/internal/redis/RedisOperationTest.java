@@ -104,7 +104,7 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         redis.multiSet(values, Duration.ofMinutes(1));
 
         assertRequestEquals("*5\r\n$3\r\nSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n$2\r\nPX\r\n$5\r\n60000\r\n"
-                + "*5\r\n$3\r\nSET\r\n$2\r\nk2\r\n$2\r\nv2\r\n$2\r\nPX\r\n$5\r\n60000\r\n");
+                            + "*5\r\n$3\r\nSET\r\n$2\r\nk2\r\n$2\r\nv2\r\n$2\r\nPX\r\n$5\r\n60000\r\n");
     }
 
     @Test
@@ -123,14 +123,5 @@ class RedisOperationTest extends AbstractRedisOperationTest {
 
         assertThat(keys).containsExactly("k1", "k2");
         assertRequestEquals("*6\r\n$4\r\nSCAN\r\n$1\r\n0\r\n$5\r\nMATCH\r\n$2\r\nk*\r\n$5\r\nCOUNT\r\n$3\r\n500\r\n");
-    }
-
-    @Test
-    void expirationTime() {
-        response(":1000\r\n:-1\r\n:-2\r\n");
-        long[] expirationTimes = redis.expirationTime("k1", "k2", "k3");
-
-        assertThat(expirationTimes).containsExactly(1000, -1, -2);
-        assertRequestEquals("*2\r\n$4\r\nPTTL\r\n$2\r\nk1\r\n" + "*2\r\n$4\r\nPTTL\r\n$2\r\nk2\r\n" + "*2\r\n$4\r\nPTTL\r\n$2\r\nk3\r\n");
     }
 }

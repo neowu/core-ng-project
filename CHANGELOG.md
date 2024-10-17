@@ -1,9 +1,11 @@
 ## Change log
 
-### 9.1.3 (9/26/2024 - )
+### 9.1.3 (9/26/2024 - 10/15/2024)
 
 * validation: @Pattern supports @Pattern(ignoreCase = true)
 * search: make core.framework.search.ElasticSearch.deleteIndex idempotent (ignore if index is missing/deleted)
+* redis: support expiring specific hash field
+  > supported by redis 7.4
 
 ### 9.1.2 (8/9/2024 - 9/26/2024)
 

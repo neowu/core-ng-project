@@ -31,7 +31,6 @@ import static core.framework.internal.redis.Protocol.Command.INCRBY;
 import static core.framework.internal.redis.Protocol.Command.MGET;
 import static core.framework.internal.redis.Protocol.Command.MSET;
 import static core.framework.internal.redis.Protocol.Command.PEXPIRE;
-import static core.framework.internal.redis.Protocol.Command.PTTL;
 import static core.framework.internal.redis.Protocol.Command.SCAN;
 import static core.framework.internal.redis.Protocol.Command.SET;
 import static core.framework.internal.redis.Protocol.Keyword.COUNT;
@@ -377,38 +376,7 @@ public final class RedisImpl implements Redis {
         return redisHyperLogLog;
     }
 
-    public long[] expirationTime(String... keys) {
-        var watch = new StopWatch();
-        int size = keys.length;
-        long[] expirationTimes = null;
-        PoolItem<RedisConnection> item = pool.borrowItem();
-        try {
-            RedisConnection connection = item.resource;
-            for (String key : keys) {
-                connection.writeArray(2);
-                connection.writeBlobString(PTTL);
-                connection.writeBlobString(encode(key));
-            }
-            connection.flush();
-            Object[] results = connection.readAll(size);
-            expirationTimes = new long[size];
-            for (int i = 0; i < results.length; i++) {
-                Long result = (Long) results[i];
-                expirationTimes[i] = result;
-            }
-            return expirationTimes;
-        } catch (IOException e) {
-            item.broken = true;
-            throw new UncheckedIOException(e);
-        } finally {
-            pool.returnItem(item);
-            long elapsed = watch.elapsed();
-            logger.debug("pttl,  keys={}, size={}, returnedValues={}, elapsed={}", new ArrayLogParam(keys), size, expirationTimes, elapsed);
-            ActionLogContext.track("redis", elapsed, size, 0);
-        }
-    }
-
-    private byte[] expirationValue(Duration expiration) {
+    byte[] expirationValue(Duration expiration) {
         long expirationTime = expiration.toMillis();
         if (expirationTime <= 0) throw new Error("expiration time must be longer than 0ms");
         return encode(expirationTime);

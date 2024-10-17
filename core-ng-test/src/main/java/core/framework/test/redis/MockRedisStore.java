@@ -51,9 +51,9 @@ class MockRedisStore {
         }
 
         @SuppressWarnings("unchecked")
-        Map<String, String> hash() {
+        Map<String, HashValue> hash() {
             assertThat(value).isInstanceOf(Map.class);
-            return (Map<String, String>) value;
+            return (Map<String, HashValue>) value;
         }
 
         @SuppressWarnings("unchecked")
@@ -74,6 +74,19 @@ class MockRedisStore {
         HyperLogLog hyperLogLog() {
             assertThat(value).isInstanceOf(HyperLogLog.class);
             return (HyperLogLog) value;
+        }
+
+        boolean expired(long now) {
+            return expirationTime != null && now >= expirationTime;
+        }
+    }
+
+    static class HashValue {
+        final String value;
+        Long expirationTime;
+
+        HashValue(String value) {
+            this.value = value;
         }
 
         boolean expired(long now) {

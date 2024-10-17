@@ -2,6 +2,7 @@ package core.framework.internal.redis;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -64,5 +65,13 @@ class RedisHashOperationTest extends AbstractRedisOperationTest {
         redis.hash().increaseBy("key", "f1", 1);
 
         assertRequestEquals("*4\r\n$7\r\nHINCRBY\r\n$3\r\nkey\r\n$2\r\nf1\r\n$1\r\n1\r\n");
+    }
+
+    @Test
+    void expire() {
+        response("*1\r\n:1\r\n");
+        redis.hash().expire("key", "f1", Duration.ofMinutes(1));
+
+        assertRequestEquals("*6", "$8", "HPEXPIRE", "$3", "key", "$5", "60000", "$6", "FIELDS", "$1", "1", "$2", "f1");
     }
 }

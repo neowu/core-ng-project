@@ -69,7 +69,6 @@ final class Protocol {
         static final byte[] GET = Strings.bytes("GET");
         static final byte[] SET = Strings.bytes("SET");
         static final byte[] PEXPIRE = Strings.bytes("PEXPIRE");
-        static final byte[] PTTL = Strings.bytes("PTTL");
         static final byte[] DEL = Strings.bytes("DEL");
         static final byte[] INCRBY = Strings.bytes("INCRBY");
         static final byte[] MGET = Strings.bytes("MGET");
@@ -82,6 +81,7 @@ final class Protocol {
         static final byte[] HMSET = Strings.bytes("HMSET");
         static final byte[] HDEL = Strings.bytes("HDEL");
         static final byte[] HINCRBY = Strings.bytes("HINCRBY");
+        static final byte[] HPEXPIRE = Strings.bytes("HPEXPIRE");
 
         static final byte[] PFADD = Strings.bytes("PFADD");
         static final byte[] PFCOUNT = Strings.bytes("PFCOUNT");
@@ -113,5 +113,6 @@ final class Protocol {
         static final byte[] LIMIT = Strings.bytes("LIMIT");
         static final byte[] WITHSCORES = Strings.bytes("WITHSCORES");
         static final byte[] BYSCORE = Strings.bytes("BYSCORE");
+        static final byte[] FIELDS = Strings.bytes("FIELDS");
     }
 }

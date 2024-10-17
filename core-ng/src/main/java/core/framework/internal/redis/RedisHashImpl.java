@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.Duration;
 import java.util.Map;
 
 import static core.framework.internal.redis.Protocol.Command.HDEL;
@@ -19,7 +20,9 @@ import static core.framework.internal.redis.Protocol.Command.HGET;
 import static core.framework.internal.redis.Protocol.Command.HGETALL;
 import static core.framework.internal.redis.Protocol.Command.HINCRBY;
 import static core.framework.internal.redis.Protocol.Command.HMSET;
+import static core.framework.internal.redis.Protocol.Command.HPEXPIRE;
 import static core.framework.internal.redis.Protocol.Command.HSET;
+import static core.framework.internal.redis.Protocol.Keyword.FIELDS;
 import static core.framework.internal.redis.RedisEncodings.decode;
 import static core.framework.internal.redis.RedisEncodings.encode;
 import static core.framework.internal.redis.RedisEncodings.validate;
@@ -186,6 +189,34 @@ public final class RedisHashImpl implements RedisHash {
             long elapsed = watch.elapsed();
             logger.debug("hdel, key={}, fields={}, size={}, deletedFields={}, elapsed={}", key, new ArrayLogParam(fields), fields.length, deletedFields, elapsed);
             ActionLogContext.track("redis", elapsed, 0, (int) deletedFields);
+        }
+    }
+
+    @Override
+    public void expire(String key, String field, Duration expiration) {
+        var watch = new StopWatch();
+        validate("key", key);
+        validate("field", field);
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.writeArray(6);
+            connection.writeBlobString(HPEXPIRE);
+            connection.writeBlobString(encode(key));
+            connection.writeBlobString(encode(expiration.toMillis()));
+            connection.writeBlobString(FIELDS);
+            connection.writeBlobString(encode(1));
+            connection.writeBlobString(encode(field));
+            connection.flush();
+            connection.readArray();
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            logger.debug("hpexpire, key={}, field={}, expiration={}, elapsed={}", key, field, expiration, elapsed);
+            ActionLogContext.track("redis", elapsed, 0, 1);
         }
     }
 }
