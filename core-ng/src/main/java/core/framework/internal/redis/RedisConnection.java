@@ -9,7 +9,7 @@ import static core.framework.internal.redis.RedisEncodings.encode;
 /**
  * @author neo
  */
-class RedisConnection implements AutoCloseable {
+public class RedisConnection implements AutoCloseable {
     RedisOutputStream outputStream;
     RedisInputStream inputStream;
     private Socket socket;

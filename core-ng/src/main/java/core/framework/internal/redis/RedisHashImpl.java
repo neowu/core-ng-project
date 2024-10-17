@@ -203,7 +203,7 @@ public final class RedisHashImpl implements RedisHash {
             connection.writeArray(6);
             connection.writeBlobString(HPEXPIRE);
             connection.writeBlobString(encode(key));
-            connection.writeBlobString(encode(expiration.toMillis()));
+            connection.writeBlobString(encode(expiration.toMillis()));      // HPEXPIRE accepts zero and negative ttl
             connection.writeBlobString(FIELDS);
             connection.writeBlobString(encode(1));
             connection.writeBlobString(encode(field));

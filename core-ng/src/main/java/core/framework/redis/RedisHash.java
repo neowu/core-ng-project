@@ -21,5 +21,6 @@ public interface RedisHash {
 
     long del(String key, String... fields);
 
+    // supported by redis since 7.4
     void expire(String key, String field, Duration duration);
 }

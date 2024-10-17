@@ -376,7 +376,7 @@ public final class RedisImpl implements Redis {
         return redisHyperLogLog;
     }
 
-    byte[] expirationValue(Duration expiration) {
+    private byte[] expirationValue(Duration expiration) {
         long expirationTime = expiration.toMillis();
         if (expirationTime <= 0) throw new Error("expiration time must be longer than 0ms");
         return encode(expirationTime);
