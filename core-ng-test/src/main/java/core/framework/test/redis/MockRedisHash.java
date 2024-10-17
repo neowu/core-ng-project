@@ -31,7 +31,7 @@ public final class MockRedisHash implements RedisHash {
         for (Map.Entry<String, MockRedisStore.HashValue> entry : hash.entrySet()) {
             MockRedisStore.HashValue hashValue = entry.getValue();
             if (!hashValue.expired(now)) {
-                results.put(entry.getKey(), hashValue.toString());
+                results.put(entry.getKey(), hashValue.value);
             }
         }
         return results;
