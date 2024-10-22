@@ -6,7 +6,9 @@ import core.framework.internal.web.websocket.WebSocketHandler;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormDataParser;
+import io.undertow.server.handlers.form.FormEncodedDataDefinition;
 import io.undertow.server.handlers.form.FormParserFactory;
+import io.undertow.server.handlers.form.MultiPartParserDefinition;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
@@ -32,12 +34,25 @@ public class HTTPIOHandler implements HttpHandler {
     HTTPIOHandler(HTTPHandler handler, ShutdownHandler shutdownHandler, long maxEntitySize, ServerSentEventHandler sseHandler, WebSocketHandler webSocketHandler) {
         this.handler = handler;
         this.shutdownHandler = shutdownHandler;
-        var builder = FormParserFactory.builder();
-        builder.setDefaultCharset(UTF_8.name());
-        formParserFactory = builder.build();
+        formParserFactory = createFormParserFactory();
         this.maxEntitySize = maxEntitySize;
         this.sseHandler = sseHandler;
         this.webSocketHandler = webSocketHandler;
+    }
+
+    private FormParserFactory createFormParserFactory() {
+        var builder = FormParserFactory.builder(false);
+
+        var formDefinition = new FormEncodedDataDefinition();
+        formDefinition.setDefaultEncoding(UTF_8.name());
+        builder.addParser(formDefinition);
+
+        var multiPartDefinition = new MultiPartParserDefinition();
+        multiPartDefinition.setDefaultEncoding(UTF_8.name());
+        multiPartDefinition.setFileSizeThreshold(-1); // always write to temp file for multipart uploading
+        builder.addParser(multiPartDefinition);
+
+        return builder.build();
     }
 
     @Override

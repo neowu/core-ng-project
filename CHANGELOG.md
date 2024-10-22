@@ -1,5 +1,9 @@
 ## Change log
 
+### 9.1.4 (10/22/2024 - )
+
+* http_server: always write multipart uploading for temp file
+
 ### 9.1.3 (9/26/2024 - 10/17/2024)
 
 * validation: @Pattern supports @Pattern(ignoreCase = true)
