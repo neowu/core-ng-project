@@ -54,7 +54,7 @@ public class FallbackDNSCache implements Dns {
         List<InetAddress> addresses;
         long ttl;
 
-        public Entry(List<InetAddress> addresses, long ttl) {
+        Entry(List<InetAddress> addresses, long ttl) {
             this.addresses = addresses;
             this.ttl = ttl;
         }
