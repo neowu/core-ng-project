@@ -37,6 +37,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.Clock;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -108,7 +109,7 @@ public final class HTTPClientBuilder {
                 builder.addInterceptor(new RetryInterceptor(maxRetries, retryWaitTime));
             }
             if (enableCookie) builder.cookieJar(new CookieManager());
-            if (enableFallbackDNSCache) builder.dns(new FallbackDNSCache());
+            if (enableFallbackDNSCache) builder.dns(new FallbackDNSCache(Clock.systemUTC()));
 
             return new HTTPClientImpl(builder.build(), userAgent, slowOperationThreshold, timeout);
         } finally {

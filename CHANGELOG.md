@@ -3,6 +3,8 @@
 ### 9.1.4 (10/22/2024 - )
 
 * http_server: always write multipart uploading for temp file
+* http_client: use 1 hour TTL for fallback dns cache
+  > report error for permanent DNS issue after 1 hour
 
 ### 9.1.3 (9/26/2024 - 10/17/2024)
 
