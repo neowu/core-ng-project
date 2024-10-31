@@ -1,4 +1,4 @@
-FROM        neowu/jre:21.0.3
+FROM        neowu/jre:21.0.5
 LABEL       app=log-collector
 RUN         addgroup --gid 1000 --system app && adduser --system --no-create-home --ingroup app --uid 1000 app
 USER        1000
