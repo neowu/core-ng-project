@@ -6,6 +6,8 @@
 * http_client: use 1 hour TTL for fallback dns cache
   > report error for permanent DNS issue after 1 hour
 * jre: published neowu/jre:21.0.5
+* log-exporter: replace "rm -rf" with "find -delete"
+  > "find" is more memory efficient, "rm -rf" may cause OOM with deep dir and many files
 
 ### 9.1.3 (9/26/2024 - 10/17/2024)
 
