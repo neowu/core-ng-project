@@ -8,6 +8,8 @@
 * jre: published neowu/jre:21.0.5
 * log-exporter: replace "rm -rf" with "find -delete"
   > "find" is more memory efficient, "rm -rf" may cause OOM with deep dir and many files
+* undertow: rolled back to 2.3.10
+  > though 2.3.18 fixed memory leak, the memory consumption is much worse under load test (heap usage and GC)
 
 ### 9.1.3 (9/26/2024 - 10/17/2024)
 
