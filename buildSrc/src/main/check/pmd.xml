@@ -12,14 +12,14 @@
     <rule ref="category/java/bestpractices.xml/AvoidReassigningParameters"/>
     <rule ref="category/java/bestpractices.xml/AvoidReassigningLoopVariables"/>
     <rule ref="category/java/bestpractices.xml/ConstantsInInterface"/>
-    <rule ref="category/java/bestpractices.xml/DefaultLabelNotLastInSwitchStmt"/>
+    <rule ref="category/java/bestpractices.xml/DefaultLabelNotLastInSwitch"/>
     <rule ref="category/java/bestpractices.xml/DoubleBraceInitialization"/>
     <rule ref="category/java/bestpractices.xml/ForLoopCanBeForeach"/>
     <rule ref="category/java/bestpractices.xml/ForLoopVariableCount"/>
     <rule ref="category/java/bestpractices.xml/JUnit5TestShouldBePackagePrivate"/>
     <rule ref="category/java/bestpractices.xml/LooseCoupling">
         <properties>
-            <property name="allowedTypes" value="java.util.Properties,org.bson.Document,io.undertow.util.HeaderValues"/>
+            <property name="allowedTypes" value="java.util.Properties,org.bson.Document,io.undertow.util.HeaderValues,org.jsoup.select.Elements,com.google.cloud.bigquery.FieldValueList"/>
         </properties>
     </rule>
     <rule ref="category/java/bestpractices.xml/MissingOverride"/>
@@ -158,7 +158,7 @@
     <rule ref="category/java/performance.xml/OptimizableToArrayCall"/>
     <rule ref="category/java/performance.xml/StringInstantiation"/>
     <rule ref="category/java/performance.xml/StringToString"/>
-    <rule ref="category/java/performance.xml/TooFewBranchesForASwitchStatement"/>
+    <rule ref="category/java/performance.xml/TooFewBranchesForSwitch"/>
     <rule ref="category/java/performance.xml/UseArraysAsList"/>
     <rule ref="category/java/performance.xml/UseIndexOfChar"/>
     <rule ref="category/java/performance.xml/UselessStringValueOf"/>
