@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 /**
  * @author neo
  */
-public final class EventSource implements AutoCloseable, Iterable<EventSource.Event>, Iterator<EventSource.Event> {
+public final class EventSource implements AutoCloseable, Iterable<EventSource.Event> {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventSource.class);
     public final int statusCode;
     public final Map<String, String> headers;   // headers key is case insensitive
@@ -44,26 +44,26 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
     }
 
     @Override
-    public boolean hasNext() {
-        if (nextEvent != null) return true;
-        nextEvent = parseResponse(body.source());
-        return nextEvent != null;
-    }
-
-    @Override
-    public Event next() {
-        if (nextEvent != null || hasNext()) {
-            var event = nextEvent;
-            nextEvent = null;
-            return event;
-        } else {
-            throw new NoSuchElementException();
-        }
-    }
-
-    @Override
     public Iterator<Event> iterator() {
-        return this;
+        return new Iterator<>() {
+            @Override
+            public boolean hasNext() {
+                if (nextEvent != null) return true;
+                nextEvent = parseResponse(body.source());
+                return nextEvent != null;
+            }
+
+            @Override
+            public Event next() {
+                if (nextEvent != null || hasNext()) {
+                    var event = nextEvent;
+                    nextEvent = null;
+                    return event;
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+        };
     }
 
     private Event parseResponse(BufferedSource source) {
