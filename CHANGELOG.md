@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.1.4 (10/22/2024 - )
+### 9.1.4 (10/22/2024 - 11/08/2024)
 
 * http_server: always write multipart uploading for temp file
 * http_client: use 1 hour TTL for fallback dns cache
