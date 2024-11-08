@@ -45,25 +45,7 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
 
     @Override
     public Iterator<Event> iterator() {
-        return new Iterator<>() {
-            @Override
-            public boolean hasNext() {
-                if (nextEvent != null) return true;
-                nextEvent = parseResponse(body.source());
-                return nextEvent != null;
-            }
-
-            @Override
-            public Event next() {
-                if (nextEvent != null || hasNext()) {
-                    var event = nextEvent;
-                    nextEvent = null;
-                    return event;
-                } else {
-                    throw new NoSuchElementException();
-                }
-            }
-        };
+        return new EventIterator();
     }
 
     private Event parseResponse(BufferedSource source) {
@@ -102,5 +84,25 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
     }
 
     public record Event(String id, String data) {
+    }
+
+    private class EventIterator implements Iterator<Event> {
+        @Override
+        public boolean hasNext() {
+            if (nextEvent != null) return true;
+            nextEvent = parseResponse(body.source());
+            return nextEvent != null;
+        }
+
+        @Override
+        public Event next() {
+            if (nextEvent != null || hasNext()) {
+                var event = nextEvent;
+                nextEvent = null;
+                return event;
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
     }
 }

@@ -36,7 +36,7 @@ public final class Files {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
-            LOGGER.debug("bytes, file={}, elapsed={}", file.toString(), watch.elapsed());
+            LOGGER.debug("bytes, file={}, elapsed={}", file, watch.elapsed());
         }
     }
 
