@@ -86,7 +86,7 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
     public record Event(String id, String data) {
     }
 
-    private class EventIterator implements Iterator<Event> {
+    private final class EventIterator implements Iterator<Event> {
         @Override
         public boolean hasNext() {
             if (nextEvent != null) return true;
