@@ -48,8 +48,8 @@ public class MessageProducer {
         var watch = new StopWatch();
         try {
             Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs,
-                ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
-                ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000,                           // 60s, DELIVERY_TIMEOUT_MS_CONFIG is INT type
+                ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.ZSTD.name,
+                ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000,                       // 60s, DELIVERY_TIMEOUT_MS_CONFIG is INT type
                 ProducerConfig.LINGER_MS_CONFIG, 5L,                                         // use small linger time within acceptable range to improve batching
                 ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                            // longer backoff to reduce cpu usage when kafka is not available
                 ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5_000L,                      // 5s

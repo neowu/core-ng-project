@@ -12,8 +12,8 @@ subprojects {
 
 val elasticVersion = "8.15.0"
 val jacksonVersion = "2.17.2"
-val junitVersion = "5.11.1"
-val mockitoVersion = "5.14.0"
+val junitVersion = "5.11.3"
+val mockitoVersion = "5.14.2"
 val assertjVersion = "3.26.3"
 
 project("core-ng-api") {
@@ -32,7 +32,7 @@ project("core-ng") {
         implementation("com.squareup.okio:okio:3.2.0")              // okio 3.3.0 has synchronization issue with virtual thread
         implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.20")
         implementation("io.undertow:undertow-core:2.3.10.Final")    // undertow 2.3.11+ has memory leak issue, 2.3.17+ has much worse memory consumption
-        implementation("org.apache.kafka:kafka-clients:3.8.0")
+        implementation("org.apache.kafka:kafka-clients:3.9.0")
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")
         compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.3")
         testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
