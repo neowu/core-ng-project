@@ -2,6 +2,10 @@
 
 ### 9.1.5 (11/11/2024 - )
 
+* log-exporter: change gsutil to "gcloud storage"
+
+> gsutil is deprecated and requires old version of python
+
 ### 9.1.4 (10/22/2024 - 11/08/2024)
 
 * http_server: always write multipart uploading for temp file
