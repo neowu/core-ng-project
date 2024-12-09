@@ -4,6 +4,8 @@ import core.framework.crypto.Hash;
 import core.framework.inject.Inject;
 import core.framework.util.Network;
 import core.framework.util.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
  * @author neo
  */
 public class ArchiveService {
+    private final Logger logger = LoggerFactory.getLogger(ArchiveService.class);
     private final String hash = Hash.md5Hex(Network.LOCAL_HOST_NAME).substring(0, 5);   // generally there only need one log-exporter, this is to avoid file name collision with multiple log-exporter
     private final Shell shell = new Shell();
 
@@ -25,6 +28,8 @@ public class ArchiveService {
     UploadService uploadService;
 
     public void uploadArchive(LocalDate date) {
+        logger.info("uploading begin, date={}", date);
+
         String actionLogPath = actionLogPath(date);
         Path actionLogFilePath = Path.of(logDir.toString(), actionLogPath);
         if (Files.exists(actionLogFilePath)) {
@@ -50,9 +55,13 @@ public class ArchiveService {
                 }
             }
         }
+
+        logger.info("uploading end, date={}", date);
     }
 
     public void cleanupArchive(LocalDate date) {
+        logger.info("cleaning up archives, date={}", date);
+
         Path actionLogFilePath = Path.of(logDir.toString(), actionLogPath(date));
         shell.execute("rm", "-f", actionLogFilePath.toString());
 
