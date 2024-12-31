@@ -61,7 +61,7 @@ project("core-ng-mongo") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng"))
-        api("org.mongodb:mongodb-driver-sync:5.1.2")
+        api("org.mongodb:mongodb-driver-sync:5.2.1")
         testImplementation(project(":core-ng-test"))
     }
 }
@@ -71,7 +71,7 @@ project("core-ng-mongo-test") {
     dependencies {
         implementation(project(":core-ng-test"))
         implementation(project(":core-ng-mongo"))
-        implementation("de.bwaldvogel:mongo-java-server:1.45.0")
+        implementation("de.bwaldvogel:mongo-java-server:1.46.0")
     }
 }
 

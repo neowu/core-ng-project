@@ -3,6 +3,7 @@
 ### 9.1.5 (11/11/2024 - )
 
 * log-exporter: change gsutil to "gcloud storage"
+* mongo: update driver to 5.2.1
 
 > gsutil is deprecated and requires old version of python
 
