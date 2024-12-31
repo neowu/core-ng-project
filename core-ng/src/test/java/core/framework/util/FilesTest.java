@@ -32,5 +32,6 @@ class FilesTest {
         Files.createDir(tempDir.resolve("temp"));   // createDir skips if dir already exists
 
         Files.deleteDir(tempDir);
+        assertThat(tempDir).doesNotExist();
     }
 }

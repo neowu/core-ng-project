@@ -2,6 +2,7 @@ package core.log.service;
 
 import core.framework.crypto.Hash;
 import core.framework.inject.Inject;
+import core.framework.util.Files;
 import core.framework.util.Network;
 import core.framework.util.Strings;
 import org.slf4j.Logger;
@@ -9,10 +10,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.exists;
 
 /**
  * @author neo
@@ -32,18 +35,18 @@ public class ArchiveService {
 
         String actionLogPath = actionLogPath(date);
         Path actionLogFilePath = Path.of(logDir.toString(), actionLogPath);
-        if (Files.exists(actionLogFilePath)) {
+        if (exists(actionLogFilePath)) {
             uploadService.upload(actionLogFilePath, actionLogPath);
         }
 
         String eventPath = eventPath(date);
         Path eventFilePath = Path.of(logDir.toString(), eventPath);
-        if (Files.exists(eventFilePath)) {
+        if (exists(eventFilePath)) {
             uploadService.upload(eventFilePath, eventPath);
         }
 
         Path traceLogDirPath = Path.of(logDir.toString(), Strings.format("/trace/{}", date));
-        if (Files.exists(traceLogDirPath)) {
+        if (exists(traceLogDirPath)) {
             File[] appDirs = traceLogDirPath.toFile().listFiles(File::isDirectory);
             if (appDirs != null) {
                 for (File appDir : appDirs) {
@@ -69,10 +72,10 @@ public class ArchiveService {
         shell.execute("rm", "-f", eventFilePath.toString());
 
         Path traceLogDirPath = Path.of(logDir.toString(), Strings.format("/trace/{}", date));
-        if (Files.exists(traceLogDirPath)) {
-            String path = traceLogDirPath.toString();
-            shell.execute("find", path, "-type", "f", "-delete");
-            shell.execute("find", path, "-type", "d", "-delete");
+        if (exists(traceLogDirPath)) {
+            logger.info("delete trace logs, path={}", traceLogDirPath);
+            // use shell (rm -rf or find) may cause pod terminate with error code 137 on mounted disk
+            Files.deleteDir(traceLogDirPath);
         }
     }
 
@@ -91,7 +94,7 @@ public class ArchiveService {
     public Path initializeLogFilePath(String logPath) throws IOException {
         Path path = Path.of(logDir.toString(), logPath);
         Path parent = path.getParent();
-        if (parent != null && !Files.exists(parent)) Files.createDirectories(parent);
+        if (parent != null && !exists(parent)) createDirectories(parent);
         return path;
     }
 }
