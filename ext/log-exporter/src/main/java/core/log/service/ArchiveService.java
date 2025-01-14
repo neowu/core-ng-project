@@ -2,17 +2,14 @@ package core.log.service;
 
 import core.framework.crypto.Hash;
 import core.framework.inject.Inject;
-import core.framework.util.Files;
 import core.framework.util.Network;
 import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.exists;
@@ -45,20 +42,6 @@ public class ArchiveService {
             uploadService.upload(eventFilePath, eventPath);
         }
 
-        Path traceLogDirPath = Path.of(logDir.toString(), Strings.format("/trace/{}", date));
-        if (exists(traceLogDirPath)) {
-            File[] appDirs = traceLogDirPath.toFile().listFiles(File::isDirectory);
-            if (appDirs != null) {
-                for (File appDir : appDirs) {
-                    String app = appDir.getName();
-                    String traceLogPath = Strings.format("/trace/{}/{}-{}-{}.tar.gz", date, app, date, hash);
-                    Path traceLogFilePath = Path.of(logDir.toString(), traceLogPath);
-                    shell.execute("tar", "-czf", traceLogFilePath.toString(), "-C", logDir.toString(), Strings.format("trace/{}/{}", date, app));
-                    uploadService.upload(traceLogFilePath, traceLogPath);
-                }
-            }
-        }
-
         logger.info("uploading end, date={}", date);
     }
 
@@ -70,13 +53,6 @@ public class ArchiveService {
 
         Path eventFilePath = Path.of(logDir.toString(), eventPath(date));
         shell.execute("rm", "-f", eventFilePath.toString());
-
-        Path traceLogDirPath = Path.of(logDir.toString(), Strings.format("/trace/{}", date));
-        if (exists(traceLogDirPath)) {
-            logger.info("delete trace logs, path={}", traceLogDirPath);
-            // use shell (rm -rf or find) may cause pod terminate with error code 137 on mounted disk
-            Files.deleteDir(traceLogDirPath);
-        }
     }
 
     public String actionLogPath(LocalDate date) {
@@ -85,10 +61,6 @@ public class ArchiveService {
 
     public String eventPath(LocalDate date) {
         return Strings.format("/event/{}/event-{}-{}.ndjson", date.getYear(), date, hash);
-    }
-
-    public String traceLogPath(LocalDateTime now, String app, String id) {
-        return Strings.format("/trace/{}/{}/{}/{}.txt", now.toLocalDate(), app, now.getHour(), id);
     }
 
     public Path initializeLogFilePath(String logPath) throws IOException {

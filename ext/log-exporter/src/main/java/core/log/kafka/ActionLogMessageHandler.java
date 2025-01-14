@@ -10,7 +10,6 @@ import core.log.service.ArchiveService;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -37,20 +36,10 @@ public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMess
             for (Message<ActionLogMessage> message : messages) {
                 ActionLogEntry entry = entry(message.value);
 
-                if (message.value.traceLog != null) {
-                    entry.traceLogPath = archiveService.traceLogPath(now, entry.app, entry.id);
-                    writeTraceLog(entry.traceLogPath, message.value.traceLog);
-                }
-
                 stream.write(writer.toJSON(entry));
                 stream.write('\n');
             }
         }
-    }
-
-    private void writeTraceLog(String traceLogPath, String content) throws IOException {
-        Path path = archiveService.initializeLogFilePath(traceLogPath);
-        Files.writeString(path, content, StandardCharsets.UTF_8, CREATE, APPEND);
     }
 
     private ActionLogEntry entry(ActionLogMessage message) {
