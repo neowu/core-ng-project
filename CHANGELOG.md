@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.1.5 (11/11/2024 - )
+### 9.1.5 (11/11/2024 - 01/22/2025)
 
 * log-exporter: change gsutil to "gcloud storage"
 * log-exporter: remove trace exporting
