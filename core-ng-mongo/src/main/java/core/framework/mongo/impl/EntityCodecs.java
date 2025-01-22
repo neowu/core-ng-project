@@ -45,7 +45,7 @@ public final class EntityCodecs {
             throw new Error("entity or view class is registered, entityClass=" + entityClass.getCanonicalName());
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked", "rawtypes", "PMD.UseDiamondOperator"})
     CodecRegistry codecRegistry() {
         List<Codec<?>> codecs = new ArrayList<>(this.codecs.values());
         codecs.add(new LocalDateTimeCodec());
