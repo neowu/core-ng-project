@@ -83,7 +83,7 @@ public final class HTTPClientImpl implements HTTPClient {
             logger.debug("[response] status={}", statusCode);
             Map<String, String> headers = headers(httpResponse);
             String contentType = headers.get(HTTPHeaders.CONTENT_TYPE);
-            if (statusCode != 200 || !"text/event-stream".equals(contentType)) {
+            if (statusCode != 200 || contentType == null || !contentType.startsWith("text/event-stream")) {
                 byte[] body = body(httpResponse, statusCode);
                 logger.debug("[response] body={}", BodyLogParam.of(body, contentType == null ? null : ContentType.parse(contentType)));
                 throw new HTTPClientException(Strings.format("invalid sse response, statusCode={}, content-type={}", statusCode, contentType), "HTTP_REQUEST_FAILED");
