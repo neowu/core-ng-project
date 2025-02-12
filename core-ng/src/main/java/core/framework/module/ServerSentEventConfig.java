@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.http.HTTPMethod;
 import core.framework.internal.inject.InjectValidator;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
@@ -37,7 +38,7 @@ public class ServerSentEventConfig extends Config {
         }
     }
 
-    public <T> void listen(String path, Class<T> eventClass, ChannelListener<T> listener) {
+    public <T> void listen(HTTPMethod method, String path, Class<T> eventClass, ChannelListener<T> listener) {
         if (HTTPIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
         if (path.contains("/:")) throw new Error("listener path must be static, path=" + path);
 
@@ -45,7 +46,7 @@ public class ServerSentEventConfig extends Config {
             throw new Error("listener class must not be anonymous class or lambda, please create static class, listenerClass=" + listener.getClass().getCanonicalName());
         new InjectValidator(listener).validate();
 
-        logger.info("sse, path={}, eventClass={}, listener={}", path, eventClass.getCanonicalName(), listener.getClass().getCanonicalName());
+        logger.info("sse, method={}, path={}, eventClass={}, listener={}", method, path, eventClass.getCanonicalName(), listener.getClass().getCanonicalName());
 
         if (context.httpServer.sseHandler == null) {
             context.httpServer.sseHandler = new ServerSentEventHandler(context.logManager, context.httpServer.siteManager.sessionManager, context.httpServer.handlerContext);
@@ -57,7 +58,7 @@ public class ServerSentEventConfig extends Config {
         context.apiController.beanClasses.add(eventClass);
 
         var sseContext = new ServerSentEventContextImpl<T>();
-        context.httpServer.sseHandler.add(path, eventClass, listener, sseContext);
+        context.httpServer.sseHandler.add(method, path, eventClass, listener, sseContext);
         context.beanFactory.bind(Types.generic(ServerSentEventContext.class, eventClass), null, sseContext);
         metrics.contexts.add(sseContext);
         context.backgroundTask().scheduleWithFixedDelay(sseContext::keepAlive, Duration.ofSeconds(15));

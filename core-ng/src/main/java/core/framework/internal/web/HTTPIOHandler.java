@@ -69,9 +69,10 @@ public class HTTPIOHandler implements HttpHandler {
 
         HttpString method = exchange.getRequestMethod();
         HeaderMap headers = exchange.getRequestHeaders();
-        boolean sse = sseHandler != null && sseHandler.check(method, headers, path);
-        boolean ws = webSocketHandler != null && webSocketHandler.check(method, headers);
-        boolean active = !sse && !ws;
+
+        var requestHandler = new HTTPRequestHandler(exchange, handler, sseHandler);
+        boolean ws = webSocketHandler != null && webSocketHandler.check(method, headers);   // TODO: retire ws and simplify
+        boolean active = !requestHandler.sse && !ws;
         boolean shutdown = shutdownHandler.handle(exchange, active);
         if (shutdown) return;
 
@@ -82,7 +83,7 @@ public class HTTPIOHandler implements HttpHandler {
                 return;
             }
 
-            var reader = new RequestBodyReader(exchange, handler);
+            var reader = new RequestBodyReader(exchange, requestHandler);
             StreamSourceChannel channel = exchange.getRequestChannel();
             reader.read(channel);  // channel will be null if getRequestChannel() is already called, but here should not be that case
             if (!reader.complete()) {
@@ -92,12 +93,10 @@ public class HTTPIOHandler implements HttpHandler {
             }
         }
 
-        if (active) {
-            exchange.dispatch(handler);
-        } else if (sse) {
-            sseHandler.handleRequest(exchange); // not dispatch, continue in io thread
-        } else {
+        if (ws) {
             exchange.dispatch(webSocketHandler);
+        } else {
+            requestHandler.handle();
         }
     }
 

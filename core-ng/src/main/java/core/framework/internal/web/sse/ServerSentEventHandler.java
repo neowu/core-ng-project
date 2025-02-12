@@ -1,5 +1,6 @@
 package core.framework.internal.web.sse;
 
+import core.framework.http.HTTPMethod;
 import core.framework.internal.async.VirtualThread;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
@@ -8,19 +9,20 @@ import core.framework.internal.web.request.RequestImpl;
 import core.framework.internal.web.session.ReadOnlySession;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.module.ServerSentEventConfig;
+import core.framework.util.Strings;
 import core.framework.web.sse.ChannelListener;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
-import io.undertow.util.Methods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
 import org.xnio.channels.StreamSinkChannel;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,25 +43,31 @@ public class ServerSentEventHandler implements HttpHandler {
         this.handlerContext = handlerContext;
     }
 
-    public boolean check(HttpString method, HeaderMap headers, String path) {
-        return Methods.GET.equals(method) && "text/event-stream".equals(headers.getFirst(Headers.ACCEPT)) && supports.containsKey(path);
+    public boolean check(HttpString method, String path, HeaderMap headers) {
+        return "text/event-stream".equals(headers.getFirst(Headers.ACCEPT))
+               && supports.containsKey(key(method.toString(), path));
     }
 
     @Override
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
+    public void handleRequest(HttpServerExchange exchange) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/event-stream");
         exchange.setPersistent(false);
         StreamSinkChannel sink = exchange.getResponseChannel();
-        if (sink.flush()) {
-            exchange.dispatch(() -> handle(exchange, sink));
-        } else {
-            var listener = ChannelListeners.flushingChannelListener(channel -> exchange.dispatch(() -> handle(exchange, sink)),
-                (channel, e) -> {
-                    logger.warn("failed to establish sse connection, error={}", e.getMessage(), e);
-                    IoUtils.safeClose(exchange.getConnection());
-                });
-            sink.getWriteSetter().set(listener);
-            sink.resumeWrites();
+        try {
+            if (sink.flush()) {
+                exchange.dispatch(() -> handle(exchange, sink));
+            } else {
+                var listener = ChannelListeners.flushingChannelListener(channel -> exchange.dispatch(() -> handle(exchange, sink)),
+                    (channel, e) -> {
+                        logger.warn("failed to establish sse connection, error={}", e.getMessage(), e);
+                        IoUtils.safeClose(exchange.getConnection());
+                    });
+                sink.getWriteSetter().set(listener);
+                sink.resumeWrites();
+            }
+        } catch (IOException e) {
+            logger.warn("failed to establish sse connection, error={}", e.getMessage(), e);
+            IoUtils.safeClose(exchange.getConnection());
         }
     }
 
@@ -78,7 +86,7 @@ public class ServerSentEventHandler implements HttpHandler {
             actionLog.warningContext.maxProcessTimeInNano(MAX_PROCESS_TIME_IN_NANO);
             String path = request.path();
             @SuppressWarnings("unchecked")
-            ChannelSupport<Object> support = (ChannelSupport<Object>) supports.get(path);   // ServerSentEventHandler.check() ensures path exists
+            ChannelSupport<Object> support = (ChannelSupport<Object>) supports.get(key(request.method().name(), path));   // ServerSentEventHandler.check() ensures path exists
             actionLog.action("sse:" + path + ":open");
             handlerContext.rateControl.validateRate(ServerSentEventConfig.SSE_OPEN_GROUP, request.clientIP());
 
@@ -104,9 +112,9 @@ public class ServerSentEventHandler implements HttpHandler {
         }
     }
 
-    public <T> void add(String path, Class<T> eventClass, ChannelListener<T> listener, ServerSentEventContextImpl<T> context) {
-        var previous = supports.put(path, new ChannelSupport<>(listener, eventClass, context));
-        if (previous != null) throw new Error("found duplicate sse listener, path=" + path);
+    public <T> void add(HTTPMethod method, String path, Class<T> eventClass, ChannelListener<T> listener, ServerSentEventContextImpl<T> context) {
+        var previous = supports.put(key(method.name(), path), new ChannelSupport<>(listener, eventClass, context));
+        if (previous != null) throw new Error(Strings.format("found duplicate sse listener, method={}, path={}", method, path));
     }
 
     public void shutdown() {
@@ -116,5 +124,9 @@ public class ServerSentEventHandler implements HttpHandler {
                 channel.close();
             }
         }
+    }
+
+    private String key(String method, String path) {
+        return method + ":" + path;
     }
 }

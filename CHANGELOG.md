@@ -1,10 +1,11 @@
 ## Change log
 
-### 9.1.6 (2/10/2025 - )
+### 9.1.6-b0 (2/10/2025 - )
 
 * http_client: tweak sse checking
 * undertow: updated to 2.3.18.Final
   > due to vulnerability of old versions, has to update to latest despite potential memory consumption is higher
+* sse: support method PUT/POST with body
 
 ### 9.1.5 (11/11/2024 - 01/22/2025)
 
