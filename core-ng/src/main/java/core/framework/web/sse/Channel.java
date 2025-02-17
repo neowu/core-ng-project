@@ -7,6 +7,7 @@ public interface Channel<T> {
         send(null, event);
     }
 
+    // gracefully close, queue "end exchange" into io thread
     void close();
 
     void join(String group);

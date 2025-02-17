@@ -63,7 +63,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
         try {
             queue.add(Strings.bytes(data));
             lastSentTime = System.nanoTime();
-            exchange.getIoThread().execute(() -> writeListener.handleEvent(sink));
+            sink.getIoThread().execute(() -> writeListener.handleEvent(sink));
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("sse", elapsed, 0, data.length());
@@ -79,10 +79,27 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
     @Override
     public void close() {
         LOGGER.debug("close sse connection, channel={}", id);
+        sink.getIoThread().execute(() -> {
+            try {
+                lock.lock();
+                if (closed) return;
+
+                closed = true;
+                if (queue.isEmpty()) {
+                    exchange.endExchange();
+                }
+            } finally {
+                lock.unlock();
+            }
+        });
+    }
+
+    public void shutdown() {
         try {
             lock.lock();
             if (closed) return;
 
+            LOGGER.debug("shutdown sse connection, channel={}", id);
             closed = true;
             queue.clear();
             exchange.endExchange();

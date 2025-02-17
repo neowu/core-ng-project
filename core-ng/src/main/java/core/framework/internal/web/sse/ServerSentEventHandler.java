@@ -121,7 +121,7 @@ public class ServerSentEventHandler implements HttpHandler {
         logger.info("close sse connections");
         for (ChannelSupport<?> support : supports.values()) {
             for (var channel : support.context.all()) {
-                channel.close();
+                ((ChannelImpl<?>) channel).shutdown();
             }
         }
     }

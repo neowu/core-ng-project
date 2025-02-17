@@ -6,6 +6,7 @@ import io.undertow.server.ServerConnection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xnio.XnioIoThread;
+import org.xnio.channels.StreamSinkChannel;
 
 import java.nio.ByteBuffer;
 
@@ -18,9 +19,10 @@ class ChannelImplTest {
 
     @BeforeEach
     void createServerSentEventChannelImpl() {
+        StreamSinkChannel sink = mock(StreamSinkChannel.class);
+        when(sink.getIoThread()).thenReturn(mock(XnioIoThread.class));
         ServerConnection connection = mock(ServerConnection.class);
-        when(connection.getIoThread()).thenReturn(mock(XnioIoThread.class));
-        channel = new ChannelImpl<>(new HttpServerExchange(connection), null, null, new ServerSentEventBuilder<>(TestEvent.class), null);
+        channel = new ChannelImpl<>(new HttpServerExchange(connection), sink, null, new ServerSentEventBuilder<>(TestEvent.class), null);
     }
 
     @Test

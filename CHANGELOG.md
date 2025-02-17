@@ -6,6 +6,7 @@
 * undertow: updated to 2.3.18.Final
   > due to vulnerability of old versions, has to update to latest despite potential memory consumption is higher
 * sse: support method PUT/POST with body
+* sse: channel.close() now closes sse connection gracefully
 
 ### 9.1.5 (11/11/2024 - 01/22/2025)
 
