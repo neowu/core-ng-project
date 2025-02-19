@@ -18,8 +18,8 @@ import javax.annotation.Nullable;
 import java.time.Duration;
 
 public class ServerSentEventConfig extends Config {
-    // use http().limitRate().add(ServerSentEventConfig.SSE_CONNECT_GROUP, ...) to configure rate limiting for ws connections
-    public static final String SSE_OPEN_GROUP = "sse:open";
+    // use http().limitRate().add(ServerSentEventConfig.SSE_CONNECT_GROUP, ...) to configure rate limiting for sse connections
+    public static final String SSE_CONNECT_GROUP = "sse:connect";
 
     private final Logger logger = LoggerFactory.getLogger(ServerSentEventConfig.class);
 
@@ -33,8 +33,8 @@ public class ServerSentEventConfig extends Config {
 
     @Override
     protected void validate() {
-        if (!context.httpServer.handlerContext.rateControl.hasGroup(SSE_OPEN_GROUP)) {
-            context.httpServer.handlerContext.rateControl.config(SSE_OPEN_GROUP, 10, 10, Duration.ofSeconds(30));
+        if (!context.httpServer.handlerContext.rateControl.hasGroup(SSE_CONNECT_GROUP)) {
+            context.httpServer.handlerContext.rateControl.config(SSE_CONNECT_GROUP, 10, 10, Duration.ofSeconds(30));
         }
     }
 

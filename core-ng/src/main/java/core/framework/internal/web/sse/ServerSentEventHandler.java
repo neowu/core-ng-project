@@ -87,8 +87,8 @@ public class ServerSentEventHandler implements HttpHandler {
             String path = request.path();
             @SuppressWarnings("unchecked")
             ChannelSupport<Object> support = (ChannelSupport<Object>) supports.get(key(request.method().name(), path));   // ServerSentEventHandler.check() ensures path exists
-            actionLog.action("sse:" + path + ":open");
-            handlerContext.rateControl.validateRate(ServerSentEventConfig.SSE_OPEN_GROUP, request.clientIP());
+            actionLog.action("sse:" + path + ":connect");
+            handlerContext.rateControl.validateRate(ServerSentEventConfig.SSE_CONNECT_GROUP, request.clientIP());
 
             var channel = new ChannelImpl<>(exchange, sink, support.context, support.builder, actionLog.id);
             actionLog.context("channel", channel.id);
