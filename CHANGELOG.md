@@ -7,6 +7,8 @@
   > due to vulnerability of old versions, has to update to latest despite potential memory consumption is higher
 * sse: support method PUT/POST with body
 * sse: channel.close() now closes sse connection gracefully
+* sse: change retry instruction to 5s
+  > in cloud env, we set backend timeout to around 620s, and let client (js) reconnect every 600s
 
 ### 9.1.5 (11/11/2024 - 01/22/2025)
 
