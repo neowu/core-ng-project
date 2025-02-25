@@ -1,7 +1,8 @@
 package core.framework.web.sse;
 
 public interface Channel<T> {
-    void send(String id, T event);
+    // return true if event is queued, return false if channel is closed
+    boolean send(String id, T event);
 
     default void send(T event) {
         send(null, event);

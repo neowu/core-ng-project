@@ -8,7 +8,7 @@ import org.mockito.Mockito;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
@@ -71,7 +71,7 @@ class ServerSentEventContextImplTest {
         context.keepAlive();
 
         channel.lastSentTime = 0;
-        doNothing().when(channel).send(":\n");
+        doReturn(Boolean.TRUE).when(channel).send(":\n");
         context.keepAlive();
         verify(channel, Mockito.times(1)).send(":\n");
     }

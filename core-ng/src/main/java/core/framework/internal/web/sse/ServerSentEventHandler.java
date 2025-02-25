@@ -28,7 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerSentEventHandler implements HttpHandler {
-    static final long MAX_PROCESS_TIME_IN_NANO = Duration.ofSeconds(300).toNanos();    // persistent connection, use longer max process time, and background task keeps pinging the connection
+    // persistent connection, use longer max process time
+    // though LB backend timeout is to 600s, for long time sse, it should be processed via message queue
+    static final long MAX_PROCESS_TIME_IN_NANO = Duration.ofSeconds(300).toNanos();
 
     private static final HttpString LAST_EVENT_ID = new HttpString("Last-Event-ID");
     private final Logger logger = LoggerFactory.getLogger(ServerSentEventHandler.class);

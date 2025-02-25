@@ -51,19 +51,20 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
     }
 
     @Override
-    public void send(String id, T event) {
+    public boolean send(String id, T event) {
         String data = builder.build(id, event);
-        send(data);
+        return send(data);
     }
 
-    void send(String data) {
-        if (closed) return;
+    boolean send(String data) {
+        if (closed) return false;
 
         var watch = new StopWatch();
         try {
             queue.add(Strings.bytes(data));
             lastSentTime = System.nanoTime();
             sink.getIoThread().execute(() -> writeListener.handleEvent(sink));
+            return true;
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("sse", elapsed, 0, data.length());
