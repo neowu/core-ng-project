@@ -4,7 +4,6 @@ import core.framework.internal.async.VirtualThread;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.Trace;
-import core.framework.internal.web.bean.ResponseBeanWriter;
 import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.internal.web.controller.InvocationImpl;
 import core.framework.internal.web.controller.WebContextImpl;
@@ -42,8 +41,6 @@ public class HTTPHandler implements HttpHandler {
     public final WebContextImpl webContext = new WebContextImpl();
     public final HTTPErrorHandler errorHandler;
 
-    public final ResponseBeanWriter responseBeanWriter = new ResponseBeanWriter();
-
     private final Logger logger = LoggerFactory.getLogger(HTTPHandler.class);
     private final LogManager logManager;
     private final SessionManager sessionManager;
@@ -58,7 +55,7 @@ public class HTTPHandler implements HttpHandler {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
         this.handlerContext = handlerContext;
-        responseHandler = new ResponseHandler(responseBeanWriter, templateManager, sessionManager);
+        responseHandler = new ResponseHandler(handlerContext.responseBeanWriter, templateManager, sessionManager);
         errorHandler = new HTTPErrorHandler(responseHandler);
     }
 

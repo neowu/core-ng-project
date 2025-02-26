@@ -1,5 +1,6 @@
 package core.framework.internal.web.sse;
 
+import core.framework.util.Strings;
 import core.framework.web.sse.Channel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,9 +72,9 @@ class ServerSentEventContextImplTest {
         context.keepAlive();
 
         channel.lastSentTime = 0;
-        doReturn(Boolean.TRUE).when(channel).send(":\n");
+        doReturn(Boolean.TRUE).when(channel).sendBytes(Strings.bytes(":\n"));
         context.keepAlive();
-        verify(channel, Mockito.times(1)).send(":\n");
+        verify(channel, Mockito.times(1)).sendBytes(Strings.bytes(":\n"));
     }
 
     private ChannelImpl<TestEvent> channel() {

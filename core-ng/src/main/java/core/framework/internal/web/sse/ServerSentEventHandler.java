@@ -6,6 +6,7 @@ import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.web.HTTPHandlerContext;
 import core.framework.internal.web.request.RequestImpl;
+import core.framework.internal.web.service.ErrorResponse;
 import core.framework.internal.web.session.ReadOnlySession;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.module.ServerSentEventConfig;
@@ -23,6 +24,7 @@ import org.xnio.IoUtils;
 import org.xnio.channels.StreamSinkChannel;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,6 +80,7 @@ public class ServerSentEventHandler implements HttpHandler {
         long httpDelay = System.nanoTime() - exchange.getRequestStartTime();
         ActionLog actionLog = logManager.begin("=== sse connect begin ===", null);
         var request = new RequestImpl(exchange, handlerContext.requestBeanReader);
+        ChannelImpl<Object> channel = null;
         try {
             logger.debug("httpDelay={}", httpDelay);
             actionLog.stats.put("http_delay", (double) httpDelay);
@@ -92,13 +95,13 @@ public class ServerSentEventHandler implements HttpHandler {
             actionLog.action("sse:" + path + ":connect");
             handlerContext.rateControl.validateRate(ServerSentEventConfig.SSE_CONNECT_GROUP, request.clientIP());
 
-            var channel = new ChannelImpl<>(exchange, sink, support.context, support.builder, actionLog.id);
+            channel = new ChannelImpl<>(exchange, sink, support.context, support.builder, actionLog.id);
             actionLog.context("channel", channel.id);
             sink.getWriteSetter().set(channel.writeListener);
             support.context.add(channel);
             exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support.context));
 
-            channel.send("retry: 5000\n\n");    // set browser retry to 5s
+            channel.sendBytes(Strings.bytes("retry: 5000\n\n"));    // set browser retry to 5s
 
             request.session = ReadOnlySession.of(sessionManager.load(request, actionLog));
             String lastEventId = exchange.getRequestHeaders().getLast(LAST_EVENT_ID);
@@ -107,11 +110,24 @@ public class ServerSentEventHandler implements HttpHandler {
             if (!channel.groups.isEmpty()) actionLog.context("group", channel.groups.toArray()); // may join group onConnect
         } catch (Throwable e) {
             logManager.logError(e);
-            exchange.endExchange();
+
+            if (channel != null) {
+                byte[] error = errorResponse(handlerContext.responseBeanWriter.toJSON(ErrorResponse.errorResponse(e, actionLog.id)));
+                channel.sendBytes(error);
+                channel.close();    // gracefully shutdown connection to make sure retry/error can be sent
+            }
         } finally {
             logManager.end("=== sse connect end ===");
             VirtualThread.COUNT.decrease();
         }
+    }
+
+    byte[] errorResponse(byte[] errorResponse) {
+        ByteBuffer buffer = ByteBuffer.wrap(new byte[errorResponse.length + 38]);
+        buffer.put(Strings.bytes("retry: 86400000\n\nevent: error\ndata: "));   // tell browser retry in 24 hours
+        buffer.put(errorResponse);
+        buffer.put(Strings.bytes("\n\n"));
+        return buffer.array();
     }
 
     public <T> void add(HTTPMethod method, String path, Class<T> eventClass, ChannelListener<T> listener, ServerSentEventContextImpl<T> context) {

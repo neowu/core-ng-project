@@ -1,17 +1,28 @@
 package core.framework.internal.web.service;
 
 import core.framework.api.json.Property;
+import core.framework.log.ErrorCode;
 
 /**
  * @author neo
  */
-public class ErrorResponse {
+public final class ErrorResponse {
+    public static ErrorResponse errorResponse(Throwable e, String actionId) {
+        var response = new ErrorResponse();
+        response.id = actionId;
+        response.message = e.getMessage();
+        if (e instanceof ErrorCode errorCode) {
+            response.errorCode = errorCode.errorCode();
+        } else {
+            response.errorCode = "INTERNAL_ERROR";
+        }
+        return response;
+    }
+
     @Property(name = "id")
     public String id;
-
     @Property(name = "errorCode")
     public String errorCode;
-
     @Property(name = "message")
     public String message;
 }

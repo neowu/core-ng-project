@@ -1,5 +1,6 @@
 package core.framework.internal.web.sse;
 
+import core.framework.util.Strings;
 import core.framework.web.sse.Channel;
 import core.framework.web.sse.ServerSentEventContext;
 import org.slf4j.Logger;
@@ -67,7 +68,7 @@ public class ServerSentEventContextImpl<T> implements ServerSentEventContext<T> 
         for (Channel<T> channel : channels.values()) {
             ChannelImpl<?> impl = (ChannelImpl<?>) channel;
             if (now - impl.lastSentTime >= 15_000_000_000L) {
-                impl.send(":\n");
+                impl.sendBytes(Strings.bytes(":\n"));
             }
         }
     }

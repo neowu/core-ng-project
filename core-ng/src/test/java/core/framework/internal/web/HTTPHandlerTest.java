@@ -19,7 +19,7 @@ class HTTPHandlerTest {
 
     @BeforeEach
     void createHTTPServerHandler() {
-        handler = new HTTPHandler(null, null, null, null);
+        handler = new HTTPHandler(null, null, null, new HTTPHandlerContext());
     }
 
     @Test

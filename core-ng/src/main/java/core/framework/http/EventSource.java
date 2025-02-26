@@ -25,7 +25,8 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
     private int responseBodyLength;
     private long elapsed;
 
-    private String lastId;
+    private String lastType;    // for "event" field
+    private String lastId;      // for "id" field
     private Event nextEvent;
 
     public EventSource(int statusCode, Map<String, String> headers, ResponseBody body, int requestBodyLength, long elapsed) {
@@ -69,11 +70,16 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
                     case "id":
                         lastId = line.substring(index + 2);
                         break;
+                    case "event":
+                        lastType = line.substring(index + 2);
+                        break;
                     case "data":
                         String id = lastId;
                         lastId = null;
-                        return new Event(id, line.substring(index + 2));
-                    default:    // ignore "event", "retry" and other fields
+                        String type = lastType;
+                        lastType = null;
+                        return new Event(id, type, line.substring(index + 2));
+                    default:    // ignore "retry" and other fields
                 }
             }
         } catch (IOException e) {
@@ -83,7 +89,7 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
         }
     }
 
-    public record Event(String id, String data) {
+    public record Event(String id, String type, String data) {
     }
 
     private final class EventIterator implements Iterator<Event> {

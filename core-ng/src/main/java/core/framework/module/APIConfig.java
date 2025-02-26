@@ -55,7 +55,7 @@ public class APIConfig extends Config {
         logger.info("create web service, interface={}", serviceInterface.getCanonicalName());
         var validator = new WebServiceInterfaceValidator(serviceInterface, context.beanClassValidator);
         validator.requestBeanReader = context.httpServer.handlerContext.requestBeanReader;
-        validator.responseBeanWriter = context.httpServer.handler.responseBeanWriter;
+        validator.responseBeanWriter = context.httpServer.handlerContext.responseBeanWriter;
         validator.validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
         new InjectValidator(service).validate();

@@ -41,6 +41,4 @@ public class ActionLogEntry {
     public Map<String, Double> stats;
     @Property(name = "perf_stats")
     public Map<String, PerformanceStatMessage> performanceStats;
-    @Property(name = "trace_log_path")
-    public String traceLogPath;
 }

@@ -4,8 +4,8 @@ public interface Channel<T> {
     // return true if event is queued, return false if channel is closed
     boolean send(String id, T event);
 
-    default void send(T event) {
-        send(null, event);
+    default boolean send(T event) {
+        return send(null, event);
     }
 
     // gracefully close, queue "end exchange" into io thread

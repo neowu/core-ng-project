@@ -1,5 +1,6 @@
 package core.framework.internal.web.sse;
 
+import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
@@ -53,22 +54,22 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
     @Override
     public boolean send(String id, T event) {
         String data = builder.build(id, event);
-        return send(data);
+        return sendBytes(Strings.bytes(data));
     }
 
-    boolean send(String data) {
+    boolean sendBytes(byte[] data) {
         if (closed) return false;
 
         var watch = new StopWatch();
         try {
-            queue.add(Strings.bytes(data));
+            queue.add(data);
             lastSentTime = System.nanoTime();
             sink.getIoThread().execute(() -> writeListener.handleEvent(sink));
             return true;
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("sse", elapsed, 0, data.length());
-            LOGGER.debug("send sse data, channel={}, data={}, elapsed={}", id, data, elapsed); // message is not in json format, not masked, assume sse won't send any sensitive data
+            ActionLogContext.track("sse", elapsed, 0, data.length);
+            LOGGER.debug("send sse data, channel={}, data={}, elapsed={}", id, new BytesLogParam(data), elapsed); // message is not in json format, not masked, assume sse won't send any sensitive data
         }
     }
 

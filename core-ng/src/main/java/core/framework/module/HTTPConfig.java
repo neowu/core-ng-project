@@ -59,7 +59,7 @@ public final class HTTPConfig extends Config {
             }
             reader.registerQueryParam(beanClass, context.beanClassValidator.beanClassNameValidator);
         } else {
-            ResponseBeanWriter writer = context.httpServer.handler.responseBeanWriter;
+            ResponseBeanWriter writer = context.httpServer.handlerContext.responseBeanWriter;
             if (reader.containsBean(beanClass) || writer.contains(beanClass)) {
                 throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
             }

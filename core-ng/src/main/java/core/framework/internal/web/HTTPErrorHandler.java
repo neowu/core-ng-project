@@ -89,15 +89,7 @@ public class HTTPErrorHandler {
             }
             return response;
         } else {
-            var response = new ErrorResponse();
-            response.id = actionId;
-            response.message = e.getMessage();
-            if (e instanceof ErrorCode errorCode) {
-                response.errorCode = errorCode.errorCode();
-            } else {
-                response.errorCode = "INTERNAL_ERROR";
-            }
-            return response;
+            return ErrorResponse.errorResponse(e, actionId);
         }
     }
 

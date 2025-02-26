@@ -6,7 +6,7 @@ import core.framework.internal.web.site.TemplateManager;
 /**
  * @author neo
  */
-final class ResponseHandlerContext {
+public final class ResponseHandlerContext {
     final ResponseBeanWriter writer;
     final TemplateManager templateManager;
 

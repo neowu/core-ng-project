@@ -1,5 +1,9 @@
 ## Change log
 
+### 9.1.7 (2/26/2025 - )
+
+* sse: send ErrorResponse to client via "event: error" on exception
+
 ### 9.1.6 (2/10/2025 - 2/25/2025)
 
 * http_client: tweak sse checking
