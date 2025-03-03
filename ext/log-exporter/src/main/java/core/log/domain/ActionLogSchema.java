@@ -59,7 +59,7 @@ public class ActionLogSchema {
             if (stat.readEntries != null) perfStats.put(key + ".read_entries", (long) stat.readEntries);
             if (stat.writeEntries != null) perfStats.put(key + ".write_entries", (long) stat.writeEntries);
         }
-        record.put("perf_stats", message.performanceStats);
+        record.put("perf_stats", perfStats);
         return record;
     }
 }

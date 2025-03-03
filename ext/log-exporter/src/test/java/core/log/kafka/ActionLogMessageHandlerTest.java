@@ -3,6 +3,7 @@ package core.log.kafka;
 import core.framework.inject.Inject;
 import core.framework.kafka.Message;
 import core.framework.log.message.ActionLogMessage;
+import core.framework.log.message.PerformanceStatMessage;
 import core.framework.util.Files;
 import core.log.IntegrationTest;
 import core.log.domain.ActionLogSchema;
@@ -20,9 +21,9 @@ import java.util.Map;
  * @author neo
  */
 class ActionLogMessageHandlerTest extends IntegrationTest {
-    private ActionLogMessageHandler handler;
     @Inject
     ActionLogSchema schema;
+    private ActionLogMessageHandler handler;
 
     @BeforeEach
     void createActionLogMessageHandler() {
@@ -48,9 +49,19 @@ class ActionLogMessageHandlerTest extends IntegrationTest {
         message.host = "host";
         message.elapsed = 1000L;
         message.context = Map.of("key", List.of("value1", "value2"));
-        message.performanceStats = Map.of();
+        message.performanceStats = Map.of("kafka", perfStats(1, 1000L, 10, 5),
+            "http", perfStats(1, 2000L, null, null));
         message.traceLog = "trace";
         handler.handle(List.of(new Message<>("key", message)));
         handler.handle(List.of(new Message<>("key", message)));
+    }
+
+    private PerformanceStatMessage perfStats(int count, long totalElapsed, Integer readEntries, Integer writeEntries) {
+        final PerformanceStatMessage stats = new PerformanceStatMessage();
+        stats.count = count;
+        stats.totalElapsed = totalElapsed;
+        stats.readEntries = readEntries;
+        stats.writeEntries = writeEntries;
+        return stats;
     }
 }
