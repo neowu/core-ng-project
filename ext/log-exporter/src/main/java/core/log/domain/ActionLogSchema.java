@@ -28,7 +28,7 @@ public class ActionLogSchema {
             .optionalString("error_code")
             .optionalString("error_message")
             .requiredLong("elapsed")
-            .name("context").type().optional().type(SchemaBuilder.map().values().stringType())
+            .name("context").type().optional().type(SchemaBuilder.map().values(SchemaBuilder.array().items().stringType()))
             .name("stats").type().optional().map().values().doubleType()
             .name("perf_stats").type().optional().map().values().longType()
             .endRecord();

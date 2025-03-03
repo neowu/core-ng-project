@@ -47,6 +47,7 @@ class ActionLogMessageHandlerTest extends IntegrationTest {
         message.result = "OK";
         message.host = "host";
         message.elapsed = 1000L;
+        message.context = Map.of("key", List.of("value1", "value2"));
         message.performanceStats = Map.of();
         message.traceLog = "trace";
         handler.handle(List.of(new Message<>("key", message)));
