@@ -29,7 +29,7 @@ class ProcessLogJobTest {
     }
 
     @Test
-    void execute() {
+    void execute() throws Exception {
         job.execute(new JobContext("job", ZonedDateTime.parse("2022-11-07T01:00:00Z")));
 
         verify(archiveService).uploadArchive(LocalDate.parse("2022-11-06"));

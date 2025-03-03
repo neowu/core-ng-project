@@ -25,12 +25,12 @@ public class EventMessage {
     public String errorCode;
     @Property(name = "error_message")
     public String errorMessage;
+    @Property(name = "elapsed")
+    public Long elapsed;
     @Property(name = "context")
     public Map<String, String> context;
     @Property(name = "stats")
     public Map<String, Double> stats;
     @Property(name = "info")
     public Map<String, String> info;
-    @Property(name = "elapsed")
-    public Long elapsed;
 }

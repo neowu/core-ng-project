@@ -4,6 +4,7 @@
 
 * sse: send ErrorResponse to client via "event: error" on exception
 * sse: log clientIP on sse:close action
+* log-exporter: export action and event in parquet format
 
 ### 9.1.6 (2/10/2025 - 2/25/2025)
 

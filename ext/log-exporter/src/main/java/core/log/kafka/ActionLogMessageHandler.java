@@ -1,64 +1,46 @@
 package core.log.kafka;
 
 import core.framework.inject.Inject;
-import core.framework.internal.json.JSONWriter;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.Message;
 import core.framework.log.message.ActionLogMessage;
-import core.log.domain.ActionLogEntry;
+import core.log.domain.ActionLogSchema;
 import core.log.service.ArchiveService;
+import org.apache.avro.file.DataFileWriter;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.specific.SpecificDatumWriter;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
-
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
 
 /**
  * @author neo
  */
 public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMessage> {
-    private final JSONWriter<ActionLogEntry> writer = new JSONWriter<>(ActionLogEntry.class);
-
     @Inject
     ArchiveService archiveService;
+    @Inject
+    ActionLogSchema schema;
 
     @Override
     public void handle(List<Message<ActionLogMessage>> messages) throws IOException {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDate now = LocalDate.now();
 
-        Path path = archiveService.initializeLogFilePath(archiveService.actionLogPath(now.toLocalDate()));
-        try (BufferedOutputStream stream = new BufferedOutputStream(Files.newOutputStream(path, CREATE, APPEND), 3 * 1024 * 1024)) {
+        Path path = archiveService.localActionLogFilePath(now);
+        archiveService.createParentDir(path);
+
+        try (DataFileWriter<GenericData.Record> writer = new DataFileWriter<>(new SpecificDatumWriter<>(schema.schema))) {
+            if (!Files.exists(path)) {
+                writer.create(schema.schema, path.toFile());
+            } else {
+                writer.appendTo(path.toFile());
+            }
             for (Message<ActionLogMessage> message : messages) {
-                ActionLogEntry entry = entry(message.value);
-
-                stream.write(writer.toJSON(entry));
-                stream.write('\n');
+                writer.append(schema.record(message.value));
             }
         }
-    }
-
-    private ActionLogEntry entry(ActionLogMessage message) {
-        var entry = new ActionLogEntry();
-        entry.id = message.id;
-        entry.date = message.date;
-        entry.app = message.app;
-        entry.host = message.host;
-        entry.result = message.result;
-        entry.action = message.action;
-        entry.correlationIds = message.correlationIds;
-        entry.clients = message.clients;
-        entry.refIds = message.refIds;
-        entry.errorCode = message.errorCode;
-        entry.errorMessage = message.errorMessage;
-        entry.elapsed = message.elapsed;
-        entry.context = message.context;
-        entry.stats = message.stats;
-        entry.performanceStats = message.performanceStats;
-        return entry;
     }
 }

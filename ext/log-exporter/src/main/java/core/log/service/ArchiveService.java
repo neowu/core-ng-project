@@ -2,8 +2,18 @@ package core.log.service;
 
 import core.framework.crypto.Hash;
 import core.framework.inject.Inject;
+import core.framework.util.Files;
 import core.framework.util.Network;
+import core.framework.util.Randoms;
+import core.framework.util.StopWatch;
 import core.framework.util.Strings;
+import org.apache.avro.file.DataFileReader;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericDatumReader;
+import org.apache.parquet.avro.AvroParquetWriter;
+import org.apache.parquet.hadoop.ParquetWriter;
+import org.apache.parquet.hadoop.metadata.CompressionCodecName;
+import org.apache.parquet.io.LocalOutputFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,46 +37,78 @@ public class ArchiveService {
     @Inject
     UploadService uploadService;
 
-    public void uploadArchive(LocalDate date) {
+    public void uploadArchive(LocalDate date) throws IOException {
         logger.info("uploading begin, date={}", date);
 
-        String actionLogPath = actionLogPath(date);
-        Path actionLogFilePath = Path.of(logDir.toString(), actionLogPath);
+        Path actionLogFilePath = localActionLogFilePath(date);
         if (exists(actionLogFilePath)) {
-            uploadService.upload(actionLogFilePath, actionLogPath);
+            Path actionLogParquetFilePath = convertToParquet(actionLogFilePath);
+            String remoteActionLogPath = remoteActionLogPath(date);
+            uploadService.upload(actionLogParquetFilePath, remoteActionLogPath);
+            Files.delete(actionLogParquetFilePath);
         }
 
-        String eventPath = eventPath(date);
-        Path eventFilePath = Path.of(logDir.toString(), eventPath);
+        Path eventFilePath = localEventFilePath(date);
         if (exists(eventFilePath)) {
-            uploadService.upload(eventFilePath, eventPath);
+            Path eventParquetFilePath = convertToParquet(actionLogFilePath);
+            String remoteEventPath = remoteEventPath(date);
+            uploadService.upload(eventParquetFilePath, remoteEventPath);
+            Files.delete(eventParquetFilePath);
         }
 
         logger.info("uploading end, date={}", date);
     }
 
+    Path convertToParquet(Path sourcePath) throws IOException {
+        var watch = new StopWatch();
+        var targetPath = sourcePath.resolveSibling(sourcePath.getFileName() + "." + Randoms.alphaNumeric(5) + ".parquet");
+        try (DataFileReader<GenericData.Record> reader = new DataFileReader<>(sourcePath.toFile(), new GenericDatumReader<>());
+             ParquetWriter<GenericData.Record> writer = AvroParquetWriter
+                 .<GenericData.Record>builder(new LocalOutputFile(targetPath))
+                 .withSchema(reader.getSchema())
+                 .withCompressionCodec(CompressionCodecName.ZSTD)
+                 .build()) {
+
+            for (GenericData.Record record : reader) {
+                writer.write(record);
+            }
+
+        } finally {
+            logger.info("convert avro to parquet, source={}, target={}, elapsed={}", sourcePath, targetPath, watch.elapsed());
+        }
+        return targetPath;
+    }
+
     public void cleanupArchive(LocalDate date) {
         logger.info("cleaning up archives, date={}", date);
 
-        Path actionLogFilePath = Path.of(logDir.toString(), actionLogPath(date));
+        Path actionLogFilePath = localActionLogFilePath(date);
         shell.execute("rm", "-f", actionLogFilePath.toString());
 
-        Path eventFilePath = Path.of(logDir.toString(), eventPath(date));
+        Path eventFilePath = localEventFilePath(date);
         shell.execute("rm", "-f", eventFilePath.toString());
     }
 
-    public String actionLogPath(LocalDate date) {
-        return Strings.format("/action/{}/action-{}-{}.ndjson", date.getYear(), date, hash);
+    public String remoteActionLogPath(LocalDate date) {
+        return Strings.format("/action/{}/action-{}-{}.parquet", date.getYear(), date, hash);
     }
 
-    public String eventPath(LocalDate date) {
-        return Strings.format("/event/{}/event-{}-{}.ndjson", date.getYear(), date, hash);
+    public String remoteEventPath(LocalDate date) {
+        return Strings.format("/event/{}/event-{}-{}.parquet", date.getYear(), date, hash);
     }
 
-    public Path initializeLogFilePath(String logPath) throws IOException {
-        Path path = Path.of(logDir.toString(), logPath);
+    public Path localActionLogFilePath(LocalDate date) {
+        String path = Strings.format("/action/{}/action-{}-{}.avro", date.getYear(), date, hash);
+        return Path.of(logDir.toString(), path);
+    }
+
+    public Path localEventFilePath(LocalDate date) {
+        String path = Strings.format("/event/{}/event-{}-{}.avro", date.getYear(), date, hash);
+        return Path.of(logDir.toString(), path);
+    }
+
+    public void createParentDir(Path path) throws IOException {
         Path parent = path.getParent();
         if (parent != null && !exists(parent)) createDirectories(parent);
-        return path;
     }
 }

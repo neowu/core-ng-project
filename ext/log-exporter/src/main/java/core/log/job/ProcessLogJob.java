@@ -5,6 +5,7 @@ import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
 import core.log.service.ArchiveService;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 /**
@@ -15,7 +16,7 @@ public class ProcessLogJob implements Job {
     ArchiveService archiveService;
 
     @Override
-    public void execute(JobContext context) {
+    public void execute(JobContext context) throws IOException {
         LocalDate today = context.scheduledTime.toLocalDate();
         archiveService.cleanupArchive(today.minusDays(5));  // cleanup first, to free disk space when possible
         archiveService.uploadArchive(today.minusDays(1));

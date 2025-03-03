@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +43,7 @@ class UploadControllerTest extends IntegrationTest {
     }
 
     @Test
-    void execute() {
+    void execute() throws IOException {
         Response response = controller.execute(request);
 
         assertThat(response.status()).isEqualTo(HTTPStatus.NO_CONTENT);

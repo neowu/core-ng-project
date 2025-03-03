@@ -5,6 +5,8 @@ import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.module.App;
+import core.log.domain.ActionLogSchema;
+import core.log.domain.EventSchema;
 import core.log.job.ProcessLogJob;
 import core.log.kafka.ActionLogMessageHandler;
 import core.log.kafka.EventMessageHandler;
@@ -12,6 +14,8 @@ import core.log.service.ArchiveService;
 import core.log.service.UploadService;
 import core.log.web.UploadController;
 import core.log.web.UploadRequest;
+import org.apache.avro.data.TimeConversions;
+import org.apache.avro.specific.SpecificData;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -30,6 +34,11 @@ public class LogExporterApp extends App {
         kafka().concurrency(1);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(5000));        // try to get at least 1M message, and can wait longer
         kafka().maxPoll(3000, 3 * 1024 * 1024);         // get 3M message at max
+
+        SpecificData specificData = SpecificData.get();
+        specificData.addLogicalTypeConversion(new TimeConversions.TimestampMicrosConversion());
+        bind(ActionLogSchema.class);
+        bind(EventSchema.class);
 
         bind(new UploadService(requiredProperty("app.log.bucket")));
         bind(ArchiveService.class);
