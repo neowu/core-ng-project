@@ -99,7 +99,7 @@ public class ServerSentEventHandler implements HttpHandler {
             actionLog.context("channel", channel.id);
             sink.getWriteSetter().set(channel.writeListener);
             support.context.add(channel);
-            exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support.context));
+            exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support.context, request.clientIP()));
 
             channel.sendBytes(Strings.bytes("retry: 5000\n\n"));    // set browser retry to 5s
 

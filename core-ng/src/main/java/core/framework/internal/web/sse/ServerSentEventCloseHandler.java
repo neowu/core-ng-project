@@ -15,11 +15,13 @@ class ServerSentEventCloseHandler<T> implements ExchangeCompletionListener {
     final ServerSentEventContextImpl<T> context;
     private final LogManager logManager;
     private final ChannelImpl<T> channel;
+    private final String clientIP;
 
-    ServerSentEventCloseHandler(LogManager logManager, ChannelImpl<T> channel, ServerSentEventContextImpl<T> context) {
+    ServerSentEventCloseHandler(LogManager logManager, ChannelImpl<T> channel, ServerSentEventContextImpl<T> context, String clientIP) {
         this.logManager = logManager;
         this.channel = channel;
         this.context = context;
+        this.clientIP = clientIP;
     }
 
     @Override
@@ -34,6 +36,7 @@ class ServerSentEventCloseHandler<T> implements ExchangeCompletionListener {
                 List<String> refIds = List.of(channel.refId);
                 actionLog.refIds = refIds;
                 actionLog.correlationIds = refIds;
+                actionLog.context.put("client_ip", List.of(clientIP));
                 if (!channel.groups.isEmpty()) actionLog.context("group", channel.groups.toArray());
                 context.remove(channel);
                 channel.shutdown();
