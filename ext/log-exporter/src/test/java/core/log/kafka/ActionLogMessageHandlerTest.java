@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,9 +49,11 @@ class ActionLogMessageHandlerTest extends IntegrationTest {
         message.result = "OK";
         message.host = "host";
         message.elapsed = 1000L;
-        message.context = Map.of("key", List.of("value1", "value2"));
+        List<String> keys = new ArrayList<>();
+        keys.add(null);
+        message.context = Map.of("customer_id", List.of("customer_id1", "customer_id2"), "key", keys);
         message.performanceStats = Map.of("kafka", perfStats(1, 1000L, 10, 5),
-            "http", perfStats(1, 2000L, null, null));
+            "http", perfStats(2, 2000L, null, null));
         message.traceLog = "trace";
         handler.handle(List.of(new Message<>("key", message)));
         handler.handle(List.of(new Message<>("key", message)));
