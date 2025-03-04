@@ -1,10 +1,10 @@
 package core.log.service;
 
 import core.framework.inject.Inject;
-import core.framework.log.message.EventMessage;
 import core.framework.util.Files;
+import core.log.ActionLogMessageFactory;
 import core.log.IntegrationTest;
-import core.log.domain.EventSchema;
+import core.log.domain.ActionLogSchema;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.specific.SpecificDatumWriter;
@@ -16,7 +16,6 @@ import org.junit.jupiter.api.condition.OS;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class ArchiveServiceTest extends IntegrationTest {
     @Inject
-    EventSchema schema;
+    ActionLogSchema schema;
     private ArchiveService archiveService;
 
     @BeforeEach
@@ -77,15 +76,9 @@ class ArchiveServiceTest extends IntegrationTest {
 
     @Test
     void convertToParquet() throws IOException {
-        var message = new EventMessage();
-        message.date = Instant.parse("2022-11-07T00:00:00Z");
-        message.id = "id";
-        message.app = "app";
-        message.action = "action";
-        message.result = "OK";
-        message.elapsed = 1000L;
+        var message = ActionLogMessageFactory.create();
 
-        Path avroPath = archiveService.localEventFilePath(LocalDate.parse("2022-11-07"));
+        Path avroPath = archiveService.localActionLogFilePath(LocalDate.parse("2022-11-07"));
         archiveService.createParentDir(avroPath);
 
         try (DataFileWriter<GenericData.Record> writer = new DataFileWriter<>(new SpecificDatumWriter<>(schema.schema))) {

@@ -11,6 +11,7 @@ import org.apache.avro.file.DataFileReader;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.parquet.avro.AvroParquetWriter;
+import org.apache.parquet.conf.PlainParquetConfiguration;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.apache.parquet.io.LocalOutputFile;
@@ -62,11 +63,14 @@ public class ArchiveService {
     Path convertToParquet(Path sourcePath) throws IOException {
         var watch = new StopWatch();
         var targetPath = sourcePath.resolveSibling(sourcePath.getFileName() + "." + Randoms.alphaNumeric(5) + ".parquet");
+        var config = new PlainParquetConfiguration();
+        config.setBoolean("parquet.avro.write-old-list-structure", false);
         try (DataFileReader<GenericData.Record> reader = new DataFileReader<>(sourcePath.toFile(), new GenericDatumReader<>());
              ParquetWriter<GenericData.Record> writer = AvroParquetWriter
                  .<GenericData.Record>builder(new LocalOutputFile(targetPath))
                  .withSchema(reader.getSchema())
                  .withCompressionCodec(CompressionCodecName.ZSTD)
+                 .withConf(config)
                  .build()) {
 
             for (GenericData.Record record : reader) {
