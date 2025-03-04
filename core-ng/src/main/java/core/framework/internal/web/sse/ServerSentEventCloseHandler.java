@@ -9,19 +9,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 class ServerSentEventCloseHandler<T> implements ExchangeCompletionListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerSentEventCloseHandler.class);
     final ServerSentEventContextImpl<T> context;
     private final LogManager logManager;
     private final ChannelImpl<T> channel;
-    private final String clientIP;
+    private final Map<String, String> logContext;
 
-    ServerSentEventCloseHandler(LogManager logManager, ChannelImpl<T> channel, ServerSentEventContextImpl<T> context, String clientIP) {
+    ServerSentEventCloseHandler(LogManager logManager, ChannelImpl<T> channel, ServerSentEventContextImpl<T> context, Map<String, String> logContext) {
         this.logManager = logManager;
         this.channel = channel;
         this.context = context;
-        this.clientIP = clientIP;
+        this.logContext = logContext;
     }
 
     @Override
@@ -36,7 +37,11 @@ class ServerSentEventCloseHandler<T> implements ExchangeCompletionListener {
                 List<String> refIds = List.of(channel.refId);
                 actionLog.refIds = refIds;
                 actionLog.correlationIds = refIds;
-                actionLog.context.put("client_ip", List.of(clientIP));
+
+                for (Map.Entry<String, String> entry : logContext.entrySet()) {
+                    actionLog.context(entry.getKey(), entry.getValue());
+                }
+
                 if (!channel.groups.isEmpty()) actionLog.context("group", channel.groups.toArray());
                 context.remove(channel);
                 channel.shutdown();

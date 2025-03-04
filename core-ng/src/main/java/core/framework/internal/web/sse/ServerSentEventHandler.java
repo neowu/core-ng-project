@@ -27,12 +27,14 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ServerSentEventHandler implements HttpHandler {
     // persistent connection, use longer max process time
     // though LB backend timeout is to 600s, for long time sse, it should be processed via message queue
     static final long MAX_PROCESS_TIME_IN_NANO = Duration.ofSeconds(300).toNanos();
+    static final HttpString HEADER_TRACE_ID = new HttpString("x-trace-id");
 
     private static final HttpString LAST_EVENT_ID = new HttpString("Last-Event-ID");
     private final Logger logger = LoggerFactory.getLogger(ServerSentEventHandler.class);
@@ -97,9 +99,18 @@ public class ServerSentEventHandler implements HttpHandler {
 
             channel = new ChannelImpl<>(exchange, sink, support.context, support.builder, actionLog.id);
             actionLog.context("channel", channel.id);
+
+            Map<String, String> logContext = new HashMap<>();
+            logContext.put("client_id", request.clientIP());
+            String traceId = exchange.getRequestHeaders().getFirst(HEADER_TRACE_ID);    // used by frontend to trace request
+            if (traceId != null) {
+                actionLog.context.put("trace_id", List.of(traceId));
+                logContext.put("trace_id", traceId);
+            }
+
             sink.getWriteSetter().set(channel.writeListener);
             support.context.add(channel);
-            exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support.context, request.clientIP()));
+            exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support.context, logContext));
 
             channel.sendBytes(Strings.bytes("retry: 5000\n\n"));    // set browser retry to 5s
 
