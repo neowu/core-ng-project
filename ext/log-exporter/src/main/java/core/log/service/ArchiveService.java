@@ -86,11 +86,11 @@ public class ArchiveService {
         shell.execute("rm", "-f", eventFilePath.toString());
     }
 
-    public String remoteActionLogPath(LocalDate date) {
+    String remoteActionLogPath(LocalDate date) {
         return Strings.format("/action/{}/action-{}-{}.parquet", date.getYear(), date, hash);
     }
 
-    public String remoteEventPath(LocalDate date) {
+    String remoteEventPath(LocalDate date) {
         return Strings.format("/event/{}/event-{}-{}.parquet", date.getYear(), date, hash);
     }
 
