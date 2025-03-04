@@ -40,24 +40,17 @@ public class ArchiveService {
 
     public void uploadArchive(LocalDate date) throws IOException {
         logger.info("uploading begin, date={}", date);
-
-        Path actionLogFilePath = localActionLogFilePath(date);
-        if (exists(actionLogFilePath)) {
-            Path actionLogParquetFilePath = convertToParquet(actionLogFilePath);
-            String remoteActionLogPath = remoteActionLogPath(date);
-            uploadService.upload(actionLogParquetFilePath, remoteActionLogPath);
-            Files.delete(actionLogParquetFilePath);
-        }
-
-        Path eventFilePath = localEventFilePath(date);
-        if (exists(eventFilePath)) {
-            Path eventParquetFilePath = convertToParquet(actionLogFilePath);
-            String remoteEventPath = remoteEventPath(date);
-            uploadService.upload(eventParquetFilePath, remoteEventPath);
-            Files.delete(eventParquetFilePath);
-        }
-
+        upload(localActionLogFilePath(date), remoteActionLogPath(date));
+        upload(localEventFilePath(date), remoteEventPath(date));
         logger.info("uploading end, date={}", date);
+    }
+
+    private void upload(Path localFilePath, String remotePath) throws IOException {
+        if (exists(localFilePath)) {
+            Path parquetFilePath = convertToParquet(localFilePath);
+            uploadService.upload(parquetFilePath, remotePath);
+            Files.delete(parquetFilePath);
+        }
     }
 
     Path convertToParquet(Path sourcePath) throws IOException {
