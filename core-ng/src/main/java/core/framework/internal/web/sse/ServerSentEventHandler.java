@@ -100,17 +100,16 @@ public class ServerSentEventHandler implements HttpHandler {
             channel = new ChannelImpl<>(exchange, sink, support.context, support.builder, actionLog.id);
             actionLog.context("channel", channel.id);
 
-            Map<String, String> logContext = new HashMap<>();
-            logContext.put("client_id", request.clientIP());
+            channel.clientIP = request.clientIP();
             String traceId = exchange.getRequestHeaders().getFirst(HEADER_TRACE_ID);    // used by frontend to trace request
             if (traceId != null) {
                 actionLog.context.put("trace_id", List.of(traceId));
-                logContext.put("trace_id", traceId);
+                channel.traceId = traceId;
             }
 
             sink.getWriteSetter().set(channel.writeListener);
             support.context.add(channel);
-            exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support.context, logContext));
+            exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support));
 
             channel.sendBytes(Strings.bytes("retry: 5000\n\n"));    // set browser retry to 5s
 

@@ -46,4 +46,13 @@ class ChannelImplTest {
         assertThat(channel.queue.size()).isEqualTo(1);
         assertThat(channel.lastSentTime).isGreaterThan(oldTime);
     }
+
+    @Test
+    void context() {
+        channel.context().put("key", "value");
+        assertThat(channel.context().get("key")).isEqualTo("value");
+
+        channel.context().put("key", null);
+        assertThat(channel.context().get("key")).isNull();
+    }
 }

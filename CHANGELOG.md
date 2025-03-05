@@ -6,6 +6,7 @@
 * sse: log clientIP on sse:close action
 * log-exporter: export action and event in parquet format
 * sse: support client side "x-trace-id" header
+* sse: support channel.context() and listener.onClose()
 
 ### 9.1.6 (2/10/2025 - 2/25/2025)
 

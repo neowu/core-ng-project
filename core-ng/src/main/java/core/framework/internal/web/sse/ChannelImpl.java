@@ -12,17 +12,20 @@ import org.slf4j.LoggerFactory;
 import org.xnio.ChannelListener;
 import org.xnio.channels.StreamSinkChannel;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.locks.ReentrantLock;
 
-class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
+class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.Context {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelImpl.class);
 
     final String id = UUID.randomUUID().toString();
@@ -33,7 +36,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
     final WriteListener writeListener = new WriteListener();
     final Deque<byte[]> queue = new ConcurrentLinkedDeque<>();
 
-    private final ServerSentEventContextImpl<T> context;
+    private final ServerSentEventContextImpl<T> serverSentEventContext;
     private final ServerSentEventBuilder<T> builder;
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -43,10 +46,15 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
     long lastSentTime = startTime;
     private volatile boolean closed = false;
 
-    ChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ServerSentEventContextImpl<T> context, ServerSentEventBuilder<T> builder, String refId) {
+    private final Map<String, Object> context = new ConcurrentHashMap<>();
+
+    String clientIP;
+    String traceId;
+
+    ChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ServerSentEventContextImpl<T> serverSentEventContext, ServerSentEventBuilder<T> builder, String refId) {
         this.exchange = exchange;
         this.sink = sink;
-        this.context = context;
+        this.serverSentEventContext = serverSentEventContext;
         this.builder = builder;
         this.refId = refId;
     }
@@ -55,6 +63,11 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
     public boolean send(String id, T event) {
         String data = builder.build(id, event);
         return sendBytes(Strings.bytes(data));
+    }
+
+    @Override
+    public Context context() {
+        return this;
     }
 
     boolean sendBytes(byte[] data) {
@@ -112,12 +125,12 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
 
     @Override
     public void join(String group) {
-        context.join(this, group);
+        serverSentEventContext.join(this, group);
     }
 
     @Override
     public void leave(String group) {
-        context.leave(this, group);
+        serverSentEventContext.leave(this, group);
     }
 
     ByteBuffer poll() {
@@ -145,6 +158,18 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T> {
         }
 
         return ByteBuffer.wrap(result);
+    }
+
+    @Nullable
+    @Override
+    public Object get(String key) {
+        return context.get(key);
+    }
+
+    @Override
+    public void put(String key, @Nullable Object value) {
+        if (value == null) context.remove(key);
+        else context.put(key, value);
     }
 
     private final class WriteListener implements ChannelListener<StreamSinkChannel> {
