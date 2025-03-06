@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.1.7 (2/26/2025 - )
+### 9.1.7 (2/26/2025 - 3/6/2025)
 
 * sse: send ErrorResponse to client via "event: error" on exception
 * sse: log clientIP on sse:close action
