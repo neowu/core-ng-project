@@ -1,5 +1,11 @@
 ## Change log
 
+### 9.1.8 (3/7/2025 - )
+
+* sse: removed default rate limit group ServerSentEventConfig.SSE_CONNECT_GROUP ("sse:connect")
+* sse: support @LimitRate on sse connect or class
+  > use @LimitRate and http().limitRate().add() to configure rate limit
+
 ### 9.1.7 (2/26/2025 - 3/6/2025)
 
 * sse: send ErrorResponse to client via "event: error" on exception

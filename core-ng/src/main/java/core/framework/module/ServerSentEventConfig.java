@@ -18,9 +18,6 @@ import javax.annotation.Nullable;
 import java.time.Duration;
 
 public class ServerSentEventConfig extends Config {
-    // use http().limitRate().add(ServerSentEventConfig.SSE_CONNECT_GROUP, ...) to configure rate limiting for sse connections
-    public static final String SSE_CONNECT_GROUP = "sse:connect";
-
     private final Logger logger = LoggerFactory.getLogger(ServerSentEventConfig.class);
 
     ModuleContext context;
@@ -29,13 +26,6 @@ public class ServerSentEventConfig extends Config {
     @Override
     protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = context;
-    }
-
-    @Override
-    protected void validate() {
-        if (!context.httpServer.handlerContext.rateControl.hasGroup(SSE_CONNECT_GROUP)) {
-            context.httpServer.handlerContext.rateControl.config(SSE_CONNECT_GROUP, 10, 10, Duration.ofSeconds(30));
-        }
     }
 
     public <T> void listen(HTTPMethod method, String path, Class<T> eventClass, ChannelListener<T> listener) {

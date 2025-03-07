@@ -70,7 +70,7 @@ public class HTTPIOHandler implements HttpHandler {
         HttpString method = exchange.getRequestMethod();
         HeaderMap headers = exchange.getRequestHeaders();
 
-        var requestHandler = new HTTPRequestHandler(exchange, handler, sseHandler);
+        var requestHandler = new Handler(exchange);
         boolean ws = webSocketHandler != null && webSocketHandler.check(method, headers);   // TODO: retire ws and simplify
         boolean active = !requestHandler.sse && !ws;
         boolean shutdown = shutdownHandler.handle(exchange, active);
@@ -122,5 +122,27 @@ public class HTTPIOHandler implements HttpHandler {
     boolean hasBody(long contentLength, HttpString method) {
         if (contentLength == 0) return false;  // if body is empty, skip reading
         return Methods.POST.equals(method) || Methods.PUT.equals(method) || Methods.PATCH.equals(method);
+    }
+
+    public class Handler {
+        private final boolean sse;
+        private final HttpServerExchange exchange;
+
+        Handler(HttpServerExchange exchange) {
+            this.exchange = exchange;
+
+            HttpString method = exchange.getRequestMethod();
+            String path = exchange.getRequestPath();
+            HeaderMap headers = exchange.getRequestHeaders();
+            sse = sseHandler != null && sseHandler.check(method, path, headers);
+        }
+
+        public void handle() {
+            if (sse) {
+                sseHandler.handleRequest(exchange); // not dispatch, continue in io thread
+            } else {
+                exchange.dispatch(handler);
+            }
+        }
     }
 }

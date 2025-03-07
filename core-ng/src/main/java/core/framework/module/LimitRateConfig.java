@@ -20,6 +20,7 @@ public final class LimitRateConfig extends Config {
         // save at max 5K group/ip combination per pod, about 800K memory, to adapt with more ips/cc attack, better defense with cloud infra based solution together
         maxEntries(5000);
         context.httpServerConfig.interceptors.add(new LimitRateInterceptor(rateControl));
+        context.httpServer.handlerContext.limitRate = true;
     }
 
     @Override

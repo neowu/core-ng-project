@@ -18,6 +18,7 @@ class LimitRateConfigTest {
     void createLimitRateConfig() {
         config = new LimitRateConfig();
         config.initialize(new ModuleContext(null), null);
+        config.maxEntries(5000);
     }
 
     @Test

@@ -5,12 +5,13 @@ import core.framework.internal.async.VirtualThread;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.web.HTTPHandlerContext;
+import core.framework.internal.web.http.RateControl;
 import core.framework.internal.web.request.RequestImpl;
 import core.framework.internal.web.service.ErrorResponse;
 import core.framework.internal.web.session.ReadOnlySession;
 import core.framework.internal.web.session.SessionManager;
-import core.framework.module.ServerSentEventConfig;
 import core.framework.util.Strings;
+import core.framework.web.rate.LimitRate;
 import core.framework.web.sse.ChannelListener;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -95,7 +96,10 @@ public class ServerSentEventHandler implements HttpHandler {
             @SuppressWarnings("unchecked")
             ChannelSupport<Object> support = (ChannelSupport<Object>) supports.get(key(request.method().name(), path));   // ServerSentEventHandler.check() ensures path exists
             actionLog.action("sse:" + path + ":connect");
-            handlerContext.rateControl.validateRate(ServerSentEventConfig.SSE_CONNECT_GROUP, request.clientIP());
+
+            if (handlerContext.limitRate) {
+                limitRate(handlerContext.rateControl, support, request.clientIP());
+            }
 
             channel = new ChannelImpl<>(exchange, sink, support.context, support.builder, actionLog.id);
             actionLog.context("channel", channel.id);
@@ -129,6 +133,14 @@ public class ServerSentEventHandler implements HttpHandler {
         } finally {
             logManager.end("=== sse connect end ===");
             VirtualThread.COUNT.decrease();
+        }
+    }
+
+    void limitRate(RateControl rateControl, ChannelSupport<Object> support, String clientIP) {
+        LimitRate limitRate = support.annotation(LimitRate.class);
+        if (limitRate != null) {
+            String group = limitRate.value();
+            rateControl.validateRate(group, clientIP);
         }
     }
 

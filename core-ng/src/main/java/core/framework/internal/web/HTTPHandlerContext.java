@@ -13,6 +13,7 @@ public class HTTPHandlerContext {
     public final RequestBeanReader requestBeanReader = new RequestBeanReader();
     public final ResponseBeanWriter responseBeanWriter = new ResponseBeanWriter();
     public final RateControl rateControl = new RateControl();
+    public boolean limitRate;
     @Nullable
     public IPv4AccessControl accessControl;
 }
