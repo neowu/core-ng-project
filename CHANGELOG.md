@@ -5,6 +5,7 @@
 * sse: removed default rate limit group ServerSentEventConfig.SSE_CONNECT_GROUP ("sse:connect")
 * sse: support @LimitRate on sse connect or class
   > use @LimitRate and http().limitRate().add() to configure rate limit
+* sse: log event count and size on sse:close action
 
 ### 9.1.7 (2/26/2025 - 3/6/2025)
 

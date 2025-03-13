@@ -39,6 +39,9 @@ class ServerSentEventCloseHandler<T> implements ExchangeCompletionListener {
                 if (!channel.groups.isEmpty()) actionLog.context("group", channel.groups.toArray());
                 support.context.remove(channel);
                 channel.shutdown();
+
+                actionLog.stats.put("sse_event_count", (double) channel.eventCount);
+                actionLog.stats.put("sse_event_size", (double) channel.eventSize);
             } catch (Throwable e) {
                 logManager.logError(e);
             } finally {

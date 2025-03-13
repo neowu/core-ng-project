@@ -47,6 +47,8 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
     private volatile boolean closed = false;
 
     private final Map<String, Object> context = new ConcurrentHashMap<>();
+    long eventCount;
+    long eventSize;
 
     String clientIP;
     String traceId;
@@ -78,6 +80,8 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
             queue.add(data);
             lastSentTime = System.nanoTime();
             sink.getIoThread().execute(() -> writeListener.handleEvent(sink));
+            eventCount++;
+            eventSize += data.length;
             return true;
         } finally {
             long elapsed = watch.elapsed();
