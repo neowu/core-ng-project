@@ -11,7 +11,6 @@ import core.framework.internal.web.service.ErrorResponse;
 import core.framework.internal.web.session.ReadOnlySession;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.util.Strings;
-import core.framework.web.rate.LimitRate;
 import core.framework.web.sse.ChannelListener;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -137,9 +136,8 @@ public class ServerSentEventHandler implements HttpHandler {
     }
 
     void limitRate(RateControl rateControl, ChannelSupport<Object> support, String clientIP) {
-        LimitRate limitRate = support.annotation(LimitRate.class);
-        if (limitRate != null) {
-            String group = limitRate.value();
+        if (support.limitRate != null) {
+            String group = support.limitRate.value();
             rateControl.validateRate(group, clientIP);
         }
     }
