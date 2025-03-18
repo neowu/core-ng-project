@@ -12,8 +12,8 @@ public class HTTPHandlerContext {
     public final RequestParser requestParser = new RequestParser();
     public final RequestBeanReader requestBeanReader = new RequestBeanReader();
     public final ResponseBeanWriter responseBeanWriter = new ResponseBeanWriter();
-    public final RateControl rateControl = new RateControl();
-    public boolean limitRate;   // TODO: simplify this design?
+    @Nullable
+    public RateControl rateControl;
     @Nullable
     public IPv4AccessControl accessControl;
 }

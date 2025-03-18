@@ -1,6 +1,6 @@
 package core.framework.internal.web.response;
 
-import core.framework.internal.log.filter.BytesLogParam;
+import core.framework.util.Strings;
 import io.undertow.io.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +20,10 @@ public final class BeanBody implements Body {
 
     @Override
     public long send(Sender sender, ResponseHandlerContext context) {
-        byte[] body = context.writer.toJSON(bean);
-        LOGGER.debug("[response] body={}", new BytesLogParam(body));
-        sender.send(ByteBuffer.wrap(body));
-        return body.length;
+        String body = context.writer.toJSON(bean);
+        LOGGER.debug("[response] body={}", body);
+        byte[] bytes = Strings.bytes(body);
+        sender.send(ByteBuffer.wrap(bytes));
+        return bytes.length;
     }
 }

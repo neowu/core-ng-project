@@ -22,7 +22,7 @@ class ChannelImplTest {
         StreamSinkChannel sink = mock(StreamSinkChannel.class);
         when(sink.getIoThread()).thenReturn(mock(XnioIoThread.class));
         ServerConnection connection = mock(ServerConnection.class);
-        channel = new ChannelImpl<>(new HttpServerExchange(connection), sink, null, new ServerSentEventBuilder<>(TestEvent.class), null);
+        channel = new ChannelImpl<>(new HttpServerExchange(connection), sink, null, new ServerSentEventWriter<>(TestEvent.class), null);
     }
 
     @Test

@@ -70,7 +70,7 @@ public class APIConfig extends Config {
                 Method targetMethod = serviceClass.getMethod(method.getName(), method.getParameterTypes());
                 String controllerInfo = serviceClass.getCanonicalName() + "." + targetMethod.getName();
                 String action = "api:" + ASCII.toLowerCase(httpMethod.name()) + ":" + path;
-                context.httpServer.handler.route.add(httpMethod, path, new ControllerHolder(controller, targetMethod, controllerInfo, action, false));
+                context.httpServer.httpHandler.route.add(httpMethod, path, new ControllerHolder(controller, targetMethod, controllerInfo, action, false));
             } catch (NoSuchMethodException e) {
                 throw new Error("failed to find impl method", e);
             }

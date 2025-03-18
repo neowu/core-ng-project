@@ -16,11 +16,12 @@ public final class LimitRateConfig extends Config {
 
     @Override
     protected void initialize(ModuleContext context, String name) {
-        rateControl = context.httpServer.handlerContext.rateControl;
+        rateControl = new RateControl();
         // save at max 5K group/ip combination per pod, about 800K memory, to adapt with more ips/cc attack, better defense with cloud infra based solution together
         maxEntries(5000);
+
+        context.httpServer.handlerContext.rateControl = rateControl;
         context.httpServerConfig.interceptors.add(new LimitRateInterceptor(rateControl));
-        context.httpServer.handlerContext.limitRate = true;
     }
 
     @Override

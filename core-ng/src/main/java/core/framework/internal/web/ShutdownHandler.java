@@ -24,8 +24,8 @@ public class ShutdownHandler implements ExchangeCompletionListener {
 
     private volatile boolean shutdown;
 
-    boolean handle(HttpServerExchange exchange, boolean active) {
-        if (active) { // do not count sse/ws requests
+    boolean handle(HttpServerExchange exchange, boolean sse) {
+        if (!sse) { // do not count sse requests
             activeRequests.increase();
             exchange.addExchangeCompleteListener(this);
         }

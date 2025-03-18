@@ -37,7 +37,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
     final Deque<byte[]> queue = new ConcurrentLinkedDeque<>();
 
     private final ServerSentEventContextImpl<T> serverSentEventContext;
-    private final ServerSentEventBuilder<T> builder;
+    private final ServerSentEventWriter<T> builder;
 
     private final ReentrantLock lock = new ReentrantLock();
     private final HttpServerExchange exchange;
@@ -53,7 +53,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
     String clientIP;
     String traceId;
 
-    ChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ServerSentEventContextImpl<T> serverSentEventContext, ServerSentEventBuilder<T> builder, String refId) {
+    ChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ServerSentEventContextImpl<T> serverSentEventContext, ServerSentEventWriter<T> builder, String refId) {
         this.exchange = exchange;
         this.sink = sink;
         this.serverSentEventContext = serverSentEventContext;
@@ -63,8 +63,8 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
 
     @Override
     public boolean send(String id, T event) {
-        String data = builder.build(id, event);
-        return sendBytes(Strings.bytes(data));
+        String message = builder.toMessage(id, event);
+        return sendBytes(Strings.bytes(message));
     }
 
     @Override
@@ -72,21 +72,23 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
         return this;
     }
 
-    boolean sendBytes(byte[] data) {
+    boolean sendBytes(byte[] event) {
         if (closed) return false;
 
         var watch = new StopWatch();
         try {
-            queue.add(data);
-            lastSentTime = System.nanoTime();
+            queue.add(event);
             sink.getIoThread().execute(() -> writeListener.handleEvent(sink));
+
+            lastSentTime = System.nanoTime();
             eventCount++;
-            eventSize += data.length;
+            eventSize += event.length;
+
             return true;
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("sse", elapsed, 0, data.length);
-            LOGGER.debug("send sse data, channel={}, data={}, elapsed={}", id, new BytesLogParam(data), elapsed); // message is not in json format, not masked, assume sse won't send any sensitive data
+            ActionLogContext.track("sse", elapsed, 0, event.length);
+            LOGGER.debug("send sse message, channel={}, message={}, elapsed={}", id, new BytesLogParam(event), elapsed); // message is not in json format, not masked, assume sse won't send any sensitive event
         }
     }
 

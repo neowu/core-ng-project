@@ -1,7 +1,6 @@
 package core.framework.internal.web.sse;
 
 import core.framework.internal.web.http.RateControl;
-import core.framework.util.Strings;
 import core.framework.web.Request;
 import core.framework.web.rate.LimitRate;
 import core.framework.web.sse.Channel;
@@ -22,9 +21,9 @@ class ServerSentEventHandlerTest {
     }
 
     @Test
-    void errorResponse() {
-        byte[] error = handler.errorResponse(Strings.bytes("{\"error_code\": \"NOT_FOUND\"}"));
-        assertThat(error).asString().isEqualTo("""
+    void errorMessage() {
+        String errorMessage = handler.errorMessage("{\"error_code\": \"NOT_FOUND\"}");
+        assertThat(errorMessage).isEqualTo("""
             retry: 86400000
             
             event: error

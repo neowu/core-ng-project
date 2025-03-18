@@ -2,7 +2,6 @@ package core.framework.internal.web;
 
 import core.framework.internal.web.request.RequestBodyReader;
 import core.framework.internal.web.sse.ServerSentEventHandler;
-import core.framework.internal.web.websocket.WebSocketHandler;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormDataParser;
@@ -24,20 +23,20 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class HTTPIOHandler implements HttpHandler {
     public static final String HEALTH_CHECK_PATH = "/health-check";
     private final Logger logger = LoggerFactory.getLogger(HTTPIOHandler.class);
+
+    private final HTTPHandler httpHandler;
+    private final ServerSentEventHandler sseHandler;
+    private final ShutdownHandler shutdownHandler;
+
     private final FormParserFactory formParserFactory;
     private final long maxEntitySize;
-    private final HTTPHandler handler;
-    private final ShutdownHandler shutdownHandler;
-    private final ServerSentEventHandler sseHandler;
-    private final WebSocketHandler webSocketHandler;
 
-    HTTPIOHandler(HTTPHandler handler, ShutdownHandler shutdownHandler, long maxEntitySize, ServerSentEventHandler sseHandler, WebSocketHandler webSocketHandler) {
-        this.handler = handler;
+    HTTPIOHandler(HTTPHandler httpHandler, ShutdownHandler shutdownHandler, long maxEntitySize, ServerSentEventHandler sseHandler) {
+        this.httpHandler = httpHandler;
         this.shutdownHandler = shutdownHandler;
         formParserFactory = createFormParserFactory();
         this.maxEntitySize = maxEntitySize;
         this.sseHandler = sseHandler;
-        this.webSocketHandler = webSocketHandler;
     }
 
     private FormParserFactory createFormParserFactory() {
@@ -59,7 +58,7 @@ public class HTTPIOHandler implements HttpHandler {
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         String path = exchange.getRequestPath();
         if (HEALTH_CHECK_PATH.equals(path)) {      // not treat health-check as action
-            handler.addKeepAliveHeader(exchange);
+            httpHandler.addKeepAliveHeader(exchange);
             exchange.endExchange(); // end exchange will send 200 / content-length=0
             return;
         }
@@ -67,23 +66,18 @@ public class HTTPIOHandler implements HttpHandler {
         long contentLength = exchange.getRequestContentLength();
         if (!checkContentLength(contentLength, exchange)) return;
 
-        HttpString method = exchange.getRequestMethod();
-        HeaderMap headers = exchange.getRequestHeaders();
-
-        var requestHandler = new Handler(exchange);
-        boolean ws = webSocketHandler != null && webSocketHandler.check(method, headers);   // TODO: retire ws and simplify
-        boolean active = !requestHandler.sse && !ws;
-        boolean shutdown = shutdownHandler.handle(exchange, active);
+        var handler = new Handler(exchange);
+        boolean shutdown = shutdownHandler.handle(exchange, handler.sse);
         if (shutdown) return;
 
-        if (hasBody(contentLength, method)) {    // parse body early, not process until body is read (e.g. for chunked), to save one blocking thread during read
+        if (hasBody(contentLength, exchange.getRequestMethod())) {    // parse body early, not process until body is read (e.g. for chunked), to save one blocking thread during read
             FormDataParser parser = formParserFactory.createParser(exchange);   // no need to close, refer to io.undertow.server.handlers.form.MultiPartParserDefinition.create, it closes on ExchangeCompletionListener
             if (parser != null) {
-                parser.parse(handler);
+                parser.parse(httpHandler);
                 return;
             }
 
-            var reader = new RequestBodyReader(exchange, requestHandler);
+            var reader = new RequestBodyReader(exchange, handler);
             StreamSourceChannel channel = exchange.getRequestChannel();
             reader.read(channel);  // channel will be null if getRequestChannel() is already called, but here should not be that case
             if (!reader.complete()) {
@@ -93,11 +87,7 @@ public class HTTPIOHandler implements HttpHandler {
             }
         }
 
-        if (ws) {
-            exchange.dispatch(webSocketHandler);
-        } else {
-            requestHandler.handle();
-        }
+        handler.handle();
     }
 
     // undertow is not handling max entity size checking correctly, it terminates request directly and bypass exchange.endExchange() in certain cases, and log errors in debug level
@@ -141,7 +131,7 @@ public class HTTPIOHandler implements HttpHandler {
             if (sse) {
                 sseHandler.handleRequest(exchange); // not dispatch, continue in io thread
             } else {
-                exchange.dispatch(handler);
+                exchange.dispatch(httpHandler);
             }
         }
     }

@@ -24,7 +24,6 @@ import org.xnio.IoUtils;
 import org.xnio.channels.StreamSinkChannel;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -96,7 +95,7 @@ public class ServerSentEventHandler implements HttpHandler {
             ChannelSupport<Object> support = (ChannelSupport<Object>) supports.get(key(request.method().name(), path));   // ServerSentEventHandler.check() ensures path exists
             actionLog.action("sse:" + path + ":connect");
 
-            if (handlerContext.limitRate) {
+            if (handlerContext.rateControl != null) {
                 limitRate(handlerContext.rateControl, support, request.clientIP());
             }
 
@@ -125,8 +124,8 @@ public class ServerSentEventHandler implements HttpHandler {
             logManager.logError(e);
 
             if (channel != null) {
-                byte[] error = errorResponse(handlerContext.responseBeanWriter.toJSON(ErrorResponse.errorResponse(e, actionLog.id)));
-                channel.sendBytes(error);
+                String message = errorMessage(handlerContext.responseBeanWriter.toJSON(ErrorResponse.errorResponse(e, actionLog.id)));
+                channel.sendBytes(Strings.bytes(message));
                 channel.close();    // gracefully shutdown connection to make sure retry/error can be sent
             }
         } finally {
@@ -142,12 +141,10 @@ public class ServerSentEventHandler implements HttpHandler {
         }
     }
 
-    byte[] errorResponse(byte[] errorResponse) {
-        ByteBuffer buffer = ByteBuffer.wrap(new byte[errorResponse.length + 38]);
-        buffer.put(Strings.bytes("retry: 86400000\n\nevent: error\ndata: "));   // tell browser retry in 24 hours
-        buffer.put(errorResponse);
-        buffer.put(Strings.bytes("\n\n"));
-        return buffer.array();
+    String errorMessage(String errorResponse) {
+        return "retry: 86400000\n\n" +
+               "event: error\n" +
+               "data: " + errorResponse + "\n\n";
     }
 
     public <T> void add(HTTPMethod method, String path, Class<T> eventClass, ChannelListener<T> listener, ServerSentEventContextImpl<T> context) {

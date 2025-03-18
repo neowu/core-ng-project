@@ -27,7 +27,7 @@ class ShutdownHandlerTest {
 
     @Test
     void handle() {
-        assertThat(handler.handle(exchange, true)).isFalse();
+        assertThat(handler.handle(exchange, false)).isFalse();
         handler.exchangeEvent(null, () -> {
         });
         assertThat(handler.activeRequests.get()).isEqualTo(0);
@@ -36,7 +36,7 @@ class ShutdownHandlerTest {
     @Test
     void handleShutdown() {
         handler.shutdown();
-        assertThat(handler.handle(exchange, true)).isTrue();
+        assertThat(handler.handle(exchange, false)).isTrue();
 
         verify(exchange).setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
         verify(exchange).setPersistent(false);
@@ -53,12 +53,12 @@ class ShutdownHandlerTest {
     void maxActiveRequests() {
         handler.activeRequests.increase();
         handler.activeRequests.increase();
-        handler.handle(exchange, true);
+        handler.handle(exchange, false);
         handler.activeRequests.decrease();
         assertThat(handler.activeRequests.max()).isEqualTo(3);
         assertThat(handler.activeRequests.max()).isEqualTo(2);
 
-        handler.handle(exchange, true);
+        handler.handle(exchange, false);
         assertThat(handler.activeRequests.max()).isEqualTo(3);
     }
 }

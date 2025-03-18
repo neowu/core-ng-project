@@ -7,7 +7,6 @@ import core.framework.internal.validate.Validator;
 import core.framework.internal.web.service.ErrorResponse;
 import core.framework.internal.web.service.InternalErrorResponse;
 import core.framework.util.Maps;
-import core.framework.util.Strings;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -37,17 +36,17 @@ public class ResponseBeanWriter {   // used by controller and web service
         return context.containsKey(beanClass);
     }
 
-    public byte[] toJSON(Object bean) {
+    public String toJSON(Object bean) {
         if (bean instanceof Optional<?> optional) {  // only support Optional<T> as response bean type
-            if (optional.isEmpty()) return Strings.bytes("null");
+            if (optional.isEmpty()) return "null";
             Object value = optional.get();
             Context<Object> context = context(this.context, value.getClass());
             context.validator.validate(value, false);
-            return context.writer.toJSON(value);
+            return context.writer.toJSONString(value);
         } else {
             Context<Object> context = context(this.context, bean.getClass());
             context.validator.validate(bean, false);
-            return context.writer.toJSON(bean);
+            return context.writer.toJSONString(bean);
         }
     }
 

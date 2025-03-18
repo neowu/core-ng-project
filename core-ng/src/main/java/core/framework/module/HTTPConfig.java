@@ -76,7 +76,7 @@ public final class HTTPConfig extends Config {
     }
 
     public void errorHandler(ErrorHandler handler) {
-        context.httpServer.handler.errorHandler.customErrorHandler = handler;
+        context.httpServer.httpHandler.errorHandler.customErrorHandler = handler;
     }
 
     // host is in "host:port" or "port" format, e.g. 8080 or 127.0.0.1:8080
@@ -113,7 +113,7 @@ public final class HTTPConfig extends Config {
 
     // use backend timeout of cloud lb
     public void maxProcessTime(Duration maxProcessTime) {
-        context.httpServer.handler.maxProcessTimeInNano = maxProcessTime.toNanos();
+        context.httpServer.httpHandler.maxProcessTimeInNano = maxProcessTime.toNanos();
     }
 
     // to configure max body size for both regular post and multipart upload

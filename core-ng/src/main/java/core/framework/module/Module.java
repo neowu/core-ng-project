@@ -82,10 +82,6 @@ public abstract class Module {
         return context.config(HTTPConfig.class, null);
     }
 
-    public WebSocketConfig ws() {
-        return context.config(WebSocketConfig.class, null);
-    }
-
     public ServerSentEventConfig sse() {
         return context.config(ServerSentEventConfig.class, null);
     }

@@ -10,13 +10,13 @@ import java.lang.reflect.Method;
 class ChannelSupport<T> {
     final ChannelListener<T> listener;
     final ServerSentEventContextImpl<T> context;
-    final ServerSentEventBuilder<T> builder;
+    final ServerSentEventWriter<T> builder;
     final LimitRate limitRate;
 
     ChannelSupport(ChannelListener<T> listener, Class<T> eventClass, ServerSentEventContextImpl<T> context) {
         this.listener = listener;
         this.context = context;
-        builder = new ServerSentEventBuilder<>(eventClass);
+        builder = new ServerSentEventWriter<>(eventClass);
         limitRate = limitRate(listener);
     }
 

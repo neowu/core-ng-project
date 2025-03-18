@@ -78,7 +78,7 @@ public class ModuleContext {    // after core.framework.module.App.start(), enti
 
     private HTTPServer createHTTPServer() {
         var httpServer = new HTTPServer(logManager);
-        beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
+        beanFactory.bind(WebContext.class, null, httpServer.httpHandler.webContext);
         beanFactory.bind(SessionContext.class, null, httpServer.siteManager.sessionManager);
         beanFactory.bind(WebDirectory.class, null, httpServer.siteManager.webDirectory);
 
@@ -107,7 +107,7 @@ public class ModuleContext {    // after core.framework.module.App.start(), enti
         var inspector = new ControllerInspector(controller);
         new ControllerClassValidator(inspector.targetClass, inspector.targetMethod).validate();
         String action = "http:" + ASCII.toLowerCase(method.name()) + ":" + path;
-        httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, action, skipInterceptor));
+        httpServer.httpHandler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, action, skipInterceptor));
     }
 
     public <T extends Config> T config(Class<T> configClass, @Nullable String name) {

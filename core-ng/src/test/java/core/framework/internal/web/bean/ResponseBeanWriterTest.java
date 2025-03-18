@@ -9,7 +9,6 @@ import core.framework.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,8 +52,8 @@ class ResponseBeanWriterTest {
     @Test
     void toJSONWithEmptyOptional() {
         Optional<TestBean> optional = Optional.empty();
-        byte[] bytes = writer.toJSON(optional);
-        assertThat(new String(bytes, StandardCharsets.UTF_8)).isEqualTo("null");
+        String json = writer.toJSON(optional);
+        assertThat(json).isEqualTo("null");
     }
 
     @Test
@@ -62,16 +61,16 @@ class ResponseBeanWriterTest {
         var bean = new TestBean();
         bean.intField = 5;
         Optional<TestBean> optional = Optional.of(bean);
-        byte[] bytes = writer.toJSON(optional);
-        assertThat(bytes).isNotEmpty();
+        String json = writer.toJSON(optional);
+        assertThat(json).contains("\"int_field\":5");
     }
 
     @Test
     void toJSON() {
         var bean = new TestBean();
         bean.intField = 5;
-        byte[] bytes = writer.toJSON(bean);
-        assertThat(bytes).isNotEmpty();
+        String json = writer.toJSON(bean);
+        assertThat(json).contains("\"int_field\":5");
     }
 
     @Test
