@@ -142,9 +142,9 @@ public class ServerSentEventHandler implements HttpHandler {
     }
 
     String errorMessage(String errorResponse) {
-        return "retry: 86400000\n\n" +
-               "event: error\n" +
-               "data: " + errorResponse + "\n\n";
+        return "retry: 86400000\n\n"
+               + "event: error\n"
+               + "data: " + errorResponse + "\n\n";
     }
 
     public <T> void add(HTTPMethod method, String path, Class<T> eventClass, ChannelListener<T> listener, ServerSentEventContextImpl<T> context) {
