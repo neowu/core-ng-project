@@ -97,7 +97,6 @@ public class MessageListener {
         return "kafka-listener" + (name == null ? "" : "-" + name);
     }
 
-    @SuppressWarnings("deprecation")
     Consumer<String, byte[]> createConsumer() {
         var watch = new StopWatch();
         try {
@@ -114,7 +113,7 @@ public class MessageListener {
             config.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxPollBytes);
             config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);
             config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) maxWaitTime.toMillis());
-            config.put(ConsumerConfig.AUTO_INCLUDE_JMX_REPORTER_CONFIG, Boolean.FALSE);
+            config.put(ConsumerConfig.METRIC_REPORTER_CLASSES_CONFIG, EmptyMetricsReporter.class.getName());
             config.put(ConsumerConfig.ENABLE_METRICS_PUSH_CONFIG, Boolean.FALSE);
             Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new KeyDeserializer(), new ByteArrayDeserializer());
             consumerMetrics.add(consumer.metrics());

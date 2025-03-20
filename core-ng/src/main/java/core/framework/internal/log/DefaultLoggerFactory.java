@@ -23,10 +23,7 @@ public final class DefaultLoggerFactory implements ILoggerFactory {
 
     private LogLevel infoLevel(String name) {
         // kafka log info for every producer/consumer, to reduce verbosity
-        if ("org.apache.kafka.clients.consumer.ConsumerConfig".equals(name)
-                || "org.apache.kafka.clients.producer.ProducerConfig".equals(name)
-                || "org.apache.kafka.clients.admin.AdminClientConfig".equals(name)
-                || "org.apache.kafka.common.utils.AppInfoParser".equals(name)) {
+        if (name.startsWith("org.apache.kafka.")) {
             return LogLevel.WARN;
         }
         return LogLevel.INFO;
