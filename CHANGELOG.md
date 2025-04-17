@@ -9,6 +9,7 @@
 * ws: remove ws support
   > websocket is not used anymore, use sse/ajax instead
 * kafka: updated to 4.0.0
+* mongo: fixed MongoCollection.aggregate() pipeline logging
 
 ### 9.1.7 (2/26/2025 - 3/6/2025)
 

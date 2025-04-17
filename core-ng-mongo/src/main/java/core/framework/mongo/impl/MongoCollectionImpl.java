@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -229,7 +228,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             int size = results.size();
             logger.debug("aggregate, collection={}, pipeline={}, readPref={}, returnedDocs={}, elapsed={}",
                 collectionName,
-                aggregate.pipeline.stream().map(stage -> new BsonLogParam(stage, mongo.registry)).collect(Collectors.toList()),
+                new BsonsLogParam(aggregate.pipeline, mongo.registry),
                 aggregate.readPreference == null ? null : aggregate.readPreference.getName(),
                 size,
                 elapsed);
@@ -320,7 +319,11 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             return deletedRows;
         } finally {
             long elapsed = watch.elapsed();
-            logger.debug("delete, collection={}, filter={}, deletedRows={}, elapsed={}", collectionName, new BsonLogParam(filter, mongo.registry), deletedRows, elapsed);
+            logger.debug("delete, collection={}, filter={}, deletedRows={}, elapsed={}",
+                collectionName,
+                new BsonLogParam(filter, mongo.registry),
+                deletedRows,
+                elapsed);
             ActionLogContext.track("mongo", elapsed, 0, (int) deletedRows);
         }
     }
