@@ -58,10 +58,10 @@ class AzureAuthProviderTest {
 
     @Test
     void exchangeRequest() {
-        String clientId = "ac6ca327-xxxx-4406-b554-f7a128a15ccd";
-        String tenantId = "b8b58c09-xxxx-404d-8960-9d2ae2605573";
+        String clientId = "aaaaaaaa-xxxx-aaaa-aaaa-aaaaaaaaaaaa";
+        String tenantId = "bbbbbbbb-xxxx-bbbb-bbbb-bbbbbbbbbbbb";
         String tokenFilePath = "azure-auth-provider-test/azureFederatedToken";
-        String token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IkNuSkVUenhHS09uUHd0SF9feEM4aExoMFVJb0FoQzI4emtlRFdhZ2________.eyJhdWQiOlsiYXBpOi8vQXp1cmVBRFRva2VuRXhjaGFuZ2UiXSwiZXhwIjoxNzE5OTc2NTIwLCJpYXQiOjE3MTk5NzI5MjAsImlzcyI6Imh0dHBzOi8vZWFzdHVzLm9pYy5wcm9kLWFrcy5henVyZS5jb20vYjhiNThjMDktYzVmMy00MDRkLTg5NjAtOWQyYWUyNjA1NTczLzE4N2YwNmFhLTlmMzItNGMwZi1iMzg3LThkY2ViOWVhMDBlMi8iLCJrdWJlcm5ldGVzLmlvIjp7Im5hbWVzcGFjZSI6ImRldi1wbGF0Zm9ybS1zZXJ2aWNlcyIsInBvZCI6eyJuYW1lIjoiYXBpLWRvYy1zZXJ2aWNlLTU1ZGNmZDc5OWQtOGw1cXIiLCJ1aWQiOiI0NGI4MWM2ZC0wM2JlLTQ5YzQtOWJjYi00ZjU3ZmE2NGE5NjkifSwic2VydmljZWFjY291bnQiOnsibmFtZSI6ImFwaS1kb2Mtc2VydmljZSIsInVpZCI6Ijk2YTEyMTY1LTRhZmItNDU5Yi1iZTFlLWZhYjMwOTEzNDhhYSJ9fSwibmJmIjoxNzE5OTcyOTIwLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGV2LXBsYXRmb3JtLXNlcnZpY2VzOmFwaS1kb2Mtc2Vy________.oS8v_7Z8UdclIC0AkhHQzQ2HzB39T1KBoSx6Gt0BYQsvsAugjDrKbO6qGN3eSs20BX3XnmW-2Q-Z4PREcf9q9KJEzBwGeNyj8Ti11Y9PHQjFKcu0aF0PEh6P34ypmm_s-dvtDOt2QVy7dHipuBj6GNYXs22ZQGZEfeWzsFwnFZORj8OGLKw-MY93chwBtAMEd8utD12T8ZbOq_YP7GIgFBD46ZbjXgcTggWdrTMJDzf92B2iI71XpFXnHG8VxOjpxd8fOo5J0iiq4BSh3SnVHyCKQg4Bfu8RB2ttMk1fvEXD6B4moy-gHjnlzwxIbVkgg0iJ6KWEkR8y-qwPbtntQ-SNwqcxGKtC8Re69nMRDmF8bWzzvnRPl5cRn4B8d4taswysCqS4Qt_Ywo0h-iznNaYQQr1_KykY6VpCtewUpCpjYKSOGeLUcno85aJo7YnNpAT53PCIweqsqcLXVL9r8TBcY2qHbcvCmJvemh-5bHNLFcuOAZ_bjsPDHPcuRLB1fq8MjSFdwMumPjeaGFBDb_EQ0UWCOxOnS956w39w5Jiv7wlbkacBeg3s5Jn4ic9ryBcPDQqjiVLuviSyRbHVhHxnMTi56qr-KF9-DqsFWI5yZkI-LwTb99TO1-qdVsml7DCvFp8ABb5_T2M29Z63G15gD10ZVmdJ1AB________";
+        String token = "7f85e0f9-60c9-4c75-b399-1b01f1a611c5________.45623123-c485-4612-a458-2a1caf45c4e9________.27b20a02-718f-45cc-90cf-e294248aa433________";
         doReturn("https://login.microsoftonline.com/").when(provider).env("AZURE_AUTHORITY_HOST");
         doReturn(clientId).when(provider).env("AZURE_CLIENT_ID");
         doReturn(tenantId).when(provider).env("AZURE_TENANT_ID");
@@ -69,7 +69,7 @@ class AzureAuthProviderTest {
         doReturn(token).when(provider).azureFederatedToken(tokenFilePath);
 
         HTTPRequest request = provider.exchangeRequest();
-        assertThat(request.uri).isEqualTo(Strings.format("https://login.microsoftonline.com/b8b58c09-xxxx-404d-8960-9d2ae2605573/oauth2/v2.0/token"));
+        assertThat(request.uri).isEqualTo(Strings.format("https://login.microsoftonline.com/bbbbbbbb-xxxx-bbbb-bbbb-bbbbbbbbbbbb/oauth2/v2.0/token"));
         assertThat(request.form.get("client_assertion")).isEqualTo(token);
         assertThat(request.form.get("client_assertion_type")).isEqualTo("urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         assertThat(request.form.get("client_id")).isEqualTo(clientId);
