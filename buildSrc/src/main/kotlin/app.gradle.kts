@@ -53,15 +53,21 @@ tasks.named("mkdir") {
     }
 }
 
+interface Context {
+    @get:Inject
+    val fs: FileSystemOperations
+}
+
 afterEvaluate {
     // split dependencies lib and app classes/bin/web to support layered docker image
     // to cache/reuse dependencies layer
     tasks.register("docker") {
         group = "distribution"
         dependsOn("installDist")
+        val context = project.objects.newInstance<Context>()
         doLast {
             val rootGroup = if (parent!!.depth > 0) parent!!.group else project.group
-            project.sync {
+            context.fs.sync {
                 val destinationDir = tasks.named<Sync>("installDist").get().destinationDir
                 from(destinationDir) {
                     exclude("lib/${rootGroup}.*.jar")
@@ -78,7 +84,7 @@ afterEvaluate {
                 into(layout.buildDirectory.dir("docker/package").get())
             }
             if (file("docker/Dockerfile").exists()) {
-                project.sync {
+                context.fs.sync {
                     from(file("docker"))
                     into(layout.buildDirectory.dir("docker").get())
                     preserve {
