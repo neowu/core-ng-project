@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.1.8 (3/7/2025 - )
+### 9.1.8 (3/7/2025 - 4/24/2025)
 
 * sse: removed default rate limit group ServerSentEventConfig.SSE_CONNECT_GROUP ("sse:connect")
 * sse: support @LimitRate on sse connect or class

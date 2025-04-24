@@ -1,5 +1,6 @@
 package core.framework.http;
 
+import javax.annotation.Nullable;
 import java.nio.charset.Charset;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ public final class HTTPResponse {
     public final int statusCode;
     public final byte[] body;
     public final Map<String, String> headers;   // headers key is case insensitive
+    @Nullable
     public final ContentType contentType;
 
     public HTTPResponse(int statusCode, Map<String, String> headers, byte[] body) {
