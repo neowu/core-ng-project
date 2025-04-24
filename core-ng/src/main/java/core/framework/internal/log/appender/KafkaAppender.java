@@ -90,7 +90,7 @@ public final class KafkaAppender implements LogAppender {
             config.put(ProducerConfig.ACKS_CONFIG, "0");                                // no acknowledge to maximize performance
             config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, Boolean.FALSE);        // since kafka 3.0.0, "enable.idempotence" is true by default, and it overrides "acks" to all
             config.put(ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");               // if not specify, kafka uses producer-${seq} name, also impact jmx naming
-            config.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name);
+            config.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.ZSTD.name);
             config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60_000);              // 60s, type is INT
             config.put(ProducerConfig.LINGER_MS_CONFIG, 50L);
             config.put(ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L);               // longer backoff to reduce cpu usage when kafka is not available
