@@ -1,5 +1,9 @@
 ## Change log
 
+### 9.1.9 (4/24/2025 - )
+
+* search: remove opentelemetry dependency from es lib
+
 ### 9.1.8 (3/7/2025 - 4/24/2025)
 
 * sse: removed default rate limit group ServerSentEventConfig.SSE_CONNECT_GROUP ("sse:connect")

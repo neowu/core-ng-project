@@ -7,7 +7,7 @@ apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
-    version = "9.1.8"
+    version = "9.1.9"
 }
 
 val elasticVersion = "8.15.0"
@@ -32,7 +32,9 @@ project("core-ng") {
         implementation("com.squareup.okio:okio:3.2.0")              // okio 3.3.0 has synchronization issue with virtual thread
         implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.20")
         implementation("io.undertow:undertow-core:2.3.18.Final")
-        implementation("org.apache.kafka:kafka-clients:4.0.0")
+        implementation("org.apache.kafka:kafka-clients:4.0.0") {
+            exclude("org.xerial.snappy")
+        }
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")
         compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.3")
         testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
@@ -79,7 +81,9 @@ project("core-ng-search") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng"))
-        api("co.elastic.clients:elasticsearch-java:${elasticVersion}")
+        api("co.elastic.clients:elasticsearch-java:${elasticVersion}") {
+            exclude(group = "io.opentelemetry")
+        }
         implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
         testImplementation(project(":core-ng-test"))
     }
@@ -90,7 +94,9 @@ project("core-ng-search-test") {
     dependencies {
         implementation(project(":core-ng-test"))
         implementation(project(":core-ng-search"))
-        implementation("org.elasticsearch:elasticsearch:${elasticVersion}")
+        implementation("org.elasticsearch:elasticsearch:${elasticVersion}") {
+            exclude(group = "io.opentelemetry")
+        }
         implementation("org.elasticsearch.plugin:transport-netty4:${elasticVersion}")
         implementation("org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}")         // used by elasticsearch scaled_float
         implementation("org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}")

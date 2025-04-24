@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch._types.ErrorCause;
 import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.instrumentation.NoopInstrumentation;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,7 +65,7 @@ public class ElasticSearchImpl implements ElasticSearch {
                 .addInterceptorFirst(new ElasticSearchLogInterceptor()));
             restClient = builder.build();
             mapper = JSONMapper.builder().serializationInclusion(JsonInclude.Include.NON_NULL).build();
-            client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper(mapper)));
+            client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper(mapper), null, NoopInstrumentation.INSTANCE));
         }
     }
 
