@@ -1,7 +1,9 @@
 ## Change log
 
-### 9.1.9 (4/24/2025 - )
+### 9.2.0 (4/24/2025 - )
 
+* java: update to 24
+  > refer to https://openjdk.org/jeps/491
 * search: remove opentelemetry dependency from es lib
 
 ### 9.1.8 (3/7/2025 - 4/24/2025)

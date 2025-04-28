@@ -7,13 +7,13 @@ apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
-    version = "9.1.9"
+    version = "9.2.0"
 }
 
 val elasticVersion = "8.15.0"
 val jacksonVersion = "2.17.2"
-val junitVersion = "5.12.1"
-val mockitoVersion = "5.16.1"
+val junitVersion = "5.12.2"
+val mockitoVersion = "5.17.0"
 val assertjVersion = "3.27.3"
 
 project("core-ng-api") {
@@ -28,9 +28,7 @@ project("core-ng") {
         implementation("org.javassist:javassist:3.30.2-GA")
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
-        implementation("com.squareup.okhttp3:okhttp:4.12.0@jar")
-        implementation("com.squareup.okio:okio:3.2.0")              // okio 3.3.0 has synchronization issue with virtual thread
-        implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.20")
+        implementation("com.squareup.okhttp3:okhttp:4.12.0")
         implementation("io.undertow:undertow-core:2.3.18.Final")
         implementation("org.apache.kafka:kafka-clients:4.0.0") {
             exclude("org.xerial.snappy")
