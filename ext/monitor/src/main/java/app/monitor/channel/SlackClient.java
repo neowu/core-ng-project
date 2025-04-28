@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class SlackClient implements Channel {
     private static final String SLACK_API_URL = "https://slack.com/api/chat.postMessage";
-    private final String[][] colors = {
+    private static final String[][] COLORS = {
             {"#ff5c33", "#ff9933"}, // 2 colors for warn, change color for weekly review of every week
             {"#a30101", "#e62a00"}  // 2 colors for error
     };
@@ -89,6 +89,6 @@ public class SlackClient implements Channel {
     String color(Severity severity, LocalDateTime date) {
         int week = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
         int colorIndex = severity == Severity.WARN ? 0 : 1;
-        return colors[colorIndex][(week - 1) % 2];
+        return COLORS[colorIndex][(week - 1) % 2];
     }
 }
