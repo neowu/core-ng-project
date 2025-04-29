@@ -32,7 +32,7 @@ project("core-ng") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng-api"))
-        api("org.slf4j:slf4j-api:2.0.16")
+        api("org.slf4j:slf4j-api:2.0.17")
         implementation("org.javassist:javassist:3.30.2-GA")
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
@@ -48,7 +48,7 @@ project("core-ng") {
         testImplementation("org.assertj:assertj-core:${assertjVersion}")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-        testRuntimeOnly("org.hsqldb:hsqldb:2.7.3")
+        testRuntimeOnly("org.hsqldb:hsqldb:2.7.4")
     }
 }
 
@@ -61,7 +61,7 @@ project("core-ng-test") {
         implementation(project(":core-ng"))
         implementation("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
         implementation("org.junit.platform:junit-platform-launcher")
-        testRuntimeOnly("org.hsqldb:hsqldb:2.7.3")
+        testRuntimeOnly("org.hsqldb:hsqldb:2.7.4")
     }
 }
 
@@ -110,7 +110,7 @@ project("core-ng-search-test") {
         implementation("core.framework.elasticsearch.module:analysis-common:${elasticVersion}")     // used by elasticsearch stemmer
         implementation("core.framework.elasticsearch.module:reindex:${elasticVersion}")             // used by elasticsearch deleteByQuery
         implementation("org.apache.httpcomponents:httpasyncclient:4.1.5")                           // used by reindex
-        runtimeOnly("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
+        runtimeOnly("org.apache.logging.log4j:log4j-to-slf4j:2.19.0")
     }
 }
 

@@ -15,8 +15,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -29,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ElasticSearchAggregationIntegrationTest extends IntegrationTest {
-    private static final Logger log = LoggerFactory.getLogger(ElasticSearchAggregationIntegrationTest.class);
     @Inject
     ElasticSearch elasticSearch;
     @Inject
