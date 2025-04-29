@@ -124,7 +124,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
             .filter(term("enum_field", JSON.toEnumValue(TestDocument.TestEnum.VALUE1))));
 
         request.sorts.add(SortOptions.of(builder -> builder.script(s ->
-            s.script(script -> script.source("doc['int_field'].value * 3")).type(ScriptSortType.Number))));
+            s.script(script -> script.source(source -> source.scriptString("doc['int_field'].value * 3"))).type(ScriptSortType.Number))));
 
         SearchResponse<TestDocument> response = documentType.search(request);
 

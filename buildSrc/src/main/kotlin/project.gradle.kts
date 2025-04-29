@@ -25,12 +25,6 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven {
-            url = uri("https://maven.codelibs.org/")
-            content {
-                includeGroup("org.codelibs.elasticsearch.module")
-            }
-        }
         mavenLocal()
     }
 

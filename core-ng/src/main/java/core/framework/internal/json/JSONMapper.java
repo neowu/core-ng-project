@@ -62,7 +62,7 @@ public class JSONMapper {
     // expose builder, to allow app build its own JSON mapper to parse external json, e.g. can be less strict
     public static JsonMapper.Builder builder() {
         JsonFactory jsonFactory = JsonFactory.builder()
-            .recyclerPool(JsonRecyclerPools.sharedLockFreePool())
+            .recyclerPool(JsonRecyclerPools.sharedConcurrentDequePool())
             .build();
 
         // refer to com.fasterxml.jackson.databind.ObjectMapper.DEFAULT_BASE for default settings, e.g. cacheProvider

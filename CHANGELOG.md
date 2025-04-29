@@ -4,7 +4,10 @@
 
 * java: update to 24
   > refer to https://openjdk.org/jeps/491
-* search: remove opentelemetry dependency from es lib
+* search: update to ES 9.0.0
+  > migrated to apache httpclient 5   
+  > simplify logging
+  > remove opentelemetry dependency
 
 ### 9.1.8 (3/7/2025 - 4/24/2025)
 

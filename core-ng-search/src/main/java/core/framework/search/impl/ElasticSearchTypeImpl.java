@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.ErrorCause;
 import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.Result;
+import co.elastic.clients.elasticsearch._types.ScriptSource;
 import co.elastic.clients.elasticsearch._types.ShardFailure;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
@@ -227,7 +228,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             Map<String, JsonData> params = request.params == null ? Map.of() : request.params.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, value -> JsonData.of(value.getValue())));
             UpdateResponse<T> response = elasticSearch.client.update(builder -> builder.index(index)
                 .id(request.id)
-                .script(s -> s.source(request.script).params(params))
+                .script(s -> s.source(new ScriptSource.Builder().scriptString(request.script).build()).params(params))
                 .retryOnConflict(request.retryOnConflict), documentClass);
             updated = response.result() == Result.Updated;
             return updated;

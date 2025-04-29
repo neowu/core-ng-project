@@ -15,6 +15,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -27,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ElasticSearchAggregationIntegrationTest extends IntegrationTest {
+    private static final Logger log = LoggerFactory.getLogger(ElasticSearchAggregationIntegrationTest.class);
     @Inject
     ElasticSearch elasticSearch;
     @Inject
@@ -62,7 +65,7 @@ class ElasticSearchAggregationIntegrationTest extends IntegrationTest {
         assertThat(response.hits).hasSize(1);
         assertThat(response.aggregations).containsKeys("total_value");
 
-        int sum = (int) response.aggregations.get("total_value").sum().value();
+        int sum = response.aggregations.get("total_value").sum().value().intValue();
         assertThat(sum).isEqualTo(21);
     }
 
