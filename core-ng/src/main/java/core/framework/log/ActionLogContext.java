@@ -66,6 +66,14 @@ public final class ActionLogContext {
         }
     }
 
+    // for non-critical actions, set max process time to avoid slow_process warning
+    public static void maxProcessTime(Duration duration) {
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        if (actionLog != null) {
+            actionLog.warningContext.maxProcessTimeInNano(duration.toNanos());
+        }
+    }
+
     // for long process, use this guidance to determine whether continue to do more work
     @Nullable
     public static Duration remainingProcessTime() {

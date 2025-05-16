@@ -1,6 +1,5 @@
 package core.framework.log;
 
-import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.Trace;
 import org.junit.jupiter.api.Test;
@@ -59,9 +58,9 @@ class ActionLogContextTest {
         assertThat(ActionLogContext.remainingProcessTime()).isNull();
 
         var logManager = new LogManager();
-        ActionLog log = logManager.begin("begin", null);
-        log.warningContext.maxProcessTimeInNano(Duration.ofSeconds(30).toNanos());
-        assertThat(ActionLogContext.remainingProcessTime()).isGreaterThan(Duration.ZERO);
+        logManager.begin("begin", null);
+        ActionLogContext.maxProcessTime(Duration.ofMinutes(30));
+        assertThat(ActionLogContext.remainingProcessTime()).isGreaterThan(Duration.ofMinutes(20));
         logManager.end("end");
     }
 }

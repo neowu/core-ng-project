@@ -8,6 +8,8 @@
   > migrated to apache httpclient 5   
   > simplify logging
   > remove opentelemetry dependency
+* action: added ActionLogContext.maxProcessTime(duration)
+  > for long and non-critical action (such as test jobs), set max process time to avoid SLOW_PROCESS warning
 
 ### 9.1.8 (3/7/2025 - 4/24/2025)
 

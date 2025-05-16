@@ -62,8 +62,8 @@ public class ServerSentEventHandler implements HttpHandler {
             if (sink.flush()) {
                 exchange.dispatch(() -> handle(exchange, sink));
             } else {
-                var listener = ChannelListeners.flushingChannelListener(channel -> exchange.dispatch(() -> handle(exchange, sink)),
-                    (channel, e) -> {
+                var listener = ChannelListeners.flushingChannelListener(_ -> exchange.dispatch(() -> handle(exchange, sink)),
+                    (_, e) -> {
                         logger.warn("failed to establish sse connection, error={}", e.getMessage(), e);
                         IoUtils.safeClose(exchange.getConnection());
                     });
