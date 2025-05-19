@@ -1,7 +1,7 @@
 package core.framework.search.impl;
 
 import core.framework.util.Strings;
-import org.apache.hc.core5.http.HttpHost;
+import org.apache.http.HttpHost;
 
 /**
  * @author neo
@@ -34,6 +34,6 @@ public final class ElasticSearchHost {
             port = Integer.parseInt(value.substring(portIndex + 1));
             hostEnd = portIndex;
         }
-        return new HttpHost(schema, value.substring(hostStart, hostEnd), port);
+        return new HttpHost(value.substring(hostStart, hostEnd), port, schema);
     }
 }

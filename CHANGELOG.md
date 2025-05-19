@@ -1,13 +1,14 @@
 ## Change log
 
-### 9.2.0 (4/24/2025 - 5/19/2025)
+### 9.2.1 (4/24/2025 - 5/19/2025) !!! only support java 24
 
 * java: update to 24
   > refer to https://openjdk.org/jeps/491
-* search: update to ES 9.0.0
-  > migrated to apache httpclient 5   
+* search: update to ES 8.17.1
   > simplify logging
   > remove opentelemetry dependency
+  > !!! es java client 9.x doesn't support with es server 8.x, es java client is forward compatible
+  > refer to https://www.elastic.co/docs/reference/elasticsearch/clients/java
 * action: added ActionLogContext.maxProcessTime(duration)
   > for long and non-critical action (such as test jobs), set max process time to avoid SLOW_PROCESS warning
 

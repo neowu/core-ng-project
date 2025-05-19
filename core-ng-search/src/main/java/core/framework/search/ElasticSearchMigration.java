@@ -3,7 +3,7 @@ package core.framework.search;
 import core.framework.internal.module.PropertyManager;
 import core.framework.search.impl.ElasticSearchHost;
 import core.framework.search.impl.ElasticSearchImpl;
-import org.apache.hc.core5.http.HttpHost;
+import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

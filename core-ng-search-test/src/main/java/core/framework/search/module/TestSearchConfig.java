@@ -3,7 +3,7 @@ package core.framework.search.module;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.search.impl.LocalElasticSearch;
-import org.apache.hc.core5.http.HttpHost;
+import org.apache.http.HttpHost;
 import org.elasticsearch.common.logging.LogConfigurator;
 
 import java.util.concurrent.locks.ReentrantLock;

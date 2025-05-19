@@ -6,11 +6,8 @@ import co.elastic.clients.elasticsearch._types.ErrorCause;
 import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
-import co.elastic.clients.transport.rest5_client.low_level.Request;
-import co.elastic.clients.transport.rest5_client.low_level.Response;
-import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
-import co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder;
+import co.elastic.clients.transport.instrumentation.NoopInstrumentation;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import core.framework.internal.json.JSONMapper;
@@ -21,18 +18,15 @@ import core.framework.search.ElasticSearchType;
 import core.framework.search.SearchException;
 import core.framework.util.Encodings;
 import core.framework.util.StopWatch;
-import org.apache.hc.client5.http.config.ConnectionConfig;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
-import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
-import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.HttpHost;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.http.message.BasicHeader;
-import org.apache.hc.core5.util.TimeValue;
-import org.apache.hc.core5.util.Timeout;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +34,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author neo
@@ -53,47 +46,26 @@ public class ElasticSearchImpl implements ElasticSearch {
     public int maxResultWindow = 10000;
     ElasticsearchClient client;
     Header authHeader;
-    private Rest5Client restClient;
+    private RestClient restClient;
     private ObjectMapper mapper;
 
     // initialize will be called in startup hook, no need to synchronize
     public void initialize() {
-        if (client == null) {
-            // initialize can be called by initSearch explicitly during test,
-            Rest5ClientBuilder builder = Rest5Client.builder(hosts);
+        if (client == null) {   // initialize can be called by initSearch explicitly during test,
+            RestClientBuilder builder = RestClient.builder(hosts);
             if (authHeader != null) {
                 builder.setDefaultHeaders(new Header[]{authHeader});
             }
-
-            RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(Timeout.ofSeconds(5))
-                .setResponseTimeout((int) timeout.toMillis(), TimeUnit.MILLISECONDS)
-                .build();
-
-            ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                .setConnectTimeout(Timeout.ofSeconds(5))
-                .setSocketTimeout((int) timeout.toMillis(), TimeUnit.MILLISECONDS)
-                .setTimeToLive(TimeValue.ofSeconds(30))
-                .build();
-
-            PoolingAsyncClientConnectionManager connectionManager =
-                PoolingAsyncClientConnectionManagerBuilder.create()
-                    .setDefaultConnectionConfig(connectionConfig)
-                    .setMaxConnPerRoute(100)
-                    .setMaxConnTotal(100)
-                    .build();
-
-            HttpAsyncClientBuilder httpClientBuilder = HttpAsyncClientBuilder.create()
-                .setDefaultRequestConfig(requestConfig)
-                .setConnectionManager(connectionManager)
-                .setUserAgent("elasticsearch-java/core-ng")
-                .setThreadFactory(Thread.ofPlatform().name("elasticsearch-rest-client-", 0).factory());
-
-            builder.setHttpClient(httpClientBuilder.build());
-
+            builder.setRequestConfigCallback(config -> config.setConnectionRequestTimeout(5_000)    // timeout of requesting connection from connection pool
+                .setConnectTimeout(5_000)   // 5s, usually es is within same network, use shorter timeout to fail fast
+                .setSocketTimeout((int) timeout.toMillis()));
+            builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
+                .setMaxConnPerRoute(100)
+                .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis())
+                .addInterceptorFirst(new ElasticSearchLogInterceptor()));
             restClient = builder.build();
             mapper = JSONMapper.builder().serializationInclusion(JsonInclude.Include.NON_NULL).build();
-            client = new ElasticsearchClient(new Rest5ClientTransport(restClient, new JacksonJsonpMapper(mapper), null, new ElasticSearchLogInstrumentation()));
+            client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper(mapper), null, NoopInstrumentation.INSTANCE));
         }
     }
 
@@ -212,7 +184,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public ClusterStateResponse state() {
         var watch = new StopWatch();
         try {
-            return client.cluster().state(builder -> builder.metric("metadata")).state().to(ClusterStateResponse.class);
+            return client.cluster().state(builder -> builder.metric("metadata")).valueBody().to(ClusterStateResponse.class);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {

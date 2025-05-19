@@ -7,7 +7,7 @@ apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
-    version = "9.2.0"
+    version = "9.2.1"
     repositories {
         maven {
             url = uri("https://neowu.github.io/maven-repo/")
@@ -18,8 +18,8 @@ subprojects {
     }
 }
 
-val elasticVersion = "9.0.0"
-val jacksonVersion = "2.18.3"
+val elasticVersion = "8.18.1"
+val jacksonVersion = "2.18.4"
 val junitVersion = "5.12.2"
 val mockitoVersion = "5.17.0"
 val assertjVersion = "3.27.3"
@@ -90,7 +90,6 @@ project("core-ng-search") {
         api("co.elastic.clients:elasticsearch-java:${elasticVersion}") {
             exclude(group = "io.opentelemetry")
         }
-        implementation("commons-logging:commons-logging:1.3.5")
         implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
         testImplementation(project(":core-ng-test"))
     }
@@ -109,7 +108,6 @@ project("core-ng-search-test") {
         implementation("core.framework.elasticsearch.module:lang-painless:${elasticVersion}")
         implementation("core.framework.elasticsearch.module:analysis-common:${elasticVersion}")     // used by elasticsearch stemmer
         implementation("core.framework.elasticsearch.module:reindex:${elasticVersion}")             // used by elasticsearch deleteByQuery
-        implementation("org.apache.httpcomponents:httpasyncclient:4.1.5")                           // used by reindex
         runtimeOnly("org.apache.logging.log4j:log4j-to-slf4j:2.19.0")
     }
 }

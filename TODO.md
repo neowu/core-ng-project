@@ -21,3 +21,5 @@
 * migrate to dragonflydb and support RESP3 (cluster / MOVED handling) ?
 * migrate to opensearch ?
 * log exporter, reimplement in rust?
+
+* update ES to 9.x

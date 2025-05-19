@@ -2,7 +2,7 @@ package core.framework.search.impl;
 
 import core.framework.util.Files;
 import core.framework.util.StopWatch;
-import org.apache.hc.core5.http.HttpHost;
+import org.apache.http.HttpHost;
 import org.elasticsearch.cluster.ClusterName;
 import org.elasticsearch.common.network.NetworkService;
 import org.elasticsearch.common.settings.Settings;
