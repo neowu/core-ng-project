@@ -11,6 +11,8 @@
   > refer to https://www.elastic.co/docs/reference/elasticsearch/clients/java
 * action: added ActionLogContext.maxProcessTime(duration)
   > for long and non-critical action (such as test jobs), set max process time to avoid SLOW_PROCESS warning
+* log: send kafka log message with ZSTD
+  > log-processor doesn't support snappy anymore, update log-processor after all services upgraded framework
 
 ### 9.1.8 (3/7/2025 - 4/24/2025)
 
