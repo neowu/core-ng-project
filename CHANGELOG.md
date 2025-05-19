@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.2.0 (4/24/2025 - )
+### 9.2.0 (4/24/2025 - 5/19/2025)
 
 * java: update to 24
   > refer to https://openjdk.org/jeps/491
