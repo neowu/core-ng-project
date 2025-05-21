@@ -1,5 +1,7 @@
 ## Change log
 
+### 9.2.2 (5/21/2025 - )
+
 ### 9.2.1 (4/24/2025 - 5/19/2025) !!! only support java 24
 
 * java: update to 24
@@ -12,7 +14,7 @@
 * action: added ActionLogContext.maxProcessTime(duration)
   > for long and non-critical action (such as test jobs), set max process time to avoid SLOW_PROCESS warning
 * log: send kafka log message with ZSTD
-  > log-processor doesn't support snappy anymore, update log-processor after all services upgraded framework
+  > log-processor doesn't support snappy anymore, update log-processor after all services + log-collector upgraded to latest version
 
 ### 9.1.8 (3/7/2025 - 4/24/2025)
 
