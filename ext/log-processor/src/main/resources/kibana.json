@@ -141,8 +141,8 @@
       "panelsJSON": "[\n  {\"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"panelIndex\": \"1\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_1\"},\n  {\"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 15, \"i\": \"2\"}, \"panelIndex\": \"2\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_2\"}\n]\n"
     },
     "references": [
-      {"id": "stat-sse_active_channels", "name": "panel_3", "type": "visualization"},
-      {"id": "perf-sse_io", "name": "panel_4", "type": "visualization"}
+      {"id": "stat-sse_active_channels", "name": "panel_1", "type": "visualization"},
+      {"id": "perf-sse_io", "name": "panel_2", "type": "visualization"}
     ]
   },
   {

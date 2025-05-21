@@ -26,6 +26,10 @@ public final class DefaultLoggerFactory implements ILoggerFactory {
         if (name.startsWith("org.apache.kafka.")) {
             return LogLevel.WARN;
         }
+        // refer to org.elasticsearch.nativeaccess.NativeAccessHolder, to emmit warning under integration-test env
+        if (name.startsWith("org.elasticsearch.nativeaccess.")) {
+            return LogLevel.ERROR;
+        }
         return LogLevel.INFO;
     }
 
