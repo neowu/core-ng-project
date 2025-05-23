@@ -7,7 +7,7 @@ apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
-    version = "9.2.1"
+    version = "9.2.2"
     repositories {
         maven {
             url = uri("https://neowu.github.io/maven-repo/")

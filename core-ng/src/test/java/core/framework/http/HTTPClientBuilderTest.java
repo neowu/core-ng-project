@@ -3,6 +3,8 @@ package core.framework.http;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -98,5 +100,10 @@ class HTTPClientBuilderTest {
     @Test
     void clientAuth() {
         builder.clientAuth(PRIVATE_KEY, CERT).build();
+    }
+
+    @Test
+    void proxy() {
+        builder.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(8081)));
     }
 }

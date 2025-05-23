@@ -23,6 +23,7 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.Proxy;
 import java.security.KeyFactory;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -82,6 +83,7 @@ public final class HTTPClientBuilder {
     private KeyManager[] keyManagers;   // for client auth
     private Integer maxRetries;
     private Duration retryWaitTime = Duration.ofMillis(500);
+    private Proxy proxy;
 
     // force to use HTTPClient.builder()
     HTTPClientBuilder() {
@@ -110,6 +112,7 @@ public final class HTTPClientBuilder {
             }
             if (enableCookie) builder.cookieJar(new CookieManager());
             if (enableFallbackDNSCache) builder.dns(new FallbackDNSCache(Clock.systemUTC()));
+            if (proxy != null) builder.proxy(proxy);
 
             return new HTTPClientImpl(builder.build(), userAgent, slowOperationThreshold, timeout);
         } finally {
@@ -181,6 +184,11 @@ public final class HTTPClientBuilder {
 
     public HTTPClientBuilder enableFallbackDNSCache() {
         enableFallbackDNSCache = true;
+        return this;
+    }
+
+    public HTTPClientBuilder proxy(Proxy proxy) {
+        this.proxy = proxy;
         return this;
     }
 

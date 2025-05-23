@@ -2,6 +2,8 @@
 
 ### 9.2.2 (5/21/2025 - )
 
+* http_client: support proxy
+
 ### 9.2.1 (4/24/2025 - 5/19/2025) !!! only support java 24
 
 * java: update to 24
