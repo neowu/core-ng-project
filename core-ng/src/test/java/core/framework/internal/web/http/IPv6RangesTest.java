@@ -42,7 +42,7 @@ class IPv6RangesTest {
     }
 
     @Test
-    void matchesMultipleRanges() {
+    void matchesWithMultipleRanges() {
         var ranges = new IPv6Ranges(List.of("2001:db8::/32", "2001:db9::/32", "2001:dba::/32"));
         assertTrue(ranges.matches(address("2001:db8::1")));
         assertTrue(ranges.matches(address("2001:db9::1")));

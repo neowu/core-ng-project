@@ -66,16 +66,15 @@ public class IPv4Ranges {
         int[][] ranges = new int[cidrs.size()][];
         int index = 0;
         for (String cidr : cidrs) {
-            int[] range = comparableIPRanges(cidr);
+            int[] range = sortableRange(cidr);
             ranges[index++] = range;
         }
         this.ranges = mergeRanges(ranges);
     }
 
-    private int[] comparableIPRanges(String cidr) {
+    private int[] sortableRange(String cidr) {
         int index = cidr.indexOf('/');
         if (index <= 0 || index >= cidr.length() - 1) throw new Error("invalid cidr, value=" + cidr);
-        int address = toInt(address(cidr.substring(0, index)));
         int maskBits = Integer.parseInt(cidr.substring(index + 1));
 
         int rangeStart;
@@ -88,6 +87,7 @@ public class IPv4Ranges {
             rangeStart = 0;
             rangeEnd = -1;
         } else {
+            int address = toInt(address(cidr.substring(0, index)));
             int mask = -1 << (32 - maskBits);
             rangeStart = address & mask;
             rangeEnd = rangeStart + ~mask;
@@ -107,8 +107,8 @@ public class IPv4Ranges {
 
     public boolean matches(byte[] address) {
         if (ranges.length == 0) return false;
-        int comparableIP = toSortable(toInt(address));
-        return withinRanges(ranges, comparableIP);
+        int sortable = toSortable(toInt(address));
+        return withinRanges(ranges, sortable);
     }
 
     // with address ^ MIN_VALUE, it converts binary presentation to sortable number form (due to java doesn't have unsigned number type)

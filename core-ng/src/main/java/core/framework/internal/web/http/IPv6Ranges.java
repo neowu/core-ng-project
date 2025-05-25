@@ -80,13 +80,13 @@ public class IPv6Ranges {
         LongLong[][] ranges = new LongLong[cidrs.size()][];
         int index = 0;
         for (String cidr : cidrs) {
-            LongLong[] range = comparableIPRanges(cidr);
+            LongLong[] range = sortableRange(cidr);
             ranges[index++] = range;
         }
         this.ranges = mergeRanges(ranges);
     }
 
-    private LongLong[] comparableIPRanges(String cidr) {
+    private LongLong[] sortableRange(String cidr) {
         int index = cidr.indexOf('/');
         if (index <= 0 || index >= cidr.length() - 1) throw new Error("invalid cidr, value=" + cidr);
         LongLong address = toLongLong(IPv4Ranges.address(cidr.substring(0, index)));
@@ -114,8 +114,8 @@ public class IPv6Ranges {
         if (ranges.length == 0) return false;
         if (address.length != 16) return false;
 
-        LongLong comparableIP = toLongLong(address).toSortable();
-        return withinRanges(ranges, comparableIP);
+        LongLong sortable = toLongLong(address).toSortable();
+        return withinRanges(ranges, sortable);
     }
 
     // high,low are used to represent a 128-bit IPv6 address as two 64-bit long values
