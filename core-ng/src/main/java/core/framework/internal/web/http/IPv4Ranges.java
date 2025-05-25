@@ -75,16 +75,28 @@ public class IPv4Ranges {
     private int[] comparableIPRanges(String cidr) {
         int index = cidr.indexOf('/');
         if (index <= 0 || index >= cidr.length() - 1) throw new Error("invalid cidr, value=" + cidr);
-        int address = toInteger(address(cidr.substring(0, index)));
+        int address = toInt(address(cidr.substring(0, index)));
         int maskBits = Integer.parseInt(cidr.substring(index + 1));
-        long mask = -1L << (32 - maskBits);
-        int lowestIP = (int) (address & mask);
-        int highestIP = (int) (lowestIP + ~mask);
-        return new int[]{lowestIP ^ Integer.MIN_VALUE, highestIP ^ Integer.MIN_VALUE};
+
+        int rangeStart;
+        int rangeEnd;
+        // refer to https://docs.oracle.com/javase/specs/jls/se22/html/jls-15.html#jls-15.19
+        // If the promoted type of the left-hand operand is int, then only the five lowest-order bits of the right-hand operand are used as the shift distance.
+        // It is as if the right-hand operand were subjected to a bitwise logical AND operator & (§15.22.1) with the mask value 0x1f (0b11111).
+        // The shift distance actually used is therefore always in the range 0 to 31, inclusive.
+        if (maskBits == 0) {
+            rangeStart = 0;
+            rangeEnd = -1;
+        } else {
+            int mask = -1 << (32 - maskBits);
+            rangeStart = address & mask;
+            rangeEnd = rangeStart + ~mask;
+        }
+        return new int[]{toSortable(rangeStart), toSortable(rangeEnd)};
     }
 
-    private int toInteger(byte[] address) {
-        if (address.length > 4) throw new Error("only support ipv4, address=" + Arrays.toString(address));
+    private int toInt(byte[] address) {
+        if (address.length != 4) throw new Error("not ipv4 address, address=" + Arrays.toString(address));
         int result = 0;
         result |= (address[0] & 0xFF) << 24;
         result |= (address[1] & 0xFF) << 16;
@@ -93,15 +105,18 @@ public class IPv4Ranges {
         return result;
     }
 
-    /*
-     * with address ^ Integer.MIN_VALUE, it converts binary presentation to sortable int form
-     * where Integer.MIN_VALUE = 0.0.0.0
-     * and 0 = 128.0.0.0
-     * and Integer.MAX_VALUE = 255.255.255.255
-     * */
     public boolean matches(byte[] address) {
         if (ranges.length == 0) return false;
-        int comparableIP = toInteger(address) ^ Integer.MIN_VALUE;
+        int comparableIP = toSortable(toInt(address));
         return withinRanges(ranges, comparableIP);
+    }
+
+    // with address ^ MIN_VALUE, it converts binary presentation to sortable number form (due to java doesn't have unsigned number type)
+    // 0.0.0.0 => MIN_VALUE         (00000000.0.0.0 => 10000000.0.0.0)
+    // 127.255.255.255 => -1        (01111111.11111111.11111111.11111111 => 11111111.11111111.11111111.11111111)
+    // 128.0.0.0 => 0               (10000000.0.0.0 => 00000000.0.0.0)
+    // 255.255.255.255 => MAX_VALUE (11111111.11111111.11111111.11111111 => 01111111.11111111.11111111.11111111)
+    private int toSortable(int value) {
+        return value ^ Integer.MIN_VALUE;
     }
 }
