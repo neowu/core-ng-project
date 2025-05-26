@@ -1,7 +1,5 @@
 package core.framework.internal.web.http;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -9,15 +7,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public class IPv4Ranges {
-    static byte[] address(String address) {
-        try {
-            return InetAddress.getByName(address).getAddress();
-        } catch (UnknownHostException e) {
-            throw new Error(e);
-        }
-    }
-
+public class IPv4Ranges implements IPRanges {
     static boolean withinRanges(int[] ranges, int value) {
         int low = 0;
         int high = ranges.length - 1;
@@ -87,7 +77,7 @@ public class IPv4Ranges {
             rangeStart = 0;
             rangeEnd = -1;
         } else {
-            int address = toInt(address(cidr.substring(0, index)));
+            int address = toInt(IPRanges.address(cidr.substring(0, index)));
             int mask = -1 << (32 - maskBits);
             rangeStart = address & mask;
             rangeEnd = rangeStart + ~mask;
@@ -105,6 +95,7 @@ public class IPv4Ranges {
         return result;
     }
 
+    @Override
     public boolean matches(byte[] address) {
         if (ranges.length == 0) return false;
         int sortable = toSortable(toInt(address));
@@ -116,6 +107,7 @@ public class IPv4Ranges {
     // 127.255.255.255 => -1        (01111111.11111111.11111111.11111111 => 11111111.11111111.11111111.11111111)
     // 128.0.0.0 => 0               (10000000.0.0.0 => 00000000.0.0.0)
     // 255.255.255.255 => MAX_VALUE (11111111.11111111.11111111.11111111 => 01111111.11111111.11111111.11111111)
+    // refer to Integer.compareUnsigned(x, y)
     private int toSortable(int value) {
         return value ^ Integer.MIN_VALUE;
     }

@@ -43,13 +43,13 @@ public final class SystemModule extends Module {
         });
         property("sys.cdn.host").ifPresent(host -> site().cdn().host(host));
         property("sys.security.csp").ifPresent(policy -> site().security().contentSecurityPolicy(policy));
-        property("sys.api.allowCIDR").ifPresent(cidrs -> site().allowAPI(new IPv4RangePropertyValueParser(cidrs).parse()));
+        property("sys.api.allowCIDR").ifPresent(cidrs -> site().allowAPI(new IPRangePropertyValueParser(cidrs).parse()));
     }
 
     void configureHTTP() {
         property("sys.http.listen").ifPresent(host -> http().listenHTTP(host));
         property("sys.https.listen").ifPresent(host -> http().listenHTTPS(host));
-        property("sys.http.allowCIDR").ifPresent(cidrs -> http().access().allow(new IPv4RangePropertyValueParser(cidrs).parse()));
+        property("sys.http.allowCIDR").ifPresent(cidrs -> http().access().allow(new IPRangePropertyValueParser(cidrs).parse()));
     }
 
     private void configureLog() {

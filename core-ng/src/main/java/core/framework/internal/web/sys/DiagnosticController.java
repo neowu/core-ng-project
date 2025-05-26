@@ -2,7 +2,7 @@ package core.framework.internal.web.sys;
 
 import core.framework.http.ContentType;
 import core.framework.internal.stat.Diagnostic;
-import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.internal.web.http.IPAccessControl;
 import core.framework.util.Files;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -13,7 +13,7 @@ import java.nio.file.Path;
  * @author neo
  */
 public class DiagnosticController {
-    private final IPv4AccessControl accessControl = new IPv4AccessControl();
+    private final IPAccessControl accessControl = new IPAccessControl();
 
     // add -XX:NativeMemoryTracking=summary or -XX:NativeMemoryTracking=detail to enable native memory tracking, and vmInfo will include NMT summary
     // enabling NMT will result in a 5-10 percent JVM performance drop

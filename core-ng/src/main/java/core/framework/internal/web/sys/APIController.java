@@ -5,7 +5,7 @@ import core.framework.internal.web.api.APIDefinitionBuilder;
 import core.framework.internal.web.api.APIDefinitionResponse;
 import core.framework.internal.web.api.MessageAPIDefinitionBuilder;
 import core.framework.internal.web.api.MessageAPIDefinitionResponse;
-import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.internal.web.http.IPAccessControl;
 import core.framework.internal.web.service.ErrorResponse;
 import core.framework.json.JSON;
 import core.framework.web.Request;
@@ -21,7 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author neo
  */
 public class APIController {
-    public final IPv4AccessControl accessControl = new IPv4AccessControl();
+    public final IPAccessControl accessControl = new IPAccessControl();
     private final ReentrantLock lock = new ReentrantLock();
 
     public Set<Class<?>> serviceInterfaces = new LinkedHashSet<>();

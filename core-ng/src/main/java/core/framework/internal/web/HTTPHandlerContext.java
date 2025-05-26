@@ -2,7 +2,7 @@ package core.framework.internal.web;
 
 import core.framework.internal.web.bean.RequestBeanReader;
 import core.framework.internal.web.bean.ResponseBeanWriter;
-import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.internal.web.http.IPAccessControl;
 import core.framework.internal.web.http.RateControl;
 import core.framework.internal.web.request.RequestParser;
 
@@ -15,5 +15,5 @@ public class HTTPHandlerContext {
     @Nullable
     public RateControl rateControl;
     @Nullable
-    public IPv4AccessControl accessControl;
+    public IPAccessControl accessControl;
 }

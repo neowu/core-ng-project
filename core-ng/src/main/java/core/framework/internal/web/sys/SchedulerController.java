@@ -3,7 +3,7 @@ package core.framework.internal.web.sys;
 import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;
 import core.framework.internal.scheduler.Scheduler;
-import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.internal.web.http.IPAccessControl;
 import core.framework.json.JSON;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class SchedulerController {
     private final Logger logger = LoggerFactory.getLogger(SchedulerController.class);
-    private final IPv4AccessControl accessControl = new IPv4AccessControl();
+    private final IPAccessControl accessControl = new IPAccessControl();
     private final Scheduler scheduler;
 
     public SchedulerController(Scheduler scheduler) {

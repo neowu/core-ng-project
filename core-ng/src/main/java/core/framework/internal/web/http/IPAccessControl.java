@@ -10,24 +10,40 @@ import java.net.UnknownHostException;
 /**
  * @author neo
  */
-public class IPv4AccessControl {
-    private final Logger logger = LoggerFactory.getLogger(IPv4AccessControl.class);
+public class IPAccessControl {
+    private final Logger logger = LoggerFactory.getLogger(IPAccessControl.class);
     public IPv4Ranges allow;
     public IPv4Ranges deny;
+    public IPv6Ranges allowIPv6;
+    public IPv6Ranges denyIPv6;
 
     public void validate(String clientIP) {
+        InetAddress address;
         try {
-            InetAddress address = InetAddress.getByName(clientIP);
-            if (isLocal(address)) {
-                logger.debug("allow site local client address");
-                return;
-            }
-
-            if (!allow(address.getAddress())) {
-                throw new ForbiddenException("access denied", "IP_ACCESS_DENIED");
-            }
+            address = InetAddress.getByName(clientIP);
         } catch (UnknownHostException e) {
             throw new Error(e);  // client ip format is already validated in ClientIPParser, so here it won't resolve DNS
+        }
+
+        if (isLocal(address)) {
+            logger.debug("allow site local client address");
+            return;
+        }
+
+        byte[] byteAddress = address.getAddress();
+        IPRanges allow;
+        IPRanges deny;
+        if (byteAddress.length == 4) {
+            allow = this.allow;
+            deny = this.deny;
+        } else if (byteAddress.length == 16) {
+            allow = allowIPv6;
+            deny = denyIPv6;
+        } else {
+            throw new Error("unexpected address, address=" + address);
+        }
+        if (!allow(byteAddress, allow, deny)) {
+            throw new ForbiddenException("access denied", "IP_ACCESS_DENIED");
         }
     }
 
@@ -35,12 +51,7 @@ public class IPv4AccessControl {
         return address.isLoopbackAddress() || address.isSiteLocalAddress();
     }
 
-    boolean allow(byte[] address) {
-        if (address.length > 4) {   // only support ipv4, as Cloud LB generally uses ipv4 endpoint (gcloud supports both ipv4/v6, but ipv6 is not majority yet)
-            logger.debug("skip with ipv6 client address");
-            return true;
-        }
-
+    boolean allow(byte[] address, IPRanges allow, IPRanges deny) {
         if (allow != null && allow.matches(address)) {
             logger.debug("allow client ip within allowed ranges");
             return true;

@@ -8,7 +8,7 @@ import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.Trace;
 import core.framework.internal.log.filter.BytesLogParam;
-import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.internal.web.http.IPAccessControl;
 import core.framework.json.JSON;
 import core.framework.kafka.Message;
 import core.framework.util.Strings;
@@ -30,7 +30,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class KafkaController {
     private final Logger logger = LoggerFactory.getLogger(KafkaController.class);
-    private final IPv4AccessControl accessControl = new IPv4AccessControl();
+    private final IPAccessControl accessControl = new IPAccessControl();
     public MessageProducer producer;
     public MessageListener listener;
 

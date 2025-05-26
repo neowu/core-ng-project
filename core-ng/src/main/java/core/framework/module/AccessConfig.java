@@ -1,8 +1,9 @@
 package core.framework.module;
 
 import core.framework.internal.module.ModuleContext;
-import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.internal.web.http.IPAccessControl;
 import core.framework.internal.web.http.IPv4Ranges;
+import core.framework.internal.web.http.IPv6Ranges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,11 +26,19 @@ public final class AccessConfig {
      * @param cidrs cidr blocks
      */
     public void allow(List<String> cidrs) {
-        IPv4AccessControl accessControl = accessControl();
+        IPAccessControl accessControl = accessControl();
         if (accessControl.allow != null) throw new Error("allowed cidrs is already configured");
 
         logger.info("allow http access, cidrs={}", cidrsLogParam(cidrs, 5));
         accessControl.allow = new IPv4Ranges(cidrs);
+    }
+
+    public void allowIPv6(List<String> cidrs) {
+        IPAccessControl accessControl = accessControl();
+        if (accessControl.allowIPv6 != null) throw new Error("allowed ipv6 cidrs is already configured");
+
+        logger.info("allow ipv6 http access, cidrs={}", cidrsLogParam(cidrs, 5));
+        accessControl.allowIPv6 = new IPv6Ranges(cidrs);
     }
 
     /**
@@ -38,11 +47,19 @@ public final class AccessConfig {
      * @param cidrs cidr blocks
      */
     public void deny(List<String> cidrs) {
-        IPv4AccessControl accessControl = accessControl();
+        IPAccessControl accessControl = accessControl();
         if (accessControl.deny != null) throw new Error("denied cidrs is already configured");
 
         logger.info("deny http access, cidrs={}", cidrsLogParam(cidrs, 5));
         accessControl.deny = new IPv4Ranges(cidrs);
+    }
+
+    public void denyIPv6(List<String> cidrs) {
+        IPAccessControl accessControl = accessControl();
+        if (accessControl.denyIPv6 != null) throw new Error("denied ipv6 cidrs is already configured");
+
+        logger.info("deny ipv6 http access, cidrs={}", cidrsLogParam(cidrs, 5));
+        accessControl.denyIPv6 = new IPv6Ranges(cidrs);
     }
 
     /**
@@ -51,12 +68,16 @@ public final class AccessConfig {
      * @param classpath cidr file
      */
     public void denyFromFile(String classpath) {
-        deny(new IPv4RangeFileParser(classpath).parse());
+        deny(new IPRangeFileParser(classpath).parse());
     }
 
-    private IPv4AccessControl accessControl() {
+    public void denyIPv6FromFile(String classpath) {
+        denyIPv6(new IPRangeFileParser(classpath).parse());
+    }
+
+    private IPAccessControl accessControl() {
         if (context.httpServer.handlerContext.accessControl == null) {
-            context.httpServer.handlerContext.accessControl = new IPv4AccessControl();
+            context.httpServer.handlerContext.accessControl = new IPAccessControl();
         }
         return context.httpServer.handlerContext.accessControl;
     }

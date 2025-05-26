@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-public class IPv6Ranges {
+public class IPv6Ranges implements IPRanges {
     static boolean withinRanges(LongLong[] ranges, LongLong value) {
         int low = 0;
         int high = ranges.length - 1;
@@ -89,7 +89,7 @@ public class IPv6Ranges {
     private LongLong[] sortableRange(String cidr) {
         int index = cidr.indexOf('/');
         if (index <= 0 || index >= cidr.length() - 1) throw new Error("invalid cidr, value=" + cidr);
-        LongLong address = toLongLong(IPv4Ranges.address(cidr.substring(0, index)));
+        LongLong address = toLongLong(IPRanges.address(cidr.substring(0, index)));
         int maskBits = Integer.parseInt(cidr.substring(index + 1));
 
         LongLong rangeStart;
@@ -110,6 +110,7 @@ public class IPv6Ranges {
         return new LongLong[]{rangeStart.toSortable(), rangeEnd.toSortable()};
     }
 
+    @Override
     public boolean matches(byte[] address) {
         if (ranges.length == 0) return false;
         if (address.length != 16) return false;

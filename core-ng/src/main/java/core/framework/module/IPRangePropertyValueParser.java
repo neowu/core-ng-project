@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 /**
  * @author neo
  */
-public final class IPv4RangePropertyValueParser {
+public final class IPRangePropertyValueParser {
     private final String value;
 
-    public IPv4RangePropertyValueParser(String value) {
+    public IPRangePropertyValueParser(String value) {
         this.value = value;
     }
 
@@ -22,7 +22,7 @@ public final class IPv4RangePropertyValueParser {
     // 2. name1: cidr, cidr; name2: cidr
     public List<String> parse() {
         if (Strings.isBlank(value)) return List.of();
-        if (value.indexOf(':') > 0) {
+        if (value.indexOf(": ") > 0) {
             return parseSemicolonDelimited(value);
         } else {
             return parseCommaDelimited(value);

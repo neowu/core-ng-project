@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static core.framework.internal.web.http.IPv4Ranges.address;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -37,52 +36,52 @@ class IPv4RangesTest {
     void matchesAll() {
         var ranges = new IPv4Ranges(List.of("0.0.0.0/0"));
 
-        assertThat(ranges.matches(address("192.168.1.1"))).isTrue();
-        assertThat(ranges.matches(address("127.0.0.1"))).isTrue();
-        assertThat(ranges.matches(address("10.10.0.1"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.1"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("127.0.0.1"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("10.10.0.1"))).isTrue();
     }
 
     @Test
     void matches() {
         var ranges = new IPv4Ranges(List.of("192.168.1.0/24"));
-        assertThat(ranges.matches(address("192.168.1.1"))).isTrue();
-        assertThat(ranges.matches(address("192.168.1.254"))).isTrue();
-        assertThat(ranges.matches(address("192.168.2.1"))).isFalse();
-        assertThat(ranges.matches(address("192.168.0.1"))).isFalse();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.1"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.254"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("192.168.2.1"))).isFalse();
+        assertThat(ranges.matches(IPRanges.address("192.168.0.1"))).isFalse();
 
         ranges = new IPv4Ranges(List.of("192.168.1.1/32"));
-        assertThat(ranges.matches(address("192.168.1.1"))).isTrue();
-        assertThat(ranges.matches(address("192.168.1.2"))).isFalse();
-        assertThat(ranges.matches(address("192.168.1.3"))).isFalse();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.1"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.2"))).isFalse();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.3"))).isFalse();
 
         ranges = new IPv4Ranges(List.of("192.168.1.1/31"));
-        assertThat(ranges.matches(address("192.168.1.0"))).isTrue();
-        assertThat(ranges.matches(address("192.168.1.1"))).isTrue();
-        assertThat(ranges.matches(address("192.168.1.2"))).isFalse();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.0"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.1"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.2"))).isFalse();
 
         ranges = new IPv4Ranges(List.of("192.168.1.1/30"));
-        assertThat(ranges.matches(address("192.168.1.0"))).isTrue();
-        assertThat(ranges.matches(address("192.168.1.1"))).isTrue();
-        assertThat(ranges.matches(address("192.168.1.2"))).isTrue();
-        assertThat(ranges.matches(address("192.168.1.3"))).isTrue();
-        assertThat(ranges.matches(address("192.168.1.4"))).isFalse();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.0"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.1"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.2"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.3"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.4"))).isFalse();
 
         ranges = new IPv4Ranges(List.of("119.137.52.0/22"));
-        assertThat(ranges.matches(address("119.137.52.1"))).isTrue();
-        assertThat(ranges.matches(address("119.137.53.1"))).isTrue();
-        assertThat(ranges.matches(address("119.137.53.254"))).isTrue();
-        assertThat(ranges.matches(address("119.137.54.254"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("119.137.52.1"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("119.137.53.1"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("119.137.53.254"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("119.137.54.254"))).isTrue();
 
         ranges = new IPv4Ranges(List.of("42.200.0.0/16", "43.224.4.0/22", "43.224.28.0/22"));
-        assertThat(ranges.matches(address("42.119.0.1"))).isFalse();
-        assertThat(ranges.matches(address("42.200.218.1"))).isTrue();
-        assertThat(ranges.matches(address("42.201.218.1"))).isFalse();
-        assertThat(ranges.matches(address("43.224.32.1"))).isFalse();
+        assertThat(ranges.matches(IPRanges.address("42.119.0.1"))).isFalse();
+        assertThat(ranges.matches(IPRanges.address("42.200.218.1"))).isTrue();
+        assertThat(ranges.matches(IPRanges.address("42.201.218.1"))).isFalse();
+        assertThat(ranges.matches(IPRanges.address("43.224.32.1"))).isFalse();
     }
 
     @Test
     void matchWithEmptyRanges() {
         var ranges = new IPv4Ranges(List.of());
-        assertThat(ranges.matches(address("192.168.1.1"))).isFalse();
+        assertThat(ranges.matches(IPRanges.address("192.168.1.1"))).isFalse();
     }
 }

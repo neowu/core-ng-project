@@ -2,7 +2,7 @@ package core.framework.internal.web.sys;
 
 import core.framework.http.ContentType;
 import core.framework.internal.cache.CacheImpl;
-import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.internal.web.http.IPAccessControl;
 import core.framework.json.JSON;
 import core.framework.util.Strings;
 import core.framework.web.Request;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 public class CacheController {
     private final Map<String, CacheImpl<?>> caches;
-    private final IPv4AccessControl accessControl = new IPv4AccessControl();
+    private final IPAccessControl accessControl = new IPAccessControl();
 
     public CacheController(Map<String, CacheImpl<?>> caches) {
         this.caches = caches;

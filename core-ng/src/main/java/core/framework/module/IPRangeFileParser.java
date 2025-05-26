@@ -16,11 +16,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * @author neo
  */
-public final class IPv4RangeFileParser {
-    private final Logger logger = LoggerFactory.getLogger(IPv4RangeFileParser.class);
+public final class IPRangeFileParser {
+    private final Logger logger = LoggerFactory.getLogger(IPRangeFileParser.class);
     private final String classpath;
 
-    public IPv4RangeFileParser(String classpath) {
+    public IPRangeFileParser(String classpath) {
         this.classpath = classpath;
     }
 

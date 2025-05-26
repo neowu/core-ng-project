@@ -93,6 +93,8 @@ public class TestModule extends AbstractTestModule {
         http().maxEntitySize(10000000);
         http().access().allow(List.of("0.0.0.0/0"));
         http().access().deny(List.of("10.0.0.0/24"));
+        http().access().allowIPv6(List.of("::/0"));
+        http().access().denyIPv6(List.of("2001:df0:465::/48"));
         http().errorHandler((request, e) -> Optional.empty());
     }
 
