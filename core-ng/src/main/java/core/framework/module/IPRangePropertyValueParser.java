@@ -5,7 +5,6 @@ import core.framework.util.Strings;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -22,7 +21,9 @@ public final class IPRangePropertyValueParser {
     // 2. name1: cidr, cidr; name2: cidr
     public List<String> parse() {
         if (Strings.isBlank(value)) return List.of();
-        if (value.indexOf(": ") > 0) {
+
+        int index = value.indexOf(": ");
+        if (index > 0) {
             return parseSemicolonDelimited(value);
         } else {
             return parseCommaDelimited(value);
@@ -30,14 +31,14 @@ public final class IPRangePropertyValueParser {
     }
 
     private List<String> parseCommaDelimited(String value) {
-        return Arrays.stream(Strings.split(value, ',')).map(String::strip).collect(Collectors.toList());
+        return Arrays.stream(Strings.split(value, ',')).map(String::strip).toList();
     }
 
     private List<String> parseSemicolonDelimited(String value) {
         List<String> results = new ArrayList<>();
         for (String item : Strings.split(value, ';')) {
             if (Strings.isBlank(item)) continue;
-            int index = item.indexOf(':');
+            int index = item.indexOf(": ");
             Arrays.stream(Strings.split(item.substring(index + 1), ','))
                   .map(String::strip)
                   .forEach(results::add);
