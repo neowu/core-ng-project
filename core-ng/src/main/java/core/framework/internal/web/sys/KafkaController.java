@@ -46,7 +46,7 @@ public class KafkaController {
         ProducerRecord<byte[], byte[]> record = record(topic, key, body, actionLog);
         producer.send(record);
 
-        return Response.text(Strings.format("message published, topic={}, key={}, message={}", topic, key, new String(body, UTF_8)));
+        return Response.text(Strings.format("message published, refId={}, topic={}, key={}, message={}", actionLog.id, topic, key, new String(body, UTF_8)));
     }
 
     public Response handle(Request request) throws Exception {
@@ -73,7 +73,7 @@ public class KafkaController {
         } else {
             throw new Error("handler not found, topic=" + topic);
         }
-        return Response.text(Strings.format("message handled, topic={}, key={}, message={}", topic, key, new String(body, UTF_8)));
+        return Response.text(Strings.format("message handled, id={}, topic={}, key={}, message={}", actionLog.id, topic, key, new String(body, UTF_8)));
     }
 
     private Object message(String topic, String key, byte[] body, MessageProcess<Object> process, ActionLog actionLog) throws IOException {
