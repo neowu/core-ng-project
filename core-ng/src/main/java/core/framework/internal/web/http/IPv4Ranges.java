@@ -74,11 +74,11 @@ public class IPv4Ranges implements IPRanges {
         // It is as if the right-hand operand were subjected to a bitwise logical AND operator & (§15.22.1) with the mask value 0x1f (0b11111).
         // The shift distance actually used is therefore always in the range 0 to 31, inclusive.
         if (maskBits == 0) {
-            rangeStart = 0;
-            rangeEnd = -1;
+            rangeStart = 0x0000_0000;
+            rangeEnd = 0xFFFF_FFFF;
         } else {
             int address = toInt(IPRanges.address(cidr.substring(0, index)));
-            int mask = -1 << (32 - maskBits);
+            int mask = 0xFFFF_FFFF << (32 - maskBits);
             rangeStart = address & mask;
             rangeEnd = rangeStart + ~mask;
         }
@@ -87,7 +87,7 @@ public class IPv4Ranges implements IPRanges {
 
     private int toInt(byte[] address) {
         if (address.length != 4) throw new Error("not ipv4 address, address=" + Arrays.toString(address));
-        int result = 0;
+        int result = 0x0000_0000;
         result |= (address[0] & 0xFF) << 24;
         result |= (address[1] & 0xFF) << 16;
         result |= (address[2] & 0xFF) << 8;

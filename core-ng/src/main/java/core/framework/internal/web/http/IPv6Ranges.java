@@ -51,7 +51,7 @@ public class IPv6Ranges implements IPRanges {
     static LongLong toLongLong(byte[] address) {
         if (address.length != 16) throw new Error("not ipv6 address, address=" + Arrays.toString(address));
 
-        long high = 0;
+        long high = 0x0000_0000_0000_0000L;
         high |= (long) (address[0] & 0xFF) << 56;
         high |= (long) (address[1] & 0xFF) << 48;
         high |= (long) (address[2] & 0xFF) << 40;
@@ -61,7 +61,7 @@ public class IPv6Ranges implements IPRanges {
         high |= (long) (address[6] & 0xFF) << 8;
         high |= address[7] & 0xFF;
 
-        long low = 0;
+        long low = 0x0000_0000_0000_0000L;
         low |= (long) (address[8] & 0xFF) << 56;
         low |= (long) (address[9] & 0xFF) << 48;
         low |= (long) (address[10] & 0xFF) << 40;
@@ -95,12 +95,12 @@ public class IPv6Ranges implements IPRanges {
         LongLong rangeStart;
         LongLong rangeEnd;
         if (maskBits == 0) {
-            rangeStart = new LongLong(0L, 0L);
-            rangeEnd = new LongLong(-1L, -1L);
+            rangeStart = new LongLong(0x0000_0000_0000_0000L, 0x0000_0000_0000_0000L);
+            rangeEnd = new LongLong(0xFFFF_FFFF_FFFF_FFFFL, 0xFFFF_FFFF_FFFF_FFFFL);
         } else if (maskBits <= 64) {
-            long highMask = -1L << (64 - maskBits);
-            rangeStart = new LongLong(address.high & highMask, 0L);
-            rangeEnd = new LongLong(rangeStart.high | ~highMask, -1L);
+            long highMask = 0xFFFF_FFFF_FFFF_FFFFL << (64 - maskBits);
+            rangeStart = new LongLong(address.high & highMask, 0x0000_0000_0000_0000L);
+            rangeEnd = new LongLong(rangeStart.high | ~highMask, 0xFFFF_FFFF_FFFF_FFFFL);
         } else {
             long lowMask = -1L << (128 - maskBits);
             rangeStart = new LongLong(address.high, address.low & lowMask);
