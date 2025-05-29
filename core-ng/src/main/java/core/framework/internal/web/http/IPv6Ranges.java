@@ -102,7 +102,7 @@ public class IPv6Ranges implements IPRanges {
             rangeStart = new LongLong(address.high & highMask, 0x0000_0000_0000_0000L);
             rangeEnd = new LongLong(rangeStart.high | ~highMask, 0xFFFF_FFFF_FFFF_FFFFL);
         } else {
-            long lowMask = -1L << (128 - maskBits);
+            long lowMask = 0xFFFF_FFFF_FFFF_FFFFL << (128 - maskBits);
             rangeStart = new LongLong(address.high, address.low & lowMask);
             rangeEnd = new LongLong(address.high, rangeStart.low | ~lowMask);
         }
