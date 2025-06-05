@@ -1,6 +1,7 @@
 package core.framework.json;
 
 import core.framework.internal.validate.ValidationException;
+import core.framework.util.UUIDv7;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -123,6 +124,17 @@ class BeanTest {
         TestBean parsedBean = Bean.fromJSON(TestBean.class, json);
 
         assertThat(parsedBean.enumField).isEqualTo(bean.enumField);
+    }
+
+    @Test
+    void uuidField() {
+        var bean = new TestBean();
+        bean.uuid = UUIDv7.randomUUID();
+
+        String json = Bean.toJSON(bean);
+        TestBean parsedBean = Bean.fromJSON(TestBean.class, json);
+
+        assertThat(parsedBean.uuid).isEqualTo(bean.uuid);
     }
 
     @Test

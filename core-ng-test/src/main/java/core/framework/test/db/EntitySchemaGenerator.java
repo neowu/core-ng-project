@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author neo
@@ -112,6 +113,9 @@ public final class EntitySchemaGenerator {
         }
         if (LocalDate.class.equals(fieldClass)) {
             return "DATE";
+        }
+        if (UUID.class.equals(fieldClass)) {
+            return "CHAR(36)";
         }
         throw new Error("unsupported field class, class=" + fieldClass.getCanonicalName());
     }

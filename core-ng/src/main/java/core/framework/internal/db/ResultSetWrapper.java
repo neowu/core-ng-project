@@ -14,23 +14,26 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author neo
  */
-final class ResultSetWrapper {
+public final class ResultSetWrapper {
     private final ResultSet resultSet;
 
     // JDBC ResultSet doesn't support to ignore non-existed column, this to build index
     private final Map<String, Integer> columnIndex;
+    private final Dialect dialect;
 
-    ResultSetWrapper(ResultSet resultSet) {
+    ResultSetWrapper(ResultSet resultSet, Dialect dialect) {
         this.resultSet = resultSet;
         try {
             columnIndex = columnIndex();
         } catch (SQLException e) {
             throw new UncheckedSQLException(e);
         }
+        this.dialect = dialect;
     }
 
     private Integer index(String column) {
@@ -148,4 +151,21 @@ final class ResultSetWrapper {
         if (time == null) return null;
         return time.atZoneSameInstant(ZoneId.systemDefault());
     }
+
+    UUID getUUID(String column) throws SQLException {
+        Integer index = index(column);
+        if (index == null) return null;
+        return getUUID(index);
+    }
+
+    UUID getUUID(int index) throws SQLException {
+        if (dialect == Dialect.MYSQL) {
+            String uuid = resultSet.getString(index);
+            return uuid != null ? UUID.fromString(uuid) : null;
+        } else {
+            // both hsqldb and postgres support UUID type
+            return resultSet.getObject(index, UUID.class);
+        }
+    }
+
 }

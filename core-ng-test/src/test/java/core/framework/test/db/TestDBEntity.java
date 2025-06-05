@@ -8,6 +8,7 @@ import core.framework.db.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 /**
  * @author chi
@@ -41,6 +42,9 @@ public class TestDBEntity {
 
     @Column(name = "bool_field")
     public Boolean boolField;
+
+    @Column(name = "uuid_field")
+    public UUID uuidField;
 
     public enum TestEnum {
         @DBEnumValue("VALUE1")

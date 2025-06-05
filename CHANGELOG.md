@@ -6,6 +6,9 @@
 * ip: support ipv6
   > support ipv6 ranges in access control
   > !!! IPRangePropertyValueParser parsing behavior slightly changed, "NAME: CIDR1, CIDR2;", the "NAME:" must have space after it
+* db: better support PostgreSQL
+  > support UUID type
+  > support JSONB type, use "?::jsonb" instead of "?" for jsonb query
 
 ### 9.2.1 (4/24/2025 - 5/19/2025) !!! only support java 24
 

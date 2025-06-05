@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import static core.framework.internal.asm.Literal.type;
 import static core.framework.internal.asm.Literal.variable;
@@ -58,6 +59,8 @@ final class RowMapperBuilder<T> {
                 builder.indent(1).append("entity.{} = resultSet.getLocalDate(\"{}\");\n", fieldName, columnName);
             } else if (ZonedDateTime.class.equals(fieldClass)) {
                 builder.indent(1).append("entity.{} = resultSet.getZonedDateTime(\"{}\");\n", fieldName, columnName);
+            } else if (UUID.class.equals(fieldClass)) {
+                builder.indent(1).append("entity.{} = resultSet.getUUID(\"{}\");\n", fieldName, columnName);
             } else if (fieldClass.isEnum()) {
                 registerEnumClass(fieldClass);
                 this.builder.addField("private final {} {}Mappings = new {}({});", type(DBEnumMapper.class), fieldName, type(DBEnumMapper.class), variable(fieldClass));

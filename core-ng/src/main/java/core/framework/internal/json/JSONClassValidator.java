@@ -18,6 +18,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static core.framework.util.Strings.format;
 
@@ -45,7 +46,7 @@ public class JSONClassValidator implements ClassVisitor {
         validator = new ClassValidator(instanceClass);
         validator.allowedValueClasses = Set.of(String.class, Boolean.class,
             Integer.class, Long.class, Double.class, BigDecimal.class,
-            LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class, LocalTime.class);
+            LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class, LocalTime.class, UUID.class);
         validator.visitor = this;
     }
 

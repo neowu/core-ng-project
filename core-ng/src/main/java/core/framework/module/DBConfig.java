@@ -101,7 +101,7 @@ public class DBConfig extends Config {
     }
 
     public void longTransactionThreshold(Duration threshold) {
-        database.operation.transactionManager.longTransactionThresholdInNanos = threshold.toNanos();
+        database.transactionManager.longTransactionThresholdInNanos = threshold.toNanos();
     }
 
     public void timeout(Duration timeout) {

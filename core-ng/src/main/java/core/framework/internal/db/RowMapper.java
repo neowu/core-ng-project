@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 /**
  * @author neo
@@ -87,6 +88,14 @@ interface RowMapper<T> {
         public Boolean map(ResultSetWrapper resultSet) throws SQLException {
             checkColumnCount(resultSet);
             return resultSet.getBoolean(1);
+        }
+    }
+
+    class UUIDRowMapper implements RowMapper<UUID> {
+        @Override
+        public UUID map(ResultSetWrapper resultSet) throws SQLException {
+            checkColumnCount(resultSet);
+            return resultSet.getUUID(1);
         }
     }
 }

@@ -5,6 +5,7 @@ import core.framework.db.Query;
 import core.framework.db.Repository;
 import core.framework.inject.Inject;
 import core.framework.test.IntegrationTest;
+import core.framework.util.UUIDv7;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,6 +40,7 @@ class DBIntegrationTest extends IntegrationTest {
         entity.dateTimeField = LocalDateTime.of(2020, Month.JULY, 23, 14, 0, 0);
         entity.dateField = entity.dateTimeField.toLocalDate();
         entity.zonedDateTimeField = ZonedDateTime.of(entity.dateTimeField, ZoneId.systemDefault());
+        entity.uuidField = UUIDv7.randomUUID();
         repository.insert(entity);
 
         Optional<TestDBEntity> selectedEntity = repository.get(entity.id);

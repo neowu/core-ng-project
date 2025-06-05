@@ -19,10 +19,12 @@ import static core.framework.internal.asm.Literal.type;
 class UpdateQueryBuilder<T> {
     final DynamicInstanceBuilder<UpdateQuery<T>> builder;
     private final Class<T> entityClass;
+    private final Dialect dialect;
 
-    UpdateQueryBuilder(Class<T> entityClass) {
+    UpdateQueryBuilder(Class<T> entityClass, Dialect dialect) {
         this.entityClass = entityClass;
         builder = new DynamicInstanceBuilder<>(UpdateQuery.class, entityClass.getSimpleName());
+        this.dialect = dialect;
     }
 
     UpdateQuery<T> build() {
@@ -42,9 +44,8 @@ class UpdateQueryBuilder<T> {
 
     private String updateMethod(Class<T> entityClass, List<Field> primaryKeyFields, List<Field> columnFields) {
         var builder = new CodeBuilder();
-        String entityClassLiteral = type(entityClass);
         builder.append("public {} update(Object value, boolean partial, String where, Object[] whereParams) {\n", type(UpdateQuery.Statement.class))
-            .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral);
+            .indent(1).append("{} entity = ({}) value;\n", type(entityClass), type(entityClass));
 
         for (Field primaryKeyField : primaryKeyFields) {
             builder.indent(1).append("if (entity.{} == null) throw new Error(\"primary key must not be null, field={}\");\n", primaryKeyField.getName(), primaryKeyField.getName());
@@ -56,8 +57,13 @@ class UpdateQueryBuilder<T> {
         for (Field field : columnFields) {
             Column column = field.getDeclaredAnnotation(Column.class);
             builder.indent(1).append("if (!partial || entity.{} != null) {\n", field.getName())
-                .indent(2).append("if (index > 0) sql.append(\", \");\n")
-                .indent(2).append("sql.append(\"{} = ?\");\n", column.name());
+                .indent(2).append("if (index > 0) sql.append(\", \");\n");
+
+            if (dialect == Dialect.POSTGRESQL && column.json()) {
+                builder.indent(2).append("sql.append(\"{} = ?::jsonb\");\n", column.name());
+            } else {
+                builder.indent(2).append("sql.append(\"{} = ?\");\n", column.name());
+            }
 
             if (column.json()) {
                 builder.indent(2).append("params.add({}.toJSON(entity.{}));\n", type(JSONHelper.class), field.getName());

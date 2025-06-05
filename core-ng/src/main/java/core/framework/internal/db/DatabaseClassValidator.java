@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static core.framework.util.Strings.format;
 
@@ -32,7 +33,7 @@ final class DatabaseClassValidator {
     private final Class<?> entityClass;
     private final Set<Class<?>> allowedValueClasses = Set.of(String.class, Boolean.class,
         Integer.class, Long.class, Double.class, BigDecimal.class,
-        LocalDate.class, LocalDateTime.class, ZonedDateTime.class);
+        LocalDate.class, LocalDateTime.class, ZonedDateTime.class, UUID.class);
     private final Set<String> columns = Sets.newHashSet();
     private final boolean isView;
     private boolean foundPrimaryKey;

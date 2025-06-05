@@ -15,7 +15,7 @@ class UpdateQueryBuilderTest {
 
     @BeforeEach
     void createUpdateQuery() {
-        builder = new UpdateQueryBuilder<>(AutoIncrementIdEntity.class);
+        builder = new UpdateQueryBuilder<>(AutoIncrementIdEntity.class, Dialect.MYSQL);
         updateQuery = builder.build();
     }
 

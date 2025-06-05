@@ -4,7 +4,6 @@ import core.framework.db.QueryDiagnostic;
 import core.framework.db.UncheckedSQLException;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
-import core.framework.internal.resource.Pool;
 import core.framework.internal.resource.PoolItem;
 import core.framework.util.Lists;
 import org.slf4j.Logger;
@@ -23,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
+import java.util.UUID;
 
 import static core.framework.log.Markers.errorCode;
 import static core.framework.util.Strings.format;
@@ -31,14 +31,14 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 public class DatabaseOperation {
-    private final Logger logger = LoggerFactory.getLogger(DatabaseOperation.class);
-
-    public final TransactionManager transactionManager;
     final EnumDBMapper enumMapper = new EnumDBMapper();
+    private final TransactionManager transactionManager;
+    private final Logger logger = LoggerFactory.getLogger(DatabaseOperation.class);
+    Dialect dialect;
     int queryTimeoutInSeconds;
 
-    DatabaseOperation(Pool<Connection> pool) {
-        transactionManager = new TransactionManager(pool);
+    DatabaseOperation(TransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
     }
 
     // as for the boilerplate code, it is mainly for performance and maintainability purpose, as framework code it's more important to keep straightforward than DRY
@@ -157,7 +157,7 @@ public class DatabaseOperation {
 
             T result = null;
             if (resultSet.next()) {
-                result = mapper.map(new ResultSetWrapper(resultSet));
+                result = mapper.map(new ResultSetWrapper(resultSet, dialect));
                 if (resultSet.next())
                     throw new Error("more than one row returned");
             }
@@ -169,7 +169,7 @@ public class DatabaseOperation {
         try (ResultSet resultSet = statement.executeQuery()) {
             logSlowQuery(statement);
 
-            var wrapper = new ResultSetWrapper(resultSet);
+            var wrapper = new ResultSetWrapper(resultSet, dialect);
             List<T> results = Lists.newArrayList();
             while (resultSet.next()) {
                 T result = mapper.map(wrapper);
@@ -218,28 +218,39 @@ public class DatabaseOperation {
             case LocalDate value -> statement.setObject(index, value, Types.DATE);
             case LocalDateTime value -> statement.setObject(index, value, Types.TIMESTAMP);
             case ZonedDateTime value -> {
-                // https://dev.mysql.com/doc/refman/8.0/en/datetime.html,
-                // TIMESTAMP has a range of '1970-01-01 00:00:01' UTC to '2038-01-19 03:14:07' UTC.
-                // for timestamp column type, there is year 2038 issue
-                // for datetime column type, jdbc will save UTC values
+                if (dialect == Dialect.POSTGRESQL) {
+                    statement.setObject(index, value.toOffsetDateTime(), Types.TIMESTAMP_WITH_TIMEZONE);
+                } else {
+                    // https://dev.mysql.com/doc/refman/8.0/en/datetime.html,
+                    // TIMESTAMP has a range of '1970-01-01 00:00:01' UTC to '2038-01-19 03:14:07' UTC.
+                    // for timestamp column type, there is year 2038 issue
+                    // for datetime column type, jdbc will save UTC values
 
-                // with insert ignore, out of range timestamp param will be converted to "0000-00-00 00:00:00" into db, and will trigger "Zero date value prohibited" error on read
-                // refer to https://dev.mysql.com/doc/refman/8.0/en/insert.html
-                // Data conversions that would trigger errors abort the statement if IGNORE is not specified. With IGNORE, invalid values are adjusted to the closest values and inserted; warnings are produced but the statement does not abort.
+                    // with insert ignore, out of range timestamp param will be converted to "0000-00-00 00:00:00" into db, and will trigger "Zero date value prohibited" error on read
+                    // refer to https://dev.mysql.com/doc/refman/8.0/en/insert.html
+                    // Data conversions that would trigger errors abort the statement if IGNORE is not specified. With IGNORE, invalid values are adjusted to the closest values and inserted; warnings are produced but the statement does not abort.
 
-                // here only to check > 0, make trade off between validating TIMESTAMP column type and keeping compatible with DATETIME column type
-                // most likely the values we deal with from external systems are lesser (e.g. nodejs default year is 1900, it converts 0 into 1900/01/01 00:00:00)
-                // if it passes timestamp after 2038-01-19 03:14:07 (Instant.ofEpochSecond(Integer.MAX_VALUE)), it will still trigger this issue on MySQL
-                // so on application level, if you can not ensure the range of input value, write its own utils to check
-                Instant instant = value.toInstant();
-                if (instant.getEpochSecond() <= 0) throw new Error("timestamp must be after 1970-01-01 00:00:00, value=" + param);
-                statement.setObject(index, instant, Types.TIMESTAMP);
+                    // here only to check > 0, make trade off between validating TIMESTAMP column type and keeping compatible with DATETIME column type
+                    // most likely the values we deal with from external systems are lesser (e.g. nodejs default year is 1900, it converts 0 into 1900/01/01 00:00:00)
+                    // if it passes timestamp after 2038-01-19 03:14:07 (Instant.ofEpochSecond(Integer.MAX_VALUE)), it will still trigger this issue on MySQL
+                    // so on application level, if you can not ensure the range of input value, write its own utils to check
+                    Instant instant = value.toInstant();
+                    if (instant.getEpochSecond() <= 0) throw new Error("timestamp must be after 1970-01-01 00:00:00, value=" + param);
+                    statement.setObject(index, instant, Types.TIMESTAMP);
+                }
             }
             case Boolean value -> statement.setBoolean(index, value);
             case Integer value -> statement.setInt(index, value);
             case Long value -> statement.setLong(index, value);
             case Double value -> statement.setDouble(index, value);
             case BigDecimal value -> statement.setBigDecimal(index, value);
+            case UUID value -> {
+                if (dialect == Dialect.POSTGRESQL) {
+                    statement.setObject(index, value, Types.OTHER);
+                } else {
+                    statement.setString(index, value.toString());
+                }
+            }
             case null -> statement.setNull(index, Types.NULL);   // both mysql/hsql driver are not using sqlType param
             default -> throw new Error(format("unsupported param type, type={}, value={}", param.getClass().getCanonicalName(), param));
         }

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.UUID;
 
 /**
  * @author neo
@@ -39,7 +40,7 @@ public final class DatabaseImpl implements Database {
     }
 
     public final Pool<Connection> pool;
-    public final DatabaseOperation operation;
+    final DatabaseOperation operation;
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
     private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
 
@@ -47,12 +48,12 @@ public final class DatabaseImpl implements Database {
     public String password;
     public CloudAuthProvider authProvider;
     public IsolationLevel isolationLevel;
+    public TransactionManager transactionManager;
 
     private String url;
     private Properties driverProperties;
     private Duration timeout;
     private Driver driver;
-    private Dialect dialect;
 
     public DatabaseImpl(String name) {
         initializeRowMappers();
@@ -62,7 +63,8 @@ public final class DatabaseImpl implements Database {
         pool.maxIdleTime = Duration.ofHours(2);  // make sure db server does not kill connection shorter than this, e.g. MySQL default wait_timeout is 8 hours
         pool.validator(connection -> connection.isValid(1), Duration.ofSeconds(30));
 
-        operation = new DatabaseOperation(pool);
+        transactionManager = new TransactionManager(pool);
+        operation = new DatabaseOperation(transactionManager);
         timeout(Duration.ofSeconds(15));
     }
 
@@ -76,6 +78,7 @@ public final class DatabaseImpl implements Database {
         rowMappers.put(LocalDateTime.class, new RowMapper.LocalDateTimeRowMapper());
         rowMappers.put(LocalDate.class, new RowMapper.LocalDateRowMapper());
         rowMappers.put(ZonedDateTime.class, new RowMapper.ZonedDateTimeRowMapper());
+        rowMappers.put(UUID.class, new RowMapper.UUIDRowMapper());
     }
 
     private Connection createConnection() {
@@ -142,6 +145,9 @@ public final class DatabaseImpl implements Database {
             properties.setProperty("connectTimeout", String.valueOf(timeout.toSeconds()));
             properties.setProperty("socketTimeout", String.valueOf(timeout.toSeconds()));
             properties.setProperty("reWriteBatchedInserts", "true");
+            properties.setProperty("prepareThreshold", "1");
+            properties.setProperty("tcpKeepAlive", "true");
+            properties.setProperty("ApplicationName", LogManager.APP_NAME);
         }
         return properties;
     }
@@ -166,13 +172,13 @@ public final class DatabaseImpl implements Database {
 
     private Driver driver(String url) {
         if (url.startsWith("jdbc:mysql:")) {
-            dialect = Dialect.MYSQL;
+            operation.dialect = Dialect.MYSQL;
             return createDriver("com.mysql.cj.jdbc.Driver");
         } else if (url.startsWith("jdbc:postgresql:")) {
-            dialect = Dialect.POSTGRESQL;
+            operation.dialect = Dialect.POSTGRESQL;
             return createDriver("org.postgresql.Driver");
         } else if (url.startsWith("jdbc:hsqldb:")) {
-            dialect = Dialect.MYSQL;    // unit test use mysql dialect
+            operation.dialect = Dialect.MYSQL;    // unit test use mysql dialect
             return createDriver("org.hsqldb.jdbc.JDBCDriver");
         } else {
             throw new Error("not supported database, url=" + url);
@@ -202,7 +208,7 @@ public final class DatabaseImpl implements Database {
         try {
             new DatabaseClassValidator(entityClass, false).validate();
             registerViewClass(entityClass);
-            return new RepositoryImpl<>(this, entityClass, dialect);
+            return new RepositoryImpl<>(this, entityClass);
         } finally {
             logger.info("register db entity, entityClass={}, elapsed={}", entityClass.getCanonicalName(), watch.elapsed());
         }
@@ -210,7 +216,7 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public Transaction beginTransaction() {
-        return operation.transactionManager.beginTransaction();
+        return transactionManager.beginTransaction();
     }
 
     @Override

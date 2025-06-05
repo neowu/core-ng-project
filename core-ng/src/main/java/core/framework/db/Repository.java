@@ -43,6 +43,7 @@ public interface Repository<T> {
     // use insert on duplicate key sql, generally used by data sync
     // BE CAUTION, it uses PK or unique index to determine duplication !!! read mysql doc carefully to avoid unexpected side effect
     // return true if the new row inserted
+    // for postgres, always return true
     boolean upsert(T entity);
 
     // use update carefully, it will update all the columns according to the entity fields, includes null fields

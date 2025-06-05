@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author neo
@@ -21,7 +22,7 @@ public final class CacheClassValidator {
         validator = new ClassValidator(cacheClass);
         validator.allowedValueClasses = Set.of(String.class, Boolean.class,
             Integer.class, Long.class, Double.class, BigDecimal.class,
-            LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class, LocalTime.class);
+            LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class, LocalTime.class, UUID.class);
     }
 
     public void validate() {

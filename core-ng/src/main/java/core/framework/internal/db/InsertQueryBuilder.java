@@ -71,15 +71,16 @@ class InsertQueryBuilder<T> {
             }
             paramFields.add(new ParamField(field.getName(), column.json()));
             columns.add(columnName);
-            params.add("?");
+            if (dialect == Dialect.POSTGRESQL && column.json()) {
+                params.add("?::jsonb");
+            } else {
+                params.add("?");
+            }
         }
 
         var builder = new CodeBuilder()
-            .append("INSERT INTO {} (", entityClass.getDeclaredAnnotation(Table.class).name())
-            .appendCommaSeparatedValues(columns)
-            .append(") VALUES (")
-            .appendCommaSeparatedValues(params)
-            .append(')');
+            .append("INSERT INTO {} (", entityClass.getDeclaredAnnotation(Table.class).name()).appendCommaSeparatedValues(columns)
+            .append(") VALUES (").appendCommaSeparatedValues(params).append(')');
         insertSQL = builder.build();
 
         if (generatedColumn != null) return;  // auto-increment entity doesn't need insert ignore and upsert, refer to core.framework.internal.db.RepositoryImpl.insertIgnore
@@ -91,11 +92,9 @@ class InsertQueryBuilder<T> {
         }
 
         if (dialect == Dialect.MYSQL) {
-            builder.append(" ON DUPLICATE KEY UPDATE ")
-                .appendCommaSeparatedValues(updates);
-        } else {
-            builder.append(" ON CONFLICT (").appendCommaSeparatedValues(primaryKeyFieldNames).append(") DO UPDATE SET ")
-                .appendCommaSeparatedValues(updates);
+            builder.append(" ON DUPLICATE KEY UPDATE ").appendCommaSeparatedValues(updates);
+        } else if (dialect == Dialect.POSTGRESQL) {
+            builder.append(" ON CONFLICT (").appendCommaSeparatedValues(primaryKeyFieldNames).append(") DO UPDATE SET ").appendCommaSeparatedValues(updates);
         }
         upsertSQL = builder.build();
     }

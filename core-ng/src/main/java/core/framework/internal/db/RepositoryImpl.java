@@ -30,12 +30,12 @@ public final class RepositoryImpl<T> implements Repository<T> {
     private final String deleteSQL;
     private final Class<T> entityClass;
 
-    RepositoryImpl(DatabaseImpl database, Class<T> entityClass, Dialect dialect) {
+    RepositoryImpl(DatabaseImpl database, Class<T> entityClass) {
         this.database = database;
         validator = Validator.of(entityClass);
-        insertQuery = new InsertQueryBuilder<>(entityClass, dialect).build();
-        selectQuery = new SelectQuery<>(entityClass, dialect);
-        updateQuery = new UpdateQueryBuilder<>(entityClass).build();
+        insertQuery = new InsertQueryBuilder<>(entityClass, database.operation.dialect).build();
+        selectQuery = new SelectQuery<>(entityClass, database.operation.dialect);
+        updateQuery = new UpdateQueryBuilder<>(entityClass, database.operation.dialect).build();
         deleteSQL = DeleteQueryBuilder.build(entityClass);
         this.entityClass = entityClass;
     }
@@ -100,7 +100,12 @@ public final class RepositoryImpl<T> implements Repository<T> {
             return affectedRows == 1;
         } finally {
             long elapsed = watch.elapsed();
-            logger.debug("upsert, sql={}, params={}, inserted={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), affectedRows == 1, elapsed);
+            if (database.operation.dialect == Dialect.POSTGRESQL) {
+                // postgres doesn't support affected rows, not log inserted to reduce confusion
+                logger.debug("upsert, sql={}, params={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), elapsed);
+            } else {
+                logger.debug("upsert, sql={}, params={}, inserted={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), affectedRows == 1, elapsed);
+            }
             database.track(elapsed, 0, affectedRows == 0 ? 0 : 1, 1);
         }
     }

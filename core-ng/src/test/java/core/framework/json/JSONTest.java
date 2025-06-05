@@ -1,6 +1,7 @@
 package core.framework.json;
 
 import core.framework.util.Types;
+import core.framework.util.UUIDv7;
 import org.junit.jupiter.api.Test;
 
 import java.io.UncheckedIOException;
@@ -138,6 +139,17 @@ class JSONTest {
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
 
         assertThat(parsedBean.enumField).isEqualTo(bean.enumField);
+    }
+
+    @Test
+    void uuidField() {
+        var bean = new TestBean();
+        bean.uuid = UUIDv7.randomUUID();
+
+        String json = JSON.toJSON(bean);
+        TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
+
+        assertThat(parsedBean.uuid).isEqualTo(bean.uuid);
     }
 
     @Test

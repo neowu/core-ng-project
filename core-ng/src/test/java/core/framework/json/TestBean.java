@@ -12,6 +12,7 @@ import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author neo
@@ -67,6 +68,9 @@ public class TestBean {
     @NotNull
     @Property(name = "defaultValue")
     public String defaultValueField = "defaultValue";
+
+    @Property(name = "uuid")
+    public UUID uuid;
 
     public enum TestEnum {
         @Property(name = "A1")
