@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.internal.db.Dialect;
 import core.framework.internal.db.cloud.AzureAuthProvider;
 import core.framework.internal.db.cloud.GCloudAuthProvider;
 import core.framework.internal.module.ModuleContext;
@@ -35,7 +36,7 @@ class DBConfigTest {
     void provider() {
         assertThat(config.provider("iam/azure/some-service"))
             .isInstanceOf(AzureAuthProvider.class)
-            .satisfies(provider -> assertThat(provider.user()).isEqualTo("some-service"));
+            .satisfies(provider -> assertThat(provider.user(Dialect.MYSQL)).isEqualTo("some-service"));
         assertThatThrownBy(() -> config.provider("iam/azure/")).hasMessageStartingWith("invalid azure iam user");
 
         assertThat(config.provider("iam/gcloud")).isInstanceOf(GCloudAuthProvider.class);

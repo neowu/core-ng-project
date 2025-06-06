@@ -5,6 +5,8 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
+import core.framework.internal.db.Dialect;
+import core.framework.util.Strings;
 
 import java.time.Duration;
 
@@ -25,10 +27,10 @@ public final class GCloudAuthProvider implements CloudAuthProvider {
     long expirationTime;
 
     @Override
-    public String user() {
+    public String user(Dialect dialect) {
         // email won't change once pod created
         if (user == null) {
-            user = parseUser(metadata("email"));
+            user = parseUser(dialect, metadata("email"));
         }
         return user;
     }
@@ -48,9 +50,16 @@ public final class GCloudAuthProvider implements CloudAuthProvider {
         return accessToken;
     }
 
-    private String parseUser(String email) {
-        int index = email.indexOf('@');
-        return email.substring(0, index);
+    // MySQL: strip entire domain
+    // PostgreSQL: strip ".gserviceaccount.com", refer to https://cloud.google.com/sql/docs/postgres/add-manage-iam-users
+    private String parseUser(Dialect dialect, String email) {
+        if (dialect == Dialect.MYSQL) {
+            int index = email.indexOf('@');
+            return email.substring(0, index);
+        } else if (dialect == Dialect.POSTGRESQL && email.endsWith(".gserviceaccount.com")) {
+            return email.substring(0, email.length() - 20);  // remove ".gserviceaccount.com"
+        }
+        throw new Error(Strings.format("unsupported gcloud iam user, dialect={}, email={}", dialect, email));
     }
 
     private String parseAccessToken(String tokenJSON) {

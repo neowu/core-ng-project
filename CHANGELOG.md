@@ -9,6 +9,7 @@
 * db: better support PostgreSQL
   > support UUID type
   > support JSONB type, use "?::jsonb" instead of "?" for jsonb query
+  > support gcloud IAM auth
 
 ### 9.2.1 (4/24/2025 - 5/19/2025) !!! only support java 24
 

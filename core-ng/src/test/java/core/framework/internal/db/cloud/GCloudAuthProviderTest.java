@@ -1,5 +1,6 @@
 package core.framework.internal.db.cloud;
 
+import core.framework.internal.db.Dialect;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +28,15 @@ class GCloudAuthProviderTest {
 
     @Test
     void user() {
-        assertThat(provider.user())
+        assertThat(provider.user(Dialect.MYSQL))
             .isEqualTo("lab-customer-service")
+            .isEqualTo(provider.user);
+    }
+
+    @Test
+    void userWithPosgreSQL() {
+        assertThat(provider.user(Dialect.POSTGRESQL))
+            .isEqualTo("lab-customer-service@lab.iam")
             .isEqualTo(provider.user);
     }
 

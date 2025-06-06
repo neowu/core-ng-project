@@ -1,10 +1,12 @@
 package core.framework.db;
 
+import core.framework.internal.db.Dialect;
+
 /**
  * @author neo
  */
 public interface CloudAuthProvider {
-    String user();
+    String user(Dialect dialect);
 
     String accessToken();
 

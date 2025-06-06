@@ -5,6 +5,7 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
+import core.framework.internal.db.Dialect;
 import core.framework.util.Files;
 import core.framework.util.Strings;
 
@@ -43,7 +44,7 @@ public class AzureAuthProvider implements CloudAuthProvider {
     }
 
     @Override
-    public String user() {
+    public String user(Dialect dialect) {
         return user;
     }
 

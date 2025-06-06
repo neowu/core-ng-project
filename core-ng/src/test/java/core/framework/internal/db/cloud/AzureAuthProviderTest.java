@@ -1,6 +1,7 @@
 package core.framework.internal.db.cloud;
 
 import core.framework.http.HTTPRequest;
+import core.framework.internal.db.Dialect;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class AzureAuthProviderTest {
 
     @Test
     void user() {
-        assertThat(provider.user())
+        assertThat(provider.user(Dialect.MYSQL))
             .isEqualTo("some-service");
     }
 

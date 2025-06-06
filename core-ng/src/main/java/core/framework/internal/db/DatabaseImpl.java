@@ -90,7 +90,7 @@ public final class DatabaseImpl implements Database {
         }
         if (authProvider != null) {
             // properties are thread safe, it's ok to set user/password with multiple threads
-            driverProperties.setProperty("user", authProvider.user());
+            driverProperties.setProperty("user", authProvider.user(operation.dialect));
             driverProperties.setProperty("password", authProvider.accessToken());
         }
         Connection connection = null;

@@ -179,8 +179,11 @@ public class DatabaseOperation {
         }
     }
 
-    // the LAST_INSERT_ID() function of mysql returns BIGINT, so here it uses Long
+    // MySQL:
+    // the LAST_INSERT_ID() function returns BIGINT, so here it uses Long
     // http://dev.mysql.com/doc/refman/5.7/en/information-functions.html
+    // PostgreSQL:
+    // SERIAL type maps to int type, BIGSERIAL maps to Long
     private OptionalLong fetchGeneratedKey(PreparedStatement statement) throws SQLException {
         try (ResultSet keys = statement.getGeneratedKeys()) {
             if (keys != null && keys.next()) {
