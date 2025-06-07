@@ -7,20 +7,15 @@ core-ng is a webapp framework, it's designed to support our own projects.
 
 ## Maven repo
 ```
-repositories {
-    maven {
-        url = uri("https://neowu.github.io/maven-repo/")
-        content {
-            includeGroupByRegex("core\\.framework.*")
+    repositories {
+        maven {
+            url = uri("https://neowu.github.io/maven-repo/")
+            content {
+                includeGroup("core.framework")
+                includeGroup("core.framework.elasticsearch.module")
+            }
         }
     }
-    maven {
-        url = uri("https://maven.codelibs.org/")
-        content {
-            includeGroup("org.codelibs.elasticsearch.module")
-        }
-    }
-}
 ```
 
 ## Wiki
