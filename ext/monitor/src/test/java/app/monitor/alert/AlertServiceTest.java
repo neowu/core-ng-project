@@ -1,7 +1,7 @@
 package app.monitor.alert;
 
 import app.monitor.AlertConfig;
-import app.monitor.channel.ChannelManager;
+import app.monitor.channel.SlackClient;
 import core.framework.log.Severity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 class AlertServiceTest {
     private AlertService service;
     @Mock
-    private ChannelManager channelManager;
+    private SlackClient slackClient;
 
     @BeforeEach
     void createActionAlertService() {
@@ -42,7 +42,7 @@ class AlertServiceTest {
             notification("productChannel", List.of("website"), List.of("PRODUCT_ERROR"), null, null));
 
         service = new AlertService(config);
-        service.channelManager = channelManager;
+        service.slackClient = slackClient;
     }
 
     private AlertConfig.Notification notification(String channel, List<String> apps, List<String> errorCodes, Severity severity, List<String> indices) {
@@ -71,29 +71,29 @@ class AlertServiceTest {
     @Test
     void processWithIgnoredWarning() {
         service.process(alert(Severity.WARN, "PATH_NOT_FOUND", "trace"));
-        verifyNoInteractions(channelManager);
+        verifyNoInteractions(slackClient);
     }
 
     @Test
     void processWithError() {
         Alert alert = alert(Severity.ERROR, "java.lang.NullPointerException", "trace");
         service.process(alert);
-        verify(channelManager).notify(eq("actionErrorChannel"), eq(alert), eq(-1));
+        verify(slackClient).notify(eq("actionErrorChannel"), eq(alert), eq(-1));
     }
 
     @Test
     void processWithProductError() {
         Alert alert = alert(Severity.ERROR, "PRODUCT_ERROR", "trace");
         service.process(alert);
-        verify(channelManager).notify(eq("actionErrorChannel"), eq(alert), eq(-1));
-        verify(channelManager).notify(eq("productChannel"), eq(alert), eq(-1));
+        verify(slackClient).notify(eq("actionErrorChannel"), eq(alert), eq(-1));
+        verify(slackClient).notify(eq("productChannel"), eq(alert), eq(-1));
     }
 
     @Test
     void processWithEventError() {
         Alert alert = alert(Severity.ERROR, "EVENT_ERROR", "event");
         service.process(alert);
-        verify(channelManager).notify(eq("eventErrorChannel"), eq(alert), eq(-1));
+        verify(slackClient).notify(eq("eventErrorChannel"), eq(alert), eq(-1));
     }
 
     @Test
