@@ -118,7 +118,10 @@ public class ServerSentEventHandler implements HttpHandler {
             request.session = ReadOnlySession.of(sessionManager.load(request, actionLog));
             String lastEventId = exchange.getRequestHeaders().getLast(LAST_EVENT_ID);
             if (lastEventId != null) actionLog.context("last_event_id", lastEventId);
+
+            actionLog.context("listener", support.listener.getClass().getCanonicalName());
             support.listener.onConnect(request, channel, lastEventId);
+
             if (!channel.groups.isEmpty()) actionLog.context("group", channel.groups.toArray()); // may join group onConnect
         } catch (Throwable e) {
             logManager.logError(e);

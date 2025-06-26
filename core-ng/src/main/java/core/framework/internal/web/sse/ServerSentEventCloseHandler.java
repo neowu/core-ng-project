@@ -34,6 +34,7 @@ class ServerSentEventCloseHandler<T> implements ExchangeCompletionListener {
                 actionLog.context("client_ip", channel.clientIP);
                 if (channel.traceId != null) actionLog.context("trace_id", channel.traceId);
 
+                actionLog.context("listener", support.listener.getClass().getCanonicalName());
                 support.listener.onClose(channel);
 
                 if (!channel.groups.isEmpty()) actionLog.context("group", channel.groups.toArray());
