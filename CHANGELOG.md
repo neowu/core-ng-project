@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.2.2 (5/21/2025 - )
+### 9.2.2 (5/21/2025 - 6/26/2025)
 
 * http_client: support proxy
 * ip: support ipv6
