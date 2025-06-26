@@ -10,6 +10,9 @@ import org.apache.avro.generic.GenericData;
 
 import java.util.Map;
 
+import static org.apache.avro.SchemaBuilder.array;
+import static org.apache.avro.SchemaBuilder.map;
+
 public class ActionLogSchema {
     public final Schema schema;
 
@@ -17,7 +20,7 @@ public class ActionLogSchema {
         schema = SchemaBuilder.record("action")
             .fields()
             .requiredString("id")
-            .name("date").type().optional().type(LogicalTypes.timestampMicros().addToSchema(Schema.create(Schema.Type.LONG)))
+            .name("date").type(LogicalTypes.timestampNanos().addToSchema(Schema.create(Schema.Type.LONG))).noDefault()
             .requiredString("app")
             .requiredString("host")
             .requiredString("result")
@@ -28,9 +31,9 @@ public class ActionLogSchema {
             .optionalString("error_code")
             .optionalString("error_message")
             .requiredLong("elapsed")
-            .name("context").type().optional().type(SchemaBuilder.map().values(SchemaBuilder.array().items().nullable().stringType()))
-            .name("stats").type().optional().map().values().doubleType()
-            .name("perf_stats").type().optional().map().values().longType()
+            .name("context").type(map().values(array().items().nullable().stringType())).noDefault()
+            .name("stats").type(map().values().doubleType()).noDefault()
+            .name("perf_stats").type(map().values().longType()).noDefault()
             .endRecord();
     }
 
@@ -50,7 +53,7 @@ public class ActionLogSchema {
         record.put("elapsed", message.elapsed);
         record.put("context", message.context);
         record.put("stats", message.stats);
-        Map<String, Long> perfStats = Maps.newHashMapWithExpectedSize(message.performanceStats.size() * 3);
+        Map<String, Long> perfStats = Maps.newHashMapWithExpectedSize(message.performanceStats.size() * 4);
         for (Map.Entry<String, PerformanceStatMessage> entry : message.performanceStats.entrySet()) {
             String key = entry.getKey();
             PerformanceStatMessage stat = entry.getValue();

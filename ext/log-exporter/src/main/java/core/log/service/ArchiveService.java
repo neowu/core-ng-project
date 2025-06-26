@@ -30,7 +30,7 @@ import static java.nio.file.Files.exists;
  */
 public class ArchiveService {
     private final Logger logger = LoggerFactory.getLogger(ArchiveService.class);
-    private final String hash = Hash.md5Hex(Network.LOCAL_HOST_NAME).substring(0, 5);   // generally there only need one log-exporter, this is to avoid file name collision with multiple log-exporter
+    private final String hash = Hash.sha256Hex(Network.LOCAL_HOST_NAME).substring(0, 5);   // generally there only need one log-exporter, this is to avoid file name collision with multiple log-exporter
     private final Shell shell = new Shell();
 
     public Path logDir = Path.of("/var/log/app");

@@ -21,13 +21,14 @@ public class ActionLogMessageFactory {
         List<String> keys = new ArrayList<>();
         keys.add(null);
         message.context = Map.of("customer_id", List.of("customer_id1", "customer_id2"), "key", keys);
+        message.stats = Map.of();
         message.performanceStats = Map.of("kafka", perfStats(1, 1000L, 10, 5),
             "http", perfStats(2, 2000L, null, null));
         return message;
     }
 
     private static PerformanceStatMessage perfStats(int count, long totalElapsed, Integer readEntries, Integer writeEntries) {
-        final PerformanceStatMessage stats = new PerformanceStatMessage();
+        var stats = new PerformanceStatMessage();
         stats.count = count;
         stats.totalElapsed = totalElapsed;
         stats.readEntries = readEntries;

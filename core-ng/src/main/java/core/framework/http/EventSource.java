@@ -17,8 +17,9 @@ import java.util.NoSuchElementException;
  */
 public final class EventSource implements AutoCloseable, Iterable<EventSource.Event> {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventSource.class);
+
     public final int statusCode;
-    public final Map<String, String> headers;   // headers key is case insensitive
+    public final Map<String, String> headers;   // headers key is case-insensitive
 
     private final ResponseBody body;
     private final int requestBodyLength;

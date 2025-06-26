@@ -6,6 +6,8 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 
+import static org.apache.avro.SchemaBuilder.map;
+
 public class EventSchema {
     public final Schema schema;
 
@@ -13,17 +15,17 @@ public class EventSchema {
         schema = SchemaBuilder.record("event")
             .fields()
             .requiredString("id")
-            .name("date").type().optional().type(LogicalTypes.timestampMicros().addToSchema(Schema.create(Schema.Type.LONG)))
+            .name("date").type(LogicalTypes.timestampNanos().addToSchema(Schema.create(Schema.Type.LONG))).noDefault()
             .requiredString("app")
-            .name("received_time").type().optional().type(LogicalTypes.timestampMicros().addToSchema(Schema.create(Schema.Type.LONG)))
+            .name("received_time").type(LogicalTypes.timestampNanos().addToSchema(Schema.create(Schema.Type.LONG))).noDefault()
             .requiredString("result")
             .requiredString("action")
             .optionalString("error_code")
             .optionalString("error_message")
             .requiredLong("elapsed")
-            .name("context").type().optional().type(SchemaBuilder.map().values().stringType())
-            .name("stats").type().optional().map().values().doubleType()
-            .name("info").type().optional().type(SchemaBuilder.map().values().stringType())
+            .name("context").type(map().values().stringType()).noDefault()
+            .name("stats").type(map().values().doubleType()).noDefault()
+            .name("info").type(map().values().stringType()).noDefault()
             .endRecord();
     }
 

@@ -36,7 +36,7 @@ public class LogExporterApp extends App {
         kafka().maxPoll(3000, 3 * 1024 * 1024);         // get 3M message at max
 
         SpecificData specificData = SpecificData.get();
-        specificData.addLogicalTypeConversion(new TimeConversions.TimestampMicrosConversion());
+        specificData.addLogicalTypeConversion(new TimeConversions.TimestampNanosConversion());
         bind(ActionLogSchema.class);
         bind(EventSchema.class);
 

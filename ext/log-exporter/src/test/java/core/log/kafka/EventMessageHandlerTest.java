@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author neo
@@ -40,10 +41,14 @@ class EventMessageHandlerTest extends IntegrationTest {
     void handle() throws IOException {
         var message = new EventMessage();
         message.date = Instant.parse("2022-11-07T00:00:00Z");
+        message.receivedTime = Instant.now();
         message.id = "id";
         message.app = "app";
         message.action = "action";
         message.result = "OK";
+        message.context = Map.of();
+        message.stats = Map.of();
+        message.info = Map.of();
         message.elapsed = 1000L;
         handler.handle(List.of(new Message<>("key", message)));
         handler.handle(List.of(new Message<>("key", message)));

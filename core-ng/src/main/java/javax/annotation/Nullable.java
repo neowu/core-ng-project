@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * help IDE (Intellij) to do nullability analysis﻿
+ * help IDE (Intellij) to do nullability analysis
  * <p>
  * refer to https://www.jetbrains.com/help/idea/nullable-and-notnull-annotations.html#nullable
  *
