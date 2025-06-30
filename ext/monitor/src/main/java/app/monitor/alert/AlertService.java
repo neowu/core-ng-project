@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 /**
  * @author ericchung, neo
@@ -34,7 +33,7 @@ public class AlertService {
         criticalErrors = new Matchers(config.criticalErrors);
         notifications = config.notifications.stream()
             .map(notification -> new Notification(notification.channel, new Matcher(notification.matcher)))
-            .collect(Collectors.toList());
+            .toList();
         timespanInMinutes = config.timespanInHours * 60;
     }
 

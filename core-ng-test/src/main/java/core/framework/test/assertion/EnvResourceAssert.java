@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +57,7 @@ public class EnvResourceAssert extends AbstractAssert<EnvResourceAssert, Path> {
         try (Stream<Path> stream = Files.list(actual)) {
             return stream.filter(Files::isDirectory)
                 .map(path -> path.resolve("resources")).filter(Files::exists)
-                .collect(Collectors.toList());
+                .toList();
         }
     }
 
@@ -74,7 +73,7 @@ public class EnvResourceAssert extends AbstractAssert<EnvResourceAssert, Path> {
     private void assertPropertyOverridesDefault(Path resourceDir) throws IOException {
         List<Path> propertyFiles;
         try (Stream<Path> stream = Files.walk(resourceDir).filter(path -> path.toString().endsWith(".properties"))) {
-            propertyFiles = stream.collect(Collectors.toList());
+            propertyFiles = stream.toList();
         }
         for (Path propertyFile : propertyFiles) {
             Path defaultPropertyFile = mainResources.resolve(resourceDir.relativize(propertyFile));

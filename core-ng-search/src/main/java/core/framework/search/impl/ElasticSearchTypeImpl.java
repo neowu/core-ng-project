@@ -136,7 +136,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             List<String> suggestions = response.suggest().values().stream()
                 .flatMap(Collection::stream).flatMap(suggestion -> suggestion.completion().options().stream()).map(CompletionSuggestOption::text)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
             options = suggestions.size();
             return suggestions;
         } catch (IOException e) {

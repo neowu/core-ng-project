@@ -20,7 +20,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -139,7 +138,7 @@ class MongoCollectionIntegrationTest extends IntegrationTest {
         List<TestMongoEntity> entities = entities();
         collection.bulkInsert(entities);
 
-        long deletedCount = collection.bulkDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
+        long deletedCount = collection.bulkDelete(entities.stream().map(entity -> entity.id).toList());
         assertThat(deletedCount).isEqualTo(2);
         entities.forEach(entity -> assertThat(collection.get(entity.id)).isEmpty());
     }

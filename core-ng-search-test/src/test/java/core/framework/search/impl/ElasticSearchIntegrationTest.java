@@ -32,7 +32,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static core.framework.search.query.Queries.match;
 import static core.framework.search.query.Queries.range;
@@ -161,20 +160,20 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         request.sorts.add(Sorts.fieldSort("id", SortOrder.Asc));
         SearchResponse<TestDocument> response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(3);
-        assertThat(response.hits.stream().map(document1 -> document1.stringField).collect(Collectors.toList()))
+        assertThat(response.hits.stream().map(document1 -> document1.stringField).toList())
             .containsOnly("value1", "value2", "value3");
 
         request.query = QueryBuilders.range(r -> r.untyped(u -> u.field("local_time_field").gt(JsonData.of(LocalTime.of(13, 0)))));
         response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(2);
-        assertThat(response.hits.stream().map(document -> document.stringField).collect(Collectors.toList()))
+        assertThat(response.hits.stream().map(document -> document.stringField).toList())
             .containsOnly("value3", "value4");
 
         request.query = range("zoned_date_time_field", from.toLocalDate(), to.toLocalDate());
         request.sorts.add(Sorts.fieldSort("id", SortOrder.Asc));
         response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(3);
-        assertThat(response.hits.stream().map(document1 -> document1.stringField).collect(Collectors.toList()))
+        assertThat(response.hits.stream().map(document1 -> document1.stringField).toList())
             .containsOnly("value1", "value2", "value3");
     }
 

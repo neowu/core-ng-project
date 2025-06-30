@@ -11,7 +11,6 @@ import core.log.web.EventController;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -47,6 +46,6 @@ public class LogCollectorApp extends App {
 
     private List<String> parseList(String value) {
         String[] origins = Strings.split(value, ',');
-        return Arrays.stream(origins).map(String::strip).collect(Collectors.toList());
+        return Arrays.stream(origins).map(String::strip).toList();
     }
 }
