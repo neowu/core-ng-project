@@ -1,5 +1,9 @@
 ## Change log
 
+### 9.2.3 (7/2/2025 - )
+
+* db: support postgres enum type
+
 ### 9.2.2 (5/21/2025 - 6/26/2025)
 
 * http_client: support proxy

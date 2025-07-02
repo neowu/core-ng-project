@@ -217,7 +217,13 @@ public class DatabaseOperation {
     private void setParam(PreparedStatement statement, int index, Object param) throws SQLException {
         switch (param) {
             case String value -> statement.setString(index, value);
-            case Enum<?> value -> statement.setString(index, enumMapper.getDBValue(value));
+            case Enum<?> value -> {
+                if (dialect == Dialect.POSTGRESQL) {
+                    statement.setObject(index, enumMapper.getDBValue(value), Types.OTHER);
+                } else {
+                    statement.setString(index, enumMapper.getDBValue(value));
+                }
+            }
             case LocalDate value -> statement.setObject(index, value, Types.DATE);
             case LocalDateTime value -> statement.setObject(index, value, Types.TIMESTAMP);
             case ZonedDateTime value -> {

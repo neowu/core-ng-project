@@ -314,6 +314,8 @@ public final class DatabaseImpl implements Database {
     }
 
     void validateSQL(String sql) {
+        if (sql.startsWith("CREATE ")) return;  // ignore DDL
+
         // validate asterisk
         // execute() could have select part, e.g. insert into select
         int index = sql.indexOf('*');

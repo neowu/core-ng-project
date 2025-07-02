@@ -128,6 +128,12 @@ class DatabaseImplTest {
     }
 
     @Test
+    void validateSQLWithDDL() {
+        database.validateSQL("""
+            CREATE TYPE status AS ENUM ('ACTIVE', 'INACTIVE')""");
+    }
+
+    @Test
     void validateSQLWithAsterisk() {
         database.validateSQL("select column * 10 from table");
         database.validateSQL("select 3*5, 4*2 from table");
