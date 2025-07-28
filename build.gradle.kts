@@ -20,8 +20,8 @@ subprojects {
 
 val elasticVersion = "8.18.1"
 val jacksonVersion = "2.18.4"
-val junitVersion = "5.12.2"
-val mockitoVersion = "5.17.0"
+val junitVersion = "5.13.4"
+val mockitoVersion = "5.18.0"
 val assertjVersion = "3.27.3"
 
 project("core-ng-api") {
@@ -42,7 +42,7 @@ project("core-ng") {
             exclude("org.xerial.snappy")
         }
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")
-        compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.3")
+        compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.3")
         testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
         testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
         testImplementation("org.assertj:assertj-core:${assertjVersion}")
@@ -69,7 +69,7 @@ project("core-ng-mongo") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng"))
-        api("org.mongodb:mongodb-driver-sync:5.2.1")
+        api("org.mongodb:mongodb-driver-sync:5.5.1")
         testImplementation(project(":core-ng-test"))
     }
 }
@@ -79,7 +79,7 @@ project("core-ng-mongo-test") {
     dependencies {
         implementation(project(":core-ng-test"))
         implementation(project(":core-ng-mongo"))
-        implementation("de.bwaldvogel:mongo-java-server:1.46.0")
+        implementation("de.bwaldvogel:mongo-java-server:1.47.0")
     }
 }
 

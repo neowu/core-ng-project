@@ -70,9 +70,11 @@
         </module>
         <module name="OverloadMethodsDeclarationOrder"/>    <!--Checks that overload methods are grouped together.-->
         <module name="ParameterAssignment"/>
+        <module name="PatternVariableAssignment"/>          <!--Checks for assignment of pattern variables.-->
         <module name="SimplifyBooleanExpression"/>          <!--Checks for overly complicated boolean expressions.-->
         <module name="SimplifyBooleanReturn"/>              <!--Checks for overly complicated boolean return statements.-->
         <module name="StringLiteralEquality"/>
+        <module name="UnnecessaryNullCheckWithInstanceOf"/> <!--Checks for redundant null checks with the instanceof operator.-->
         <module name="UnnecessaryParentheses"/>             <!--Checks if unnecessary parentheses are used in a statement or expression.-->
         <module name="UnnecessarySemicolonAfterOuterTypeDeclaration"/>
         <module name="UnnecessarySemicolonAfterTypeMemberDeclaration"/>

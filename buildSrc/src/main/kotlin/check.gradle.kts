@@ -19,7 +19,7 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle("com.puppycrawl.tools:checkstyle:10.23.0")
+            checkstyle("com.puppycrawl.tools:checkstyle:10.26.1")
             checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
         }
 
@@ -47,7 +47,7 @@ subprojects {
     pmd {
         ruleSets = listOf()
         ruleSetFiles = rootProject.files("buildSrc/src/main/check/pmd.xml")
-        toolVersion = "7.13.0"
+        toolVersion = "7.16.0"
         isConsoleOutput = true
 
         tasks.withType<Pmd> {
@@ -57,7 +57,7 @@ subprojects {
 
     spotbugs {
         dependencies {
-            spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.9")
+            spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.12")
         }
 
         toolVersion = "4.9.3"

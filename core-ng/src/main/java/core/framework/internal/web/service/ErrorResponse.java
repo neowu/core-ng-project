@@ -11,8 +11,8 @@ public final class ErrorResponse {
         var response = new ErrorResponse();
         response.id = actionId;
         response.message = e.getMessage();
-        if (e instanceof ErrorCode errorCode) {
-            response.errorCode = errorCode.errorCode();
+        if (e instanceof ErrorCode code) {
+            response.errorCode = code.errorCode();
         } else {
             response.errorCode = "INTERNAL_ERROR";
         }

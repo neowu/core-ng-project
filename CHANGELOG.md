@@ -4,6 +4,7 @@
 
 * db: support postgres enum type
 * http_client: update okhttp to 5.1.0
+* mongo: update driver to 5.5.1
 
 ### 9.2.2 (5/21/2025 - 6/26/2025)
 

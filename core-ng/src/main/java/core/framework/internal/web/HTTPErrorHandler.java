@@ -78,9 +78,9 @@ public class HTTPErrorHandler {
             response.id = actionId;
             response.message = e.getMessage();
             response.stackTrace = Exceptions.stackTrace(e);
-            if (e instanceof ErrorCode errorCode) {
-                response.errorCode = errorCode.errorCode();
-                response.severity = errorCode.severity().name();
+            if (e instanceof ErrorCode code) {
+                response.errorCode = code.errorCode();
+                response.severity = code.severity().name();
             } else {
                 // internally LogManager logs exception class name as error code if not impl ErrorCode,
                 // here it uses INTERNAL_ERROR as it's border of internal, we don't want to expose internal details (exception class) to external which is part of api contract
