@@ -18,7 +18,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,9 +157,7 @@ public final class HTTPClientImpl implements HTTPClient {
             // refer to https://tools.ietf.org/html/rfc7230#section-3.3.2, with 204, server won't send body and content-length, hence no need to read it, and body will be quietly closed by response.close()
             body = new byte[0];
         } else {
-            ResponseBody responseBody = httpResponse.body();
-            if (responseBody == null) throw new Error("unexpected response body"); // refer to okhttp3.Response.body(), call.execute always return non-null body except for cachedResponse/networkResponse
-            body = responseBody.bytes();
+            body = httpResponse.body().bytes();
         }
         return body;
     }

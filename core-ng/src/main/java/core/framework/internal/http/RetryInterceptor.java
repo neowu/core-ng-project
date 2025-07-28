@@ -7,8 +7,6 @@ import core.framework.util.Threads;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
-import okhttp3.internal.connection.RouteException;
 import okhttp3.internal.http2.ConnectionShutdownException;
 import okhttp3.internal.http2.ErrorCode;
 import okhttp3.internal.http2.StreamResetException;
@@ -22,7 +20,6 @@ import java.net.SocketTimeoutException;
 import java.time.Duration;
 
 import static core.framework.log.Markers.errorCode;
-import static okhttp3.internal.Util.closeQuietly;
 
 /**
  * @author neo
@@ -47,11 +44,11 @@ public class RetryInterceptor implements Interceptor {
                 int statusCode = response.code();
                 if (shouldRetry(statusCode, attempts)) {    // do not check call.isCanceled(), RetryAndFollowUpInterceptor already checked and throw exception
                     logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, responseStatus={}, uri={}", statusCode, uri(request));
-                    closeResponseBody(response);
+                    response.close();
                 } else {
                     return response;
                 }
-            } catch (IOException | RouteException e) {
+            } catch (IOException e) {
                 if (shouldRetry(chain.call().isCanceled(), request.method(), attempts, e)) {
                     logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, uri={}, error={}", uri(request), e.getMessage(), e);
                 } else {
@@ -72,13 +69,6 @@ public class RetryInterceptor implements Interceptor {
         return request.url().newBuilder().query(null).build().toString();
     }
 
-    // response.close asserts body not null, refer to Response.close()
-    // RetryAndFollowUpInterceptor also closes body directly
-    private void closeResponseBody(Response response) {
-        ResponseBody body = response.body();
-        if (body != null) closeQuietly(body);
-    }
-
     boolean shouldRetry(int statusCode, int attempts) {
         if (statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code) {
             if (attempts >= maxRetries) return false;
@@ -93,7 +83,6 @@ public class RetryInterceptor implements Interceptor {
         if (attempts >= maxRetries) return false;
         if (!withinMaxProcessTime(attempts)) return false;
 
-        if (e instanceof RouteException) return true;   // if it's route failure, then request is not sent yet
         if (e instanceof ConnectionShutdownException) return true;  // refer to RetryAndFollowUpInterceptor -> requestSendStarted = e !is ConnectionShutdownException
 
         // only not retry on POST if request sent
