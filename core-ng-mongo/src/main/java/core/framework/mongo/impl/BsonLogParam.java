@@ -4,6 +4,7 @@ import core.framework.internal.log.filter.LogParam;
 import org.bson.codecs.configuration.CodecConfigurationException;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
@@ -11,10 +12,11 @@ import java.util.Set;
  * @author neo
  */
 class BsonLogParam implements LogParam {
+    @Nullable
     private final Bson bson;
     private final CodecRegistry registry;
 
-    BsonLogParam(Bson bson, CodecRegistry registry) {
+    BsonLogParam(@Nullable Bson bson, CodecRegistry registry) {
         this.bson = bson;
         this.registry = registry;
     }

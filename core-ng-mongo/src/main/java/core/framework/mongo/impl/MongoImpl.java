@@ -19,6 +19,7 @@ import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,9 @@ public class MongoImpl implements Mongo {
     private final ConnectionPoolSettings.Builder connectionPoolSettings = ConnectionPoolSettings.builder()
         .maxConnectionIdleTime(Duration.ofMinutes(30).toMillis(), TimeUnit.MILLISECONDS);
 
+    @Nullable
     public ConnectionString uri;
+    @Nullable
     public MongoConnectionPoolMetrics metrics;
 
     long timeoutInMs = Duration.ofSeconds(15).toMillis();

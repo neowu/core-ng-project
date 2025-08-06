@@ -47,6 +47,7 @@ public final class ExecutorImpl implements Executor {
         logger.info("shutting down executor");
         lock.lock();
         try {
+            ScheduledExecutorService scheduler = this.scheduler;
             if (scheduler != null) {
                 List<Runnable> canceledTasks = scheduler.shutdownNow(); // drop all delayed tasks
                 if (!canceledTasks.isEmpty()) {

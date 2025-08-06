@@ -3,6 +3,7 @@ package core.framework.internal.template;
 import core.framework.internal.reflect.Methods;
 import core.framework.internal.validate.ClassValidator;
 import core.framework.internal.validate.ClassVisitor;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -33,7 +34,7 @@ final class ModelClassValidator implements ClassVisitor {
     }
 
     @Override
-    public void visitClass(Class<?> objectClass, String path) {
+    public void visitClass(Class<?> objectClass, @Nullable String path) {
         Method[] methods = objectClass.getDeclaredMethods();
         for (Method method : methods) {
             if (Modifier.isPublic(method.getModifiers()) && method.getReturnType().isPrimitive()) {

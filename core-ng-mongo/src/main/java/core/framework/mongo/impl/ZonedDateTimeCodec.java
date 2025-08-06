@@ -6,6 +6,7 @@ import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +20,12 @@ import java.time.ZonedDateTime;
 public class ZonedDateTimeCodec implements Codec<ZonedDateTime> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ZonedDateTimeCodec.class);
 
-    static void write(BsonWriter writer, ZonedDateTime value) {
+    static void write(BsonWriter writer, @Nullable ZonedDateTime value) {
         if (value == null) writer.writeNull();
         else writer.writeDateTime(value.toInstant().toEpochMilli());
     }
 
+    @Nullable
     static ZonedDateTime read(BsonReader reader, String field) {
         BsonType currentType = reader.getCurrentBsonType();
         if (currentType == BsonType.NULL) {
@@ -43,6 +45,7 @@ public class ZonedDateTimeCodec implements Codec<ZonedDateTime> {
         write(writer, value);
     }
 
+    @Nullable
     @Override
     public ZonedDateTime decode(BsonReader reader, DecoderContext context) {
         return read(reader, reader.getCurrentName());

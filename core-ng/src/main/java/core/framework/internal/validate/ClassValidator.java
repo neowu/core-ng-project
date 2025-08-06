@@ -3,6 +3,7 @@ package core.framework.internal.validate;
 import core.framework.internal.reflect.Fields;
 import core.framework.internal.reflect.GenericTypes;
 import core.framework.util.Sets;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -29,7 +30,7 @@ public class ClassValidator {
         visitObject(instanceClass, null, null);
     }
 
-    private void visitObject(Class<?> objectClass, Field owner, String path) {
+    private void visitObject(Class<?> objectClass, Field owner, @Nullable String path) {
         if (visitedClasses.contains(objectClass))
             throw new Error("class must not have circular reference, field=" + Fields.path(owner));
 

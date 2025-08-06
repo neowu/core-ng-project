@@ -1,6 +1,7 @@
 package core.framework.internal.validate;
 
 import core.framework.util.Maps;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import java.util.Map;
  * @author neo
  */
 public final class ValidationErrors {
+    @Nullable
     public Map<String, String> errors;
 
     public void add(String field, String error, Map<String, String> arguments) {
@@ -17,7 +19,7 @@ public final class ValidationErrors {
     }
 
     // assume var can only be used once, and there are only limited predefined vars, not considering i18n, just to make default message more friendly for engineers
-    String message(String error, Map<String, String> arguments) {
+    String message(String error, @Nullable Map<String, String> arguments) {
         if (arguments == null) return error;
         var builder = new StringBuilder(error);
         for (Map.Entry<String, String> entry : arguments.entrySet()) {

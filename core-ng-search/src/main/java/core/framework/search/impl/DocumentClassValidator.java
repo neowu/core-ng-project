@@ -3,6 +3,7 @@ package core.framework.search.impl;
 import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.reflect.Fields;
 import core.framework.search.Index;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ final class DocumentClassValidator extends JSONClassValidator {
     }
 
     @Override
-    public void visitClass(Class<?> objectClass, String path) {
+    public void visitClass(Class<?> objectClass, @Nullable String path) {
         super.visitClass(objectClass, path);
 
         if (path == null && !objectClass.isAnnotationPresent(Index.class)) {

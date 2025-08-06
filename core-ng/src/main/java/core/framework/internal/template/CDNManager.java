@@ -1,6 +1,7 @@
 package core.framework.internal.template;
 
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CDNManager {
     private final Logger logger = LoggerFactory.getLogger(CDNManager.class);
+    @Nullable
     private String host;
 
     public String url(String url) {

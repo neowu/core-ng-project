@@ -11,18 +11,20 @@ import org.bson.codecs.EncoderContext;
 import org.bson.codecs.IdGenerator;
 import org.bson.codecs.ObjectIdGenerator;
 import org.bson.types.ObjectId;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author neo
  */
 final class EntityCodec<T> implements CollectibleCodec<T> {
+    @Nullable
     final EntityIdHandler<T> idHandler;
     private final Class<T> entityClass;
     private final EntityEncoder<T> encoder;
     private final EntityDecoder<T> decoder;
     private final IdGenerator idGenerator = new ObjectIdGenerator();
 
-    EntityCodec(Class<T> entityClass, EntityIdHandler<T> idHandler, EntityEncoder<T> encoder, EntityDecoder<T> decoder) {
+    EntityCodec(Class<T> entityClass, @Nullable EntityIdHandler<T> idHandler, EntityEncoder<T> encoder, EntityDecoder<T> decoder) {
         this.entityClass = entityClass;
         this.idHandler = idHandler;
         this.encoder = encoder;
@@ -44,6 +46,7 @@ final class EntityCodec<T> implements CollectibleCodec<T> {
         return idHandler.get(document) != null;
     }
 
+    @Nullable
     @Override
     public BsonValue getDocumentId(T document) {
         Object id = idHandler.get(document);

@@ -5,6 +5,7 @@ import core.framework.util.Sets;
 import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public final class EntityCodecs {
         register(viewClass, null);
     }
 
+    @Nullable
     public <T> Object id(T entity) {
         @SuppressWarnings("unchecked")
         EntityCodec<T> codec = (EntityCodec<T>) codecs.get(entity.getClass());
@@ -34,8 +36,8 @@ public final class EntityCodecs {
         return idHandler.get(entity);
     }
 
-    private <T> void register(Class<T> entityClass, EntityIdHandler<T> idHandler) {
-        EntityEncoderBuilder<T> builder = new EntityEncoderBuilder<>(entityClass);
+    private <T> void register(Class<T> entityClass, @Nullable EntityIdHandler<T> idHandler) {
+        var builder = new EntityEncoderBuilder<T>(entityClass);
         EntityEncoder<T> entityEncoder = builder.build();
         enumClasses.addAll(builder.enumCodecFields.keySet());
         EntityDecoder<T> entityDecoder = new EntityDecoderBuilder<>(entityClass).build();

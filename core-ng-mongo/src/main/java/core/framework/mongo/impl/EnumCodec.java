@@ -9,6 +9,7 @@ import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
     }
 
     @Override
-    public void encode(BsonWriter writer, T value, EncoderContext context) {
+    public void encode(BsonWriter writer, @Nullable T value, EncoderContext context) {
         if (value == null) {
             writer.writeNull();
         } else {
@@ -47,6 +48,7 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
         }
     }
 
+    @Nullable
     @Override
     public T decode(BsonReader reader, DecoderContext context) {
         return read(reader, reader.getCurrentName());
@@ -68,6 +70,7 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
     }
 
     // used by EntityDecoder
+    @Nullable
     public T read(BsonReader reader, String field) {
         BsonType currentType = reader.getCurrentBsonType();
         if (currentType == BsonType.NULL) {

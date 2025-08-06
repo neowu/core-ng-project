@@ -182,8 +182,7 @@ public final class ActionLog {
         return builder.toString();
     }
 
-    @Nullable
-    public PerformanceWarning[] warnings() {
+    public PerformanceWarning @Nullable [] warnings() {
         List<PerformanceWarning> configs = new ArrayList<>(performanceStats.size());
         for (PerformanceStat stat : performanceStats.values()) {
             if (stat.warning != null) configs.add(stat.warning);

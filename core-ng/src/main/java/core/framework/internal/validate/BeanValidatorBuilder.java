@@ -48,7 +48,7 @@ public class BeanValidatorBuilder {
         return builder.build();
     }
 
-    private String validateMethod(Class<?> beanClass, String parentPath) {
+    private String validateMethod(Class<?> beanClass, @Nullable String parentPath) {
         String methodName = "validate" + beanClass.getSimpleName() + (index++);
         var builder = new CodeBuilder().append("private void {}({} bean, {} errors, boolean partial) {\n", methodName, type(beanClass), type(ValidationErrors.class));
         for (Field field : Classes.instanceFields(beanClass)) {
@@ -104,7 +104,7 @@ public class BeanValidatorBuilder {
         }
     }
 
-    private void buildMapValidation(CodeBuilder builder, Field field, String pathLiteral, String parentPath) {
+    private void buildMapValidation(CodeBuilder builder, Field field, String pathLiteral, @Nullable String parentPath) {
         buildSizeValidation(builder, field, pathLiteral, "size");
 
         Type valueType = GenericTypes.mapValueType(field.getGenericType());
@@ -121,7 +121,7 @@ public class BeanValidatorBuilder {
         }
     }
 
-    private void buildListValidation(CodeBuilder builder, Field field, String pathLiteral, String parentPath) {
+    private void buildListValidation(CodeBuilder builder, Field field, String pathLiteral, @Nullable String parentPath) {
         buildSizeValidation(builder, field, pathLiteral, "size");
 
         Class<?> valueClass = GenericTypes.listValueClass(field.getGenericType());
@@ -168,13 +168,13 @@ public class BeanValidatorBuilder {
         }
     }
 
-    private String path(Field field, String parentPath) {
+    private String path(Field field, @Nullable String parentPath) {
         String path = field.getName();
         if (parentPath == null) return path;
         return parentPath + "." + path;
     }
 
-    private void validate(Class<?> beanClass, Field parentField) {
+    private void validate(Class<?> beanClass, @Nullable Field parentField) {
         try {
             Object beanWithDefaultValue = beanClass.getDeclaredConstructor().newInstance();
             for (Field field : Classes.instanceFields(beanClass)) {

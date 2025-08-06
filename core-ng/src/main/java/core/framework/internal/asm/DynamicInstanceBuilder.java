@@ -7,6 +7,7 @@ import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
+import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,13 +32,13 @@ public class DynamicInstanceBuilder<T> {
 
     private final CtClass classBuilder;
     private final Class<? super T> interfaceClass;
-    private Class<?>[] constructorParamClasses;
     private final SourceCode sourceCode = new SourceCode();
+    private Class<?> @Nullable [] constructorParamClasses;
 
     // with java modules, the generated class must be within same package of lookup class
     // refer to javassist.util.proxy.DefineClassHelper.toClass(java.lang.Class<?>, byte[])
     // so here it will always use interfaceClass as prefix of generated class name, and append name
-    public DynamicInstanceBuilder(Class<? super T> interfaceClass, String name) {
+    public DynamicInstanceBuilder(Class<? super T> interfaceClass, @Nullable String name) {
         if (!interfaceClass.isInterface())
             throw new Error("class must be interface, class=" + interfaceClass.getCanonicalName());
 

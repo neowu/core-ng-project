@@ -7,6 +7,7 @@ import com.mongodb.event.ConnectionCreatedEvent;
 import com.mongodb.event.ConnectionPoolListener;
 import core.framework.internal.stat.Metrics;
 import core.framework.internal.stat.Stats;
+import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -18,7 +19,7 @@ public class MongoConnectionPoolMetrics implements ConnectionPoolListener, Metri
     private final AtomicInteger active = new AtomicInteger(0);
     private final String statPrefix;
 
-    public MongoConnectionPoolMetrics(String name) {
+    public MongoConnectionPoolMetrics(@Nullable String name) {
         statPrefix = "pool_mongo" + (name == null ? "" : '-' + name);
     }
 

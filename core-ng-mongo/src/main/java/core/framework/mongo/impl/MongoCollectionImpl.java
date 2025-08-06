@@ -28,6 +28,7 @@ import core.framework.util.Lists;
 import core.framework.util.StopWatch;
 import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     private final Class<T> entityClass;
     private final String collectionName;
     private final Validator<T> validator;
-    private com.mongodb.client.MongoCollection<T> collection;
+    private com.mongodb.client.@Nullable MongoCollection<T> collection;
 
     MongoCollectionImpl(MongoImpl mongo, Class<T> entityClass) {
         this.mongo = mongo;
@@ -367,9 +368,10 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         }
     }
 
-    private com.mongodb.client.MongoCollection<T> collection(ReadPreference readPreference) {
-        if (readPreference != null) return collection().withReadPreference(readPreference);
-        return collection();
+    private com.mongodb.client.MongoCollection<T> collection(@Nullable ReadPreference readPreference) {
+        com.mongodb.client.MongoCollection<T> collection = collection();
+        if (readPreference != null) return collection.withReadPreference(readPreference);
+        return collection;
     }
 
     private com.mongodb.client.MongoCollection<T> collection() {

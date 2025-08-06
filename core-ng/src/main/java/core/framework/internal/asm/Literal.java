@@ -2,6 +2,7 @@ package core.framework.internal.asm;
 
 import core.framework.internal.reflect.GenericTypes;
 import core.framework.util.Types;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
@@ -27,7 +28,7 @@ public final class Literal {
         }
     }
 
-    public static String variable(String text) {
+    public static String variable(@Nullable String text) {
         if (text == null) return "null";
 
         var builder = new StringBuilder("\"");

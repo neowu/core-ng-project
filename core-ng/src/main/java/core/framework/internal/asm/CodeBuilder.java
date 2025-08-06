@@ -41,8 +41,7 @@ public class CodeBuilder {
     }
 
     public CodeBuilder indent(int indent) {
-        for (int i = 0; i < indent; i++)
-            builder.append("    ");
+        builder.append("    ".repeat(Math.max(0, indent)));
         return this;
     }
 

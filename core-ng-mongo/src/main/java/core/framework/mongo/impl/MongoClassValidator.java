@@ -11,6 +11,7 @@ import core.framework.mongo.MongoEnumValue;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
 import org.bson.types.ObjectId;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -30,6 +31,7 @@ public final class MongoClassValidator implements ClassVisitor {
     private final ClassValidator validator;
     private final Map<String, Set<String>> fields = Maps.newHashMap();
     private boolean validateView;
+    @Nullable
     private Field id;
 
     MongoClassValidator(Class<?> entityClass) {
@@ -54,13 +56,13 @@ public final class MongoClassValidator implements ClassVisitor {
     }
 
     @Override
-    public void visitClass(Class<?> objectClass, String path) {
+    public void visitClass(Class<?> objectClass, @Nullable String path) {
         if (!validateView && path == null && !objectClass.isAnnotationPresent(Collection.class))
             throw new Error("mongo entity class must have @Collection, class=" + objectClass.getCanonicalName());
     }
 
     @Override
-    public void visitField(Field field, String parentPath) {
+    public void visitField(Field field, @Nullable String parentPath) {
         if (field.isAnnotationPresent(Id.class)) {
             validateId(field, parentPath == null);
         } else {

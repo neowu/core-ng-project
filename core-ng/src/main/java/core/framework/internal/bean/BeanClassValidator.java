@@ -1,6 +1,7 @@
 package core.framework.internal.bean;
 
 import core.framework.internal.json.JSONClassValidator;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +19,7 @@ public final class BeanClassValidator { // bean is used by both web service requ
 
         var validator = new JSONClassValidator(beanClass) {
             @Override
-            public void visitClass(Class<?> objectClass, String path) {
+            public void visitClass(Class<?> objectClass, @Nullable String path) {
                 super.visitClass(objectClass, path);
                 beanClassNameValidator.validate(objectClass);
             }

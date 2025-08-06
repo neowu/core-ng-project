@@ -10,6 +10,7 @@ import core.framework.mongo.MongoCollection;
 import core.framework.mongo.impl.MongoConnectionPoolMetrics;
 import core.framework.mongo.impl.MongoImpl;
 import core.framework.util.Types;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 
@@ -20,13 +21,15 @@ import static core.framework.util.Strings.format;
  */
 public class MongoConfig extends Config {
     protected MongoImpl mongo;
+    @Nullable
     String uri;
     private ModuleContext context;
+    @Nullable
     private String name;
     private boolean entityAdded;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = context;
         this.name = name;
 

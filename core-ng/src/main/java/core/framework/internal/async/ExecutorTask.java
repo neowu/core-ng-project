@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -25,14 +26,17 @@ class ExecutorTask<T> implements Callable<T> {
     private final LogManager logManager;
     private final TaskContext context;
 
-    private final String rootAction;
-    private final String correlationId;
-    private final String refId;
-    private final Trace trace;
     @Nullable
-    private final PerformanceWarning[] warnings;
+    private final String rootAction;
+    @Nullable
+    private final String correlationId;
+    @Nullable
+    private final String refId;
+    @Nullable
+    private final Trace trace;
+    private final PerformanceWarning @Nullable [] warnings;
 
-    ExecutorTask(Callable<T> task, LogManager logManager, TaskContext context, ActionLog parentActionLog) {
+    ExecutorTask(Callable<T> task, LogManager logManager, TaskContext context, @Nullable ActionLog parentActionLog) {
         this.task = task;
         this.logManager = logManager;
         this.context = context;
@@ -63,9 +67,9 @@ class ExecutorTask<T> implements Callable<T> {
             if (rootAction != null) { // if rootAction != null, then all parent info are available
                 actionLog.context("root_action", rootAction);
                 LOGGER.debug("correlationId={}", correlationId);
-                actionLog.correlationIds = List.of(correlationId);
+                actionLog.correlationIds = List.of(Objects.requireNonNull(correlationId));
                 LOGGER.debug("refId={}", refId);
-                actionLog.refIds = List.of(refId);
+                actionLog.refIds = List.of(Objects.requireNonNull(refId));
                 if (trace != null) actionLog.trace = trace;
                 if (warnings != null) actionLog.initializeWarnings(warnings);
             }

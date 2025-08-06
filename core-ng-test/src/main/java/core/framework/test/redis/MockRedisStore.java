@@ -1,6 +1,7 @@
 package core.framework.test.redis;
 
 import core.framework.util.Maps;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serial;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MockRedisStore {
     final Map<String, Value> store = Maps.newConcurrentHashMap();
 
+    @Nullable
     Value get(String key) {
         Value value = store.get(key);
         if (value == null) return null;
@@ -33,6 +35,7 @@ class MockRedisStore {
 
     static final class Value {
         final Object value;
+        @Nullable
         Long expirationTime;
 
         Value(Object value) {
@@ -83,6 +86,7 @@ class MockRedisStore {
 
     static class HashValue {
         final String value;
+        @Nullable
         Long expirationTime;
 
         HashValue(String value) {
