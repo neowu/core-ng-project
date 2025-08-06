@@ -4,10 +4,13 @@ import core.framework.api.http.HTTPStatus;
 import core.framework.log.ErrorCode;
 import core.framework.log.Severity;
 
+import java.io.Serial;
+
 /**
  * @author neo
  */
 public final class RemoteServiceException extends RuntimeException implements ErrorCode {
+    @Serial
     private static final long serialVersionUID = 6935063785656278927L;
 
     public final HTTPStatus status;

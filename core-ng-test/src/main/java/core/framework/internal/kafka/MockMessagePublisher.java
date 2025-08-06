@@ -2,8 +2,8 @@ package core.framework.internal.kafka;
 
 import core.framework.internal.validate.Validator;
 import core.framework.kafka.MessagePublisher;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 
 /**
  * @author neo

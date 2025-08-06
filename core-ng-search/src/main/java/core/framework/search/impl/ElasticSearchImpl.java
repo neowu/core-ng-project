@@ -27,6 +27,7 @@ import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,9 +43,11 @@ public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
 
     public Duration timeout = Duration.ofSeconds(15);
-    public HttpHost[] hosts;
+    public HttpHost @Nullable [] hosts;
     public int maxResultWindow = 10000;
+    @Nullable
     ElasticsearchClient client;
+    @Nullable
     Header authHeader;
     private RestClient restClient;
     private ObjectMapper mapper;

@@ -8,6 +8,7 @@ import core.framework.search.ElasticSearchType;
 import core.framework.search.impl.ElasticSearchHost;
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.util.Types;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 
@@ -18,11 +19,12 @@ public class SearchConfig extends Config {
     ElasticSearchImpl search;
     boolean auth;
     private ModuleContext context;
+    @Nullable
     private String name;
     private boolean typeAdded;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = context;
         this.name = name;
 

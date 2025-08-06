@@ -4,6 +4,7 @@ import core.framework.log.LogAppender;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.PerformanceStatMessage;
 import core.framework.log.message.StatMessage;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.text.DecimalFormat;
@@ -125,7 +126,7 @@ public final class ConsoleAppender implements LogAppender {
         }
     }
 
-    String filterLineSeparator(String value) {
+    String filterLineSeparator(@Nullable String value) {
         if (value == null) return "";
         int length = value.length();
         var builder = new StringBuilder(length);

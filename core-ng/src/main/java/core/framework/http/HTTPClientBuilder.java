@@ -12,6 +12,7 @@ import core.framework.internal.http.TimeoutInterceptor;
 import core.framework.util.StopWatch;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,10 +80,13 @@ public final class HTTPClientBuilder {
     private boolean enableFallbackDNSCache = false;
     private String userAgent = "HTTPClient";
     private boolean trustAll = false;
+    @Nullable
     private KeyStore trustStore;
-    private KeyManager[] keyManagers;   // for client auth
+    private KeyManager @Nullable [] keyManagers;   // for client auth
+    @Nullable
     private Integer maxRetries;
     private Duration retryWaitTime = Duration.ofMillis(500);
+    @Nullable
     private Proxy proxy;
 
     // force to use HTTPClient.builder()

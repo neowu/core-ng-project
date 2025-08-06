@@ -1,6 +1,7 @@
 package core.framework.internal.inject;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
+
 import java.lang.reflect.Type;
 import java.util.Objects;
 

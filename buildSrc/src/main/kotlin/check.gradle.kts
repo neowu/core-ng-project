@@ -3,8 +3,8 @@ import com.github.spotbugs.snom.Confidence
 plugins {
     checkstyle apply false
     pmd apply false
-    jacoco apply false
     id("com.github.spotbugs") apply false
+    jacoco apply false
     id("jacoco-report-aggregation") apply false
 }
 

@@ -9,8 +9,8 @@ import core.framework.internal.web.response.FileBody;
 import core.framework.internal.web.response.ResponseImpl;
 import core.framework.internal.web.response.TemplateBody;
 import core.framework.internal.web.response.TextBody;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Optional;
 

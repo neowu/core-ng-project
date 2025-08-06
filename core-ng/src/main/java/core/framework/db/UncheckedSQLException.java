@@ -1,5 +1,7 @@
 package core.framework.db;
 
+import org.jspecify.annotations.Nullable;
+
 import java.io.Serial;
 import java.sql.SQLException;
 
@@ -10,6 +12,7 @@ public final class UncheckedSQLException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = 5857178985477320780L;
 
+    @Nullable
     public final ErrorType errorType;
 
     // expose original sqlState to support handle errors not covered by errorType
@@ -24,6 +27,7 @@ public final class UncheckedSQLException extends RuntimeException {
     // different jdbc driver translates sqlState to exception differently, but with common set
     // hsqldb: org.hsqldb.jdbc.JDBCUtil,
     // mysql: com.mysql.cj.jdbc.exceptions.SQLError
+    @Nullable
     private ErrorType errorType(SQLException e) {
         String state = e.getSQLState();
         if (state == null) return null;

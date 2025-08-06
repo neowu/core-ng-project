@@ -2,8 +2,8 @@ package core.framework.internal.log;
 
 import core.framework.log.Markers;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;

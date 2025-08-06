@@ -4,6 +4,7 @@ import core.framework.internal.stat.Metrics;
 import core.framework.internal.stat.Stats;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
@@ -11,13 +12,18 @@ import java.util.Map;
  * @author neo
  */
 public class ProducerMetrics implements Metrics {
+    @Nullable
     private final String name;
+    @Nullable
     Metric requestSizeAvg; // The average size of all requests in the window for a broker.
+    @Nullable
     Metric requestSizeMax; // The maximum size of any request sent in the window for a broker
+    @Nullable
     private Metric requestRate; // The number of batch requests sent per second, one batch request contains multiple messages
+    @Nullable
     private Metric outgoingByteRate; // The number of outgoing bytes sent to all servers per second
 
-    public ProducerMetrics(String name) {
+    public ProducerMetrics(@Nullable String name) {
         this.name = name;
     }
 

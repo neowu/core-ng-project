@@ -7,6 +7,7 @@ import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 import core.framework.internal.db.Dialect;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 
@@ -22,7 +23,9 @@ public final class GCloudAuthProvider implements CloudAuthProvider {
         .retryWaitTime(Duration.ofMillis(50))
         .build();
 
+    @Nullable
     String user;    // iam user, won't change once pod is created
+    @Nullable
     String accessToken;
     long expirationTime;
 

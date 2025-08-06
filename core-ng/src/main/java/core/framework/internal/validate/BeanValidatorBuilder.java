@@ -12,8 +12,8 @@ import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.reflect.Classes;
 import core.framework.internal.reflect.Fields;
 import core.framework.internal.reflect.GenericTypes;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.regex.PatternSyntaxException;

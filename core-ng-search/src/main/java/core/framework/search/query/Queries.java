@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.NumberRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -27,21 +28,21 @@ public class Queries {
         return QueryBuilders.matchPhrase().field(field).query(query).build()._toQuery();
     }
 
-    public static Query range(String field, ZonedDateTime from, ZonedDateTime to) {
+    public static Query range(String field, @Nullable ZonedDateTime from, @Nullable ZonedDateTime to) {
         var range = new DateRangeQuery.Builder().field(field);
         if (from != null) range.gte(from.format(DateTimeFormatter.ISO_INSTANT));
         if (to != null) range.lte(to.format(DateTimeFormatter.ISO_INSTANT));
         return QueryBuilders.range().date(range.build()).build()._toQuery();
     }
 
-    public static Query range(String field, LocalDate from, LocalDate to) {
+    public static Query range(String field, @Nullable LocalDate from, @Nullable LocalDate to) {
         var range = new DateRangeQuery.Builder().field(field);
         if (from != null) range.gte(from.format(DateTimeFormatter.ISO_LOCAL_DATE));
         if (to != null) range.lte(to.format(DateTimeFormatter.ISO_LOCAL_DATE));
         return QueryBuilders.range().date(range.build()).build()._toQuery();
     }
 
-    public static Query range(String field, Number from, Number to) {
+    public static Query range(String field, @Nullable Number from, @Nullable Number to) {
         var range = new NumberRangeQuery.Builder().field(field);
         if (from != null) range.gte(from.doubleValue());
         if (to != null) range.lte(to.doubleValue());

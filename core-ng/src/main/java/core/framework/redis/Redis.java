@@ -1,6 +1,7 @@
 package core.framework.redis;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
+
 import java.time.Duration;
 import java.util.Map;
 import java.util.function.Consumer;

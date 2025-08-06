@@ -9,6 +9,7 @@ import core.framework.util.Files;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import core.framework.web.site.WebDirectory;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ public class TemplateManager {
         this.message = message;
     }
 
-    public String process(String templatePath, Object model, String language) {
+    public String process(String templatePath, Object model, @Nullable String language) {
         var watch = new StopWatch();
         try {
             HTMLTemplate template = get(templatePath, model.getClass(), language);
@@ -57,7 +58,7 @@ public class TemplateManager {
         }
     }
 
-    private HTMLTemplate get(String templatePath, Class<?> modelClass, String language) {
+    private HTMLTemplate get(String templatePath, Class<?> modelClass, @Nullable String language) {
         Map<String, HTMLTemplate> templates = this.templates.get(templatePath);
         if (templates == null)
             throw new Error("template is not registered, please use site().template() to add template, templatePath=" + templatePath);

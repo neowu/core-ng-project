@@ -6,6 +6,7 @@ import core.framework.util.Properties;
 import core.framework.util.Sets;
 import core.framework.util.Strings;
 import core.framework.web.site.Message;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +109,7 @@ public class MessageImpl implements Message {
     }
 
     @Override
-    public String get(String key, String language) {
+    public String get(String key, @Nullable String language) {
         String message = getMessage(key, language).orElse(null);
         if (message == null) {
             logger.error(Markers.errorCode("INVALID_MESSAGE_KEY"), "can not find message, key={}, language={}", key, language);
@@ -117,7 +118,7 @@ public class MessageImpl implements Message {
         return message;
     }
 
-    Optional<String> getMessage(String key, String language) {
+    Optional<String> getMessage(String key, @Nullable String language) {
         String targetLanguage = language == null ? languages[0] : language;
         List<Properties> properties = messages.get(targetLanguage);
         if (properties == null) throw new Error("language is not defined, please check site().message(), language=" + targetLanguage);

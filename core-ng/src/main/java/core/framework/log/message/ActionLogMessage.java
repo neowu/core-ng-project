@@ -1,8 +1,8 @@
 package core.framework.log.message;
 
 import core.framework.api.json.Property;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +29,10 @@ public class ActionLogMessage {
     public List<String> clients;
     @Property(name = "ref_ids")
     public List<String> refIds;
+    @Nullable
     @Property(name = "error_code")
     public String errorCode;
+    @Nullable
     @Property(name = "error_message")
     public String errorMessage;
     @Property(name = "elapsed")

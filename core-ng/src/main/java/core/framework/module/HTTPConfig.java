@@ -12,6 +12,7 @@ import core.framework.internal.web.bean.ResponseBeanWriter;
 import core.framework.web.Controller;
 import core.framework.web.ErrorHandler;
 import core.framework.web.Interceptor;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,7 @@ public final class HTTPConfig extends Config {
     ModuleContext context;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = context;
     }
 

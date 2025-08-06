@@ -14,6 +14,7 @@ import org.elasticsearch.indices.breaker.HierarchyCircuitBreakerService;
 import org.elasticsearch.node.LocalNode;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeValidationException;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,7 @@ import java.nio.file.Path;
 public class LocalElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(LocalElasticSearch.class);
     private Path dataPath;
+    @Nullable
     private LocalNode node;
 
     public HttpHost start() {

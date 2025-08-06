@@ -1,6 +1,6 @@
 package core.framework.internal.module;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author neo

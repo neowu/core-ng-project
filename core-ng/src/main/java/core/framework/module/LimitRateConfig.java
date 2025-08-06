@@ -4,6 +4,7 @@ import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.http.LimitRateInterceptor;
 import core.framework.internal.web.http.RateControl;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 
@@ -15,7 +16,7 @@ public final class LimitRateConfig extends Config {
     private RateControl rateControl;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         rateControl = new RateControl();
         // save at max 5K group/ip combination per pod, about 800K memory, to adapt with more ips/cc attack, better defense with cloud infra based solution together
         maxEntries(5000);

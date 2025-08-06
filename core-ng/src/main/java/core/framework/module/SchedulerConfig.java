@@ -14,6 +14,7 @@ import core.framework.internal.web.sys.SchedulerController;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.Trigger;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Clock;
 import java.time.DayOfWeek;
@@ -29,7 +30,7 @@ public final class SchedulerConfig extends Config {
     private boolean triggerAdded;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         var scheduler = new Scheduler(context.logManager);
         context.startupHook.start.add(scheduler::start);
         context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> scheduler.shutdown());

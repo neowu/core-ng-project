@@ -10,6 +10,7 @@ import core.framework.internal.asm.CodeBuilder;
 import core.framework.internal.reflect.Classes;
 import core.framework.util.Lists;
 import core.framework.util.StopWatch;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public final class EntitySchemaGenerator {
     }
 
     // http://dev.mysql.com/doc/connector-j/en/connector-j-reference-type-conversions.html
-    private String columnType(Class<?> fieldClass, Size size, boolean json) {
+    private String columnType(Class<?> fieldClass, @Nullable Size size, boolean json) {
         if (json) return "TEXT";
         if (Integer.class.equals(fieldClass)) return "INT";
         if (Long.class.equals(fieldClass)) return "BIGINT";

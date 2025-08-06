@@ -11,6 +11,7 @@ import core.framework.internal.log.LogManager;
 import core.framework.internal.resource.Pool;
 import core.framework.util.ASCII;
 import core.framework.util.StopWatch;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,16 +45,16 @@ public final class DatabaseImpl implements Database {
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
     private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
 
-    public String user;
-    public String password;
-    public CloudAuthProvider authProvider;
-    public IsolationLevel isolationLevel;
+    public @Nullable String user;
+    public @Nullable String password;
+    public @Nullable CloudAuthProvider authProvider;
+    public @Nullable IsolationLevel isolationLevel;
     public TransactionManager transactionManager;
 
-    private String url;
-    private Properties driverProperties;
+    private @Nullable String url;
+    private @Nullable Properties driverProperties;
     private Duration timeout;
-    private Driver driver;
+    private @Nullable Driver driver;
 
     public DatabaseImpl(String name) {
         initializeRowMappers();

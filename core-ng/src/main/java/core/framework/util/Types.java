@@ -1,5 +1,7 @@
 package core.framework.util;
 
+import org.jspecify.annotations.Nullable;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -53,7 +55,7 @@ public final class Types {
         }
 
         @Override
-        public Type getOwnerType() {
+        public @Nullable Type getOwnerType() {
             return null;
         }
 

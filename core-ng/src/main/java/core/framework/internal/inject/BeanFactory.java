@@ -5,8 +5,8 @@ import core.framework.inject.Named;
 import core.framework.internal.reflect.Fields;
 import core.framework.util.Maps;
 import core.framework.util.Types;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

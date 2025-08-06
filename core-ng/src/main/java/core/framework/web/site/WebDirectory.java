@@ -1,6 +1,7 @@
 package core.framework.web.site;
 
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,7 @@ import java.nio.file.Paths;
 public final class WebDirectory {
     private final Logger logger = LoggerFactory.getLogger(WebDirectory.class);
 
+    @Nullable
     private final Path root;
     public boolean localEnv;
 
@@ -23,7 +25,7 @@ public final class WebDirectory {
         this.root = locateRootDirectory();
     }
 
-    private Path locateRootDirectory() {
+    private @Nullable Path locateRootDirectory() {
         String value = System.getProperty("core.webPath");
         if (value != null) {
             Path path = Paths.get(value).toAbsolutePath();
@@ -47,7 +49,7 @@ public final class WebDirectory {
         return null;
     }
 
-    private Path findLocalRootDirectory() {
+    private @Nullable Path findLocalRootDirectory() {
         Path path = Paths.get("./src/main/dist/web");
         if (Files.isDirectory(path)) return path;
         return null;

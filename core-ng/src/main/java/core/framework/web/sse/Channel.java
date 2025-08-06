@@ -1,10 +1,10 @@
 package core.framework.web.sse;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface Channel<T> {
     // return true if event is queued, return false if channel is closed
-    boolean send(String id, T event);
+    boolean send(@Nullable String id, T event);
 
     default boolean send(T event) {
         return send(null, event);

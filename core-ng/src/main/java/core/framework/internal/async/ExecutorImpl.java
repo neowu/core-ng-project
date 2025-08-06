@@ -5,6 +5,7 @@ import core.framework.async.Task;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.util.Sets;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ public final class ExecutorImpl implements Executor {
     private final ReentrantLock lock = new ReentrantLock();
     private final Set<String> runningTasks = Sets.newConcurrentHashSet();     // track running tasks, used to print tasks failed to complete on shutdown
 
+    @Nullable
     volatile ScheduledExecutorService scheduler;
 
     public ExecutorImpl(ExecutorService executor, LogManager logManager, long maxProcessTimeInNano) {

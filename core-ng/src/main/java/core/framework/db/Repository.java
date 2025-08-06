@@ -1,5 +1,7 @@
 package core.framework.db;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -10,19 +12,19 @@ import java.util.OptionalLong;
 public interface Repository<T> {
     Query<T> select();
 
-    default List<T> select(String where, Object... params) {
+    default List<T> select(@Nullable String where, Object... params) {
         Query<T> query = select();
         if (where != null) query.where(where, params);
         return query.fetch();
     }
 
-    default long count(String where, Object... params) {
+    default long count(@Nullable String where, Object... params) {
         Query<T> query = select();
         if (where != null) query.where(where, params);
         return query.count();
     }
 
-    default Optional<T> selectOne(String where, Object... params) {
+    default Optional<T> selectOne(@Nullable String where, Object... params) {
         Query<T> query = select();
         if (where != null) query.where(where, params);
         return query.fetchOne();

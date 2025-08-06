@@ -23,7 +23,7 @@ class ControllerInspectorTest {
 
     @Test
     void lambdaMethod() {
-        var inspector = new ControllerInspector((LambdaController) request -> null);
+        var inspector = new ControllerInspector((LambdaController) request -> Response.empty());
         assertThat(inspector.targetClass.isHidden()).isTrue();
         // hidden class does not have canonicalName
         assertThat(inspector.targetClass.getName()).startsWith(ControllerInspectorTest.class.getCanonicalName());
@@ -42,13 +42,13 @@ class ControllerInspectorTest {
     public static class TestController implements Controller {
         @Override
         public Response execute(Request request) {
-            return null;
+            return Response.empty();
         }
     }
 
     public static class TestControllers {
         public Response get(Request request) {
-            return null;
+            return Response.empty();
         }
     }
 }

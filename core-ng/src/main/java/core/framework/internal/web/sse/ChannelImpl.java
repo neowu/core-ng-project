@@ -7,12 +7,12 @@ import core.framework.util.StopWatch;
 import core.framework.util.Strings;
 import core.framework.web.sse.Channel;
 import io.undertow.server.HttpServerExchange;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.ChannelListener;
 import org.xnio.channels.StreamSinkChannel;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
     }
 
     @Override
-    public boolean send(String id, T event) {
+    public boolean send(@Nullable String id, T event) {
         String message = builder.toMessage(id, event);
         return sendBytes(Strings.bytes(message));
     }

@@ -6,6 +6,7 @@ import core.framework.internal.module.ShutdownHook;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.resource.PoolMetrics;
 import core.framework.redis.Redis;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +19,13 @@ public class RedisConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(RedisConfig.class);
     private ModuleContext context;
     private Redis redis;
+    @Nullable
     private String name;
+    @Nullable
     private String host;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = context;
         this.name = name;
         redis = createRedis();

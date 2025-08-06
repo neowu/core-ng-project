@@ -1,6 +1,7 @@
 package app.monitor.job;
 
 import core.framework.api.json.Property;
+import org.jspecify.annotations.Nullable;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -34,6 +35,7 @@ public class KubePodList {  // refer to https://kubernetes.io/docs/reference/gen
         @Property(name = "creationTimestamp")
         public ZonedDateTime creationTimestamp;
 
+        @Nullable
         @Property(name = "deletionTimestamp")
         public ZonedDateTime deletionTimestamp;
 
@@ -97,6 +99,7 @@ public class KubePodList {  // refer to https://kubernetes.io/docs/reference/gen
         @Property(name = "running")
         public ContainerStateRunning running;
 
+        @Nullable
         @Property(name = "waiting")
         public ContainerStateWaiting waiting;
 

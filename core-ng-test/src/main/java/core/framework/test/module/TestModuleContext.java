@@ -7,6 +7,7 @@ import core.framework.internal.module.ModuleContext;
 import core.framework.test.async.MockExecutor;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ public class TestModuleContext extends ModuleContext {
         beanFactory.bind(Executor.class, null, new MockExecutor());
     }
 
-    public <T> T getConfig(Class<T> configClass, String name) {
+    public <T> T getConfig(Class<T> configClass, @Nullable String name) {
         @SuppressWarnings("unchecked")
         T config = (T) configs.get(configClass.getCanonicalName() + ":" + name);
         if (config == null) throw new Error(format("can not find config, configClass={}, name={}", configClass.getCanonicalName(), name));

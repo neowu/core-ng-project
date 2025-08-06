@@ -1,10 +1,10 @@
 package core.framework.internal.log;
 
 import core.framework.log.IOWarning;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 
 import static core.framework.log.Markers.errorCode;

@@ -6,6 +6,7 @@ import core.framework.internal.module.ModuleContext;
 import core.framework.test.db.EntitySchemaGenerator;
 import core.framework.test.module.TestModuleContext;
 import core.framework.util.Types;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -14,11 +15,12 @@ import java.util.List;
  */
 public final class InitDBConfig extends Config {
     private TestModuleContext context;
+    @Nullable
     private String name;
     private DBConfig config;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = (TestModuleContext) context;
         this.name = name;
         config = this.context.getConfig(DBConfig.class, name);

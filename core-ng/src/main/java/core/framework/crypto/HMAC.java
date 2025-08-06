@@ -27,12 +27,12 @@ public final class HMAC {
     private final Hash hash;
 
     public HMAC(byte[] key, Hash hash) {
+        if (key == null) throw new Error("key must not be null");
         this.key = key;
         this.hash = hash;
     }
 
     public byte[] digest(byte[] message) {
-        if (key == null) throw new Error("key must not be null");
         try {
             Mac mac = Mac.getInstance(hash.algorithm);
             SecretKey secretKey = new SecretKeySpec(key, hash.algorithm);

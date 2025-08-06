@@ -5,8 +5,7 @@ import core.framework.internal.web.bean.ResponseBeanWriter;
 import core.framework.internal.web.http.IPAccessControl;
 import core.framework.internal.web.http.RateControl;
 import core.framework.internal.web.request.RequestParser;
-
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class HTTPHandlerContext {
     public final RequestParser requestParser = new RequestParser();

@@ -3,6 +3,8 @@ package core.framework.test.async;
 import core.framework.async.Executor;
 import core.framework.async.Task;
 import core.framework.internal.async.CallableTask;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
@@ -13,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author neo
  */
+@NullMarked
 public class MockExecutor implements Executor {
     @Override
     public <T> Future<T> submit(String action, Callable<T> task) {
@@ -31,6 +34,7 @@ public class MockExecutor implements Executor {
 
     private static class ExecutorFuture<T> implements Future<T> {
         private T result;
+        @Nullable
         private Throwable error;
 
         ExecutorFuture(Callable<T> task) {

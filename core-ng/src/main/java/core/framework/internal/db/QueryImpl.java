@@ -3,6 +3,7 @@ package core.framework.internal.db;
 import core.framework.db.Query;
 import core.framework.util.Lists;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,9 +18,13 @@ public class QueryImpl<T> implements Query<T> {
     private final SelectQuery<T> selectQuery;
     private final StringBuilder whereClause = new StringBuilder();
     private final List<Object> params = Lists.newArrayList();
+    @Nullable
     private String groupBy;
+    @Nullable
     private String sort;
+    @Nullable
     private Integer skip;
+    @Nullable
     private Integer limit;
 
     QueryImpl(DatabaseImpl database, Class<T> entityClass, SelectQuery<T> selectQuery) {

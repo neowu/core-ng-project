@@ -7,6 +7,7 @@ import core.framework.web.Request;
 import core.framework.web.Response;
 import core.framework.web.Session;
 import core.framework.web.SessionContext;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +104,7 @@ public class SessionManager implements SessionContext {
         this.timeout = timeout;
     }
 
-    public void cookie(String name, String domain) {
+    public void cookie(String name, @Nullable String domain) {
         if (name == null) throw new Error("name must not be null");
         // path must be /, refer to https://datatracker.ietf.org/doc/html/rfc6265#section-4.1.2.4
         cookieSpec = new CookieSpec(name).domain(domain).path("/").sessionScope().httpOnly().secure().sameSite();

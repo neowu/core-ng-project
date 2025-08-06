@@ -1,8 +1,8 @@
 package core.framework.search;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.function.Consumer;
 

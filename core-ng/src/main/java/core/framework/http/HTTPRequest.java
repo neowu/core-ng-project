@@ -4,6 +4,7 @@ import core.framework.internal.http.HTTPRequestHelper;
 import core.framework.util.Encodings;
 import core.framework.util.Maps;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Map;
@@ -18,12 +19,16 @@ public final class HTTPRequest {
     public final Map<String, String> params = Maps.newLinkedHashMap();
     public final Map<String, String> headers = Maps.newLinkedHashMap();    // make headers/params order deterministic
     public String uri;
-    public byte[] body;
+    public byte @Nullable [] body;
+    @Nullable
     public ContentType contentType;
+    @Nullable
     public Map<String, String> form;    // shortcut view only, doesn't impact final request
-
+    @Nullable
     public Duration connectTimeout;
+    @Nullable
     public Duration timeout;            // read and write timeout
+    @Nullable
     public Duration slowOperationThreshold;
 
     public HTTPRequest(HTTPMethod method, String uri) {

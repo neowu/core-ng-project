@@ -1,6 +1,7 @@
 package core.framework.internal.stat;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
+
 import java.lang.management.GarbageCollectorMXBean;
 
 /**

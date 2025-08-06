@@ -18,6 +18,7 @@ import core.framework.internal.web.service.WebServiceInterfaceValidator;
 import core.framework.util.ASCII;
 import core.framework.web.Controller;
 import core.framework.web.service.WebServiceClientProxy;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public class APIConfig extends Config {
     private ResponseBeanReader reader;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = context;
         // default value is for internal api call only, targeting for kube env (with short connect timeout and more retries)
         httpClient = HTTPClient.builder()

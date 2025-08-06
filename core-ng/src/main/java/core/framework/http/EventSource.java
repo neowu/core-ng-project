@@ -4,6 +4,7 @@ import core.framework.log.ActionLogContext;
 import core.framework.util.StopWatch;
 import okhttp3.ResponseBody;
 import okio.BufferedSource;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +27,11 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
     private int responseBodyLength;
     private long elapsed;
 
+    @Nullable
     private String lastType;    // for "event" field
+    @Nullable
     private String lastId;      // for "id" field
+    @Nullable
     private Event nextEvent;
 
     public EventSource(int statusCode, Map<String, String> headers, ResponseBody body, int requestBodyLength, long elapsed) {
@@ -50,7 +54,7 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
         return new EventIterator();
     }
 
-    private Event parseResponse(BufferedSource source) {
+    private @Nullable Event parseResponse(BufferedSource source) {
         var watch = new StopWatch();
         try {
             while (true) {
@@ -90,7 +94,7 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
         }
     }
 
-    public record Event(String id, String type, String data) {
+    public record Event(@Nullable String id, @Nullable String type, String data) {
     }
 
     private final class EventIterator implements Iterator<Event> {

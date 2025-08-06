@@ -40,10 +40,10 @@ import core.framework.search.SearchResponse;
 import core.framework.search.UpdateRequest;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;

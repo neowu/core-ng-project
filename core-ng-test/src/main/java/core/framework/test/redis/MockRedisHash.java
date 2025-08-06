@@ -2,8 +2,8 @@ package core.framework.test.redis;
 
 import core.framework.redis.RedisHash;
 import core.framework.util.Maps;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;

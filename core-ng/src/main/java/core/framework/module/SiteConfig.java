@@ -10,6 +10,7 @@ import core.framework.internal.web.site.StaticDirectoryController;
 import core.framework.internal.web.site.StaticFileController;
 import core.framework.internal.web.site.WebSecurityInterceptor;
 import core.framework.web.site.Message;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +25,12 @@ import java.util.List;
 public class SiteConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(SiteConfig.class);
     boolean messageConfigured;
+    @Nullable
     private WebSecurityInterceptor webSecurityInterceptor;
     private ModuleContext context;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = context;
         context.httpServer.handlerContext.requestParser.logSiteHeaders = true;
     }

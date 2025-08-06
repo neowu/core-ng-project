@@ -7,6 +7,7 @@ import core.framework.search.impl.ElasticSearchTypeImpl;
 import core.framework.test.module.TestModuleContext;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Types;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author neo
@@ -16,7 +17,7 @@ public final class InitSearchConfig extends Config {
     private SearchConfig config;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = (TestModuleContext) context;
         config = this.context.getConfig(SearchConfig.class, null);
         config.search.initialize(); // for es integration test, it usually calls putIndex, so to initialize before for once

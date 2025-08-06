@@ -1,6 +1,7 @@
 package core.framework.internal.redis;
 
 import core.framework.internal.resource.Pool;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -14,6 +15,7 @@ import static core.framework.internal.redis.Protocol.Command.AUTH;
  */
 class RedisConnectionFactory implements Supplier<RedisConnection> {
     RedisHost host;
+    @Nullable
     String password;
     int timeoutInMs = (int) Duration.ofSeconds(5).toMillis();
 

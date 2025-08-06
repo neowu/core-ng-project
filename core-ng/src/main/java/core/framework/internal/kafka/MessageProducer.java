@@ -9,6 +9,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.record.CompressionType;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +25,12 @@ public class MessageProducer {
     public final ProducerMetrics producerMetrics;
     private final Logger logger = LoggerFactory.getLogger(MessageProducer.class);
     private final KafkaURI uri;
+    @Nullable
     private final String name;
     private final int maxRequestSize;
     private Producer<byte[], byte[]> producer;
 
-    public MessageProducer(KafkaURI uri, String name, int maxRequestSize) {
+    public MessageProducer(KafkaURI uri, @Nullable String name, int maxRequestSize) {
         this.uri = uri;
         this.name = name;
         this.maxRequestSize = maxRequestSize;
@@ -83,7 +85,7 @@ public class MessageProducer {
         }
 
         @Override
-        public void onCompletion(RecordMetadata metadata, Exception exception) {
+        public void onCompletion(RecordMetadata metadata, @Nullable Exception exception) {
             if (exception != null) {    // if failed to send message (kafka is down), fallback to error output
                 byte[] key = record.key();
                 LOGGER.error("failed to send kafka message, error={}, topic={}, key={}, value={}",

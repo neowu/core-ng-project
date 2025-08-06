@@ -10,6 +10,7 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ public class MessageListener {
 
     private final Logger logger = LoggerFactory.getLogger(MessageListener.class);
     private final KafkaURI uri;
+    @Nullable
     private final String name;
 
     public int concurrency = Runtime.getRuntime().availableProcessors() * 16;
@@ -44,9 +46,10 @@ public class MessageListener {
     public String groupId = LogManager.APP_NAME;
 
     long maxProcessTimeInNano;
+    @Nullable
     private MessageListenerThread thread;
 
-    public MessageListener(KafkaURI uri, String name, LogManager logManager, long maxProcessTimeInNano) {
+    public MessageListener(KafkaURI uri, @Nullable String name, LogManager logManager, long maxProcessTimeInNano) {
         this.uri = uri;
         this.name = name;
         this.logManager = logManager;
@@ -54,12 +57,12 @@ public class MessageListener {
         this.consumerMetrics = new ConsumerMetrics(name);
     }
 
-    public <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
+    public <T> void subscribe(String topic, Class<T> messageClass, @Nullable MessageHandler<T> handler, @Nullable BulkMessageHandler<T> bulkHandler) {
         boolean added = topics.add(topic);
         if (!added) throw new Error("topic is already subscribed, topic=" + topic);
         if (handler != null) {
             processes.put(topic, new MessageProcess<>(handler, messageClass));
-        } else {
+        } else if (bulkHandler != null) {
             bulkProcesses.put(topic, new MessageProcess<>(bulkHandler, messageClass));
         }
     }
@@ -93,7 +96,7 @@ public class MessageListener {
         }
     }
 
-    String threadName(String name) {
+    String threadName(@Nullable String name) {
         return "kafka-listener" + (name == null ? "" : "-" + name);
     }
 

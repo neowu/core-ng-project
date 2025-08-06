@@ -11,8 +11,8 @@ import core.log.domain.ActionDocument;
 import core.log.domain.TraceDocument;
 import core.log.service.ActionLogForwarder;
 import core.log.service.IndexService;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;

@@ -11,10 +11,10 @@ import core.framework.internal.web.sse.ServerSentEventMetrics;
 import core.framework.util.Types;
 import core.framework.web.sse.ChannelListener;
 import core.framework.web.sse.ServerSentEventContext;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 
 public class ServerSentEventConfig extends Config {

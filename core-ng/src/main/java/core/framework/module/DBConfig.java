@@ -14,6 +14,7 @@ import core.framework.internal.resource.PoolMetrics;
 import core.framework.util.Lists;
 import core.framework.util.Strings;
 import core.framework.util.Types;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.List;
@@ -25,14 +26,16 @@ import static core.framework.util.Strings.format;
  */
 public class DBConfig extends Config {
     final List<Class<?>> entityClasses = Lists.newArrayList();
+    @Nullable
     protected String name;
     DatabaseImpl database;
     private ModuleContext context;
+    @Nullable
     private String url;
     private boolean entityAdded;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = context;
         this.name = name;
 

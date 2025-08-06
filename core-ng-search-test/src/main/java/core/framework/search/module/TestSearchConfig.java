@@ -5,6 +5,7 @@ import core.framework.internal.module.ShutdownHook;
 import core.framework.search.impl.LocalElasticSearch;
 import org.apache.http.HttpHost;
 import org.elasticsearch.common.logging.LogConfigurator;
+import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -23,10 +24,11 @@ public class TestSearchConfig extends SearchConfig {
     // only start one local node for testing to reduce resource overhead,
     // only breaking case is that multiple search() using same index name, then if one unit test operates both ElasticSearchType will result in conflict or merged results
     // this can be avoided by designing test differently
+    @Nullable
     private static HttpHost localESHost;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         super.initialize(context, name);
         startLocalElasticSearch(context);
     }

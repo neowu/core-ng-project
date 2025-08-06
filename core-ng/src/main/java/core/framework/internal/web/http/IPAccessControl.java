@@ -1,6 +1,7 @@
 package core.framework.internal.web.http;
 
 import core.framework.web.exception.ForbiddenException;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,9 +13,13 @@ import java.net.UnknownHostException;
  */
 public class IPAccessControl {
     private final Logger logger = LoggerFactory.getLogger(IPAccessControl.class);
+    @Nullable
     public IPv4Ranges allow;
+    @Nullable
     public IPv4Ranges deny;
+    @Nullable
     public IPv6Ranges allowIPv6;
+    @Nullable
     public IPv6Ranges denyIPv6;
 
     public void validate(String clientIP) {
@@ -51,7 +56,7 @@ public class IPAccessControl {
         return address.isLoopbackAddress() || address.isSiteLocalAddress();
     }
 
-    boolean allow(byte[] address, IPRanges allow, IPRanges deny) {
+    boolean allow(byte[] address, @Nullable IPRanges allow, @Nullable IPRanges deny) {
         if (allow != null && allow.matches(address)) {
             logger.debug("allow client ip within allowed ranges");
             return true;

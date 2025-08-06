@@ -26,6 +26,9 @@ val assertjVersion = "3.27.3"
 
 project("core-ng-api") {
     apply(plugin = "lib")
+    dependencies {
+        api("org.jspecify:jspecify:1.0.0")
+    }
 }
 
 project("core-ng") {

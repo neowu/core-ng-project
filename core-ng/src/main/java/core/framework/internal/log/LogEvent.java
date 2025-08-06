@@ -3,9 +3,9 @@ package core.framework.internal.log;
 import core.framework.internal.log.marker.ErrorCodeMarker;
 import core.framework.util.Exceptions;
 import core.framework.util.Network;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Marker;
 
-import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 

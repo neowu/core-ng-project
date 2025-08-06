@@ -10,6 +10,7 @@ import core.framework.util.Maps;
 import core.log.domain.EventDocument;
 import core.log.service.EventForwarder;
 import core.log.service.IndexService;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Map;
  * @author neo
  */
 public class EventMessageHandler implements BulkMessageHandler<EventMessage> {
+    @Nullable
     final EventForwarder forwarder;
 
     @Inject
@@ -26,7 +28,7 @@ public class EventMessageHandler implements BulkMessageHandler<EventMessage> {
     @Inject
     ElasticSearchType<EventDocument> eventType;
 
-    public EventMessageHandler(EventForwarder forwarder) {
+    public EventMessageHandler(@Nullable EventForwarder forwarder) {
         this.forwarder = forwarder;
     }
 

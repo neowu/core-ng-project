@@ -18,10 +18,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
@@ -80,7 +80,7 @@ public final class HTTPClientImpl implements HTTPClient {
             Response httpResponse = client.newCall(httpRequest).execute();
             int statusCode = httpResponse.code();
             logger.debug("[response] status={}", statusCode);
-            Map<String, String> headers = headers(httpResponse);
+            Map<String, @Nullable String> headers = headers(httpResponse);
             String contentType = headers.get(HTTPHeaders.CONTENT_TYPE);
             if (statusCode != 200 || contentType == null || !contentType.startsWith("text/event-stream")) {
                 byte[] body = body(httpResponse, statusCode);
@@ -102,7 +102,7 @@ public final class HTTPClientImpl implements HTTPClient {
     HTTPResponse response(Response httpResponse) throws IOException {
         int statusCode = httpResponse.code();
         logger.debug("[response] status={}", statusCode);
-        Map<String, String> headers = headers(httpResponse);
+        Map<String, @Nullable String> headers = headers(httpResponse);
         byte[] body = body(httpResponse, statusCode);
         var response = new HTTPResponse(statusCode, headers, body);
         logger.debug("[response] body={}", BodyLogParam.of(body, response.contentType));
@@ -162,7 +162,7 @@ public final class HTTPClientImpl implements HTTPClient {
         return body;
     }
 
-    private Map<String, String> headers(Response httpResponse) {
+    private Map<String, @Nullable String> headers(Response httpResponse) {
         Map<String, String> headers = new TreeMap<>(CASE_INSENSITIVE_ORDER);
         Headers httpHeaders = httpResponse.headers();
         for (int i = 0; i < httpHeaders.size(); i++) {
@@ -178,7 +178,7 @@ public final class HTTPClientImpl implements HTTPClient {
     }
 
     @Nullable
-    MediaType mediaType(ContentType contentType) {
+    MediaType mediaType(@Nullable ContentType contentType) {
         if (contentType == null) return null;   // generally body is always set with valid content type, but in theory contentType=null is considered legitimate, so here to support such case
         if (ContentType.APPLICATION_JSON.equals(contentType)) return MEDIA_TYPE_APPLICATION_JSON; // avoid parsing as application/json is most used type
         return MediaType.get(contentType.toString());   // use get() not parse() to fail if passed invalid contentType

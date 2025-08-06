@@ -1,6 +1,7 @@
 package core.framework.http;
 
 import core.framework.util.ASCII;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +36,8 @@ public final class ContentType {
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentType.class);
     // cache most used ones to save paring time
     private static final Map<String, ContentType> CACHE = Map.of(
-            APPLICATION_JSON.contentType, APPLICATION_JSON,
-            TEXT_HTML.contentType, TEXT_HTML
+        APPLICATION_JSON.contentType, APPLICATION_JSON,
+        TEXT_HTML.contentType, TEXT_HTML
     );
 
     // only cover common case, assume pattern is "media-type; charset=" or "multipart/form-data; boundary="
@@ -49,7 +50,7 @@ public final class ContentType {
         return parseContentType(normalizedContentType);
     }
 
-    public static ContentType create(String mediaType, Charset charset) {
+    public static ContentType create(String mediaType, @Nullable Charset charset) {
         String contentType = charset == null ? mediaType : mediaType + "; charset=" + ASCII.toLowerCase(charset.name());
         return new ContentType(contentType, mediaType, charset);
     }
@@ -72,7 +73,7 @@ public final class ContentType {
         return new ContentType(contentType, mediaType, charset);
     }
 
-    private static Charset parseCharset(String charset) {
+    private static @Nullable Charset parseCharset(String charset) {
         try {
             return Charset.forName(charset);
         } catch (UnsupportedCharsetException | IllegalCharsetNameException e) {
@@ -83,9 +84,10 @@ public final class ContentType {
 
     public final String mediaType;
     private final String contentType;
+    @Nullable
     private final Charset charset;
 
-    private ContentType(String contentType, String mediaType, Charset charset) {
+    private ContentType(String contentType, String mediaType, @Nullable Charset charset) {
         this.contentType = contentType;
         this.mediaType = mediaType;
         this.charset = charset;

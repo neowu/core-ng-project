@@ -7,6 +7,7 @@ import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.resource.PoolMetrics;
 import core.framework.internal.web.session.LocalSessionStore;
 import core.framework.internal.web.session.RedisSessionStore;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ public class SessionConfig extends Config {
     private ModuleContext context;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = context;
         cookie("SessionId", null);
     }
@@ -29,7 +30,7 @@ public class SessionConfig extends Config {
         context.httpServer.siteManager.sessionManager.timeout(timeout);
     }
 
-    public void cookie(String name, String domain) {
+    public void cookie(String name, @Nullable String domain) {
         context.httpServer.siteManager.sessionManager.cookie(name, domain);
         context.logManager.maskFields(name);
     }

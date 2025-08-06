@@ -7,8 +7,8 @@ import co.elastic.clients.elasticsearch._types.mapping.RuntimeField;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Map;

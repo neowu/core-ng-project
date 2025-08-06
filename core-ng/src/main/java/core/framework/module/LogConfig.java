@@ -8,6 +8,7 @@ import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.log.LogAppender;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 
@@ -18,7 +19,7 @@ public class LogConfig extends Config {
     private ModuleContext context;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = context;
     }
 

@@ -4,10 +4,10 @@ import core.framework.async.Task;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
@@ -106,7 +106,7 @@ public abstract class Module {
         return db(null);
     }
 
-    public DBConfig db(String name) {
+    public DBConfig db(@Nullable String name) {
         return context.config(DBConfig.class, name);
     }
 
@@ -114,7 +114,7 @@ public abstract class Module {
         return context.config(RedisConfig.class, null);
     }
 
-    public RedisConfig redis(String name) {
+    public RedisConfig redis(@Nullable String name) {
         return context.config(RedisConfig.class, name);
     }
 
@@ -122,7 +122,7 @@ public abstract class Module {
         return kafka(null);
     }
 
-    public KafkaConfig kafka(String name) {
+    public KafkaConfig kafka(@Nullable String name) {
         return context.config(KafkaConfig.class, name);
     }
 
@@ -130,7 +130,7 @@ public abstract class Module {
         return config(configClass, null);
     }
 
-    public <T extends Config> T config(Class<T> configClass, String name) {
+    public <T extends Config> T config(Class<T> configClass, @Nullable String name) {
         return context.config(configClass, name);
     }
 

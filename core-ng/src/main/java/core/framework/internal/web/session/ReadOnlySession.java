@@ -1,8 +1,8 @@
 package core.framework.internal.web.session;
 
 import core.framework.web.Session;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 /**

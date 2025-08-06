@@ -16,6 +16,7 @@ import core.framework.redis.RedisSet;
 import core.framework.redis.RedisSortedSet;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +70,7 @@ public final class RedisImpl implements Redis {
         connectionFactory.host = new RedisHost(host);
     }
 
-    public void password(String password) {
+    public void password(@Nullable String password) {
         connectionFactory.password = password;
     }
 

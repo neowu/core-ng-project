@@ -4,6 +4,7 @@ import core.framework.db.Column;
 import core.framework.db.PrimaryKey;
 import core.framework.db.Table;
 import core.framework.internal.reflect.Classes;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -56,7 +57,7 @@ final class SelectQuery<T> {
         return sql(columns, where, null, sort, skip, limit);
     }
 
-    String sql(String projection, StringBuilder where, String groupBy, String sort, Integer skip, Integer limit) {
+    String sql(String projection, StringBuilder where, @Nullable String groupBy, @Nullable String sort, @Nullable Integer skip, @Nullable Integer limit) {
         var builder = new StringBuilder(64);
         builder.append("SELECT ").append(projection).append(" FROM ").append(table);
         if (!where.isEmpty()) builder.append(" WHERE ").append(where);
@@ -72,7 +73,7 @@ final class SelectQuery<T> {
         return builder.toString();
     }
 
-    Object[] params(List<Object> params, Integer skip, Integer limit) {
+    Object[] params(List<Object> params, @Nullable Integer skip, @Nullable Integer limit) {
         if (skip != null && limit == null) throw new Error("limit must not be null if skip is not, skip=" + skip);
         if (skip == null && limit == null) return params.toArray();
 

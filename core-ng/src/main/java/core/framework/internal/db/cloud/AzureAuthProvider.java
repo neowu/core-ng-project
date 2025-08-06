@@ -8,6 +8,7 @@ import core.framework.http.HTTPResponse;
 import core.framework.internal.db.Dialect;
 import core.framework.util.Files;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.time.Duration;
@@ -36,6 +37,7 @@ public class AzureAuthProvider implements CloudAuthProvider {
         .retryWaitTime(Duration.ofMillis(50))
         .build();
     private final String user;
+    @Nullable
     String accessToken;
     long expirationTime;
 

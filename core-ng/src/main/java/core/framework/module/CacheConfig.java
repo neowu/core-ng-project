@@ -16,6 +16,7 @@ import core.framework.internal.resource.PoolMetrics;
 import core.framework.internal.web.sys.CacheController;
 import core.framework.util.ASCII;
 import core.framework.util.Types;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,12 +32,14 @@ public class CacheConfig extends Config {
     Map<String, CacheImpl<?>> caches;
 
     private ModuleContext context;
+    @Nullable
     private LocalCacheStore localCacheStore;
+    @Nullable
     private CacheStore redisCacheStore;
     private int maxLocalSize;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = context;
 
         caches = new HashMap<>();
@@ -66,7 +69,7 @@ public class CacheConfig extends Config {
         redis(host, null);
     }
 
-    public void redis(String host, String password) {
+    public void redis(String host, @Nullable String password) {
         if (localCacheStore != null || redisCacheStore != null) throw new Error("cache store is already configured, please configure only once");
         configureRedis(host, password);
     }
@@ -94,7 +97,7 @@ public class CacheConfig extends Config {
         return ASCII.toLowerCase(cacheClass.getSimpleName());
     }
 
-    void configureRedis(String host, String password) {
+    void configureRedis(String host, @Nullable String password) {
         logger.info("create redis cache store, host={}", host);
 
         var redis = new RedisImpl("redis-cache");

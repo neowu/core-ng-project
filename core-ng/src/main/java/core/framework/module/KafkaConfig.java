@@ -14,6 +14,7 @@ import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
 import core.framework.kafka.MessagePublisher;
 import core.framework.util.Types;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,17 +27,21 @@ import static core.framework.util.Strings.format;
  */
 public class KafkaConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(KafkaConfig.class);
+    @Nullable
     String name;
+    @Nullable
     MessageProducer producer;
     private ModuleContext context;
+    @Nullable
     private KafkaURI uri;
+    @Nullable
     private MessageListener listener;
     private boolean handlerAdded;
     private int maxRequestSize = 1024 * 1024;   // default 1M, refer to org.apache.kafka.clients.producer.ProducerConfig.MAX_REQUEST_SIZE_CONFIG
     private KafkaController controller;
 
     @Override
-    protected void initialize(ModuleContext context, String name) {
+    protected void initialize(ModuleContext context, @Nullable String name) {
         this.context = context;
         this.name = name;
         controller = new KafkaController();
@@ -59,7 +64,7 @@ public class KafkaConfig extends Config {
     }
 
     // to make IoC simpler, each topic should have its own message class
-    public <T> MessagePublisher<T> publish(String topic, Class<T> messageClass) {
+    public <T> MessagePublisher<T> publish(@Nullable String topic, Class<T> messageClass) {
         if (topic == null) throw new Error("topic must not be null");
         logger.info("publish, topic={}, messageClass={}, name={}", topic, messageClass.getTypeName(), name);
         if (uri == null) throw new Error("kafka uri must be configured first, name=" + name);
@@ -99,7 +104,7 @@ public class KafkaConfig extends Config {
         subscribe(topic, messageClass, null, handler);
     }
 
-    private <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
+    private <T> void subscribe(String topic, Class<T> messageClass, @Nullable MessageHandler<T> handler, @Nullable BulkMessageHandler<T> bulkHandler) {
         if (handler == null && bulkHandler == null) throw new Error("handler must not be null");
         logger.info("subscribe, topic={}, messageClass={}, handlerClass={}, name={}", topic, messageClass.getTypeName(), handler != null ? handler.getClass().getCanonicalName() : bulkHandler.getClass().getCanonicalName(), name);
         context.beanClassValidator.validate(messageClass);
@@ -160,11 +165,11 @@ public class KafkaConfig extends Config {
         listener.maxPollBytes = maxBytes;
     }
 
-    public void minPoll(int minBytes, Duration maxWaitTime) {
-        if (minBytes <= 0) throw new Error("min poll bytes must be greater than 0, value=" + minBytes);
+    public void minPoll(int minPollBytes, Duration maxWaitTime) {
+        if (minPollBytes <= 0) throw new Error("min poll bytes must be greater than 0, value=" + minPollBytes);
         if (maxWaitTime == null || maxWaitTime.toMillis() <= 0) throw new Error("max wait time must be greater than 0, value=" + maxWaitTime);
         MessageListener listener = listener();
-        listener.minPollBytes = minBytes;
+        listener.minPollBytes = minPollBytes;
         listener.maxWaitTime = maxWaitTime;
     }
 }

@@ -1,6 +1,7 @@
 package core.framework.db;
 
 import core.framework.internal.db.Dialect;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author neo
@@ -14,6 +15,7 @@ public interface CloudAuthProvider {
         // used by driver to determine if current connection requires cloud auth, for multiple connections with different auth
         public static final String CLOUD_AUTH = "core.framework.db.cloudAuth";
         // in cloud env, only need one global auth provider
+        @Nullable
         private static CloudAuthProvider provider;
 
         public static void set(CloudAuthProvider provider) {
@@ -21,6 +23,7 @@ public interface CloudAuthProvider {
             Provider.provider = provider;
         }
 
+        @Nullable
         public static CloudAuthProvider get() {
             return provider;
         }

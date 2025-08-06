@@ -11,6 +11,7 @@ import core.framework.web.Request;
 import core.framework.web.Session;
 import core.framework.web.exception.BadRequestException;
 import io.undertow.server.HttpServerExchange;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Map;
@@ -30,6 +31,7 @@ public final class RequestImpl implements Request {
 
     private final HttpServerExchange exchange;
     private final RequestBeanReader reader;
+    @Nullable
     public Session session;
 
     HTTPMethod method;
@@ -39,8 +41,10 @@ public final class RequestImpl implements Request {
     int port;
     String path;
     String requestURL;
+    @Nullable
     ContentType contentType;
-    byte[] body;
+    byte @Nullable [] body;
+    @Nullable
     Map<String, String> cookies;
 
     public RequestImpl(HttpServerExchange exchange, RequestBeanReader reader) {

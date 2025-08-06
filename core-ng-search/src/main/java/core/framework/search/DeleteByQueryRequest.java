@@ -1,8 +1,7 @@
 package core.framework.search;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author neo

@@ -2,6 +2,7 @@ package core.framework.test.module;
 
 import core.framework.module.InitDBConfig;
 import core.framework.module.Module;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ public abstract class AbstractTestModule extends Module {
         return overrideBinding(type, null, instance);
     }
 
-    public <T> T overrideBinding(Type type, String name, T instance) {
+    public <T> T overrideBinding(Type type, @Nullable String name, T instance) {
         return ((TestModuleContext) context).overrideBinding(type, name, instance);
     }
 
@@ -37,7 +38,7 @@ public abstract class AbstractTestModule extends Module {
         return initDB(null);
     }
 
-    public InitDBConfig initDB(String name) {
+    public InitDBConfig initDB(@Nullable String name) {
         return context.config(InitDBConfig.class, name);
     }
 

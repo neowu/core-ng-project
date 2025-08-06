@@ -1,8 +1,7 @@
 package core.framework.web.sse;
 
 import core.framework.web.Request;
-
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface ChannelListener<T> {
     void onConnect(Request request, Channel<T> channel, @Nullable String lastEventId);

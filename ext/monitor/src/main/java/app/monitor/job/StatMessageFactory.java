@@ -4,6 +4,7 @@ import core.framework.internal.log.LogManager;
 import core.framework.internal.stat.Stats;
 import core.framework.log.message.StatMessage;
 import core.framework.util.Exceptions;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.Map;
@@ -26,7 +27,7 @@ class StatMessageFactory {
         return message;
     }
 
-    static StatMessage failedToCollect(String app, String host, Throwable e) {
+    static StatMessage failedToCollect(String app, @Nullable String host, Throwable e) {
         var now = Instant.now();
         var message = new StatMessage();
         message.id = LogManager.ID_GENERATOR.next(now);

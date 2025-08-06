@@ -1,8 +1,8 @@
 package core.framework.util;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.helpers.MessageFormatter;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -15,7 +15,7 @@ public final class Strings {
         return text.getBytes(UTF_8);
     }
 
-    public static String format(String pattern, Object... params) {
+    public static String format(String pattern, @Nullable Object... params) {
         return MessageFormatter.arrayFormat(pattern, params).getMessage();
     }
 

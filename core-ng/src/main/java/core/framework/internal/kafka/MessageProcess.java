@@ -8,8 +8,8 @@ import core.framework.internal.validate.Validator;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
 import core.framework.log.IOWarning;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.List;
 

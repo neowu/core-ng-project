@@ -1,6 +1,7 @@
 package core.framework.internal.web.response;
 
 import io.undertow.io.Sender;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author neo
@@ -8,9 +9,10 @@ import io.undertow.io.Sender;
 public final class TemplateBody implements Body {
     private final String templatePath;
     private final Object model;
+    @Nullable
     private final String language;
 
-    public TemplateBody(String templatePath, Object model, String language) {
+    public TemplateBody(String templatePath, Object model, @Nullable String language) {
         this.templatePath = templatePath;
         this.model = model;
         this.language = language;
