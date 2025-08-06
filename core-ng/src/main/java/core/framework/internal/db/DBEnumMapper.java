@@ -3,6 +3,7 @@ package core.framework.internal.db;
 import core.framework.db.DBEnumValue;
 import core.framework.internal.reflect.Enums;
 import core.framework.util.Maps;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
@@ -21,7 +22,8 @@ final class DBEnumMapper<T extends Enum<T>> {
     }
 
     // used by generated code, must be public
-    public T getEnum(String value) {
+    @Nullable
+    public T getEnum(@Nullable String value) {
         if (value == null) return null;
         T enumValue = mappings.get(value);
         if (enumValue == null)

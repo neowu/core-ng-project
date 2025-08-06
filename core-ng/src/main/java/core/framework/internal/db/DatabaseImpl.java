@@ -54,7 +54,7 @@ public final class DatabaseImpl implements Database {
     private @Nullable String url;
     private @Nullable Properties driverProperties;
     private Duration timeout;
-    private @Nullable Driver driver;
+    private Driver driver;
 
     public DatabaseImpl(String name) {
         initializeRowMappers();

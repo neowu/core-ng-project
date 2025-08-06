@@ -4,6 +4,7 @@ import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
 import core.framework.internal.resource.Pool;
 import core.framework.internal.resource.PoolItem;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +16,8 @@ import java.time.Duration;
  * @author neo
  */
 public final class TransactionManager {
-    private static final ThreadLocal<PoolItem<Connection>> CURRENT_CONNECTION = new ThreadLocal<>();
-    private static final ThreadLocal<TransactionState> CURRENT_TRANSACTION_STATE = new ThreadLocal<>();
+    private static final ThreadLocal<@Nullable PoolItem<Connection>> CURRENT_CONNECTION = new ThreadLocal<>();
+    private static final ThreadLocal<@Nullable TransactionState> CURRENT_TRANSACTION_STATE = new ThreadLocal<>();
 
     private final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
     private final Pool<Connection> pool;

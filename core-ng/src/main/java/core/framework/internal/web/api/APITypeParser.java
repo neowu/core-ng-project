@@ -11,6 +11,7 @@ import core.framework.api.web.service.QueryParam;
 import core.framework.internal.reflect.Classes;
 import core.framework.internal.reflect.GenericTypes;
 import core.framework.util.Maps;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -132,6 +133,7 @@ class APITypeParser {
 
     static class TypeDefinition {
         final String type;
+        @Nullable
         List<String> params;
 
         TypeDefinition(String type) {

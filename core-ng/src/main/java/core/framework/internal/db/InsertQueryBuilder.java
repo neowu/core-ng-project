@@ -8,6 +8,7 @@ import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.reflect.Classes;
 import core.framework.util.Lists;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ class InsertQueryBuilder<T> {
     private final Dialect dialect;
     private final List<String> primaryKeyFieldNames = Lists.newArrayList();
 
+    @Nullable
     private String generatedColumn;
     private List<ParamField> paramFields;
     private String insertSQL;

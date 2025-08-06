@@ -1,6 +1,7 @@
 package core.framework.internal.web.api;
 
 import core.framework.api.json.Property;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class APIType {
         @Property(name = "type")
         public String type;
 
+        @Nullable
         @Property(name = "typeParams")
         public List<String> typeParams;
 
@@ -35,21 +37,27 @@ public class APIType {
     }
 
     public static class Constraints {
+        @Nullable
         @Property(name = "notNull")
         public Boolean notNull;
 
+        @Nullable
         @Property(name = "notBlank")
         public Boolean notBlank;
 
+        @Nullable
         @Property(name = "min")
         public Double min;
 
+        @Nullable
         @Property(name = "max")
         public Double max;
 
+        @Nullable
         @Property(name = "size")
         public Size size;
 
+        @Nullable
         @Property(name = "pattern")
         public String pattern;
     }

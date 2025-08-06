@@ -3,6 +3,7 @@ package core.framework.internal.db;
 import core.framework.db.UncheckedSQLException;
 import core.framework.util.ASCII;
 import core.framework.util.Maps;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -36,6 +37,7 @@ public final class ResultSetWrapper {
         this.dialect = dialect;
     }
 
+    @Nullable
     private Integer index(String column) {
         return columnIndex.get(ASCII.toLowerCase(column));
     }
@@ -58,6 +60,7 @@ public final class ResultSetWrapper {
         return columnIndex.size();
     }
 
+    @Nullable
     Integer getInt(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
@@ -68,6 +71,7 @@ public final class ResultSetWrapper {
         return resultSet.getObject(index, Integer.class);
     }
 
+    @Nullable
     Boolean getBoolean(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
@@ -78,6 +82,7 @@ public final class ResultSetWrapper {
         return resultSet.getObject(index, Boolean.class);
     }
 
+    @Nullable
     Long getLong(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
@@ -88,6 +93,7 @@ public final class ResultSetWrapper {
         return resultSet.getObject(index, Long.class);
     }
 
+    @Nullable
     Double getDouble(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
@@ -98,6 +104,7 @@ public final class ResultSetWrapper {
         return resultSet.getObject(index, Double.class);
     }
 
+    @Nullable
     String getString(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
@@ -108,6 +115,7 @@ public final class ResultSetWrapper {
         return resultSet.getString(index);
     }
 
+    @Nullable
     BigDecimal getBigDecimal(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
@@ -118,6 +126,7 @@ public final class ResultSetWrapper {
         return resultSet.getBigDecimal(index);
     }
 
+    @Nullable
     LocalDateTime getLocalDateTime(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
@@ -128,6 +137,7 @@ public final class ResultSetWrapper {
         return resultSet.getObject(index, LocalDateTime.class);
     }
 
+    @Nullable
     LocalDate getLocalDate(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
@@ -138,6 +148,7 @@ public final class ResultSetWrapper {
         return resultSet.getObject(index, LocalDate.class);
     }
 
+    @Nullable
     ZonedDateTime getZonedDateTime(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
@@ -152,12 +163,14 @@ public final class ResultSetWrapper {
         return time.atZoneSameInstant(ZoneId.systemDefault());
     }
 
+    @Nullable
     UUID getUUID(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getUUID(index);
     }
 
+    @Nullable
     UUID getUUID(int index) throws SQLException {
         if (dialect == Dialect.MYSQL) {
             String uuid = resultSet.getString(index);

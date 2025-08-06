@@ -1,5 +1,7 @@
 package core.framework.internal.cache;
 
+import org.jspecify.annotations.Nullable;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +10,7 @@ import java.util.Map;
  * @author neo
  */
 public interface CacheStore {   // all keys here are direct cacheKey, not the key passed to Cache<T>
+    @Nullable
     <T> T get(String key, CacheContext<T> context);
 
     <T> Map<String, T> getAll(String[] keys, CacheContext<T> context);

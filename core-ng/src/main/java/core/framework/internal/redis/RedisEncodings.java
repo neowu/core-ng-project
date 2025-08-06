@@ -1,6 +1,7 @@
 package core.framework.internal.redis;
 
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -18,11 +19,11 @@ class RedisEncodings {
         }
     }
 
-    static void validate(String name, String value) {
+    static void validate(String name, @Nullable String value) {
         if (value == null) throw new Error(name + " must not be null");
     }
 
-    static void validate(String name, String... values) {
+    static void validate(String name, @Nullable String... values) {
         if (values.length == 0) throw new Error(name + " must not be empty");
         for (String value : values) {
             if (value == null) throw new Error(name + " must not contain null");
@@ -48,7 +49,8 @@ class RedisEncodings {
         return Strings.bytes(text); // according to JMH benchmark, text.getBytes(UTF_8) beats getBytesWithOtherCharset or convert by char[] directly, refer to JDK impl for details
     }
 
-    static String decode(byte[] value) {
+    @Nullable
+    static String decode(byte @Nullable [] value) {
         if (value == null) return null;
         return new String(value, StandardCharsets.UTF_8);
     }

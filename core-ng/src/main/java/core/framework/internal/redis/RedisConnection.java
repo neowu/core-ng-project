@@ -1,5 +1,7 @@
 package core.framework.internal.redis;
 
+import org.jspecify.annotations.Nullable;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -92,11 +94,12 @@ public class RedisConnection implements AutoCloseable {
         if (socket != null) socket.close();
     }
 
+    @Nullable
     String readSimpleString() throws IOException {
         return (String) Protocol.read(inputStream);
     }
 
-    byte[] readBlobString() throws IOException {
+    byte @Nullable [] readBlobString() throws IOException {
         return (byte[]) Protocol.read(inputStream);
     }
 
@@ -104,13 +107,14 @@ public class RedisConnection implements AutoCloseable {
         return (long) Protocol.read(inputStream);
     }
 
-    Object[] readArray() throws IOException {
+    Object @Nullable [] readArray() throws IOException {
         return (Object[]) Protocol.read(inputStream);
     }
 
+    @Nullable
     Object[] readAll(int size) throws IOException {
         RedisException exception = null;
-        Object[] results = new Object[size];
+        @Nullable Object[] results = new Object[size];
         for (int i = 0; i < size; i++) {
             try {
                 results[i] = Protocol.read(inputStream);

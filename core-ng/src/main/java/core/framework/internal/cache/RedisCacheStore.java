@@ -5,6 +5,7 @@ import core.framework.internal.redis.RedisException;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,7 @@ public class RedisCacheStore implements CacheStore {
         this.redis = redis;
     }
 
+    @Nullable
     @Override
     public <T> T get(String key, CacheContext<T> context) {
         try {

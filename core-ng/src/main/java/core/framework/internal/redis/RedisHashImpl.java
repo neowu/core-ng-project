@@ -7,6 +7,7 @@ import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisHash;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,7 @@ public final class RedisHashImpl implements RedisHash {
         this.redis = redis;
     }
 
+    @Nullable
     @Override
     public String get(String key, String field) {
         var watch = new StopWatch();

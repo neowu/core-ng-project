@@ -6,6 +6,7 @@ import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.resource.PoolItem;
 import core.framework.util.Lists;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +109,7 @@ public class DatabaseOperation {
         }
     }
 
-    OptionalLong insert(String sql, Object[] params, String generatedColumn) {
+    OptionalLong insert(String sql, Object[] params, @Nullable String generatedColumn) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = insertStatement(connection.resource, sql, generatedColumn)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
@@ -124,7 +125,7 @@ public class DatabaseOperation {
         }
     }
 
-    Optional<long[]> batchInsert(String sql, List<Object[]> params, String generatedColumn) {
+    Optional<long[]> batchInsert(String sql, List<Object[]> params, @Nullable String generatedColumn) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = insertStatement(connection.resource, sql, generatedColumn)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
@@ -146,7 +147,7 @@ public class DatabaseOperation {
         }
     }
 
-    private PreparedStatement insertStatement(Connection connection, String sql, String generatedColumn) throws SQLException {
+    private PreparedStatement insertStatement(Connection connection, String sql, @Nullable String generatedColumn) throws SQLException {
         if (generatedColumn == null) return connection.prepareStatement(sql);
         return connection.prepareStatement(sql, new String[]{generatedColumn});
     }
@@ -206,7 +207,7 @@ public class DatabaseOperation {
         return results;
     }
 
-    private void setParams(PreparedStatement statement, Object... params) throws SQLException {
+    private void setParams(PreparedStatement statement, Object @Nullable ... params) throws SQLException {
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
                 setParam(statement, i + 1, params[i]);
@@ -214,7 +215,7 @@ public class DatabaseOperation {
         }
     }
 
-    private void setParam(PreparedStatement statement, int index, Object param) throws SQLException {
+    private void setParam(PreparedStatement statement, int index, @Nullable Object param) throws SQLException {
         switch (param) {
             case String value -> statement.setString(index, value);
             case Enum<?> value -> {

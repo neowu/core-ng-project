@@ -1,6 +1,7 @@
 package core.framework.internal.redis;
 
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -25,10 +26,12 @@ final class Protocol {
         stream.writeBytesCRLF(value);
     }
 
+    @Nullable
     static Object read(RedisInputStream stream) throws IOException {
         return parseObject(stream);
     }
 
+    @Nullable
     private static Object parseObject(RedisInputStream stream) throws IOException {
         byte firstByte = stream.readByte();
         return switch (firstByte) {
@@ -44,14 +47,14 @@ final class Protocol {
         };
     }
 
-    private static byte[] parseBlobString(RedisInputStream stream) throws IOException {
+    private static byte @Nullable [] parseBlobString(RedisInputStream stream) throws IOException {
         int length = (int) stream.readLong();
         if (length == -1) return null;
 
         return stream.readBytes(length);
     }
 
-    private static Object[] parseArray(RedisInputStream stream) throws IOException {
+    private static Object @Nullable [] parseArray(RedisInputStream stream) throws IOException {
         int length = (int) stream.readLong();
         if (length == -1) return null;
 
