@@ -21,7 +21,7 @@ public class CookieManager implements CookieJar {
         for (Cookie cookie : cookies) {
             String key = cookie.domain() + ":" + cookie.path() + ":" + cookie.name();
             // refer to okhttp3.Cookie.parse(), with maxAge=0, it set expiresAt = Long.MIN_VALUE
-            if (cookie.expiresAt() == Long.MIN_VALUE && "".equals(cookie.value())) {
+            if (cookie.expiresAt() == Long.MIN_VALUE && cookie.value().isEmpty()) {
                 store.remove(key);
             } else {
                 store.put(key, cookie);
