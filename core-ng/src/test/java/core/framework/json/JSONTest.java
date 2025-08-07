@@ -217,4 +217,15 @@ class JSONTest {
         assertThatThrownBy(() -> JSON.fromJSON(Integer.class, "\"\""))
             .isInstanceOf(UncheckedIOException.class);
     }
+
+    @Test
+    void ignoreNull() {
+        var bean = new TestBean();
+        bean.ignoreNull = null;
+
+        String json = JSON.toJSON(bean);
+        assertThat(json)
+            .contains("\"empty\":null")
+            .doesNotContain("ignoreNull");
+    }
 }

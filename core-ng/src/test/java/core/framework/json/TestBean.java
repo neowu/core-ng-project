@@ -1,5 +1,6 @@
 package core.framework.json;
 
+import core.framework.api.json.IgnoreNull;
 import core.framework.api.json.Property;
 import core.framework.api.validate.NotNull;
 import core.framework.util.Lists;
@@ -64,6 +65,10 @@ public class TestBean {
 
     @Property(name = "empty")
     public Empty empty;
+
+    @IgnoreNull
+    @Property(name = "ignoreNull")
+    public String ignoreNull;
 
     @NotNull
     @Property(name = "defaultValue")

@@ -1,5 +1,6 @@
 package core.framework.internal.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.PropertyName;
@@ -7,6 +8,7 @@ import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import core.framework.api.json.IgnoreNull;
 import core.framework.api.json.Property;
 
 import java.io.Serial;
@@ -66,6 +68,19 @@ public class JSONAnnotationIntrospector extends AnnotationIntrospector {
         Property element = annotated.getAnnotation(Property.class);
         if (element != null) {
             return new PropertyName(element.name(), null);
+        }
+        return null;
+    }
+
+    @Override
+    public JsonInclude.Value findPropertyInclusion(Annotated a) {
+        return propertyInclusion(a);
+    }
+
+    private JsonInclude.Value propertyInclusion(Annotated annotated) {
+        IgnoreNull ignoreNull = annotated.getAnnotation(IgnoreNull.class);
+        if (ignoreNull != null) {
+            return JsonInclude.Value.empty().withValueInclusion(JsonInclude.Include.NON_NULL);
         }
         return null;
     }

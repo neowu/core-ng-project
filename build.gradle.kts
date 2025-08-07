@@ -1,56 +1,56 @@
 plugins {
     `java-library`
     `maven-publish`
-    project
 }
+
+apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
-    version = "9.2.3"
+    version = "9.0.3"
+
     repositories {
         maven {
             url = uri("https://neowu.github.io/maven-repo/")
             content {
-                includeGroup("core.framework.elasticsearch.module")
+                includeGroupByRegex("core\\.framework.*")       // for elasticsearch modules dependencies
             }
         }
     }
 }
 
-val elasticVersion = "8.18.1"
-val jacksonVersion = "2.18.4"
-val junitVersion = "5.13.4"
-val mockitoVersion = "5.18.0"
-val assertjVersion = "3.27.3"
+val elasticVersion = "8.11.1"
+val kafkaVersion = "3.6.1"
+val jacksonVersion = "2.16.1"
+val junitVersion = "5.10.0"
+val mockitoVersion = "5.6.0"
+val assertjVersion = "3.24.2"
 
 project("core-ng-api") {
     apply(plugin = "lib")
-    dependencies {
-        api("org.jspecify:jspecify:1.0.0")
-    }
 }
 
 project("core-ng") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng-api"))
-        api("org.slf4j:slf4j-api:2.0.17")
-        implementation("org.javassist:javassist:3.30.2-GA")
+        api("org.slf4j:slf4j-api:2.0.9")
+        implementation("org.javassist:javassist:3.29.2-GA")
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
-        implementation("com.squareup.okhttp3:okhttp:5.1.0")
-        implementation("io.undertow:undertow-core:2.3.18.Final")
-        implementation("org.apache.kafka:kafka-clients:4.0.0") {
-            exclude("org.xerial.snappy")
-        }
+        implementation("com.squareup.okhttp3:okhttp:4.11.0")
+        implementation("io.undertow:undertow-core:2.3.10.Final")
+        implementation("org.apache.kafka:kafka-clients:${kafkaVersion}@jar")
+        implementation("org.xerial.snappy:snappy-java:1.1.10.5")      // used by kafka message compression
+        compileOnly("com.mysql:mysql-connector-j:8.2.0@jar")
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")
-        compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.3")
+        compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.0")
         testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
         testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
         testImplementation("org.assertj:assertj-core:${assertjVersion}")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-        testRuntimeOnly("org.hsqldb:hsqldb:2.7.4")
+        testRuntimeOnly("org.hsqldb:hsqldb:2.7.2")
     }
 }
 
@@ -63,7 +63,7 @@ project("core-ng-test") {
         implementation(project(":core-ng"))
         implementation("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
         implementation("org.junit.platform:junit-platform-launcher")
-        testRuntimeOnly("org.hsqldb:hsqldb:2.7.4")
+        testRuntimeOnly("org.hsqldb:hsqldb:2.7.2")
     }
 }
 
@@ -71,7 +71,7 @@ project("core-ng-mongo") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng"))
-        api("org.mongodb:mongodb-driver-sync:5.5.1")
+        api("org.mongodb:mongodb-driver-sync:4.11.0")
         testImplementation(project(":core-ng-test"))
     }
 }
@@ -81,7 +81,7 @@ project("core-ng-mongo-test") {
     dependencies {
         implementation(project(":core-ng-test"))
         implementation(project(":core-ng-mongo"))
-        implementation("de.bwaldvogel:mongo-java-server:1.47.0")
+        implementation("de.bwaldvogel:mongo-java-server:1.44.0")
     }
 }
 
@@ -89,9 +89,7 @@ project("core-ng-search") {
     apply(plugin = "lib")
     dependencies {
         api(project(":core-ng"))
-        api("co.elastic.clients:elasticsearch-java:${elasticVersion}") {
-            exclude(group = "io.opentelemetry")
-        }
+        api("co.elastic.clients:elasticsearch-java:${elasticVersion}")
         implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
         testImplementation(project(":core-ng-test"))
     }
@@ -102,15 +100,12 @@ project("core-ng-search-test") {
     dependencies {
         implementation(project(":core-ng-test"))
         implementation(project(":core-ng-search"))
-        implementation("org.elasticsearch:elasticsearch:${elasticVersion}") {
-            exclude(group = "io.opentelemetry")
-        }
-        implementation("org.elasticsearch.plugin:transport-netty4:${elasticVersion}")
-        implementation("core.framework.elasticsearch.module:mapper-extras:${elasticVersion}")       // used by elasticsearch scaled_float
+        implementation("org.elasticsearch:elasticsearch:${elasticVersion}")
+        implementation("core.framework.elasticsearch.module:transport-netty4:${elasticVersion}")
+        implementation("core.framework.elasticsearch.module:mapper-extras:${elasticVersion}")    // used by elasticsearch scaled_float
         implementation("core.framework.elasticsearch.module:lang-painless:${elasticVersion}")
-        implementation("core.framework.elasticsearch.module:analysis-common:${elasticVersion}")     // used by elasticsearch stemmer
-        implementation("core.framework.elasticsearch.module:reindex:${elasticVersion}")             // used by elasticsearch deleteByQuery
-        runtimeOnly("org.apache.logging.log4j:log4j-to-slf4j:2.19.0")
+        implementation("core.framework.elasticsearch.module:analysis-common:${elasticVersion}")  // used by elasticsearch stemmer
+        implementation("core.framework.elasticsearch.module:reindex:${elasticVersion}")          // used by elasticsearch deleteByQuery
     }
 }
 
