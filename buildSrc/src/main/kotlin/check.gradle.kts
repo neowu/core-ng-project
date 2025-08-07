@@ -8,74 +8,70 @@ plugins {
     id("jacoco-report-aggregation") apply false
 }
 
-subprojects {
-    if (!plugins.hasPlugin("java")) return@subprojects      // only apply to projects have java plugin
+apply(plugin = "checkstyle")
+apply(plugin = "pmd")
+apply(plugin = "com.github.spotbugs")
+apply(plugin = "jacoco")
+apply(plugin = "jacoco-report-aggregation")
 
-    apply(plugin = "checkstyle")
-    apply(plugin = "pmd")
-    apply(plugin = "com.github.spotbugs")
-    apply(plugin = "jacoco")
-    apply(plugin = "jacoco-report-aggregation")
+checkstyle {
+    dependencies {
+        checkstyle("com.puppycrawl.tools:checkstyle:10.26.1")
+        checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
+    }
 
-    checkstyle {
-        dependencies {
-            checkstyle("com.puppycrawl.tools:checkstyle:10.26.1")
-            checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
-        }
+    configFile = rootProject.file("buildSrc/src/main/check/checkstyle.xml")
+    configProperties["configDir"] = configFile.parentFile
 
-        configFile = rootProject.file("buildSrc/src/main/check/checkstyle.xml")
-        configProperties["configDir"] = configFile.parentFile
-
-        tasks.named<Checkstyle>("checkstyleMain") {
-            group = "verification"
-            source = fileTree(projectDir) {
-                include("conf/**/*.properties")
-                include("src/main/java/**/*.java")
-                include("src/main/**/*.properties")
-            }
-        }
-
-        tasks.named<Checkstyle>("checkstyleTest").configure {
-            group = "verification"
-            source = fileTree(projectDir) {
-                include("src/test/java/**/*.java")       // not include java files in resources
-                include("src/test/**/*.properties")
-            }
+    tasks.named<Checkstyle>("checkstyleMain") {
+        group = "verification"
+        source = fileTree(projectDir) {
+            include("conf/**/*.properties")
+            include("src/main/java/**/*.java")
+            include("src/main/**/*.properties")
         }
     }
 
-    pmd {
-        ruleSets = listOf()
-        ruleSetFiles = rootProject.files("buildSrc/src/main/check/pmd.xml")
-        toolVersion = "7.16.0"
-        isConsoleOutput = true
-
-        tasks.withType<Pmd> {
-            group = "verification"
+    tasks.named<Checkstyle>("checkstyleTest").configure {
+        group = "verification"
+        source = fileTree(projectDir) {
+            include("src/test/java/**/*.java")       // not include java files in resources
+            include("src/test/**/*.properties")
         }
     }
+}
 
-    spotbugs {
-        dependencies {
-            spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.12")
-        }
+pmd {
+    ruleSets = listOf()
+    ruleSetFiles = rootProject.files("buildSrc/src/main/check/pmd.xml")
+    toolVersion = "7.16.0"
+    isConsoleOutput = true
 
-        toolVersion = "4.9.3"
-        reportLevel = Confidence.LOW
-        extraArgs = listOf("-longBugCodes")
-        includeFilter = rootProject.file("buildSrc/src/main/check/spotbugs.xml")
+    tasks.withType<Pmd> {
+        group = "verification"
+    }
+}
+
+spotbugs {
+    dependencies {
+        spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.12")
     }
 
-    jacoco {
-        toolVersion = "0.8.13"
+    toolVersion = "4.9.3"
+    reportLevel = Confidence.LOW
+    extraArgs = listOf("-longBugCodes")
+    includeFilter = rootProject.file("buildSrc/src/main/check/spotbugs.xml")
+}
 
-        tasks.named<JacocoReport>("testCodeCoverageReport") {
-            reports {
-                xml.required = true
-                xml.outputLocation = layout.buildDirectory.file("reports/jacoco/report.xml").get()
-                html.required = true
-                csv.required = false
-            }
+jacoco {
+    toolVersion = "0.8.13"
+
+    tasks.named<JacocoReport>("testCodeCoverageReport") {
+        reports {
+            xml.required = true
+            xml.outputLocation = layout.buildDirectory.file("reports/jacoco/report.xml").get()
+            html.required = true
+            csv.required = false
         }
     }
 }

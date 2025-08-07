@@ -75,9 +75,9 @@ subprojects {
             }
         }
     }
-}
 
-apply(plugin = "check")
+    apply(plugin = "check")
+}
 
 allprojects {
     apply(plugin = "idea")

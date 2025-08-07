@@ -207,7 +207,7 @@ public class DatabaseOperation {
         return results;
     }
 
-    private void setParams(PreparedStatement statement, Object @Nullable ... params) throws SQLException {
+    private void setParams(PreparedStatement statement, Object... params) throws SQLException {
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
                 setParam(statement, i + 1, params[i]);
