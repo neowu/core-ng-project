@@ -1,9 +1,8 @@
 plugins {
     `java-library`
     `maven-publish`
+    project
 }
-
-apply(plugin = "project")
 
 subprojects {
     group = "core.framework"
