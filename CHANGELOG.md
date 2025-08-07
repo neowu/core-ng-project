@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.2.3 (7/2/2025 - )
+### 9.2.3 (7/2/2025 - 8/7/2025)
 
 * db: support postgres enum type
 * http_client: update okhttp to 5.1.0
