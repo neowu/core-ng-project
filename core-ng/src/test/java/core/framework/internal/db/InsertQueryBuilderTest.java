@@ -47,4 +47,19 @@ class InsertQueryBuilderTest {
         assertThat(query.upsertSQL).isNull();
         assertThat(query.generatedColumn).isEqualTo("id");
     }
+
+    @Test
+    void compositeId() {
+        InsertQueryBuilder<CompositeKeyEntity> builder = new InsertQueryBuilder<>(CompositeKeyEntity.class, Dialect.MYSQL);
+        InsertQuery<CompositeKeyEntity> query = builder.build();
+
+        assertThat(query.upsertSQL).isEqualTo("INSERT INTO composite_key_entity (id1, id_2, boolean_field, long_field) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE boolean_field = VALUES(boolean_field), long_field = VALUES(long_field)");
+    }
+
+    @Test
+    void compositeIdWithPostgreSQL() {
+        InsertQueryBuilder<CompositeKeyEntity> builder = new InsertQueryBuilder<>(CompositeKeyEntity.class, Dialect.POSTGRESQL);
+        InsertQuery<CompositeKeyEntity> query = builder.build();
+        assertThat(query.upsertSQL).isEqualTo("INSERT INTO composite_key_entity (id1, id_2, boolean_field, long_field) VALUES (?, ?, ?, ?) ON CONFLICT (id1, id_2) DO UPDATE SET boolean_field = EXCLUDED.boolean_field, long_field = EXCLUDED.long_field");
+    }
 }

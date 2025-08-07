@@ -31,12 +31,8 @@ public class CodeBuilder {
     }
 
     public CodeBuilder appendCommaSeparatedValues(List<String> values) {
-        int index = 0;
-        for (String value : values) {
-            if (index > 0) builder.append(", ");
-            builder.append(value);
-            index++;
-        }
+        String valuesString = String.join(", ", values);
+        builder.append(valuesString);
         return this;
     }
 
