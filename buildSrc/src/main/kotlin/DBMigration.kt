@@ -2,7 +2,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.net.HttpURLConnection
 import java.net.URI
-import java.util.Properties
+import java.util.*
 
 /**
  * @author neo
@@ -20,10 +20,16 @@ object DBMigration {
     }
 
     // refer to core.framework.internal.db.cloud.GCloudAuthProvider
-    fun iamUser(): String {
+    fun iamUser(dialect: String): String {
         val email = metadata("email")
-        val regex = """([^@]*)@[^@]*""".toRegex()
-        return regex.matchEntire(email)!!.groups[1]!!.value
+        if (dialect == "postgresql" && email.endsWith(".gserviceaccount.com")) {
+            return email.substring(0, email.length - 20)   // remove ".gserviceaccount.com"
+        } else if (dialect == "mysql") {
+            val index = email.indexOf('@')
+            return email.substring(0, index)
+        } else {
+            throw Error("unsupported gcloud iam user, dialect=${dialect}, email=${email}")
+        }
     }
 
     fun iamAccessToken(): String {

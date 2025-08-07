@@ -12,13 +12,13 @@ interface ExecSupport {
 afterEvaluate {
     if (!project.extensions.extraProperties.has("frontendDir")) throw Error("project does not have frontendDir property, assign by project.ext[\"frontendDir\"]")
     val frontendDir = file(project.extensions.extraProperties.get("frontendDir") as String)
+    val support = project.objects.newInstance<ExecSupport>()
 
     tasks.register("buildFrontend") {
         group = "build"
         doLast {
             if (!frontendDir.exists()) throw Error("$frontendDir does not exist")
 
-            val support = project.objects.newInstance<ExecSupport>()
             support.operation.exec {
                 workingDir(frontendDir)
                 commandLine(Frontend.commandLine(listOf("pnpm", "install")))
