@@ -18,7 +18,7 @@ public class CompositeKeyEntity {
     public String id1;
 
     @PrimaryKey
-    @Column(name = "id2")
+    @Column(name = "id_2")
     @Size(max = 36)
     public String id2;
 

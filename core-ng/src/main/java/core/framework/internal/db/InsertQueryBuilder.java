@@ -23,7 +23,7 @@ class InsertQueryBuilder<T> {
     final DynamicInstanceBuilder<InsertQueryParamBuilder<T>> builder;
     private final Class<T> entityClass;
     private final Dialect dialect;
-    private final List<String> primaryKeyFieldNames = Lists.newArrayList();
+    private final List<PrimaryKeyField> primaryKeyFields = Lists.newArrayList();
 
     @Nullable
     private String generatedColumn;
@@ -61,7 +61,7 @@ class InsertQueryBuilder<T> {
                     generatedColumn = columnName;
                     continue;
                 }
-                primaryKeyFieldNames.add(field.getName());    // pk fields is only needed for assigned id
+                primaryKeyFields.add(new PrimaryKeyField(field.getName(), columnName));
             } else {
                 if (dialect == Dialect.MYSQL) {
                     // VALUES(column) syntax is deprecated since MySQL 8.0.20, this is to keep compatible with old MySQL (gcloud still has 8.0.18)
@@ -85,7 +85,8 @@ class InsertQueryBuilder<T> {
             .append(") VALUES (").appendCommaSeparatedValues(params).append(')');
         insertSQL = builder.build();
 
-        if (generatedColumn != null) return;  // auto-increment entity doesn't need insert ignore and upsert, refer to core.framework.internal.db.RepositoryImpl.insertIgnore
+        if (generatedColumn != null)
+            return;  // auto-increment entity doesn't need insert ignore and upsert, refer to core.framework.internal.db.RepositoryImpl.insertIgnore
 
         if (dialect == Dialect.MYSQL) {
             insertIgnoreSQL = new StringBuilder(insertSQL).insert(6, " IGNORE").toString();
@@ -96,7 +97,8 @@ class InsertQueryBuilder<T> {
         if (dialect == Dialect.MYSQL) {
             builder.append(" ON DUPLICATE KEY UPDATE ").appendCommaSeparatedValues(updates);
         } else if (dialect == Dialect.POSTGRESQL) {
-            builder.append(" ON CONFLICT (").appendCommaSeparatedValues(primaryKeyFieldNames).append(") DO UPDATE SET ").appendCommaSeparatedValues(updates);
+            List<String> columnNames = primaryKeyFields.stream().map(f -> f.columnName).toList();
+            builder.append(" ON CONFLICT (").appendCommaSeparatedValues(columnNames).append(") DO UPDATE SET ").appendCommaSeparatedValues(updates);
         }
         upsertSQL = builder.build();
     }
@@ -109,8 +111,8 @@ class InsertQueryBuilder<T> {
             .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral);
 
         if (generatedColumn == null) {
-            for (String name : primaryKeyFieldNames) {
-                builder.indent(1).append("if (entity.{} == null) throw new Error(\"primary key must not be null, field={}\");\n", name, name);
+            for (PrimaryKeyField field : primaryKeyFields) {
+                builder.indent(1).append("if (entity.{} == null) throw new Error(\"primary key must not be null, field={}\");\n", field.name, field.name);
             }
         }
 
@@ -132,5 +134,8 @@ class InsertQueryBuilder<T> {
     }
 
     private record ParamField(String name, boolean json) {
+    }
+
+    private record PrimaryKeyField(String name, String columnName) {
     }
 }
