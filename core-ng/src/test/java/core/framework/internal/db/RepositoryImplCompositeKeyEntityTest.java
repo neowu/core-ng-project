@@ -24,7 +24,7 @@ class RepositoryImplCompositeKeyEntityTest {
     void createDatabase() {
         database = new DatabaseImpl("db");
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
-        database.execute("CREATE TABLE composite_key_entity (id1 VARCHAR(36), id2 VARCHAR(36), boolean_field BIT(1), long_field BIGINT, PRIMARY KEY (id1, id2))");
+        database.execute("CREATE TABLE composite_key_entity (id1 VARCHAR(36), id_2 VARCHAR(36), boolean_field BIT(1), long_field BIGINT, PRIMARY KEY (id1, id_2))");
 
         repository = database.repository(CompositeKeyEntity.class);
     }

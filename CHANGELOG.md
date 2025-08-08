@@ -1,5 +1,7 @@
 ## Change log
 
+### 9.2.4 (8/8/2025 -)
+
 ### 9.2.3 (7/2/2025 - 8/7/2025)
 
 * db: support postgres enum type

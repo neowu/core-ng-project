@@ -6,7 +6,6 @@ import core.framework.db.Table;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.reflect.Classes;
-import core.framework.util.Lists;
 import core.framework.util.Strings;
 import org.jspecify.annotations.Nullable;
 
@@ -23,10 +22,12 @@ class InsertQueryBuilder<T> {
     final DynamicInstanceBuilder<InsertQueryParamBuilder<T>> builder;
     private final Class<T> entityClass;
     private final Dialect dialect;
-    private final List<PrimaryKeyField> primaryKeyFields = Lists.newArrayList();
+
+    private final List<String> primaryKeyColumns = new ArrayList<>(3);
+    private final List<String> primaryKeyFields = new ArrayList<>(3);
 
     @Nullable
-    private String generatedColumn;
+    private String generatedColumn;     // db entity must not have more than one auto incremental primary key, validated by DatabaseClassValidator
     private List<ParamField> paramFields;
     private String insertSQL;
     private String insertIgnoreSQL;
@@ -61,7 +62,8 @@ class InsertQueryBuilder<T> {
                     generatedColumn = columnName;
                     continue;
                 }
-                primaryKeyFields.add(new PrimaryKeyField(field.getName(), columnName));
+                primaryKeyFields.add(field.getName());
+                primaryKeyColumns.add(columnName);
             } else {
                 if (dialect == Dialect.MYSQL) {
                     // VALUES(column) syntax is deprecated since MySQL 8.0.20, this is to keep compatible with old MySQL (gcloud still has 8.0.18)
@@ -85,8 +87,7 @@ class InsertQueryBuilder<T> {
             .append(") VALUES (").appendCommaSeparatedValues(params).append(')');
         insertSQL = builder.build();
 
-        if (generatedColumn != null)
-            return;  // auto-increment entity doesn't need insert ignore and upsert, refer to core.framework.internal.db.RepositoryImpl.insertIgnore
+        if (generatedColumn != null) return;  // auto-increment entity doesn't need insert ignore and upsert, refer to core.framework.internal.db.RepositoryImpl.insertIgnore
 
         if (dialect == Dialect.MYSQL) {
             insertIgnoreSQL = new StringBuilder(insertSQL).insert(6, " IGNORE").toString();
@@ -97,8 +98,7 @@ class InsertQueryBuilder<T> {
         if (dialect == Dialect.MYSQL) {
             builder.append(" ON DUPLICATE KEY UPDATE ").appendCommaSeparatedValues(updates);
         } else if (dialect == Dialect.POSTGRESQL) {
-            List<String> columnNames = primaryKeyFields.stream().map(f -> f.columnName).toList();
-            builder.append(" ON CONFLICT (").appendCommaSeparatedValues(columnNames).append(") DO UPDATE SET ").appendCommaSeparatedValues(updates);
+            builder.append(" ON CONFLICT (").appendCommaSeparatedValues(primaryKeyColumns).append(") DO UPDATE SET ").appendCommaSeparatedValues(updates);
         }
         upsertSQL = builder.build();
     }
@@ -111,8 +111,8 @@ class InsertQueryBuilder<T> {
             .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral);
 
         if (generatedColumn == null) {
-            for (PrimaryKeyField field : primaryKeyFields) {
-                builder.indent(1).append("if (entity.{} == null) throw new Error(\"primary key must not be null, field={}\");\n", field.name, field.name);
+            for (String field : primaryKeyFields) {
+                builder.indent(1).append("if (entity.{} == null) throw new Error(\"primary key must not be null, field={}\");\n", field, field);
             }
         }
 
@@ -134,8 +134,5 @@ class InsertQueryBuilder<T> {
     }
 
     private record ParamField(String name, boolean json) {
-    }
-
-    private record PrimaryKeyField(String name, String columnName) {
     }
 }
