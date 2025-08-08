@@ -5,6 +5,7 @@ import core.framework.db.Repository;
 import core.framework.internal.validate.Validator;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,7 +117,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         return update(entity, false, null, null);
     }
 
-    private boolean update(T entity, boolean partial, String where, Object[] params) {
+    private boolean update(T entity, boolean partial, @Nullable String where, Object @Nullable [] params) {
         var watch = new StopWatch();
         validator.validate(entity, partial);
         UpdateQuery.Statement query = updateQuery.update(entity, partial, where, params);

@@ -1,10 +1,12 @@
 package core.framework.internal.db;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author neo
  */
 public interface UpdateQuery<T> {
-    Statement update(T entity, boolean partial, String where, Object[] params);
+    Statement update(T entity, boolean partial, @Nullable String where, Object @Nullable [] params);
 
     class Statement {
         final String sql;
