@@ -6,7 +6,7 @@ tasks.named("mkdir") {
 
 interface Context {
     @get:Inject
-    val operation: ExecOperations
+    val exec: ExecOperations
 
     @get:Inject
     val fs: FileSystemOperations
@@ -24,7 +24,7 @@ afterEvaluate {
     tasks.register("buildFrontend") {
         group = "build"
         doLast {
-            context.operation.exec {
+            context.exec.exec {
                 workingDir(frontendDir)
                 commandLine(Frontend.commandLine(listOf("pnpm", "install")))
             }
@@ -32,7 +32,7 @@ afterEvaluate {
             val command = mutableListOf("pnpm", "run", "build")
             if (env != null) command.addAll(listOf("--env", env))
 
-            context.operation.exec {
+            context.exec.exec {
                 workingDir(frontendDir)
                 commandLine(Frontend.commandLine(command))
             }

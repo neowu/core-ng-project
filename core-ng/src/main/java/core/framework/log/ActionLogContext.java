@@ -31,7 +31,7 @@ public final class ActionLogContext {
         return values;
     }
 
-    public static void put(String key, Object... values) {
+    public static void put(String key, @Nullable Object... values) {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {    // here to check null is for unit testing the logManager.begin may not be called
             actionLog.context(key, values);

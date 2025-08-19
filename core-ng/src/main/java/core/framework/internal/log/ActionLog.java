@@ -117,7 +117,7 @@ public final class ActionLog {
         return null;
     }
 
-    public void context(String key, Object... values) {
+    public void context(String key, @Nullable Object... values) {
         List<String> contextValues = context.computeIfAbsent(key, k -> new ArrayList<>(Math.max(2, values.length)));    // at least use 2 as init capacity, 0 capacity will result in size 10 array after adding
         for (Object value : values) {
             String contextValue = String.valueOf(value);
