@@ -2,6 +2,7 @@ package core.framework.log;
 
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.Trace;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -24,6 +25,7 @@ class ActionLogContextTest {
         assertThat(ActionLogContext.track("db", 100)).isEqualTo(1);
     }
 
+    @SuppressFBWarnings("NP_LOAD_OF_KNOWN_NULL_VALUE")
     @Test
     void withCurrentActionLog() {
         var logManager = new LogManager();
