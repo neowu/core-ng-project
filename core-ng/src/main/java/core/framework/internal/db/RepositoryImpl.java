@@ -1,5 +1,6 @@
 package core.framework.internal.db;
 
+import core.framework.db.Dialect;
 import core.framework.db.Query;
 import core.framework.db.Repository;
 import core.framework.internal.validate.Validator;

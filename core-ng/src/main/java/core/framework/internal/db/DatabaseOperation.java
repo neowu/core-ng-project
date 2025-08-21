@@ -1,5 +1,6 @@
 package core.framework.internal.db;
 
+import core.framework.db.Dialect;
 import core.framework.db.QueryDiagnostic;
 import core.framework.db.UncheckedSQLException;
 import core.framework.internal.log.ActionLog;

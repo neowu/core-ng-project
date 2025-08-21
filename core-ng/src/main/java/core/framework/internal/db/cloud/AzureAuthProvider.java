@@ -1,11 +1,11 @@
 package core.framework.internal.db.cloud;
 
 import core.framework.db.CloudAuthProvider;
+import core.framework.db.Dialect;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.internal.db.Dialect;
 import core.framework.util.Files;
 import core.framework.util.Strings;
 import org.jspecify.annotations.Nullable;

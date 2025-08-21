@@ -1,6 +1,6 @@
 package core.framework.module;
 
-import core.framework.internal.db.Dialect;
+import core.framework.db.Dialect;
 import core.framework.internal.db.cloud.AzureAuthProvider;
 import core.framework.internal.db.cloud.GCloudAuthProvider;
 import core.framework.internal.module.ModuleContext;

@@ -1,13 +1,12 @@
 package core.framework.db;
 
-import core.framework.internal.db.Dialect;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author neo
  */
 public interface CloudAuthProvider {
-    String user(Dialect dialect);
+    String user(Dialect dialect);   // cloud auth provider is global singleton, one app may connect to multiple cloud databases with different dialects
 
     String accessToken();
 

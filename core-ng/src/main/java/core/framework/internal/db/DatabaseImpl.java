@@ -2,6 +2,7 @@ package core.framework.internal.db;
 
 import core.framework.db.CloudAuthProvider;
 import core.framework.db.Database;
+import core.framework.db.Dialect;
 import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.db.Transaction;

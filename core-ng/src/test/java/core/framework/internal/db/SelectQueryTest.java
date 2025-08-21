@@ -1,5 +1,6 @@
 package core.framework.internal.db;
 
+import core.framework.db.Dialect;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

@@ -1,5 +1,6 @@
 package core.framework.internal.db;
 
+import core.framework.db.Dialect;
 import core.framework.util.ClasspathResources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

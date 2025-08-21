@@ -1,6 +1,7 @@
 package core.framework.internal.db;
 
 import core.framework.db.Column;
+import core.framework.db.Dialect;
 import core.framework.db.PrimaryKey;
 import core.framework.db.Table;
 import core.framework.internal.asm.CodeBuilder;

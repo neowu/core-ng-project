@@ -1,6 +1,10 @@
 ## Change log
 
-### 9.2.4 (8/8/2025 -)
+### 9.2.4 (8/8/2025 - 8/21/2025)
+
+* mysql: updated and patched to 8.4.0-r5
+  > use "core.framework.mysql:mysql-connector-j:8.4.0-r5"
+* db: fixed InsertQueryBuilder, bug if @PrimaryKey/@Column name is different with field name
 
 ### 9.2.3 (7/2/2025 - 8/7/2025)
 

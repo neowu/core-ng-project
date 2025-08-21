@@ -1,6 +1,6 @@
 package core.framework.internal.db.cloud;
 
-import core.framework.internal.db.Dialect;
+import core.framework.db.Dialect;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

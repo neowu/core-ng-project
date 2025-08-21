@@ -1,4 +1,4 @@
-package core.framework.internal.db;
+package core.framework.db;
 
 /**
  * @author neo
