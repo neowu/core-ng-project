@@ -166,7 +166,6 @@ public final class DatabaseImpl implements Database {
     }
 
     public void url(String url) {
-        if (!url.startsWith("jdbc:")) throw new Error("jdbc url must start with \"jdbc:\", url=" + url);
         this.url = url;
         driver = driver(url);
         logger.info("set database connection url, url={}, driver={}.{}", url, driver.getMajorVersion(), driver.getMinorVersion());

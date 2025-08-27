@@ -56,6 +56,7 @@ public class DBConfig extends Config {
 
     public void url(String url) {
         if (this.url != null) throw new Error(format("db url is already configured, name={}, url={}, previous={}", name, url, this.url));
+        if (!url.startsWith("jdbc:")) throw new Error("jdbc url must start with \"jdbc:\", url=" + url);
         database.url(databaseURL(url));
         this.url = url;
     }

@@ -1,5 +1,9 @@
 ## Change log
 
+### 9.2.5 (8/27/2025 - )
+
+* db: check jdbc url on DBConfig
+
 ### 9.2.4 (8/8/2025 - 8/21/2025)
 
 * mysql: updated and patched to 8.4.0-r5
