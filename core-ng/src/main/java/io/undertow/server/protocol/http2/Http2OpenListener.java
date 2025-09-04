@@ -36,7 +36,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
  * Open listener for HTTP2 server
  *
@@ -86,11 +85,6 @@ public final class Http2OpenListener implements ChannelListener<StreamConnection
     }
 
     @Override
-    public void handleEvent(StreamConnection channel) {
-        handleEvent(channel, null);
-    }
-
-    @Override
     public ConnectorStatistics getConnectorStatistics() {
         return null;
     }
@@ -128,5 +122,10 @@ public final class Http2OpenListener implements ChannelListener<StreamConnection
     @Override
     public ByteBufferPool getBufferPool() {
         return bufferPool;
+    }
+
+    @Override
+    public void handleEvent(StreamConnection channel) {
+        handleEvent(channel, null);
     }
 }
