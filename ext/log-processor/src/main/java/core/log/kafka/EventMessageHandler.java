@@ -8,9 +8,7 @@ import core.framework.search.BulkIndexRequest;
 import core.framework.search.ElasticSearchType;
 import core.framework.util.Maps;
 import core.log.domain.EventDocument;
-import core.log.service.EventForwarder;
 import core.log.service.IndexService;
-import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,23 +18,14 @@ import java.util.Map;
  * @author neo
  */
 public class EventMessageHandler implements BulkMessageHandler<EventMessage> {
-    @Nullable
-    final EventForwarder forwarder;
-
     @Inject
     IndexService indexService;
     @Inject
     ElasticSearchType<EventDocument> eventType;
 
-    public EventMessageHandler(@Nullable EventForwarder forwarder) {
-        this.forwarder = forwarder;
-    }
-
     @Override
     public void handle(List<Message<EventMessage>> messages) {
         index(messages, LocalDate.now());
-
-        if (forwarder != null) forwarder.forward(messages);
     }
 
     void index(List<Message<EventMessage>> messages, LocalDate now) {

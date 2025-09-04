@@ -3,6 +3,8 @@
 ### 9.2.5 (8/27/2025 - )
 
 * db: check jdbc url on DBConfig
+* log-processor: removed log forwarding
+  > not really useful to mix business message with system message
 
 ### 9.2.4 (8/8/2025 - 8/21/2025)
 

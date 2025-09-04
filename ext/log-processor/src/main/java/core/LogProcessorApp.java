@@ -1,16 +1,12 @@
 package core;
 
 import core.framework.http.HTTPClient;
-import core.framework.json.Bean;
-import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.log.message.StatMessage;
 import core.framework.module.App;
-import core.framework.module.KafkaConfig;
 import core.framework.search.module.SearchConfig;
-import core.log.LogForwardConfig;
 import core.log.domain.ActionDocument;
 import core.log.domain.EventDocument;
 import core.log.domain.StatDocument;
@@ -19,8 +15,6 @@ import core.log.job.CleanupOldIndexJob;
 import core.log.kafka.ActionLogMessageHandler;
 import core.log.kafka.EventMessageHandler;
 import core.log.kafka.StatMessageHandler;
-import core.log.service.ActionLogForwarder;
-import core.log.service.EventForwarder;
 import core.log.service.IndexOption;
 import core.log.service.IndexService;
 import core.log.service.JobConfig;
@@ -48,8 +42,7 @@ public class LogProcessorApp extends App {
 
         configureKibanaService();
 
-        Forwarders forwarders = configureLogForwarders();
-        configureKafka(forwarders);
+        configureKafka();
         configureJob();
 
         load(new DiagramModule());
@@ -73,15 +66,15 @@ public class LogProcessorApp extends App {
         bind(option);
     }
 
-    private void configureKafka(Forwarders forwarders) {
+    private void configureKafka() {
         kafka().uri(requiredProperty("sys.kafka.uri"));
         kafka().concurrency(2);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(500));          // try to get at least 1M message
         kafka().maxPoll(3000, 3 * 1024 * 1024);         // get 3M message at max
 
-        kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(new ActionLogMessageHandler(forwarders.action)));
+        kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));
         kafka().subscribe(LogTopics.TOPIC_STAT, StatMessage.class, bind(StatMessageHandler.class));
-        kafka().subscribe(LogTopics.TOPIC_EVENT, EventMessage.class, bind(new EventMessageHandler(forwarders.event)));
+        kafka().subscribe(LogTopics.TOPIC_EVENT, EventMessage.class, bind(EventMessageHandler.class));
     }
 
     private void configureSearch() {
@@ -108,31 +101,5 @@ public class LogProcessorApp extends App {
         bind(config);
 
         schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
-    }
-
-    private Forwarders configureLogForwarders() {
-        var forwarders = new Forwarders();
-        // configure by env APP_LOG_FORWARD_CONFIG
-        String configValue = property("app.log.forward.config").orElse(null);
-        if (configValue != null) {
-            Bean.register(LogForwardConfig.class);
-            LogForwardConfig config = Bean.fromJSON(LogForwardConfig.class, configValue);
-            KafkaConfig kafka = kafka("forward");
-            kafka.uri(config.kafkaURI);
-            if (config.action != null) {
-                MessagePublisher<ActionLogMessage> publisher = kafka.publish(config.action.topic, ActionLogMessage.class);
-                forwarders.action = new ActionLogForwarder(publisher, config.action);
-            }
-            if (config.event != null) {
-                MessagePublisher<EventMessage> publisher = kafka.publish(config.event.topic, EventMessage.class);
-                forwarders.event = new EventForwarder(publisher, config.event);
-            }
-        }
-        return forwarders;
-    }
-
-    static class Forwarders {
-        ActionLogForwarder action;
-        EventForwarder event;
     }
 }

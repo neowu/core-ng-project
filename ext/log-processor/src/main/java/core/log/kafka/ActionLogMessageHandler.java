@@ -9,9 +9,7 @@ import core.framework.search.ElasticSearchType;
 import core.framework.util.Maps;
 import core.log.domain.ActionDocument;
 import core.log.domain.TraceDocument;
-import core.log.service.ActionLogForwarder;
 import core.log.service.IndexService;
-import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,9 +19,6 @@ import java.util.Map;
  * @author neo
  */
 public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMessage> {
-    @Nullable
-    final ActionLogForwarder forwarder;
-
     @Inject
     IndexService indexService;
     @Inject
@@ -31,15 +26,9 @@ public class ActionLogMessageHandler implements BulkMessageHandler<ActionLogMess
     @Inject
     ElasticSearchType<TraceDocument> traceType;
 
-    public ActionLogMessageHandler(@Nullable ActionLogForwarder forwarder) {
-        this.forwarder = forwarder;
-    }
-
     @Override
     public void handle(List<Message<ActionLogMessage>> messages) {
         index(messages, LocalDate.now());
-
-        if (forwarder != null) forwarder.forward(messages);
     }
 
     void index(List<Message<ActionLogMessage>> messages, LocalDate now) {
