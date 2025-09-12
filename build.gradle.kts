@@ -40,7 +40,7 @@ project("core-ng") {
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
         implementation("com.squareup.okhttp3:okhttp:5.1.0")
         implementation("io.undertow:undertow-core:2.3.18.Final")
-        implementation("org.apache.kafka:kafka-clients:4.0.0") {
+        implementation("org.apache.kafka:kafka-clients:4.1.0") {
             exclude("org.xerial.snappy")
         }
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")

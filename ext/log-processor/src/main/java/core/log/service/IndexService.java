@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  */
 public class IndexService {
     private final DateTimeFormatter indexDateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd"); // follow same pattern as elastic.co product line, e.g. metricbeats, in order to unify cleanup job
-    private final Pattern indexPattern = Pattern.compile("[\\w\\.\\-]+-(\\d{4}\\.\\d{2}\\.\\d{2})");
+    private final Pattern indexPattern = Pattern.compile("[\\w.\\-]+-(\\d{4}\\.\\d{2}\\.\\d{2})");
     @Inject
     ElasticSearch search;
     @Inject

@@ -101,7 +101,7 @@ class MessageListenerThread extends Thread {
         }
 
         logger.info("close kafka consumer, name={}", getName());
-        consumer.close();
+        consumer.close();   // refer to org.apache.kafka.clients.consumer.CloseOptions.GroupMembershipOperation, for dynamic membership, consumer will leave group on close()
     }
 
     @Nullable

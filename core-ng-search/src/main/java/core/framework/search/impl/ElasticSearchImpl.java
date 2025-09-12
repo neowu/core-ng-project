@@ -43,9 +43,8 @@ public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
 
     public Duration timeout = Duration.ofSeconds(15);
-    public HttpHost @Nullable [] hosts;
+    public HttpHost[] hosts;
     public int maxResultWindow = 10000;
-    @Nullable
     ElasticsearchClient client;
     @Nullable
     Header authHeader;
