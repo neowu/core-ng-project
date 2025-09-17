@@ -6,6 +6,7 @@
 * log-processor: removed log forwarding
   > not really useful to mix business message with system message
 * kafka: update to 4.1.0
+* mongo: support readPreference in findOne
 
 ### 9.2.4 (8/8/2025 - 8/21/2025)
 
