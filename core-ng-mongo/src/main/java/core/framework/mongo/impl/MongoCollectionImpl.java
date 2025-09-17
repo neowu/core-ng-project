@@ -132,7 +132,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         int returnedDocs = 0;
         try {
             List<T> results = new ArrayList<>(2);
-            FindIterable<T> query = collection()
+            FindIterable<T> query = collection(findOne.readPreference)
                 .find(filter)
                 .limit(2)
                 .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
