@@ -42,6 +42,8 @@ public final class DatabaseImpl implements Database {
     }
 
     public final Pool<Connection> pool;
+    public final TransactionManager transactionManager;
+
     final DatabaseOperation operation;
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
     private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
@@ -50,7 +52,6 @@ public final class DatabaseImpl implements Database {
     public @Nullable String password;
     public @Nullable CloudAuthProvider authProvider;
     public @Nullable IsolationLevel isolationLevel;
-    public TransactionManager transactionManager;
 
     private @Nullable String url;
     private @Nullable Properties driverProperties;

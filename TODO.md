@@ -19,6 +19,8 @@
 
 * migrate to opensearch ? or update ES to 9.x
 
+* support hsql postgres dialect, to test postgres specific sql?
+
 ### obsoleted
 
 * template, use ByteBuffer[] for performance? (server side template not useful anymore)

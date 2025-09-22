@@ -34,8 +34,8 @@ import static core.framework.util.Strings.format;
  */
 public class DatabaseOperation {
     final EnumDBMapper enumMapper = new EnumDBMapper();
-    private final TransactionManager transactionManager;
     private final Logger logger = LoggerFactory.getLogger(DatabaseOperation.class);
+    private final TransactionManager transactionManager;
     Dialect dialect;
     int queryTimeoutInSeconds;
 
