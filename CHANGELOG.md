@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.2.5 (8/27/2025 - )
+### 9.3.0 (8/27/2025 - )    !!! will be released with java 25
 
 * db: check jdbc url on DBConfig
 * log-processor: removed log forwarding
