@@ -10,7 +10,7 @@ jobs:
     - uses: actions/setup-java@v3
       with:
         distribution: temurin
-        java-version: 24
+        java-version: 25
     - uses: gradle/gradle-build-action@v2.11.1
     - run: ./gradlew -Penv=prod -p ext docker
     - run: echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV

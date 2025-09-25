@@ -4,7 +4,7 @@ import core.log.LogExporterApp;
  * @author neo
  */
 public class Main {
-    public static void main(String[] args) {
+    static void main() {
         new LogExporterApp().start();
     }
 }

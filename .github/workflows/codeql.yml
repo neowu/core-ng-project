@@ -21,7 +21,7 @@ jobs:
     - uses: actions/setup-java@v3
       with:
         distribution: temurin
-        java-version: 24
+        java-version: 25
     - uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
