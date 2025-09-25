@@ -3,6 +3,7 @@ package core.framework.internal.web.http;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class IPv6Ranges implements IPRanges {
     static boolean withinRanges(LongLong[] ranges, LongLong value) {
@@ -134,6 +135,18 @@ public class IPv6Ranges implements IPRanges {
         public int compareTo(LongLong other) {
             int result = Long.compare(high, other.high);
             return result != 0 ? result : Long.compare(low, other.low);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            LongLong longLong = (LongLong) o;
+            return low == longLong.low && high == longLong.high;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(high, low);
         }
     }
 }

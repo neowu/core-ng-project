@@ -7,6 +7,7 @@ import core.framework.web.CookieSpec;
 import core.framework.web.Response;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
@@ -17,7 +18,9 @@ import java.util.Optional;
 public final class ResponseImpl implements Response {
     public final Body body;
     final Map<HttpString, String> headers = Maps.newHashMap();
+    @Nullable
     Map<CookieSpec, String> cookies;
+    @Nullable
     private ContentType contentType;
     private HTTPStatus status = HTTPStatus.OK;
 
@@ -42,7 +45,7 @@ public final class ResponseImpl implements Response {
     }
 
     @Override
-    public Response header(String name, String value) {
+    public Response header(String name, @Nullable String value) {
         if (Headers.CONTENT_TYPE.equalToString(name)) throw new Error("must not use header() to update content type, please use response.contentType()");
         headers.put(new HttpString(name), value);
         return this;
@@ -61,7 +64,7 @@ public final class ResponseImpl implements Response {
     }
 
     @Override
-    public Response cookie(CookieSpec spec, String value) {
+    public Response cookie(CookieSpec spec, @Nullable String value) {
         if (cookies == null) cookies = Maps.newHashMap();
         cookies.put(spec, value);
         return this;

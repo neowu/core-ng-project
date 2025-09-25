@@ -26,6 +26,7 @@
     <rule ref="category/java/bestpractices.xml/OneDeclarationPerLine"/>
     <rule ref="category/java/bestpractices.xml/PreserveStackTrace"/>
     <rule ref="category/java/bestpractices.xml/PrimitiveWrapperInstantiation"/>
+    <rule ref="category/java/bestpractices.xml/RelianceOnDefaultCharset"/>
     <rule ref="category/java/bestpractices.xml/SimplifiableTestAssertion"/>
     <rule ref="category/java/bestpractices.xml/SystemPrintln"/>
     <rule ref="category/java/bestpractices.xml/UnnecessaryVarargsArrayCreation"/>
@@ -52,13 +53,13 @@
             <property name="ignoredAnnotations" value="org.junit.jupiter.api.Test"/>
         </properties>
     </rule>
+    <rule ref="category/java/codestyle.xml/ModifierOrder"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryAnnotationValueElement"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryBoxing"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryCast"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryConstructor"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryImport"/>
-    <rule ref="category/java/codestyle.xml/UnnecessaryLocalBeforeReturn"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryModifier"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryReturn"/>
     <rule ref="category/java/codestyle.xml/UnnecessarySemicolon"/>
@@ -66,6 +67,7 @@
     <rule ref="category/java/codestyle.xml/UselessParentheses"/>
     <rule ref="category/java/codestyle.xml/UselessQualifiedThis"/>
     <rule ref="category/java/codestyle.xml/UseShortArrayInitializer"/>
+    <rule ref="category/java/codestyle.xml/VariableCanBeInlined"/>
 
     <rule ref="category/java/design.xml/AbstractClassWithoutAnyMethod"/>
     <rule ref="category/java/design.xml/AvoidThrowingNewInstanceOfSameException"/>
@@ -86,7 +88,7 @@
     <rule ref="category/java/design.xml/SwitchDensity"/>
     <rule ref="category/java/design.xml/UselessOverridingMethod"/>
 
-    <rule ref="category/java/errorprone.xml/AssignmentInOperand"/>
+    <!--    <rule ref="category/java/errorprone.xml/AssignmentInOperand"/>-->
     <rule ref="category/java/errorprone.xml/AssignmentToNonFinalStatic"/>
     <rule ref="category/java/errorprone.xml/AvoidAssertAsIdentifier"/>
     <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop"/>
@@ -95,7 +97,6 @@
     <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor"/>
     <rule ref="category/java/errorprone.xml/AvoidEnumAsIdentifier"/>
     <rule ref="category/java/errorprone.xml/AvoidInstanceofChecksInCatchClause"/>
-    <rule ref="category/java/errorprone.xml/AvoidLosingExceptionInformation"/>
     <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators"/>
     <rule ref="category/java/errorprone.xml/AvoidUsingOctalValues"/>
     <rule ref="category/java/errorprone.xml/BrokenNullCheck"/>
@@ -121,6 +122,7 @@
     <rule ref="category/java/errorprone.xml/MisplacedNullCheck"/>
     <rule ref="category/java/errorprone.xml/NonStaticInitializer"/>
     <rule ref="category/java/errorprone.xml/OverrideBothEqualsAndHashcode"/>
+    <rule ref="category/java/errorprone.xml/OverrideBothEqualsAndHashCodeOnComparable"/>
     <rule ref="category/java/errorprone.xml/ReturnFromFinallyBlock"/>
     <rule ref="category/java/errorprone.xml/SingleMethodSingleton"/>
     <rule ref="category/java/errorprone.xml/SingletonClassReturningNewInstance"/>
@@ -135,7 +137,7 @@
     <rule ref="category/java/errorprone.xml/UnusedNullCheckInEquals"/>
     <rule ref="category/java/errorprone.xml/UseCorrectExceptionLogging"/>
     <rule ref="category/java/errorprone.xml/UseEqualsToCompareStrings"/>
-    <rule ref="category/java/errorprone.xml/UselessOperationOnImmutable"/>
+    <!--    <rule ref="category/java/errorprone.xml/UselessPureMethodCall" />-->
     <rule ref="category/java/errorprone.xml/UseLocaleWithCaseConversions"/>
     <rule ref="category/java/errorprone.xml/UseProperClassLoader"/>
 

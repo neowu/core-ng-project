@@ -16,7 +16,7 @@ public class WebContextImpl implements WebContext {
     private static final ThreadLocal<Context> CONTEXT = new ThreadLocal<>();
 
     @Override
-    public Object get(String key) {
+    public @Nullable Object get(String key) {
         Context context = CONTEXT.get();
         if (context.context == null) return null;
         return context.context.get(key);
@@ -38,7 +38,7 @@ public class WebContextImpl implements WebContext {
     public void responseCookie(CookieSpec spec, @Nullable String value) {
         Context context = CONTEXT.get();
         if (context.responseCookies == null) context.responseCookies = new HashMap<>();
-        context.responseCookies.put(spec, value);
+        context.responseCookies.put(spec, value);   // cookies map allows null, to remove cookie thru response cookie header, refer to core.framework.internal.web.response.ResponseHandler.cookie
     }
 
     public void initialize(Request request) {
@@ -60,7 +60,9 @@ public class WebContextImpl implements WebContext {
 
     static class Context {
         final Request request;
+        @Nullable
         Map<String, Object> context;
+        @Nullable
         Map<CookieSpec, String> responseCookies;
 
         Context(Request request) {

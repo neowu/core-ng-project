@@ -6,6 +6,7 @@ import org.jspecify.annotations.Nullable;
  * @author neo
  */
 public interface WebContext {
+    @Nullable
     Object get(String key);     // context is used to pass value from interceptor to controller/ws, key will be static and deterministic, that's why here is designed to return Object, not Optional<T>
 
     void put(String key, Object value);

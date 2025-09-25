@@ -5,6 +5,7 @@ import core.framework.http.HTTPHeaders;
 import core.framework.web.Request;
 import core.framework.web.Response;
 import core.framework.web.exception.NotFoundException;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ import java.time.Duration;
 public final class StaticDirectoryController implements StaticContentController {
     private final Logger logger = LoggerFactory.getLogger(StaticDirectoryController.class);
     private final Path contentDirectory;
+    @Nullable
     String cacheHeader;
 
     public StaticDirectoryController(Path contentDirectory) {

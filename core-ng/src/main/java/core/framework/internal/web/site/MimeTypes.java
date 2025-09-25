@@ -3,6 +3,7 @@ package core.framework.internal.web.site;
 import core.framework.http.ContentType;
 import core.framework.util.ASCII;
 import core.framework.util.Maps;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
@@ -49,6 +50,7 @@ final class MimeTypes {
         MIME_TYPES.put("zip", ContentType.create("application/zip", null));
     }
 
+    @Nullable
     static ContentType get(String fileName) {
         int index = fileName.lastIndexOf('.');
         if (index > 0 && index + 1 < fileName.length()) {

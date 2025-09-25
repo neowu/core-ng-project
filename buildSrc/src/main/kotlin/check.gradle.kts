@@ -16,7 +16,7 @@ apply(plugin = "jacoco-report-aggregation")
 
 checkstyle {
     dependencies {
-        checkstyle("com.puppycrawl.tools:checkstyle:10.26.1")
+        checkstyle("com.puppycrawl.tools:checkstyle:11.0.1")
         checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
     }
 
@@ -44,7 +44,7 @@ checkstyle {
 pmd {
     ruleSets = listOf()
     ruleSetFiles = rootProject.files("buildSrc/src/main/check/pmd.xml")
-    toolVersion = "7.16.0"
+    toolVersion = "7.17.0"
     isConsoleOutput = true
 
     tasks.withType<Pmd> {
@@ -57,7 +57,7 @@ spotbugs {
         spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.12")
     }
 
-    toolVersion = "4.9.3"
+    toolVersion = "4.9.6"
     reportLevel = Confidence.LOW
     extraArgs = listOf("-longBugCodes")
     includeFilter = rootProject.file("buildSrc/src/main/check/spotbugs.xml")

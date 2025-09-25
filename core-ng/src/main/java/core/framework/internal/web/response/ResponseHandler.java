@@ -14,6 +14,7 @@ import io.undertow.server.handlers.CookieImpl;
 import io.undertow.server.handlers.CookieSameSiteMode;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +76,7 @@ public class ResponseHandler {
         }
     }
 
-    CookieImpl cookie(CookieSpec spec, String value) {
+    CookieImpl cookie(CookieSpec spec, @Nullable String value) {
         var cookie = new CookieImpl(spec.name);
         if (value == null) {
             cookie.setMaxAge(0);
