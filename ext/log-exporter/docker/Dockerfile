@@ -1,4 +1,4 @@
-FROM        neowu/jre:24.0.1
+FROM        neowu/jre:25.0.0
 LABEL       app=log-exporter
 RUN         apk add --no-cache python3 curl
 # gcloud iam requires user home, so must not put --no-create-home
