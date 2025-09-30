@@ -6,7 +6,7 @@ plugins {
 
 subprojects {
     group = "core.framework"
-    version = "9.2.5"
+    version = "9.3.0-b0"
     repositories {
         maven {
             url = uri("https://neowu.github.io/maven-repo/")
@@ -20,7 +20,7 @@ subprojects {
 val elasticVersion = "8.18.1"
 val jacksonVersion = "2.18.4"
 val junitVersion = "5.13.4"
-val mockitoVersion = "5.18.0"
+val mockitoVersion = "5.20.0"
 val assertjVersion = "3.27.3"
 
 project("core-ng-api") {

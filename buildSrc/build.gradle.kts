@@ -9,8 +9,7 @@ repositories {
 
 java {
     toolchain {
-        // kotlin doesn't support Java 24 yet
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
