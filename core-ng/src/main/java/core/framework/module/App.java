@@ -21,24 +21,24 @@ public abstract class App extends Module {
     private final Logger logger = LoggerFactory.getLogger(App.class);
 
     public final void start() {
-        ActionLog actionLog = logManager.begin("=== startup begin ===", null);
-        boolean failed = false;
-        try {
-            logContext(actionLog);
-            configure();
-            context.probe.check();    // readiness probe only needs to run on actual startup, not on test
-            logger.info("execute startup tasks");
-            context.startupHook.initialize();
-            context.startupHook.start();
-            cleanup();
-            logger.info("startup completed, elapsed={}", actionLog.elapsed());
-        } catch (Throwable e) {
-            logger.error(Markers.errorCode("FAILED_TO_START"), "app failed to start, error={}", e.getMessage(), e);
-            failed = true;
-        } finally {
-            logManager.end("=== startup end ===");
-        }
-        if (failed) {
+        var success = logManager.run("start", null, actionLog -> {
+            var result = true;
+            try {
+                logContext(actionLog);
+                configure();
+                context.probe.check();    // readiness probe only needs to run on actual startup, not on test
+                logger.info("execute startup tasks");
+                context.startupHook.initialize();
+                context.startupHook.start();
+                cleanup();
+                logger.info("startup completed, elapsed={}", actionLog.elapsed());
+            } catch (Throwable e) {
+                logger.error(Markers.errorCode("FAILED_TO_START"), "app failed to start, error={}", e.getMessage(), e);
+                result = false;
+            }
+            return result;
+        });
+        if (!success) {
             System.exit(1);
         }
     }

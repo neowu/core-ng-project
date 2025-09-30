@@ -131,7 +131,7 @@ public class CacheImpl<T> implements Cache<T> {
 
     // set to actionLog directly to keep trace log concise
     private void stat(String key, double value) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog != null) {
             actionLog.stats.compute(key, (k, oldValue) -> (oldValue == null) ? value : oldValue + value);
         }

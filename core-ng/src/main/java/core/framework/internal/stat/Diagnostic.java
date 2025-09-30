@@ -32,7 +32,7 @@ public class Diagnostic {
         return invokeDiagnosticCommand("vmNativeMemory", "summary");
     }
 
-    // currently Java 21 only support dump virtual thread to file
+    // currently Java 25 only support dump virtual thread to file
     // refer to com.sun.management.internal.HotSpotDiagnostic.dumpThreads(java.lang.String, com.sun.management.HotSpotDiagnosticMXBean.ThreadDumpFormat)
     public static String virtualThread() {
         Path path = Files.tempFile();

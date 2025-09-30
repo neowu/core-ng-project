@@ -1,7 +1,6 @@
 package core.framework.internal.http;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import okhttp3.Request;
 import okhttp3.internal.http2.ConnectionShutdownException;
@@ -307,12 +306,11 @@ class RetryInterceptorTest {
     @Test
     void withinMaxProcessTime() {
         var logManager = new LogManager();
-        ActionLog actionLog = logManager.begin("begin", null);
-
-        actionLog.warningContext.maxProcessTimeInNano(Duration.ofSeconds(1).toNanos());
-        assertThat(interceptor.withinMaxProcessTime(1)).isTrue();
-        assertThat(interceptor.withinMaxProcessTime(2)).isFalse();
-
-        logManager.end("end");
+        logManager.run("test", null, actionLog -> {
+            actionLog.warningContext.maxProcessTimeInNano(Duration.ofSeconds(1).toNanos());
+            assertThat(interceptor.withinMaxProcessTime(1)).isTrue();
+            assertThat(interceptor.withinMaxProcessTime(2)).isFalse();
+            return null;
+        });
     }
 }

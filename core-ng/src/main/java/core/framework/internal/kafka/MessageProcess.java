@@ -20,8 +20,7 @@ public class MessageProcess<T> {
     public final Object handler;
     public final JSONReader<T> reader;
     public final Validator<T> validator;
-    @Nullable
-    public final PerformanceWarning[] warnings;
+    public final PerformanceWarning @Nullable [] warnings;
 
     MessageProcess(Object handler, Class<T> messageClass) {
         this.handler = handler;
@@ -40,8 +39,7 @@ public class MessageProcess<T> {
         return (BulkMessageHandler<T>) handler;
     }
 
-    @Nullable
-    private PerformanceWarning[] warnings(Object handler) {
+    private PerformanceWarning @Nullable [] warnings(Object handler) {
         try {
             Method targetMethod;
             if (handler instanceof MessageHandler) {

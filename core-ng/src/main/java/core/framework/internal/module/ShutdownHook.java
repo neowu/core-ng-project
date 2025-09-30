@@ -80,16 +80,14 @@ public final class ShutdownHook implements Runnable {
             }
         }
 
-        ActionLog actionLog = logManager.begin("=== shutdown begin ===", null);
-        logContext(actionLog);
-
         long endTime = System.currentTimeMillis() + shutdownTimeoutInNano / 1_000_000;
-
-        shutdown(endTime, STAGE_0, STAGE_6);
-        logManager.end("=== shutdown end ==="); // end action log before closing kafka log appender
-
+        ActionLog log = logManager.run("stop", null, actionLog -> {
+            logContext(actionLog);
+            shutdown(endTime, STAGE_0, STAGE_6);    // end action log before closing kafka log appender
+            return actionLog;
+        });
         shutdown(endTime, STAGE_7, STAGE_8);
-        logger.info("shutdown completed, elapsed={}", actionLog.elapsed());
+        logger.info("shutdown completed, elapsed={}", log.elapsed());
     }
 
     void logContext(ActionLog actionLog) {

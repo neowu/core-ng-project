@@ -308,7 +308,7 @@ public final class DatabaseImpl implements Database {
     }
 
     void track(long elapsed, int readRows, int writeRows, int queries) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog != null) {
             actionLog.stats.compute("db_queries", (k, oldValue) -> (oldValue == null) ? queries : oldValue + queries);
             actionLog.track("db", elapsed, readRows, writeRows);

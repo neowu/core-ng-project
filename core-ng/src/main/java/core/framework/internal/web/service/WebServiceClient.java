@@ -117,7 +117,7 @@ public class WebServiceClient {
         Map<String, String> headers = request.headers;
         headers.put(HTTPHandler.HEADER_CLIENT.toString(), LogManager.APP_NAME);
 
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog == null) return;  // web service client may be used without action log context
 
         headers.put(HTTPHandler.HEADER_CORRELATION_ID.toString(), actionLog.correlationId());

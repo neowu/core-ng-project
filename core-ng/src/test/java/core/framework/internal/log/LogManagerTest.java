@@ -58,8 +58,7 @@ class LogManagerTest {
     void endWithAppenderFailure() {
         doThrow(new Error("test")).when(appender).append(any(ActionLogMessage.class));
 
-        logManager.begin("begin", null);
-        logManager.end("end");
+        logManager.run("test", null, actionLog -> null);
     }
 
     private static final class TestException extends Exception implements ErrorCode {

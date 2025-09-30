@@ -4,6 +4,7 @@ import core.framework.internal.log.Trace;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +19,18 @@ public class KafkaMessage {
 
     final String key;
     final byte[] value;
+    @Nullable
     final Trace trace;
+    @Nullable
     final String correlationId;
+    @Nullable
     final String refId;
+    @Nullable
     final String client;
     final long timestamp;
 
     // one poll batch is small (~500) and short (~500ms), it doesn't expect many messages with same key (less than 3?)
+    @Nullable
     List<KafkaMessage> subsequent;
 
     KafkaMessage(ConsumerRecord<String, byte[]> record) {
@@ -41,6 +47,7 @@ public class KafkaMessage {
         timestamp = record.timestamp();
     }
 
+    @Nullable
     final String header(Headers headers, String key) {
         Header header = headers.lastHeader(key);
         if (header == null) return null;

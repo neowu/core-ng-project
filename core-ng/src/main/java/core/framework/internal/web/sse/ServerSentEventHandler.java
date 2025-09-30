@@ -79,13 +79,24 @@ public class ServerSentEventHandler implements HttpHandler {
     void handle(HttpServerExchange exchange, StreamSinkChannel sink) {
         VirtualThread.COUNT.increase();
         long httpDelay = System.nanoTime() - exchange.getRequestStartTime();
-        ActionLog actionLog = logManager.begin("=== sse connect begin ===", null);
+
+        try {
+            logManager.run("sse", null, actionLog -> {
+                logger.debug("httpDelay={}", httpDelay);
+                actionLog.stats.put("http_delay", (double) httpDelay);
+
+                handleSSEConnect(exchange, sink, actionLog);
+                return null;
+            });
+        } finally {
+            VirtualThread.COUNT.decrease();
+        }
+    }
+
+    private void handleSSEConnect(HttpServerExchange exchange, StreamSinkChannel sink, ActionLog actionLog) {
         var request = new RequestImpl(exchange, handlerContext.requestBeanReader);
         ChannelImpl<Object> channel = null;
         try {
-            logger.debug("httpDelay={}", httpDelay);
-            actionLog.stats.put("http_delay", (double) httpDelay);
-
             handlerContext.requestParser.parse(request, exchange, actionLog);
             if (handlerContext.accessControl != null) handlerContext.accessControl.validate(request.clientIP());  // check ip before checking routing, return 403 asap
 
@@ -131,9 +142,6 @@ public class ServerSentEventHandler implements HttpHandler {
                 channel.sendBytes(Strings.bytes(message));
                 channel.close();    // gracefully shutdown connection to make sure retry/error can be sent
             }
-        } finally {
-            logManager.end("=== sse connect end ===");
-            VirtualThread.COUNT.decrease();
         }
     }
 

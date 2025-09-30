@@ -1,6 +1,5 @@
 package core.framework.internal.kafka;
 
-import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.Trace;
 import core.framework.util.Strings;
@@ -36,25 +35,25 @@ class MessagePublisherImplTest {
 
     @Test
     void publish() {
-        ActionLog actionLog = logManager.begin("begin", null);
-        actionLog.correlationIds = List.of("correlationId");
-        actionLog.trace = Trace.CASCADE;
+        logManager.run("test", null, actionLog -> {
+            actionLog.correlationIds = List.of("correlationId");
+            actionLog.trace = Trace.CASCADE;
 
-        var message = new TestMessage();
-        message.stringField = "value";
+            var message = new TestMessage();
+            message.stringField = "value";
 
-        publisher.publish(message);
-        verify(producer).send(argThat(record -> {
-            assertThat(record.key()).isNull();
-            assertThat(new String(record.headers().lastHeader(KafkaMessage.HEADER_CORRELATION_ID).value(), UTF_8)).isEqualTo("correlationId");
-            assertThat(new String(record.headers().lastHeader(KafkaMessage.HEADER_REF_ID).value(), UTF_8)).isEqualTo(actionLog.id);
-            assertThat(new String(record.headers().lastHeader(KafkaMessage.HEADER_TRACE).value(), UTF_8)).isEqualTo(Trace.CASCADE.name());
-            return true;
-        }));
+            publisher.publish(message);
+            verify(producer).send(argThat(record -> {
+                assertThat(record.key()).isNull();
+                assertThat(new String(record.headers().lastHeader(KafkaMessage.HEADER_CORRELATION_ID).value(), UTF_8)).isEqualTo("correlationId");
+                assertThat(new String(record.headers().lastHeader(KafkaMessage.HEADER_REF_ID).value(), UTF_8)).isEqualTo(actionLog.id);
+                assertThat(new String(record.headers().lastHeader(KafkaMessage.HEADER_TRACE).value(), UTF_8)).isEqualTo(Trace.CASCADE.name());
+                return true;
+            }));
 
-        publisher.publish("key", message);
-        verify(producer).send(argThat(record -> Arrays.equals(Strings.bytes("key"), record.key()) && "topic".equals(record.topic())));
-
-        logManager.end("end");
+            publisher.publish("key", message);
+            verify(producer).send(argThat(record -> Arrays.equals(Strings.bytes("key"), record.key()) && "topic".equals(record.topic())));
+            return null;
+        });
     }
 }

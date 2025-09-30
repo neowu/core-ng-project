@@ -133,7 +133,7 @@ public final class ExecutorImpl implements Executor {
 
     private <T> ExecutorTask<T> execution(String actionId, String action, Instant startTime, Callable<T> task) {
         var context = new ExecutorTask.TaskContext(actionId, action, startTime, maxProcessTimeInNano, runningTasks);
-        ActionLog parentActionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog parentActionLog = LogManager.currentActionLog();
         return new ExecutorTask<>(task, logManager, context, parentActionLog);
     }
 

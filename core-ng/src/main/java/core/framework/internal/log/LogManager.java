@@ -5,6 +5,7 @@ import core.framework.log.ErrorCode;
 import core.framework.log.LogAppender;
 import core.framework.log.Markers;
 import core.framework.log.Severity;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -12,16 +13,18 @@ import org.slf4j.Marker;
 import java.util.Collections;
 import java.util.Map;
 
+import static java.lang.ScopedValue.where;
+
 /**
  * @author neo
  */
 public class LogManager {
-    public static final ThreadLocal<ActionLog> CURRENT_ACTION_LOG = new ThreadLocal<>();
     public static final String APP_NAME;
 
     public static final IdGenerator ID_GENERATOR = new IdGenerator();
     static final LogFilter FILTER = new LogFilter();
     private static final Logger LOGGER = LoggerFactory.getLogger(LogManager.class);
+    private static final ScopedValue<ActionLog> CURRENT_ACTION_LOG = ScopedValue.newInstance();
 
     static {
         APP_NAME = appName(System.getenv());
@@ -43,23 +46,31 @@ public class LogManager {
         return appName;
     }
 
+    @Nullable
+    public static ActionLog currentActionLog() {
+        if (!CURRENT_ACTION_LOG.isBound()) return null;
+        return CURRENT_ACTION_LOG.get();
+    }
+
     private final ActionLogMessageFactory actionLogMessageFactory = new ActionLogMessageFactory();
     public LogAppender appender;
 
-    public ActionLog begin(String message, String id) {
-        var actionLog = new ActionLog(message, id);
-        CURRENT_ACTION_LOG.set(actionLog);
-        return actionLog;
+    public <T> T run(String action, String id, ActionLogCallable<T> task) {
+        var log = new ActionLog("=== " + action + " begin ===", id);
+        return where(CURRENT_ACTION_LOG, log).call(() -> {
+            try {
+                return task.call(log);
+            } finally {
+                log.end("=== " + action + " end ===");
+                appendLog(log);
+            }
+        });
     }
 
-    public void end(String message) {
-        ActionLog actionLog = CURRENT_ACTION_LOG.get();
-        actionLog.end(message);
-        CURRENT_ACTION_LOG.remove();    // actionLog.end(message) may produce more logs
-
+    private void appendLog(ActionLog log) {
         if (appender != null) {
             try {
-                appender.append(actionLogMessageFactory.create(actionLog));
+                appender.append(actionLogMessageFactory.create(log));
             } catch (Throwable e) {
                 LOGGER.warn("failed to append action log, error={}", e.getMessage(), e);
             }
@@ -82,5 +93,10 @@ public class LogManager {
 
     public void maskFields(String... fields) {
         Collections.addAll(FILTER.maskedFields, fields);
+    }
+
+    @FunctionalInterface
+    public interface ActionLogCallable<T> {
+        T call(ActionLog actionLog);
     }
 }

@@ -59,7 +59,14 @@ class ExecutorTask<T> implements Callable<T> {
     @Override
     public T call() throws Exception {
         VirtualThread.COUNT.increase();
-        ActionLog actionLog = logManager.begin("=== task execution begin ===", context.actionId);
+        try {
+            return logManager.run("task", context.actionId, this::call);
+        } finally {
+            VirtualThread.COUNT.decrease();
+        }
+    }
+
+    private T call(ActionLog actionLog) {
         try {
             actionLog.action(action());
             actionLog.warningContext.maxProcessTimeInNano(context.maxProcessTimeInNano);
@@ -83,9 +90,7 @@ class ExecutorTask<T> implements Callable<T> {
             logManager.logError(e);
             throw new TaskException(Strings.format("task failed, action={}, id={}, error={}", context.action, context.actionId, e.getMessage()), e);
         } finally {
-            logManager.end("=== task execution end ===");
             context.runningTasks.remove(toString());
-            VirtualThread.COUNT.decrease();
         }
     }
 

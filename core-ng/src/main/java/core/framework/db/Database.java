@@ -24,7 +24,7 @@ public interface Database {
      */
     static void suppressSlowSQLWarning(boolean suppress) {
         // pass flag thru thread local to MySQLQueryInterceptor, and put in action log to reset for every action
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog != null) {
             actionLog.warningContext.suppressSlowSQLWarning = suppress;
         }

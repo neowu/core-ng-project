@@ -59,7 +59,7 @@ public class RetryInterceptor implements Interceptor {
             attempts++;
 
             // set to actionLog directly to keep trace log concise
-            ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+            ActionLog actionLog = LogManager.currentActionLog();
             if (actionLog != null) actionLog.stats.compute("http_retries", (key, oldValue) -> (oldValue == null) ? 1.0 : oldValue + 1);
         }
     }
@@ -100,7 +100,7 @@ public class RetryInterceptor implements Interceptor {
 
     // for short circuit, e.g. heavy load request causes remote service busy, and client timeout triggers more retry requests, to amplify the load
     boolean withinMaxProcessTime(int attempts) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog == null) return true;
         long remainingTime = actionLog.remainingProcessTimeInNano();
         if (remainingTime <= waitTime(attempts).toNanos()) {

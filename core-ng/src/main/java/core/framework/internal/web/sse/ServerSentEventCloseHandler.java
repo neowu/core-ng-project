@@ -23,35 +23,43 @@ class ServerSentEventCloseHandler<T> implements ExchangeCompletionListener {
     public void exchangeEvent(HttpServerExchange exchange, NextListener next) {
         exchange.dispatch(() -> {
             VirtualThread.COUNT.increase();
-            ActionLog actionLog = logManager.begin("=== sse close begin ===", null);
             try {
-                actionLog.action("sse:" + exchange.getRequestPath() + ":close");
-                actionLog.context("channel", channel.id);
-                List<String> refIds = List.of(channel.refId);
-                actionLog.refIds = refIds;
-                actionLog.correlationIds = refIds;
-
-                actionLog.context("client_ip", channel.clientIP);
-                if (channel.traceId != null) actionLog.context("trace_id", channel.traceId);
-
-                actionLog.context("listener", support.listener.getClass().getCanonicalName());
-                support.listener.onClose(channel);
-
-                if (!channel.groups.isEmpty()) actionLog.context("group", channel.groups.toArray());
-                support.context.remove(channel);
-                channel.shutdown();
-
-                actionLog.stats.put("sse_event_count", (double) channel.eventCount);
-                actionLog.stats.put("sse_event_size", (double) channel.eventSize);
-            } catch (Throwable e) {
-                logManager.logError(e);
+                logManager.run("sse", null, actionLog -> {
+                    handleSSEClose(exchange, actionLog);
+                    return null;
+                });
             } finally {
-                double duration = System.nanoTime() - channel.startTime;
-                actionLog.stats.put("sse_duration", duration);
-                logManager.end("=== sse close end ===");
                 VirtualThread.COUNT.decrease();
             }
         });
         next.proceed();
+    }
+
+    private void handleSSEClose(HttpServerExchange exchange, ActionLog actionLog) {
+        try {
+            actionLog.action("sse:" + exchange.getRequestPath() + ":close");
+            actionLog.context("channel", channel.id);
+            List<String> refIds = List.of(channel.refId);
+            actionLog.refIds = refIds;
+            actionLog.correlationIds = refIds;
+
+            actionLog.context("client_ip", channel.clientIP);
+            if (channel.traceId != null) actionLog.context("trace_id", channel.traceId);
+
+            actionLog.context("listener", support.listener.getClass().getCanonicalName());
+            support.listener.onClose(channel);
+
+            if (!channel.groups.isEmpty()) actionLog.context("group", channel.groups.toArray());
+            support.context.remove(channel);
+            channel.shutdown();
+
+            actionLog.stats.put("sse_event_count", (double) channel.eventCount);
+            actionLog.stats.put("sse_event_size", (double) channel.eventSize);
+        } catch (Throwable e) {
+            logManager.logError(e);
+        } finally {
+            double duration = System.nanoTime() - channel.startTime;
+            actionLog.stats.put("sse_duration", duration);
+        }
     }
 }

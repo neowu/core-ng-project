@@ -145,30 +145,36 @@ public final class Scheduler {
     private void submitJob(Task task, ZonedDateTime scheduledTime, @Nullable String triggerActionId) {
         jobExecutor.submit(() -> {
             VirtualThread.COUNT.increase();
-            ActionLog actionLog = logManager.begin("=== job execution begin ===", null);
             try {
-                String name = task.name();
-                actionLog.action("job:" + name);
-                if (triggerActionId != null) {  // triggered by scheduler controller
-                    actionLog.refIds = List.of(triggerActionId);
-                    actionLog.correlationIds = List.of(triggerActionId);
-                    actionLog.trace = Trace.CASCADE;
-                }
-                actionLog.warningContext.maxProcessTimeInNano(maxProcessTimeInNano);
-                actionLog.context("trigger", task.trigger());
-                Job job = task.job();
-                actionLog.context("job", name);
-                actionLog.context("job_class", job.getClass().getCanonicalName());
-                actionLog.context("scheduled_time", scheduledTime.toInstant());
-                job.execute(new JobContext(name, scheduledTime));
-                return null;
-            } catch (Throwable e) {
-                logManager.logError(e);
-                throw e;
+                return logManager.run("job", null, actionLog -> {
+                    runJob(task, scheduledTime, triggerActionId, actionLog);
+                    return null;
+                });
             } finally {
-                logManager.end("=== job execution end ===");
                 VirtualThread.COUNT.decrease();
             }
         });
+    }
+
+    private void runJob(Task task, ZonedDateTime scheduledTime, @Nullable String triggerActionId, ActionLog actionLog) {
+        try {
+            String name = task.name();
+            actionLog.action("job:" + name);
+            if (triggerActionId != null) {  // triggered by scheduler controller
+                actionLog.refIds = List.of(triggerActionId);
+                actionLog.correlationIds = List.of(triggerActionId);
+                actionLog.trace = Trace.CASCADE;
+            }
+            actionLog.warningContext.maxProcessTimeInNano(maxProcessTimeInNano);
+            actionLog.context("trigger", task.trigger());
+            Job job = task.job();
+            actionLog.context("job", name);
+            actionLog.context("job_class", job.getClass().getCanonicalName());
+            actionLog.context("scheduled_time", scheduledTime.toInstant());
+            job.execute(new JobContext(name, scheduledTime));
+        } catch (Throwable e) {
+            logManager.logError(e);
+            throw new JobException(format("job failed, job={}, id={}, error={}", task.name(), actionLog.id, e.getMessage()), e);
+        }
     }
 }

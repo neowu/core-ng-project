@@ -22,8 +22,7 @@ public final class WarningContext {
         new PerformanceWarning("mongo", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000)
     };
 
-    @Nullable
-    public static PerformanceWarning[] warnings(IOWarning[] warnings) {
+    public static PerformanceWarning @Nullable [] warnings(IOWarning[] warnings) {
         if (warnings.length == 0) return null;
 
         var results = new PerformanceWarning[warnings.length];

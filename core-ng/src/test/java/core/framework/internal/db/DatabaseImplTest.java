@@ -8,6 +8,7 @@ import core.framework.internal.log.LogLevel;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.WarningContext;
 import core.framework.log.IOWarning;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -252,13 +253,14 @@ class DatabaseImplTest {
     @Test
     void track() {
         var logManager = new LogManager();
-        ActionLog actionLog = logManager.begin("begin", null);
-        actionLog.warningContext.maxProcessTimeInNano(100);
-        database.track(100, 1, 0, 1);
-        assertThat(actionLog.stats).containsEntry("db_queries", 1.0);
-        database.track(100, 1, 0, 1);
-        assertThat(actionLog.stats).containsEntry("db_queries", 2.0);
-        logManager.end("end");
+        logManager.run("test", null, actionLog -> {
+            actionLog.warningContext.maxProcessTimeInNano(100);
+            database.track(100, 1, 0, 1);
+            assertThat(actionLog.stats).containsEntry("db_queries", 1.0);
+            database.track(100, 1, 0, 1);
+            assertThat(actionLog.stats).containsEntry("db_queries", 2.0);
+            return null;
+        });
     }
 
     @Test
@@ -267,17 +269,21 @@ class DatabaseImplTest {
         IOWarning[] warnings = getClass().getDeclaredMethod("trackWithTooManyDBOperations").getDeclaredAnnotationsByType(IOWarning.class); // for convenience of test, not actual usage
 
         var logManager = new LogManager();
-        ActionLog actionLog = logManager.begin("begin", null);
+        ActionLog log = logManager.run("test", null, actionLog -> trackWithTooManyDBOperations(actionLog, warnings));
+
+        assertThat(log.result).isEqualTo(LogLevel.WARN);
+        assertThat(log.errorCode()).isEqualTo("HIGH_DB_IO");
+        assertThat(log.errorMessage).startsWith("too many operations, operation=db");
+    }
+
+    @SuppressFBWarnings("CFS_CONFUSING_FUNCTION_SEMANTICS")
+    private ActionLog trackWithTooManyDBOperations(ActionLog actionLog, IOWarning[] warnings) {
         actionLog.initializeWarnings(requireNonNull(WarningContext.warnings(warnings)));
         for (int i = 0; i < 10; i++) {
             database.track(100, 0, 1, 20);
         }
         assertThat(actionLog.stats).containsEntry("db_queries", 200.0);
-        logManager.end("end");
-
-        assertThat(actionLog.result).isEqualTo(LogLevel.WARN);
-        assertThat(actionLog.errorCode()).isEqualTo("HIGH_DB_IO");
-        assertThat(actionLog.errorMessage).startsWith("too many operations, operation=db");
+        return actionLog;
     }
 
     @Test
@@ -287,13 +293,14 @@ class DatabaseImplTest {
         IOWarning[] warnings = getClass().getDeclaredMethod("trackWithReadTooManyRows").getDeclaredAnnotationsByType(IOWarning.class); // for convenience of test, not actual usage
 
         var logManager = new LogManager();
-        ActionLog actionLog = logManager.begin("begin", null);
-        actionLog.initializeWarnings(requireNonNull(WarningContext.warnings(warnings)));
-        database.track(100, 100, 1, 20);
-        assertThat(actionLog.result).isEqualTo(LogLevel.WARN);
-        assertThat(actionLog.errorCode()).isEqualTo("HIGH_DB_IO");
-        assertThat(actionLog.errorMessage).startsWith("read too many entries once, operation=db");
-        logManager.end("end");
+        logManager.run("test", null, actionLog -> {
+            actionLog.initializeWarnings(requireNonNull(WarningContext.warnings(warnings)));
+            database.track(100, 100, 1, 20);
+            assertThat(actionLog.result).isEqualTo(LogLevel.WARN);
+            assertThat(actionLog.errorCode()).isEqualTo("HIGH_DB_IO");
+            assertThat(actionLog.errorMessage).startsWith("read too many entries once, operation=db");
+            return null;
+        });
     }
 
     private void insertRow(int id, String stringField, TestEnum enumField) {

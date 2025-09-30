@@ -42,16 +42,14 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
     private final ReentrantLock lock = new ReentrantLock();
     private final HttpServerExchange exchange;
     private final StreamSinkChannel sink;
-
-    long lastSentTime = startTime;
-    private volatile boolean closed = false;
-
     private final Map<String, Object> context = new ConcurrentHashMap<>();
+    long lastSentTime = startTime;
     long eventCount;
     long eventSize;
-
     String clientIP;
+    @Nullable
     String traceId;
+    private volatile boolean closed = false;
 
     ChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ServerSentEventContextImpl<T> serverSentEventContext, ServerSentEventWriter<T> builder, String refId) {
         this.exchange = exchange;
@@ -179,6 +177,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
     }
 
     private final class WriteListener implements ChannelListener<StreamSinkChannel> {
+        @Nullable
         private ByteBuffer buffer;
 
         @Override

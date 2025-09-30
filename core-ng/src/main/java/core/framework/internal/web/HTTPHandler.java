@@ -73,14 +73,28 @@ public class HTTPHandler implements HttpHandler {
         semaphore.acquireUninterruptibly();
         VirtualThread.COUNT.increase();
         long httpDelay = System.nanoTime() - exchange.getRequestStartTime();
-        ActionLog actionLog = logManager.begin("=== http transaction begin ===", null);
-        var request = new RequestImpl(exchange, handlerContext.requestBeanReader);
+
         try {
-            webContext.initialize(request);
+            logManager.run("http", null, actionLog -> {
+                var request = new RequestImpl(exchange, handlerContext.requestBeanReader);
+                webContext.run(request, () -> {
+                    logger.debug("httpDelay={}", httpDelay);    // http delay includes request body parsing time, it could be long if client sent post body slowly, and it is usually low, so not to use Duration format
+                    actionLog.stats.put("http_delay", (double) httpDelay);
 
-            logger.debug("httpDelay={}", httpDelay);    // http delay includes request body parsing time, it could be long if client sent post body slowly, and it is usually low, so not to use Duration format
-            actionLog.stats.put("http_delay", (double) httpDelay);
+                    handle(exchange, request, actionLog);
+                });
+                return null;
+            });
+        } finally {
+            // refer to io.undertow.io.AsyncSenderImpl.send(java.nio.ByteBuffer, io.undertow.io.IoCallback),
+            // sender.send() will write response until can't write more, then call channel.resumeWrites(), which will resume after this finally block finished, so this can be small delay
+            VirtualThread.COUNT.decrease();
+            semaphore.release();
+        }
+    }
 
+    private void handle(HttpServerExchange exchange, RequestImpl request, ActionLog actionLog) {
+        try {
             handlerContext.requestParser.parse(request, exchange, actionLog);
 
             if (handlerContext.accessControl != null) handlerContext.accessControl.validate(request.clientIP());  // check ip before checking routing, return 403 asap
@@ -104,13 +118,6 @@ public class HTTPHandler implements HttpHandler {
         } catch (Throwable e) {
             logManager.logError(e);
             errorHandler.handleError(e, exchange, request, actionLog);
-        } finally {
-            // refer to io.undertow.io.AsyncSenderImpl.send(java.nio.ByteBuffer, io.undertow.io.IoCallback),
-            // sender.send() will write response until can't write more, then call channel.resumeWrites(), which will resume after this finally block finished, so this can be small delay
-            webContext.cleanup();
-            logManager.end("=== http transaction end ===");
-            VirtualThread.COUNT.decrease();
-            semaphore.release();
         }
     }
 

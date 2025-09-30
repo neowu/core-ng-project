@@ -273,7 +273,7 @@ public class DatabaseOperation {
             boolean badIndexUsed = diagnostic.noGoodIndexUsed();
             if (!noIndexUsed && !badIndexUsed) return;
 
-            ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+            ActionLog actionLog = LogManager.currentActionLog();
             boolean warning = actionLog == null || !actionLog.warningContext.suppressSlowSQLWarning;
             String message = noIndexUsed ? "no index used" : "bad index used";
             String sqlValue = diagnostic.sql();

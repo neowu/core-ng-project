@@ -5,7 +5,7 @@ import java.io.Serial;
 /**
  * @author neo
  */
-public class TaskException extends Exception {
+public class TaskException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = -5143310703118077256L;
 

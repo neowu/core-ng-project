@@ -25,26 +25,30 @@ class ActionLogContextTest {
         assertThat(ActionLogContext.track("db", 100)).isEqualTo(1);
     }
 
-    @SuppressFBWarnings("NP_LOAD_OF_KNOWN_NULL_VALUE")
     @Test
     void withCurrentActionLog() {
         var logManager = new LogManager();
-        logManager.begin("begin", null);
 
-        assertThat(ActionLogContext.id()).isNotNull();
+        logManager.run("test", null, actionLog -> {
+            assertThat(ActionLogContext.id()).isNotNull();
 
-        assertThat(ActionLogContext.get("key")).isEmpty();
-        ActionLogContext.put("key", "value");
-        assertThat(ActionLogContext.get("key")).contains("value");
+            assertThat(ActionLogContext.get("key")).isEmpty();
+            ActionLogContext.put("key", "value");
+            assertThat(ActionLogContext.get("key")).contains("value");
 
+            putNullContextValue();
+            assertThat(ActionLogContext.get("nullValue")).contains("null");
+
+            assertThat(ActionLogContext.track("db", 100)).isEqualTo(1);
+            assertThat(ActionLogContext.track("db", 100)).isEqualTo(2);
+            return null;
+        });
+    }
+
+    @SuppressFBWarnings("NP_LOAD_OF_KNOWN_NULL_VALUE")
+    private void putNullContextValue() {
         String value = null;
         ActionLogContext.put("nullValue", value);
-        assertThat(ActionLogContext.get("nullValue")).contains("null");
-
-        assertThat(ActionLogContext.track("db", 100)).isEqualTo(1);
-        assertThat(ActionLogContext.track("db", 100)).isEqualTo(2);
-
-        logManager.end("end");
     }
 
     @Test
@@ -52,10 +56,11 @@ class ActionLogContextTest {
         ActionLogContext.triggerTrace(true);
 
         var logManager = new LogManager();
-        logManager.begin("begin", null);
-        ActionLogContext.triggerTrace(false);
-        assertThat(LogManager.CURRENT_ACTION_LOG.get().trace).isEqualTo(Trace.CURRENT);
-        logManager.end("end");
+        logManager.run("test", null, actionLog -> {
+            ActionLogContext.triggerTrace(false);
+            assertThat(actionLog.trace).isEqualTo(Trace.CURRENT);
+            return null;
+        });
     }
 
     @Test
@@ -63,9 +68,10 @@ class ActionLogContextTest {
         assertThat(ActionLogContext.remainingProcessTime()).isNull();
 
         var logManager = new LogManager();
-        logManager.begin("begin", null);
-        ActionLogContext.maxProcessTime(Duration.ofMinutes(30));
-        assertThat(ActionLogContext.remainingProcessTime()).isGreaterThan(Duration.ofMinutes(20));
-        logManager.end("end");
+        logManager.run("test", null, actionLog -> {
+            ActionLogContext.maxProcessTime(Duration.ofMinutes(30));
+            assertThat(ActionLogContext.remainingProcessTime()).isGreaterThan(Duration.ofMinutes(20));
+            return null;
+        });
     }
 }

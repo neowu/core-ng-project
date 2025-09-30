@@ -209,32 +209,32 @@ class MessageListenerThread extends Thread {
     }
 
     <T> void handleSingle(String topic, MessageProcess<T> process, KafkaMessage message) {
-        ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
-        try {
-            initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), process.warnings);
+        logManager.run("message", null, actionLog -> {
+            try {
+                initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), process.warnings);
 
-            actionLog.track("kafka", 0, 1, 0);
+                actionLog.track("kafka", 0, 1, 0);
 
-            if (message.trace != null) actionLog.trace = message.trace;
-            if (message.correlationId != null) actionLog.correlationIds = List.of(message.correlationId);
-            if (message.client != null) actionLog.clients = List.of(message.client);
-            if (message.refId != null) actionLog.refIds = List.of(message.refId);
-            logger.debug("[header] refId={}, client={}, correlationId={}, trace={}", message.refId, message.client, message.correlationId, message.trace);
+                if (message.trace != null) actionLog.trace = message.trace;
+                if (message.correlationId != null) actionLog.correlationIds = List.of(message.correlationId);
+                if (message.client != null) actionLog.clients = List.of(message.client);
+                if (message.refId != null) actionLog.refIds = List.of(message.refId);
+                logger.debug("[header] refId={}, client={}, correlationId={}, trace={}", message.refId, message.client, message.correlationId, message.trace);
 
-            actionLog.context.put("key", Collections.singletonList(message.key)); // key can be null
+                actionLog.context.put("key", Collections.singletonList(message.key)); // key can be null
 
-            checkConsumerDelay(actionLog, message.timestamp, listener.longConsumerDelayThresholdInNano);
+                checkConsumerDelay(actionLog, message.timestamp, listener.longConsumerDelayThresholdInNano);
 
-            logger.debug("[message] key={}, value={}, timestamp={}", message.key, new BytesLogParam(message.value), message.timestamp);
+                logger.debug("[message] key={}, value={}, timestamp={}", message.key, new BytesLogParam(message.value), message.timestamp);
 
-            T messageObject = process.reader.fromJSON(message.value);
-            process.validator.validate(messageObject, false);
-            process.handler().handle(message.key, messageObject);
-        } catch (Throwable e) {
-            logManager.logError(e);
-        } finally {
-            logManager.end("=== message handling end ===");
-        }
+                T messageObject = process.reader.fromJSON(message.value);
+                process.validator.validate(messageObject, false);
+                process.handler().handle(message.key, messageObject);
+            } catch (Throwable e) {
+                logManager.logError(e);
+            }
+            return null;
+        });
     }
 
     private void processBulk(MessageProcess<?> bulkProcess, KafkaMessages messages) throws InterruptedException {
@@ -251,24 +251,24 @@ class MessageListenerThread extends Thread {
     }
 
     <T> void handleBulk(String topic, MessageProcess<T> process, List<KafkaMessage> messages) {
-        ActionLog actionLog = logManager.begin("=== message handling begin ===", null);
-        try {
-            initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), process.warnings);
+        logManager.run("message", null, actionLog -> {
+            try {
+                initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), process.warnings);
 
-            List<Message<T>> messageObjects = messages(messages, actionLog, process.reader);
-            for (Message<T> message : messageObjects) {   // validate after fromJSON, so it can track refId/correlationId
-                process.validator.validate(message.value, false);
+                List<Message<T>> messageObjects = messages(messages, actionLog, process.reader);
+                for (Message<T> message : messageObjects) {   // validate after fromJSON, so it can track refId/correlationId
+                    process.validator.validate(message.value, false);
+                }
+
+                process.bulkHandler().handle(messageObjects);
+            } catch (Throwable e) {
+                logManager.logError(e);
             }
-
-            process.bulkHandler().handle(messageObjects);
-        } catch (Throwable e) {
-            logManager.logError(e);
-        } finally {
-            logManager.end("=== message handling end ===");
-        }
+            return null;
+        });
     }
 
-    private void initAction(ActionLog actionLog, String topic, String handler, PerformanceWarning[] warnings) {
+    private void initAction(ActionLog actionLog, String topic, String handler, PerformanceWarning @Nullable [] warnings) {
         actionLog.action("topic:" + topic);
         actionLog.warningContext.maxProcessTimeInNano(listener.maxProcessTimeInNano);
         actionLog.context.put("topic", List.of(topic));

@@ -47,7 +47,7 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("publish, topic={}, key={}, message={}, elapsed={}", topic, key, new BytesLogParam(message), elapsed);
-            ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+            ActionLog actionLog = LogManager.currentActionLog();
             if (actionLog != null) {
                 trackMaxMessageSize(actionLog, message.length);
                 actionLog.track("kafka", elapsed, 0, 1);   // kafka producer send message in background, the main purpose of track is to count how many message sent in action
@@ -68,7 +68,7 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
     private void linkContext(Headers headers) {
         headers.add(KafkaMessage.HEADER_CLIENT, Strings.bytes(LogManager.APP_NAME));
 
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog == null) return;      // publisher may be used without action log context
 
         headers.add(KafkaMessage.HEADER_CORRELATION_ID, Strings.bytes(actionLog.correlationId()));

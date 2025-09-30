@@ -30,14 +30,15 @@ class HTTPEventListenerFactoryTest {
         Proxy proxy = mock(Proxy.class);
         var logManager = new LogManager();
 
-        logManager.begin("begin", null);
-        EventListener listener = factory.create(call);
-        listener.dnsStart(call, "domain");
-        listener.dnsEnd(call, "domain", List.of());
-        listener.connectStart(call, new InetSocketAddress(8443), proxy);
-        listener.connectEnd(call, new InetSocketAddress(8443), proxy, Protocol.HTTP_2);
-        listener.responseHeadersStart(call);
-        listener.responseBodyEnd(call, -1);
-        logManager.end("end");
+        logManager.run("test", null, actionLog -> {
+            EventListener listener = factory.create(call);
+            listener.dnsStart(call, "domain");
+            listener.dnsEnd(call, "domain", List.of());
+            listener.connectStart(call, new InetSocketAddress(8443), proxy);
+            listener.connectEnd(call, new InetSocketAddress(8443), proxy, Protocol.HTTP_2);
+            listener.responseHeadersStart(call);
+            listener.responseBodyEnd(call, -1);
+            return null;
+        });
     }
 }

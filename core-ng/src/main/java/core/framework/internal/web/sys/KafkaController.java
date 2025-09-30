@@ -87,7 +87,7 @@ public class KafkaController {
     }
 
     private ActionLog initAction(String topic, String key) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         actionLog.context.put("topic", List.of(topic));
         actionLog.context.put("key", List.of(key));
         return actionLog;

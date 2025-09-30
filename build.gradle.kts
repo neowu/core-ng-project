@@ -42,6 +42,7 @@ project("core-ng") {
         implementation("io.undertow:undertow-core:2.3.18.Final")
         implementation("org.apache.kafka:kafka-clients:4.1.0") {
             exclude("org.xerial.snappy")
+            exclude("org.lz4")
         }
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")
         compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.3")

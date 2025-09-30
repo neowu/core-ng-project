@@ -66,22 +66,28 @@ class MessageListenerThreadTest {
 
     @Test
     void checkConsumerDelay() {
-        var actionLog = logManager.begin(null, null);
-        thread.checkConsumerDelay(actionLog, actionLog.date.minusSeconds(5).toEpochMilli(), Duration.ofSeconds(3).toNanos());
-        assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofSeconds(5).toNanos());
-        assertThat(actionLog.result).isEqualTo(LogLevel.WARN);
-        assertThat(actionLog.errorCode()).isEqualTo("LONG_CONSUMER_DELAY");
+        logManager.run("test", null, actionLog -> {
+            thread.checkConsumerDelay(actionLog, actionLog.date.minusSeconds(5).toEpochMilli(), Duration.ofSeconds(3).toNanos());
+            assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofSeconds(5).toNanos());
+            assertThat(actionLog.result).isEqualTo(LogLevel.WARN);
+            assertThat(actionLog.errorCode()).isEqualTo("LONG_CONSUMER_DELAY");
+            return null;
+        });
 
-        actionLog = logManager.begin(null, null);
-        thread.checkConsumerDelay(actionLog, actionLog.date.minus(Duration.ofMinutes(16)).toEpochMilli(), Duration.ofSeconds(30).toNanos());
-        assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofMinutes(16).toNanos());
-        assertThat(actionLog.result).isEqualTo(LogLevel.ERROR);
-        assertThat(actionLog.errorCode()).isEqualTo("LONG_CONSUMER_DELAY");
+        logManager.run("test", null, actionLog -> {
+            thread.checkConsumerDelay(actionLog, actionLog.date.minus(Duration.ofMinutes(16)).toEpochMilli(), Duration.ofSeconds(30).toNanos());
+            assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofMinutes(16).toNanos());
+            assertThat(actionLog.result).isEqualTo(LogLevel.ERROR);
+            assertThat(actionLog.errorCode()).isEqualTo("LONG_CONSUMER_DELAY");
+            return null;
+        });
 
-        actionLog = logManager.begin(null, null);
-        thread.checkConsumerDelay(actionLog, actionLog.date.minusSeconds(1).toEpochMilli(), Duration.ofSeconds(6).toNanos());
-        assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofSeconds(1).toNanos());
-        assertThat(actionLog.errorCode()).isNull();
+        logManager.run("test", null, actionLog -> {
+            thread.checkConsumerDelay(actionLog, actionLog.date.minusSeconds(1).toEpochMilli(), Duration.ofSeconds(6).toNanos());
+            assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofSeconds(1).toNanos());
+            assertThat(actionLog.errorCode()).isNull();
+            return null;
+        });
     }
 
     @Test

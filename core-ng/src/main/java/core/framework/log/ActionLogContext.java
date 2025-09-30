@@ -18,13 +18,13 @@ public final class ActionLogContext {
 
     @Nullable
     public static String id() {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog == null) return null;
         return actionLog.id;
     }
 
     public static List<String> get(String key) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog == null) return List.of();
         List<String> values = actionLog.context.get(key);
         if (values == null) return List.of();
@@ -32,7 +32,7 @@ public final class ActionLogContext {
     }
 
     public static void put(String key, @Nullable Object... values) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog != null) {    // here to check null is for unit testing the logManager.begin may not be called
             actionLog.context(key, values);
         }
@@ -40,7 +40,7 @@ public final class ActionLogContext {
 
     // to collect numeric metrics, and can be aggregated by Elasticsearch/Kibana
     public static void stat(String key, double value) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog != null) {
             actionLog.stat(key, value);
         }
@@ -52,13 +52,13 @@ public final class ActionLogContext {
 
     // return the total count of operations within current action
     public static int track(String operation, long elapsed, int readEntries, int writeEntries) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog == null) return 1;    // be called without action context
         return actionLog.track(operation, elapsed, readEntries, writeEntries);
     }
 
     public static void triggerTrace(boolean cascade) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog != null) {
             Trace trace = cascade ? Trace.CASCADE : Trace.CURRENT;
             LOGGER.debug("trigger trace, trace={}", trace);
@@ -68,7 +68,7 @@ public final class ActionLogContext {
 
     // for non-critical actions, set max process time to avoid slow_process warning
     public static void maxProcessTime(Duration duration) {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog != null) {
             actionLog.warningContext.maxProcessTimeInNano(duration.toNanos());
         }
@@ -77,7 +77,7 @@ public final class ActionLogContext {
     // for long process, use this guidance to determine whether continue to do more work
     @Nullable
     public static Duration remainingProcessTime() {
-        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+        ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog == null) return null;
         return Duration.ofNanos(actionLog.remainingProcessTimeInNano());
     }

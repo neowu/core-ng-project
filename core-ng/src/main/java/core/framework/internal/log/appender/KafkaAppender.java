@@ -17,6 +17,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.record.CompressionType;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -185,7 +186,7 @@ public final class KafkaAppender implements LogAppender {
     // so here use inner class as workaround
     class KafkaCallback implements Callback {
         @Override
-        public void onCompletion(RecordMetadata metadata, Exception exception) {
+        public void onCompletion(RecordMetadata metadata, @Nullable Exception exception) {
             if (exception != null) {
                 logger.warn("failed to send log message", exception);
                 records.clear();

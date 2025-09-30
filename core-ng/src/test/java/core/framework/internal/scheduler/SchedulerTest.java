@@ -1,7 +1,6 @@
 package core.framework.internal.scheduler;
 
 
-import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.Trace;
 import core.framework.scheduler.Job;
@@ -27,9 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,12 +40,12 @@ class SchedulerTest {
     ScheduledExecutorService schedulerExecutor;
     @Mock
     ExecutorService jobExecutor;
-    @Mock
     LogManager logManager;
     private Scheduler scheduler;
 
     @BeforeEach
     void createScheduler() {
+        logManager = new LogManager();
         scheduler = new Scheduler(logManager, schedulerExecutor, jobExecutor);
     }
 
@@ -99,21 +96,13 @@ class SchedulerTest {
     @Test
     void triggerNow() throws Exception {
         scheduler.addFixedRateTask("hourly-job", new TestJob(), Duration.ofHours(1));
-        scheduler.triggerNow("hourly-job", "actionId");
+        scheduler.triggerNow("hourly-job", "triggerActionId");
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Callable<?>> task = ArgumentCaptor.forClass(Callable.class);
         verify(jobExecutor).submit(task.capture());
 
-        var actionLog = new ActionLog(null, null);
-        when(logManager.begin(anyString(), isNull())).thenReturn(actionLog);
-
         task.getValue().call();
-
-        assertThat(actionLog.trace).isEqualTo(Trace.CASCADE);
-        assertThat(actionLog.refIds).isEqualTo(List.of("actionId"));
-        assertThat(actionLog.correlationIds).isEqualTo(List.of("actionId"));
-        assertThat(actionLog.context).containsKeys("trigger", "job", "job_class", "scheduled_time");
     }
 
     @Test
@@ -130,6 +119,12 @@ class SchedulerTest {
         public void execute(JobContext context) {
             assertThat(context.name).isNotNull();
             assertThat(context.scheduledTime).isNotNull();
+
+            var actionLog = LogManager.currentActionLog();
+            assertThat(actionLog.trace).isEqualTo(Trace.CASCADE);
+            assertThat(actionLog.refIds).isEqualTo(List.of("triggerActionId"));
+            assertThat(actionLog.correlationIds).isEqualTo(List.of("triggerActionId"));
+            assertThat(actionLog.context).containsKeys("trigger", "job", "job_class", "scheduled_time");
         }
     }
 }

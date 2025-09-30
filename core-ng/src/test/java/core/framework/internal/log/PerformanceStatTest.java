@@ -22,29 +22,25 @@ class PerformanceStatTest {
 
     @Test
     void checkSingleIO() {
-        try {
-            ActionLog actionLog = logManager.begin("begin", null);
+        logManager.run("test", null, actionLog -> {
             stat.checkSingleIO(Duration.ofSeconds(10).toNanos(), 1000);
 
             assertThat(actionLog.errorCode()).isEqualTo("SLOW_DB");
             assertThat(actionLog.errorMessage).startsWith("slow operation, operation=db, elapsed=PT10S");
-        } finally {
-            logManager.end("end");
-        }
+            return null;
+        });
     }
 
     @Test
     void checkTotalIO() {
-        try {
-            ActionLog actionLog = logManager.begin("begin", null);
+        logManager.run("test", null, actionLog -> {
             stat.readEntries = 20_000;
             stat.writeEntries = 20_000;
             stat.checkTotalIO();
 
             assertThat(actionLog.errorCode()).isEqualTo("HIGH_DB_IO");
             assertThat(actionLog.errorMessage).startsWith("read too many entries, operation=db, entries=20000");
-        } finally {
-            logManager.end("end");
-        }
+            return null;
+        });
     }
 }
