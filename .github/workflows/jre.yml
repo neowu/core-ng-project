@@ -12,5 +12,5 @@ jobs:
     - uses: docker/build-push-action@v4
       with:
         context: "docker/jre"
-        tags: "neowu/jre:24.0.1"
+        tags: "neowu/jre:25.0.0"
         push: true
