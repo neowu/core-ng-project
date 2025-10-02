@@ -66,7 +66,7 @@ public class ElasticSearchImpl implements ElasticSearch {
                 .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis())
                 .addInterceptorFirst(new ElasticSearchLogInterceptor()));
             restClient = builder.build();
-            mapper = JSONMapper.builder().serializationInclusion(JsonInclude.Include.NON_NULL).build();
+            mapper = JSONMapper.builder().defaultPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL)).build();
             client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper(mapper), null, NoopInstrumentation.INSTANCE));
         }
     }
