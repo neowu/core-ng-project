@@ -16,7 +16,7 @@ public class ServerSentEventMetrics implements Metrics {
     public void collect(Stats stats) {
         int count = 0;
         for (ServerSentEventContextImpl<?> context : contexts) {
-            count += context.channels.size();
+            count += context.size();
         }
         stats.put("sse_active_channels", count);
     }

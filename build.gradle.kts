@@ -18,10 +18,10 @@ subprojects {
 }
 
 val elasticVersion = "8.18.1"
-val jacksonVersion = "2.18.4"
+val jacksonVersion = "2.20.0"
 val junitVersion = "5.13.4"
 val mockitoVersion = "5.20.0"
-val assertjVersion = "3.27.3"
+val assertjVersion = "3.27.6"
 
 project("core-ng-api") {
     apply(plugin = "lib")
