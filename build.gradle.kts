@@ -39,7 +39,7 @@ project("core-ng") {
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
         implementation("com.squareup.okhttp3:okhttp:5.1.0")
-        implementation("io.undertow:undertow-core:2.3.18.Final")
+        implementation("io.undertow:undertow-core:2.3.19.Final")
         implementation("org.apache.kafka:kafka-clients:4.1.0") {
             exclude("org.xerial.snappy")
             exclude("org.lz4")
