@@ -10,6 +10,8 @@
 * migrate from ThreadLocal to ScopedValue
   > updated WebContext
   > updated LogManager
+* sse: fixed memory leak under heavy load
+  > exchange was not properly closed under heavy IO + throwing error on connect
 
 ### 9.2.4 (8/8/2025 - 8/21/2025)
 

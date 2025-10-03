@@ -103,10 +103,16 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
                 lock.lock();
                 if (closed) return;
 
-                closed = true;
-                if (queue.isEmpty()) {
-                    exchange.endExchange();
+                // for flow like
+                // channel.sendBytes("error");
+                // channel.close();
+                // the close logic (this closure) could run first in different IO thread while sendBytes is blocked due to lock
+                // so here we should try to send remaining messages in queue before close
+                if (!queue.isEmpty()) {
+                    writeListener.handleEvent(sink);
                 }
+                exchange.endExchange();
+                closed = true;  // make sure mark closed after endExchange, to make sure no leak of exchange
             } finally {
                 lock.unlock();
             }
@@ -119,9 +125,9 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
             if (closed) return;
 
             LOGGER.debug("shutdown sse connection, channel={}", id);
-            closed = true;
             queue.clear();
             exchange.endExchange();
+            closed = true;  // make sure mark closed after endExchange, to make sure no leak of exchange
         } finally {
             lock.unlock();
         }
