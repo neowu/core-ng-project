@@ -85,7 +85,7 @@ public class ServerSentEventHandler implements HttpHandler {
                 logger.debug("httpDelay={}", httpDelay);
                 actionLog.stats.put("http_delay", (double) httpDelay);
 
-                handleSSEConnect(exchange, sink, actionLog);
+                connect(exchange, sink, actionLog);
                 return null;
             });
         } finally {
@@ -93,7 +93,7 @@ public class ServerSentEventHandler implements HttpHandler {
         }
     }
 
-    private void handleSSEConnect(HttpServerExchange exchange, StreamSinkChannel sink, ActionLog actionLog) {
+    private void connect(HttpServerExchange exchange, StreamSinkChannel sink, ActionLog actionLog) {
         var request = new RequestImpl(exchange, handlerContext.requestBeanReader);
         ChannelImpl<Object> channel = null;
         try {
@@ -110,19 +110,17 @@ public class ServerSentEventHandler implements HttpHandler {
                 limitRate(handlerContext.rateControl, support, request.clientIP());
             }
 
-            channel = new ChannelImpl<>(exchange, sink, support.context, support.builder, actionLog.id);
-            actionLog.context("channel", channel.id);
+            channel = new ChannelImpl<>(exchange, sink, support.context, support.builder, actionLog.id, request);
+            sink.getWriteSetter().set(channel.writeListener);
+            exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support));
+            support.context.add(channel);
 
-            channel.clientIP = request.clientIP();
+            actionLog.context("channel", channel.id);
             String traceId = exchange.getRequestHeaders().getFirst(HEADER_TRACE_ID);    // used by frontend to trace request
             if (traceId != null) {
                 actionLog.context.put("trace_id", List.of(traceId));
                 channel.traceId = traceId;
             }
-
-            sink.getWriteSetter().set(channel.writeListener);
-            support.context.add(channel);
-            exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support));
 
             channel.sendBytes(Strings.bytes("retry: 5000\n\n"));    // set browser retry to 5s
 

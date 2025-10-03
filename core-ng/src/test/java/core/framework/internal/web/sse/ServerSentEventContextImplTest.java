@@ -1,5 +1,6 @@
 package core.framework.internal.web.sse;
 
+import core.framework.internal.web.request.RequestImpl;
 import core.framework.util.Strings;
 import core.framework.web.sse.Channel;
 import org.junit.jupiter.api.BeforeEach;
@@ -78,6 +79,6 @@ class ServerSentEventContextImplTest {
     }
 
     private ChannelImpl<TestEvent> channel() {
-        return new ChannelImpl<>(null, null, context, new ServerSentEventWriter<>(TestEvent.class), null);
+        return new ChannelImpl<>(null, null, context, new ServerSentEventWriter<>(TestEvent.class), null, new RequestImpl(null, null));
     }
 }

@@ -1,6 +1,7 @@
 package core.framework.internal.web.sse;
 
 import core.framework.internal.log.filter.BytesLogParam;
+import core.framework.internal.web.request.RequestImpl;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
@@ -32,6 +33,8 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
     final Set<String> groups = Sets.newConcurrentHashSet();
     final String refId;
     final long startTime = System.nanoTime();
+    final String path;
+    final String clientIP;
 
     final WriteListener writeListener = new WriteListener();
     final Deque<byte[]> queue = new ConcurrentLinkedDeque<>();
@@ -43,20 +46,22 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
     private final HttpServerExchange exchange;
     private final StreamSinkChannel sink;
     private final Map<String, Object> context = new ConcurrentHashMap<>();
+
     long lastSentTime = startTime;
     long eventCount;
     long eventSize;
-    String clientIP;
+
     @Nullable
     String traceId;
-    private volatile boolean closed = false;
 
-    ChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ServerSentEventContextImpl<T> serverSentEventContext, ServerSentEventWriter<T> builder, String refId) {
+    ChannelImpl(HttpServerExchange exchange, StreamSinkChannel sink, ServerSentEventContextImpl<T> serverSentEventContext, ServerSentEventWriter<T> builder, String refId, RequestImpl request) {
         this.exchange = exchange;
         this.sink = sink;
         this.serverSentEventContext = serverSentEventContext;
         this.builder = builder;
         this.refId = refId;
+        this.path = request.path();
+        this.clientIP = request.clientIP();
     }
 
     @Override
@@ -71,7 +76,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
     }
 
     boolean sendBytes(byte[] event) {
-        if (closed) return false;
+        if (exchange.isResponseComplete()) return false;
 
         var watch = new StopWatch();
         try {
@@ -92,7 +97,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
 
     @Override
     public boolean isOpen() {
-        return !closed;
+        return !exchange.isResponseComplete();
     }
 
     @Override
@@ -101,7 +106,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
         sink.getIoThread().execute(() -> {
             try {
                 lock.lock();
-                if (closed) return;
+                if (exchange.isResponseComplete()) return;
 
                 // for flow like
                 // channel.sendBytes("error");
@@ -112,7 +117,6 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
                     writeListener.handleEvent(sink);
                 }
                 exchange.endExchange();
-                closed = true;  // make sure mark closed after endExchange, to make sure no leak of exchange
             } finally {
                 lock.unlock();
             }
@@ -122,12 +126,11 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
     public void shutdown() {
         try {
             lock.lock();
-            if (closed) return;
+            if (exchange.isResponseComplete()) return;
 
             LOGGER.debug("shutdown sse connection, channel={}", id);
             queue.clear();
             exchange.endExchange();
-            closed = true;  // make sure mark closed after endExchange, to make sure no leak of exchange
         } finally {
             lock.unlock();
         }

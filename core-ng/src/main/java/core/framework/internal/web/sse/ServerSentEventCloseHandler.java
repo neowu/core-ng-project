@@ -9,9 +9,9 @@ import io.undertow.server.HttpServerExchange;
 import java.util.List;
 
 class ServerSentEventCloseHandler<T> implements ExchangeCompletionListener {
-    final ChannelSupport<T> support;
     private final LogManager logManager;
     private final ChannelImpl<T> channel;
+    private final ChannelSupport<T> support;
 
     ServerSentEventCloseHandler(LogManager logManager, ChannelImpl<T> channel, ChannelSupport<T> support) {
         this.logManager = logManager;
@@ -24,10 +24,7 @@ class ServerSentEventCloseHandler<T> implements ExchangeCompletionListener {
         exchange.dispatch(() -> {
             VirtualThread.COUNT.increase();
             try {
-                logManager.run("sse", null, actionLog -> {
-                    handleSSEClose(exchange, actionLog);
-                    return null;
-                });
+                logManager.run("sse", null, this::close);
             } finally {
                 VirtualThread.COUNT.decrease();
             }
@@ -35,9 +32,9 @@ class ServerSentEventCloseHandler<T> implements ExchangeCompletionListener {
         next.proceed();
     }
 
-    private void handleSSEClose(HttpServerExchange exchange, ActionLog actionLog) {
+    private Void close(ActionLog actionLog) {
         try {
-            actionLog.action("sse:" + exchange.getRequestPath() + ":close");
+            actionLog.action("sse:" + channel.path + ":close");
             actionLog.context("channel", channel.id);
             List<String> refIds = List.of(channel.refId);
             actionLog.refIds = refIds;
@@ -46,20 +43,21 @@ class ServerSentEventCloseHandler<T> implements ExchangeCompletionListener {
             actionLog.context("client_ip", channel.clientIP);
             if (channel.traceId != null) actionLog.context("trace_id", channel.traceId);
 
-            actionLog.context("listener", support.listener.getClass().getCanonicalName());
-            support.listener.onClose(channel);
-
             if (!channel.groups.isEmpty()) actionLog.context("group", channel.groups.toArray());
             support.context.remove(channel);
-            channel.shutdown();
+            // at this point (as ExchangeCompleteListener), exchange is closed, no need to close channel again
 
             actionLog.stats.put("sse_event_count", (double) channel.eventCount);
             actionLog.stats.put("sse_event_size", (double) channel.eventSize);
+
+            actionLog.context("listener", support.listener.getClass().getCanonicalName());
+            support.listener.onClose(channel);  // run onClose at last in case it throws exception to break flow
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {
             double duration = System.nanoTime() - channel.startTime;
             actionLog.stats.put("sse_duration", duration);
         }
+        return null;
     }
 }

@@ -1,5 +1,6 @@
 package core.framework.internal.web.sse;
 
+import core.framework.internal.web.request.RequestImpl;
 import core.framework.util.Strings;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.ServerConnection;
@@ -18,11 +19,11 @@ class ChannelImplTest {
     private ChannelImpl<TestEvent> channel;
 
     @BeforeEach
-    void createServerSentEventChannelImpl() {
+    void createChannelImpl() {
         StreamSinkChannel sink = mock(StreamSinkChannel.class);
         when(sink.getIoThread()).thenReturn(mock(XnioIoThread.class));
         ServerConnection connection = mock(ServerConnection.class);
-        channel = new ChannelImpl<>(new HttpServerExchange(connection), sink, null, new ServerSentEventWriter<>(TestEvent.class), null);
+        channel = new ChannelImpl<>(new HttpServerExchange(connection), sink, null, new ServerSentEventWriter<>(TestEvent.class), null, new RequestImpl(null, null));
     }
 
     @Test

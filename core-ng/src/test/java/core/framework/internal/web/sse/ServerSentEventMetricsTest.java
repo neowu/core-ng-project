@@ -1,6 +1,7 @@
 package core.framework.internal.web.sse;
 
 import core.framework.internal.stat.Stats;
+import core.framework.internal.web.request.RequestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,7 @@ class ServerSentEventMetricsTest {
     @Test
     void collect() {
         ServerSentEventContextImpl<Object> context = new ServerSentEventContextImpl<>();
-        context.add(new ChannelImpl<>(null, null, null, null, null));
+        context.add(new ChannelImpl<>(null, null, null, null, null, new RequestImpl(null, null)));
         metrics.contexts.add(context);
 
         var stats = new Stats();
