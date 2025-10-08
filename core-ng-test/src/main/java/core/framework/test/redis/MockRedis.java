@@ -8,6 +8,7 @@ import core.framework.redis.RedisList;
 import core.framework.redis.RedisSet;
 import core.framework.redis.RedisSortedSet;
 import core.framework.util.Maps;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Map;
@@ -28,6 +29,7 @@ public final class MockRedis implements Redis {
     private final MockRedisHyperLogLog hyperLogLog = new MockRedisHyperLogLog(store);
 
     @Override
+    @Nullable
     public String get(String key) {
         var value = store.get(key);
         if (value == null) return null;
@@ -35,7 +37,7 @@ public final class MockRedis implements Redis {
     }
 
     @Override
-    public boolean set(String key, String value, Duration expiration, boolean onlyIfAbsent) {
+    public boolean set(String key, String value, @Nullable Duration expiration, boolean onlyIfAbsent) {
         MockRedisStore.Value redisValue = new MockRedisStore.Value(value);
         if (expiration != null) redisValue.expirationTime = System.currentTimeMillis() + expiration.toMillis();
         if (onlyIfAbsent) {

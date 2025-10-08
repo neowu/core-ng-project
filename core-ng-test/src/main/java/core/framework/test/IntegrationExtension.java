@@ -14,7 +14,7 @@ public final class IntegrationExtension implements TestInstancePostProcessor {
     public void postProcessTestInstance(Object testInstance, ExtensionContext context) {
         ExtensionContext.Store store = context.getRoot().getStore(ExtensionContext.Namespace.GLOBAL);
         Class<?> testClass = context.getRequiredTestClass();
-        AbstractTestModule module = store.getOrComputeIfAbsent(AbstractTestModule.class, key -> createTestModule(testClass, store), AbstractTestModule.class);
+        AbstractTestModule module = store.computeIfAbsent(AbstractTestModule.class, key -> createTestModule(testClass, store), AbstractTestModule.class);
         module.inject(testInstance);
     }
 

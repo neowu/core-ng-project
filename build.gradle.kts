@@ -6,7 +6,7 @@ plugins {
 
 subprojects {
     group = "core.framework"
-    version = "9.3.0-b2"
+    version = "9.3.0"
     repositories {
         maven {
             url = uri("https://neowu.github.io/maven-repo/")
@@ -19,7 +19,7 @@ subprojects {
 
 val elasticVersion = "8.18.1"
 val jacksonVersion = "2.20.0"
-val junitVersion = "5.13.4"
+val junitVersion = "6.0.0"
 val mockitoVersion = "5.20.0"
 val assertjVersion = "3.27.6"
 

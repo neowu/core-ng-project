@@ -85,12 +85,13 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
+    @Nullable
     public String get(String key) {
         validate("key", key);   // only validate on interface methods, internal usage will be checked by caller
         return decode(getBytes(key));
     }
 
-    public byte[] getBytes(String key) {
+    public byte @Nullable [] getBytes(String key) {
         var watch = new StopWatch();
         byte[] value = null;
         PoolItem<RedisConnection> item = pool.borrowItem();
@@ -116,13 +117,13 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
-    public boolean set(String key, String value, Duration expiration, boolean onlyIfAbsent) {
+    public boolean set(String key, String value, @Nullable Duration expiration, boolean onlyIfAbsent) {
         validate("key", key);
         validate("value", value);
         return set(key, encode(value), expiration, onlyIfAbsent);
     }
 
-    public boolean set(String key, byte[] value, Duration expiration, boolean onlyIfAbsent) {
+    public boolean set(String key, byte[] value, @Nullable Duration expiration, boolean onlyIfAbsent) {
         var watch = new StopWatch();
         byte[] expirationValue = expiration == null ? null : expirationValue(expiration);
         boolean updated = false;

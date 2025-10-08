@@ -38,6 +38,7 @@ public final class MockRedisHash implements RedisHash {
     }
 
     @Override
+    @Nullable
     public String get(String key, String field) {
         var value = store.get(key);
         if (value == null) return null;

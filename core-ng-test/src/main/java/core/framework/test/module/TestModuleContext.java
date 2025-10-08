@@ -55,7 +55,7 @@ public class TestModuleContext extends ModuleContext {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T bind(Type type, String name, T instance) {
+    public <T> T bind(Type type, @Nullable String name, T instance) {
         var key = new Key(type, name);
         T overrideBinding = (T) overrideBindings.get(key);
         if (overrideBinding != null) {
@@ -72,7 +72,7 @@ public class TestModuleContext extends ModuleContext {
         validateOverrideBindings();
     }
 
-    <T> T overrideBinding(Type type, String name, T instance) {
+    <T> T overrideBinding(Type type, @Nullable String name, T instance) {
         Object previous = overrideBindings.put(new Key(type, name), instance);
         if (previous != null) throw new Error(format("found duplicate override binding, type={}, name={}, previous={}", type.getTypeName(), name, previous));
         return instance;

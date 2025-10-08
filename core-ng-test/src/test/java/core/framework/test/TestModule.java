@@ -22,6 +22,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -122,6 +123,7 @@ public class TestModule extends AbstractTestModule {
         db().view(TestDBView.class);
         db().view(TestDBProjection.class);
         initDB().createSchema();
+        assertThat(initDB().repository(TestDBEntity.class)).isNotNull();
     }
 
     private void configureJob() {
