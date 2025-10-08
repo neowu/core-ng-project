@@ -1,5 +1,7 @@
 ## Change log
 
+### 9.3.1 (10/8/2025 - )
+
 ### 9.3.0 (8/27/2025 - 10/8/2025) !!! only support java 25
 
 * db: check jdbc url on DBConfig

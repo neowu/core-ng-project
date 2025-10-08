@@ -119,7 +119,9 @@ class MongoCollectionIntegrationTest extends IntegrationTest {
     @Test
     void bulkReplace() {
         List<TestMongoEntity> entities = entities();
-        entities.forEach(entity -> entity.id = new ObjectId());
+        for (TestMongoEntity entity : entities) {
+            entity.id = new ObjectId();
+        }
         collection.bulkReplace(entities);
 
         entities.forEach(entity -> assertThat(collection.get(entity.id)).get()
