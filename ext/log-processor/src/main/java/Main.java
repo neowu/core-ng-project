@@ -3,6 +3,8 @@ import core.LogProcessorApp;
 /**
  * @author neo
  */
-void main() {
-    new LogProcessorApp().start();
+class Main {
+    void main() {
+        new LogProcessorApp().start();
+    }
 }

@@ -88,7 +88,11 @@
     <rule ref="category/java/design.xml/SwitchDensity"/>
     <rule ref="category/java/design.xml/UselessOverridingMethod"/>
 
-    <!--    <rule ref="category/java/errorprone.xml/AssignmentInOperand"/>-->
+    <rule ref="category/java/errorprone.xml/AssignmentInOperand">
+        <properties>
+            <property name="allowIncrementDecrement" value="true"/>
+        </properties>
+    </rule>
     <rule ref="category/java/errorprone.xml/AssignmentToNonFinalStatic"/>
     <rule ref="category/java/errorprone.xml/AvoidAssertAsIdentifier"/>
     <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop"/>
@@ -137,7 +141,7 @@
     <rule ref="category/java/errorprone.xml/UnusedNullCheckInEquals"/>
     <rule ref="category/java/errorprone.xml/UseCorrectExceptionLogging"/>
     <rule ref="category/java/errorprone.xml/UseEqualsToCompareStrings"/>
-    <!--    <rule ref="category/java/errorprone.xml/UselessPureMethodCall" />-->
+    <!--<rule ref="category/java/errorprone.xml/UselessPureMethodCall"/>-->
     <rule ref="category/java/errorprone.xml/UseLocaleWithCaseConversions"/>
     <rule ref="category/java/errorprone.xml/UseProperClassLoader"/>
 

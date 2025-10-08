@@ -3,6 +3,8 @@ import app.MonitorApp;
 /**
  * @author ericchung
  */
-void main() {
-    new MonitorApp().start();
+class Main {
+    void main() {
+        new MonitorApp().start();
+    }
 }

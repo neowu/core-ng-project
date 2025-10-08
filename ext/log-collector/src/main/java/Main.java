@@ -3,6 +3,8 @@ import core.log.LogCollectorApp;
 /**
  * @author neo
  */
-void main() {
-    new LogCollectorApp().start();
+class Main {
+    void main() {
+        new LogCollectorApp().start();
+    }
 }

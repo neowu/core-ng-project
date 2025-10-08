@@ -16,7 +16,7 @@ apply(plugin = "jacoco-report-aggregation")
 
 checkstyle {
     dependencies {
-        checkstyle("com.puppycrawl.tools:checkstyle:11.0.1")
+        checkstyle("com.puppycrawl.tools:checkstyle:11.1.0")
         checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
     }
 

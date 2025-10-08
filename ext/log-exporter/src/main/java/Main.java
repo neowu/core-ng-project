@@ -3,6 +3,8 @@ import core.log.LogExporterApp;
 /**
  * @author neo
  */
-void main() {
-    new LogExporterApp().start();
+class Main {
+    void main() {
+        new LogExporterApp().start();
+    }
 }
