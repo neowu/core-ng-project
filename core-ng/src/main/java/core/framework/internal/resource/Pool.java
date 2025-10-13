@@ -133,7 +133,7 @@ public class Pool<T extends AutoCloseable> {
             item = new PoolItem<>(factory.get());
             return item;
         } catch (Throwable e) {
-            size.getAndDecrement();
+            size.decrementAndGet();
             throw e;
         } finally {
             LOGGER.debug("create new resource, pool={}, item={}, elapsed={}", name, item == null ? null : item.resource, watch.elapsed());
