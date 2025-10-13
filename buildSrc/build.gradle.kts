@@ -13,13 +13,6 @@ java {
     }
 }
 
-kotlin {
-    compilerOptions {
-        // kotlin not support jvm 25 yet
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_24)
-    }
-}
-
 dependencies {
     implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:6.2.5")
     implementation("org.flywaydb:flyway-gradle-plugin:11.13.2")
