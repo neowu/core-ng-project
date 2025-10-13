@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.xnio.ChannelListener;
 import org.xnio.channels.StreamSinkChannel;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -219,7 +218,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
                         return;
                     }
                 }
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 LOGGER.warn("failed to write sse message, error={}", e.getMessage(), e);
                 exchange.endExchange();
             } finally {

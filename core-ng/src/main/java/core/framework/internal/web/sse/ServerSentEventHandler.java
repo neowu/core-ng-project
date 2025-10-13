@@ -23,7 +23,6 @@ import org.xnio.ChannelListeners;
 import org.xnio.IoUtils;
 import org.xnio.channels.StreamSinkChannel;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +69,7 @@ public class ServerSentEventHandler implements HttpHandler {
                 sink.getWriteSetter().set(listener);
                 sink.resumeWrites();
             }
-        } catch (IOException e) {
+        } catch (Throwable e) {
             logger.warn("failed to establish sse connection, error={}", e.getMessage(), e);
             IoUtils.safeClose(exchange.getConnection());
         }
