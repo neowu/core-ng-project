@@ -60,6 +60,7 @@ public class RedisCacheStore implements CacheStore {
         }
     }
 
+    @Nullable
     private <T> T deserialize(byte[] value, JSONReader<T> reader, Validator<T> validator) {
         try {
             T result = reader.fromJSON(value);

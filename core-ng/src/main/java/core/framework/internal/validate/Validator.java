@@ -41,6 +41,7 @@ public final class Validator<T> {
     }
 
     // used only internally, for places don't want to catch exception
+    @Nullable
     public Map<String, String> errors(T bean, boolean partial) {
         if (bean == null) {
             return Map.of("bean", "bean must not be null");
