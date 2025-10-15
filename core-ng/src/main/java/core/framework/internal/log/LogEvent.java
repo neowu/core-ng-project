@@ -1,6 +1,7 @@
 package core.framework.internal.log;
 
 import core.framework.internal.log.marker.ErrorCodeMarker;
+import core.framework.log.LogLevel;
 import core.framework.util.Exceptions;
 import core.framework.util.Network;
 import org.jspecify.annotations.Nullable;

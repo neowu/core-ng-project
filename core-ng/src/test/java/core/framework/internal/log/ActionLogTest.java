@@ -1,5 +1,6 @@
 package core.framework.internal.log;
 
+import core.framework.log.LogLevel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

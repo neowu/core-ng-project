@@ -17,6 +17,7 @@ public class KafkaMessage {
     public static final String HEADER_CLIENT = "client";
     public static final String HEADER_REF_ID = "refId";
 
+    @Nullable
     final String key;
     final byte[] value;
     @Nullable

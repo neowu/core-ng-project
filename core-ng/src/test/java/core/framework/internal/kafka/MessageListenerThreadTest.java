@@ -2,12 +2,12 @@ package core.framework.internal.kafka;
 
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.log.ActionLog;
-import core.framework.internal.log.LogLevel;
 import core.framework.internal.log.LogManager;
 import core.framework.json.JSON;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.Message;
 import core.framework.kafka.MessageHandler;
+import core.framework.log.LogLevel;
 import core.framework.util.Strings;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;

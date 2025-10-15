@@ -1,5 +1,6 @@
 package core.framework.internal.log;
 
+import core.framework.log.LogLevel;
 import core.framework.log.Markers;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.PerformanceStatMessage;

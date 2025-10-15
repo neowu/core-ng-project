@@ -3,6 +3,7 @@ package core.framework.internal.kafka;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.utils.Utils;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -15,8 +16,9 @@ public class KeyDeserializer implements Deserializer<String> {
         throw new Error("unexpected flow");
     }
 
+    @Nullable
     @Override
-    public String deserialize(String topic, Headers headers, ByteBuffer data) {
+    public String deserialize(String topic, Headers headers, @Nullable ByteBuffer data) {
         if (data == null) return null;
 
         if (data.hasArray()) {

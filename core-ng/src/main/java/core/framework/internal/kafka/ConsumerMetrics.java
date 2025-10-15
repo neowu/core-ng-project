@@ -4,6 +4,7 @@ import core.framework.internal.stat.Metrics;
 import core.framework.internal.stat.Stats;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -13,13 +14,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author neo
  */
 public class ConsumerMetrics implements Metrics {
+    @Nullable
     private final String name;
     private final List<Metric> recordsLagMax = new CopyOnWriteArrayList<>();    // all metrics are added in message thread, so to use concurrent list
     private final List<Metric> recordsConsumedRate = new CopyOnWriteArrayList<>();
     private final List<Metric> bytesConsumedRate = new CopyOnWriteArrayList<>();
     private final List<Metric> fetchRate = new CopyOnWriteArrayList<>();
 
-    ConsumerMetrics(String name) {
+    ConsumerMetrics(@Nullable String name) {
         this.name = name;
     }
 

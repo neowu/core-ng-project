@@ -1,5 +1,6 @@
 package core.framework.internal.log;
 
+import core.framework.log.LogLevel;
 import core.framework.util.Strings;
 import org.slf4j.Marker;
 
@@ -28,8 +29,8 @@ public final class LoggerImpl extends AbstractLogger {
         return builder.toString();
     }
 
-    private final LogLevel infoLevel;
-    private final LogLevel traceLevel;
+    final LogLevel infoLevel;
+    final LogLevel traceLevel;
 
     LoggerImpl(String name, LogLevel infoLevel, LogLevel traceLevel) {
         super(abbreviateLoggerName(name));

@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class KafkaMessageTest {
     @Test
     void create() {
-        var record = new ConsumerRecord<String, byte[]>("topic", 1, 0, "key", Strings.bytes("value"));
+        var record = new ConsumerRecord<>("topic", 1, 0, "key", Strings.bytes("value"));
         record.headers().add(KafkaMessage.HEADER_TRACE, Strings.bytes(Trace.CURRENT.name()));
         var message = new KafkaMessage(record);
 
@@ -21,7 +21,7 @@ class KafkaMessageTest {
 
     @Test
     void header() {
-        var record = new ConsumerRecord<String, byte[]>("topic", 1, 0, "key", Strings.bytes("value"));
+        var record = new ConsumerRecord<>("topic", 1, 0, "key", Strings.bytes("value"));
         var message = new KafkaMessage(record);
 
         var headers = new RecordHeaders();

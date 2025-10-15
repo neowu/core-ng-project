@@ -7,6 +7,7 @@ import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.validate.Validator;
+import core.framework.log.LogLevels;
 import core.framework.log.Markers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ public abstract class App extends Module {
 
     private void cleanup() {
         // free static objects not used anymore
+        LogLevels.cleanup();
         Validator.cleanup();
         JSONMapper.cleanup();
         if (!context.httpServer.siteManager.webDirectory.localEnv) {    // for local env, it may rebuild html template at runtime
