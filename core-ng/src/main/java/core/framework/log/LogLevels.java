@@ -24,14 +24,13 @@ public final class LogLevels {
         traceLevels.add(new Entry("org.xnio", LogLevel.INFO));
     }
 
-    public static void infoLevel(String prefix, LogLevel level) {
-        if (infoLevels == null) throw new Error("log levels must be configured before slf4j initialization");
-        infoLevels.add(new Entry(prefix, level));
-    }
-
-    public static void traceLevel(String prefix, LogLevel level) {
-        if (traceLevels == null) throw new Error("log levels must be configured before slf4j initialization");
-        traceLevels.add(new Entry(prefix, level));
+    // action log trace collects logs where level >= traceLevel, logs where level >= infoLevel will be printed out to console always
+    public static void add(String prefix, LogLevel traceLevel, LogLevel infoLevel) {
+        if (traceLevels == null || infoLevels == null) throw new Error("log levels must be configured before slf4j initialization");
+        if (traceLevel.value > infoLevel.value)
+            throw new Error("log with info level less than trace level may not be printed, prefix=" + prefix);  // refer to core.framework.internal.log.LoggerImpl.log()
+        traceLevels.add(new Entry(prefix, traceLevel));
+        infoLevels.add(new Entry(prefix, infoLevel));
     }
 
     public static DefaultLoggerFactory createLoggerFactory() {
