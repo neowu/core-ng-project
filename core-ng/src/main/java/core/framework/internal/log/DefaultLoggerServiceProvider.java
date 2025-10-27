@@ -1,6 +1,5 @@
 package core.framework.internal.log;
 
-import core.framework.log.LogLevels;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.IMarkerFactory;
 import org.slf4j.helpers.BasicMarkerFactory;
@@ -38,7 +37,7 @@ public class DefaultLoggerServiceProvider implements SLF4JServiceProvider {
 
     @Override
     public void initialize() {
-        loggerFactory = LogLevels.createLoggerFactory();
+        loggerFactory = new DefaultLoggerFactory();
         markerFactory = new BasicMarkerFactory();
         mdcAdapter = new NOPMDCAdapter();
     }

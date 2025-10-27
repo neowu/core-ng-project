@@ -1,7 +1,5 @@
 package core.framework.internal.log;
 
-import core.framework.log.LogLevel;
-import core.framework.log.LogLevels;
 import core.framework.util.Maps;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
@@ -13,13 +11,6 @@ import java.util.Map;
  */
 public final class DefaultLoggerFactory implements ILoggerFactory {
     private final Map<String, Logger> loggers = Maps.newConcurrentHashMap();
-    private final LogLevels.Entry[] infoLevels;
-    private final LogLevels.Entry[] traceLevels;
-
-    public DefaultLoggerFactory(LogLevels.Entry[] infoLevels, LogLevels.Entry[] traceLevels) {
-        this.infoLevels = infoLevels;
-        this.traceLevels = traceLevels;
-    }
 
     @Override
     public Logger getLogger(String name) {
@@ -31,19 +22,22 @@ public final class DefaultLoggerFactory implements ILoggerFactory {
     }
 
     private LogLevel infoLevel(String name) {
-        for (LogLevels.Entry entry : infoLevels) {
-            if (name.startsWith(entry.prefix())) {
-                return entry.level();
-            }
+        // kafka log info for every producer/consumer, to reduce verbosity
+        if (name.startsWith("org.apache.kafka.")) {
+            return LogLevel.WARN;
+        }
+        // refer to org.elasticsearch.nativeaccess.NativeAccessHolder, to emmit warning under integration-test env
+        if (name.startsWith("org.elasticsearch.nativeaccess.")) {
+            return LogLevel.ERROR;
         }
         return LogLevel.INFO;
     }
 
     private LogLevel traceLevel(String name) {
-        for (LogLevels.Entry entry : traceLevels) {
-            if (name.startsWith(entry.prefix())) {
-                return entry.level();
-            }
+        if (name.startsWith("org.elasticsearch.")
+            || name.startsWith("org.mongodb.")
+            || name.startsWith("org.xnio.")) {
+            return LogLevel.INFO;
         }
         return LogLevel.DEBUG;
     }

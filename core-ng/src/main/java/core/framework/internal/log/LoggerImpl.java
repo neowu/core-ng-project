@@ -1,6 +1,5 @@
 package core.framework.internal.log;
 
-import core.framework.log.LogLevel;
 import core.framework.util.Strings;
 import org.slf4j.Marker;
 

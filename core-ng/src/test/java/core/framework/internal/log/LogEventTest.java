@@ -1,6 +1,5 @@
 package core.framework.internal.log;
 
-import core.framework.log.LogLevel;
 import core.framework.log.Markers;
 import org.junit.jupiter.api.Test;
 

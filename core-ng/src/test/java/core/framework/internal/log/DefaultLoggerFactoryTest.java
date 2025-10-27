@@ -1,7 +1,5 @@
 package core.framework.internal.log;
 
-import core.framework.log.LogLevel;
-import core.framework.log.LogLevels;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -13,16 +11,15 @@ class DefaultLoggerFactoryTest {
 
     @BeforeEach
     void createDefaultLoggerFactory() {
-        factory = new DefaultLoggerFactory(new LogLevels.Entry[]{new LogLevels.Entry("com.test.", LogLevel.WARN)},
-            new LogLevels.Entry[]{new LogLevels.Entry("com.test.", LogLevel.INFO)});
+        factory = new DefaultLoggerFactory();
     }
 
     @Test
     void logLevel() {
-        Logger logger = factory.getLogger("com.test.Test");
+        Logger logger = factory.getLogger("org.apache.kafka.common.config.AbstractConfig");
 
         assertThat(logger).isInstanceOf(LoggerImpl.class);
         assertThat(((LoggerImpl) logger).infoLevel).isEqualTo(LogLevel.WARN);
-        assertThat(((LoggerImpl) logger).traceLevel).isEqualTo(LogLevel.INFO);
+        assertThat(((LoggerImpl) logger).traceLevel).isEqualTo(LogLevel.DEBUG);
     }
 }

@@ -2,7 +2,6 @@
 
 ### 9.3.1 (10/8/2025 - )
 
-* log: config output level via LogLevels.infoLevel()/traceLevel(), make it possible to reduce unnecessary external logs
 
 ### 9.3.0 (8/27/2025 - 10/8/2025) !!! only support java 25
 

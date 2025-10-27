@@ -2,6 +2,7 @@ package core.framework.internal.cache;
 
 import core.framework.internal.log.filter.ArrayLogParam;
 import core.framework.util.Maps;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,12 +19,14 @@ public class LocalCacheStore implements CacheStore {
     private final Logger logger = LoggerFactory.getLogger(LocalCacheStore.class);
     public int maxSize = 10000;  // 10000 simple objects roughly takes 1M-10M heap + hashmap overhead
 
+    @Nullable
     @Override
     public <T> T get(String key, CacheContext<T> context) {
         logger.debug("get, key={}", key);
         return get(key, System.currentTimeMillis());
     }
 
+    @Nullable
     private <T> T get(String key, long now) {
         @SuppressWarnings("unchecked")
         CacheItem<T> item = (CacheItem<T>) caches.get(key);

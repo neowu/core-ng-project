@@ -1,6 +1,5 @@
 package core.framework.internal.log;
 
-import core.framework.log.LogLevel;
 import core.framework.log.Markers;
 import core.framework.util.Strings;
 import org.jspecify.annotations.Nullable;
@@ -13,8 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static core.framework.log.LogLevel.DEBUG;
-import static core.framework.log.LogLevel.WARN;
+import static core.framework.internal.log.LogLevel.DEBUG;
+import static core.framework.internal.log.LogLevel.WARN;
 
 /**
  * @author neo
