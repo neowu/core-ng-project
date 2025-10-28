@@ -79,6 +79,8 @@ public final class ConsoleAppender implements LogAppender {
             builder.append(LOG_SPLITTER).append(key).append("_count=").append(stat.count);
             if (stat.readEntries != null) builder.append(LOG_SPLITTER).append(key).append("_reads=").append(stat.readEntries);
             if (stat.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("_writes=").append(stat.writeEntries);
+            if (stat.readBytes != null) builder.append(LOG_SPLITTER).append(key).append("_read_bytes=").append(stat.readBytes);
+            if (stat.writeBytes != null) builder.append(LOG_SPLITTER).append(key).append("_write_bytes=").append(stat.writeBytes);
             builder.append(LOG_SPLITTER).append(key).append("_elapsed=").append(format.format(stat.totalElapsed));
         }
         return builder.toString();

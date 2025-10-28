@@ -61,6 +61,8 @@ public class ActionLogSchema {
             perfStats.put(key + ".total_elapsed", stat.totalElapsed);
             if (stat.readEntries != null) perfStats.put(key + ".read_entries", (long) stat.readEntries);
             if (stat.writeEntries != null) perfStats.put(key + ".write_entries", (long) stat.writeEntries);
+            if (stat.readBytes != null) perfStats.put(key + ".read_bytes", stat.readBytes);
+            if (stat.writeBytes != null) perfStats.put(key + ".write_bytes", stat.writeBytes);
         }
         record.put("perf_stats", perfStats);
         return record;
