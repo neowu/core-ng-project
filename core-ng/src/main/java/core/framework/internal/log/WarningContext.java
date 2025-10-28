@@ -14,13 +14,6 @@ import static core.framework.log.Markers.errorCode;
  */
 public final class WarningContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(WarningContext.class);
-    // use static constant mapping for both performance and simplicity
-    private static final PerformanceWarning[] DEFAULT_WARNINGS = {
-        new PerformanceWarning("db", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000),
-        new PerformanceWarning("redis", 2000, Duration.ofMillis(500), 1000, 10_000, 10_000),
-        new PerformanceWarning("elasticsearch", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000),
-        new PerformanceWarning("mongo", 2000, Duration.ofSeconds(5), 2000, 10_000, 10_000)
-    };
 
     public static PerformanceWarning @Nullable [] warnings(IOWarning[] warnings) {
         if (warnings.length == 0) return null;
@@ -32,32 +25,39 @@ public final class WarningContext {
             PerformanceWarning defaultWarning = defaultWarning(operation);
 
             int maxOperations = warning.maxOperations();
-            if (maxOperations < 0 && defaultWarning != null) maxOperations = defaultWarning.maxOperations;
+            if (maxOperations < 0 && defaultWarning != null) maxOperations = defaultWarning.maxOperations();
 
-            Duration maxElapsed = null;
-            if (warning.maxElapsedInMs() > 0) maxElapsed = Duration.ofMillis(warning.maxElapsedInMs());
-            if (maxElapsed == null && defaultWarning != null && defaultWarning.maxElapsed > 0) maxElapsed = Duration.ofNanos(defaultWarning.maxElapsed);
+            long maxElapsed = warning.maxElapsedInMs() * 1_000_000L;
+            if (maxElapsed < 0 && defaultWarning != null) maxElapsed = defaultWarning.maxElapsed();
 
             int maxReads = warning.maxReads();
-            if (maxReads < 0 && defaultWarning != null) maxReads = defaultWarning.maxReads;
+            if (maxReads < 0 && defaultWarning != null) maxReads = defaultWarning.maxReads();
 
             int maxTotalReads = warning.maxTotalReads();
-            if (maxTotalReads < 0 && defaultWarning != null) maxTotalReads = defaultWarning.maxTotalReads;
+            if (maxTotalReads < 0 && defaultWarning != null) maxTotalReads = defaultWarning.maxTotalReads();
 
             int maxTotalWrites = warning.maxTotalWrites();
-            if (maxTotalWrites < 0 && defaultWarning != null) maxTotalWrites = defaultWarning.maxTotalWrites;
+            if (maxTotalWrites < 0 && defaultWarning != null) maxTotalWrites = defaultWarning.maxTotalWrites();
 
-            results[i] = new PerformanceWarning(operation, maxOperations, maxElapsed, maxReads, maxTotalReads, maxTotalWrites);
+            long maxReadBytes = warning.maxReadBytes();
+            if (maxReadBytes < 0 && defaultWarning != null) maxReadBytes = defaultWarning.maxReadBytes();
+
+            long maxTotalReadBytes = warning.maxTotalReadBytes();
+            if (maxTotalReadBytes < 0 && defaultWarning != null) maxTotalReadBytes = defaultWarning.maxTotalReadBytes();
+
+            results[i] = new PerformanceWarning(operation, maxOperations, maxElapsed, maxReads, maxTotalReads, maxTotalWrites, maxReadBytes, maxTotalReadBytes);
         }
         return results;
     }
 
     static PerformanceWarning defaultWarning(String operation) {
         return switch (operation) {
-            case "db" -> DEFAULT_WARNINGS[0];
-            case "redis" -> DEFAULT_WARNINGS[1];
-            case "elasticsearch" -> DEFAULT_WARNINGS[2];
-            case "mongo" -> DEFAULT_WARNINGS[3];
+            case "db" -> new PerformanceWarning("db", 2000, Duration.ofSeconds(5).toNanos(), 2_000, 10_000, 10_000, -1, -1);
+            case "redis" -> new PerformanceWarning("redis", 2000, Duration.ofMillis(500).toNanos(), 1_000, 10_000, 10_000, -1, -1);
+            case "elasticsearch" -> new PerformanceWarning("elasticsearch", 2000, Duration.ofSeconds(5).toNanos(), 2_000, 10_000, 10_000, -1, -1);
+            case "mongo" -> new PerformanceWarning("mongo", 2000, Duration.ofSeconds(5).toNanos(), 2_000, 10_000, 10_000, -1, -1);
+            case "cache" -> new PerformanceWarning("cache", 1000, Duration.ofSeconds(1).toNanos(), 1_000, 1_000, -1, 500_000, 2_000_000);
+            case "http" -> new PerformanceWarning("http", 200, Duration.ofSeconds(10).toNanos(), -1, -1, -1, 1_000_000, 10_000_000);
             default -> null;
         };
     }

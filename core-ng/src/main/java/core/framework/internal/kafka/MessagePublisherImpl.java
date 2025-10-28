@@ -50,7 +50,7 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
             ActionLog actionLog = LogManager.currentActionLog();
             if (actionLog != null) {
                 trackMaxMessageSize(actionLog, message.length);
-                actionLog.track("kafka", elapsed, 0, 1);   // kafka producer send message in background, the main purpose of track is to count how many message sent in action
+                actionLog.track("kafka", elapsed, 0, 1, 0, message.length);   // kafka producer send message in background, the main purpose of track is to count how many message sent in action
             }
         }
     }

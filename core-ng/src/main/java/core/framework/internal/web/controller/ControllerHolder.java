@@ -15,7 +15,6 @@ public class ControllerHolder {
     public final String controllerInfo;
     public final Controller controller;
     public final String action;
-    @Nullable
     public final PerformanceWarning @Nullable [] warnings;
 
     final Method targetMethod;      // targetMethod is used to find associated annotation

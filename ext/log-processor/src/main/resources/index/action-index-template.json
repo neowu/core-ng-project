@@ -58,6 +58,22 @@
               "type": "integer"
             }
           }
+        },
+        {
+          "perf_stats.read_bytes": {
+            "path_match": "perf_stats.*.read_bytes",
+            "mapping": {
+              "type": "long"
+            }
+          }
+        },
+        {
+          "perf_stats.write_bytes": {
+            "path_match": "perf_stats.*.write_bytes",
+            "mapping": {
+              "type": "long"
+            }
+          }
         }
       ],
       "properties": {

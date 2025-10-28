@@ -41,7 +41,7 @@ class HTTPClientImplTest {
 
     @BeforeEach
     void createHTTPClient() {
-        httpClient = new HTTPClientImpl(okHttpClient, "TestUserAgent", Duration.ofSeconds(10), Duration.ofSeconds(30));
+        httpClient = new HTTPClientImpl(okHttpClient, "TestUserAgent", Duration.ofSeconds(30));
     }
 
     @Test
@@ -104,15 +104,6 @@ class HTTPClientImplTest {
     }
 
     @Test
-    void slowOperationThresholdInNanos() {
-        var request = new HTTPRequest(HTTPMethod.POST, "http://localhost/uri");
-        assertThat(httpClient.slowOperationThresholdInNanos(request)).isEqualTo(Duration.ofSeconds(10).toNanos());
-
-        request.slowOperationThreshold = Duration.ofSeconds(1);
-        assertThat(httpClient.slowOperationThresholdInNanos(request)).isEqualTo(Duration.ofSeconds(1).toNanos());
-    }
-
-    @Test
     void execute() throws IOException {
         Response httpResponse = new Response.Builder().request(new Request.Builder().url("http://localhost/uri").build())
             .protocol(Protocol.HTTP_1_1).code(200).message("OK")
@@ -134,7 +125,7 @@ class HTTPClientImplTest {
             .header("content-type", "text/event-stream")
             .body(ResponseBody.create(Strings.bytes("""
                 retry: 10000
-
+                
                 id: 1
                 data: test"""), MediaType.get("text/event-stream")))
             .build();

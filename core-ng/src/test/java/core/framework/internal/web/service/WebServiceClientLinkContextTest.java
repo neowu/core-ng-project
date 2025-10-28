@@ -25,7 +25,7 @@ class WebServiceClientLinkContextTest {
     @BeforeEach
     void createWebServiceClient() {
         logManager = new LogManager();
-        var httpClient = new HTTPClientImpl(null, null, Duration.ofSeconds(10), Duration.ofSeconds(20));
+        var httpClient = new HTTPClientImpl(null, null, Duration.ofSeconds(20));
         webServiceClient = new WebServiceClient("http://localhost", httpClient, new RequestBeanWriter(), new ResponseBeanReader());
     }
 

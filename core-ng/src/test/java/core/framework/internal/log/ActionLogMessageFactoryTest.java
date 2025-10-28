@@ -24,8 +24,8 @@ class ActionLogMessageFactoryTest {
         var log = new ActionLog("begin", null);
         log.action("action");
         log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null));
-        log.track("db", 1000, 1, 2);
-        log.track("http", 2000, 0, 0);
+        log.track("db", 1000, 1, 2, 0, 0);
+        log.track("http", 2000, 0, 0, 1000, 2000);
         log.context("order_id", "id1", "id2");
 
         ActionLogMessage message = factory.create(log);
@@ -41,11 +41,15 @@ class ActionLogMessageFactoryTest {
         assertThat(stats.count).isEqualTo(1);
         assertThat(stats.readEntries).isEqualTo(1);
         assertThat(stats.writeEntries).isEqualTo(2);
+        assertThat(stats.readBytes).isNull();
+        assertThat(stats.writeBytes).isNull();
 
         stats = message.performanceStats.get("http");
         assertThat(stats.totalElapsed).isEqualTo(2000);
         assertThat(stats.count).isEqualTo(1);
         assertThat(stats.readEntries).isNull();
         assertThat(stats.writeEntries).isNull();
+        assertThat(stats.readBytes).isEqualTo(1000);
+        assertThat(stats.writeBytes).isEqualTo(2000);
     }
 }

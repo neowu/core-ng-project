@@ -16,23 +16,31 @@ class PerformanceStatTest {
 
     @BeforeEach
     void createPerformanceStat() {
-        stat = new PerformanceStat(new PerformanceWarning("db", 100, Duration.ofSeconds(5), 1000, 10_000, 10_000));
+        stat = new PerformanceStat(new PerformanceWarning("db", 100, Duration.ofSeconds(5).toNanos(), 1000, 10_000, 10_000, 10_000, 10_000));
         logManager = new LogManager();
     }
 
     @Test
     void checkSingleIO() {
         logManager.run("test", null, actionLog -> {
-            stat.checkSingleIO(Duration.ofSeconds(10).toNanos(), 1000);
+            stat.checkSingleIO(Duration.ofSeconds(10).toNanos(), 1_000, 1_000);
 
             assertThat(actionLog.errorCode()).isEqualTo("SLOW_DB");
             assertThat(actionLog.errorMessage).startsWith("slow operation, operation=db, elapsed=PT10S");
             return null;
         });
+
+        logManager.run("test", null, actionLog -> {
+            stat.checkSingleIO(Duration.ofMillis(10).toNanos(), 100, 11_000);
+
+            assertThat(actionLog.errorCode()).isEqualTo("HIGH_DB_IO");
+            assertThat(actionLog.errorMessage).startsWith("read too many bytes once, operation=db, bytes=11000");
+            return null;
+        });
     }
 
     @Test
-    void checkTotalIO() {
+    void checkTotalIOWithReadTooManyEntries() {
         logManager.run("test", null, actionLog -> {
             stat.readEntries = 20_000;
             stat.writeEntries = 20_000;
@@ -40,6 +48,18 @@ class PerformanceStatTest {
 
             assertThat(actionLog.errorCode()).isEqualTo("HIGH_DB_IO");
             assertThat(actionLog.errorMessage).startsWith("read too many entries, operation=db, entries=20000");
+            return null;
+        });
+    }
+
+    @Test
+    void checkTotalIOWithReadTooManyBytes() {
+        logManager.run("test", null, actionLog -> {
+            stat.readBytes = 20_000;
+            stat.checkTotalIO();
+
+            assertThat(actionLog.errorCode()).isEqualTo("HIGH_DB_IO");
+            assertThat(actionLog.errorMessage).startsWith("read too many bytes, operation=db, bytes=20000");
             return null;
         });
     }

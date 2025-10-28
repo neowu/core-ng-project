@@ -89,7 +89,7 @@ class ChannelImpl<T> implements java.nio.channels.Channel, Channel<T>, Channel.C
             return true;
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("sse", elapsed, 0, event.length);
+            ActionLogContext.track("sse", elapsed, 0, 1, 0, event.length);
             LOGGER.debug("send sse message, channel={}, message={}, elapsed={}", id, new BytesLogParam(event), elapsed); // message is not in json format, not masked, assume sse won't send any sensitive event
         }
     }

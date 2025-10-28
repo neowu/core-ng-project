@@ -72,7 +72,6 @@ public final class HTTPClientBuilder {
     private Duration connectTimeout = Duration.ofSeconds(25);
     private Duration timeout = Duration.ofSeconds(60);
     private Duration keepAlive = Duration.ofSeconds(30);    // conservative setting, as http connection to internet/external can be cut off by NAT/firewall if idle too long
-    private Duration slowOperationThreshold = Duration.ofSeconds(30);   // slow threshold should be longer than connect timeout
     private boolean enableCookie = false;
     // there is already networkaddress.cache.ttl=300s, this is to mitigate dns failure further,
     // like external domain can be under DDos attack constantly (DNS hijacking) or unstable DNS query between countries
@@ -118,7 +117,7 @@ public final class HTTPClientBuilder {
             if (enableFallbackDNSCache) builder.dns(new FallbackDNSCache(Clock.systemUTC()));
             if (proxy != null) builder.proxy(proxy);
 
-            return new HTTPClientImpl(builder.build(), userAgent, slowOperationThreshold, timeout);
+            return new HTTPClientImpl(builder.build(), userAgent, timeout);
         } finally {
             logger.info("create http client, elapsed={}", watch.elapsed());
         }
@@ -158,11 +157,6 @@ public final class HTTPClientBuilder {
 
     public HTTPClientBuilder keepAlive(Duration keepAlive) {
         this.keepAlive = keepAlive;
-        return this;
-    }
-
-    public HTTPClientBuilder slowOperationThreshold(Duration slowOperationThreshold) {
-        this.slowOperationThreshold = slowOperationThreshold;
         return this;
     }
 

@@ -27,7 +27,6 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static core.framework.log.Markers.errorCode;
 import static java.lang.String.CASE_INSENSITIVE_ORDER;
 
 /**
@@ -38,13 +37,11 @@ public final class HTTPClientImpl implements HTTPClient {
     public final long timeoutInNano;
     private final Logger logger = LoggerFactory.getLogger(HTTPClientImpl.class);
     private final String userAgent;
-    private final long slowOperationThresholdInNanos;
     private final OkHttpClient client;
 
-    public HTTPClientImpl(OkHttpClient client, String userAgent, Duration slowOperationThreshold, Duration timeout) {
+    public HTTPClientImpl(OkHttpClient client, String userAgent, Duration timeout) {
         this.client = client;
         this.userAgent = userAgent;
-        slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
         timeoutInNano = timeout.toNanos();
     }
 
@@ -62,11 +59,8 @@ public final class HTTPClientImpl implements HTTPClient {
             throw new HTTPClientException(Strings.format("http request failed, uri={}, error={}", request.uri, e.getMessage()), "HTTP_REQUEST_FAILED", e);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("http", elapsed, responseBodyLength, requestBodyLength);
+            ActionLogContext.track("http", elapsed, 0, 0, responseBodyLength, requestBodyLength);
             logger.debug("execute, elapsed={}", elapsed);
-            if (elapsed > slowOperationThresholdInNanos(request)) {
-                logger.warn(errorCode("SLOW_HTTP"), "slow http operation, method={}, uri={}, elapsed={}", request.method, request.uri, Duration.ofNanos(elapsed));
-            }
         }
     }
 
@@ -87,15 +81,12 @@ public final class HTTPClientImpl implements HTTPClient {
                 logger.debug("[response] body={}", BodyLogParam.of(body, contentType == null ? null : ContentType.parse(contentType)));
                 throw new HTTPClientException(Strings.format("invalid sse response, statusCode={}, content-type={}", statusCode, contentType), "HTTP_REQUEST_FAILED");
             }
-            return new EventSource(statusCode, headers, httpResponse.body(), requestBodyLength, watch.elapsed());
-        } catch (IOException e) {
-            throw new HTTPClientException(Strings.format("sse request failed, uri={}, error={}", request.uri, e.getMessage()), "HTTP_REQUEST_FAILED", e);
-        } finally {
+
             long elapsed = watch.elapsed();
             logger.debug("sse, elapsed={}", elapsed);
-            if (elapsed > slowOperationThresholdInNanos(request)) {
-                logger.warn(errorCode("SLOW_HTTP"), "slow http operation, method={}, uri={}, elapsed={}", request.method, request.uri, Duration.ofNanos(elapsed));
-            }
+            return new EventSource(statusCode, headers, httpResponse.body(), requestBodyLength, elapsed);
+        } catch (IOException e) {
+            throw new HTTPClientException(Strings.format("sse request failed, uri={}, error={}", request.uri, e.getMessage()), "HTTP_REQUEST_FAILED", e);
         }
     }
 
@@ -170,11 +161,6 @@ public final class HTTPClientImpl implements HTTPClient {
         }
         logger.debug("[response] headers={}", new FieldMapLogParam(headers));
         return headers;
-    }
-
-    long slowOperationThresholdInNanos(HTTPRequest request) {
-        if (request.slowOperationThreshold != null) return request.slowOperationThreshold.toNanos();
-        return slowOperationThresholdInNanos;
     }
 
     @Nullable

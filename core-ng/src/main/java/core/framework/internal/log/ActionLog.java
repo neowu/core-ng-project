@@ -143,13 +143,13 @@ public final class ActionLog {
 
     public void initializeWarnings(PerformanceWarning[] warnings) {
         for (PerformanceWarning warning : warnings) {
-            performanceStats.put(warning.operation, new PerformanceStat(warning));
+            performanceStats.put(warning.operation(), new PerformanceStat(warning));
         }
     }
 
-    public int track(String operation, long elapsed, int readEntries, int writeEntries) {
+    public int track(String operation, long elapsed, int readEntries, int writeEntries, long readBytes, long writeBytes) {
         PerformanceStat stat = performanceStats.computeIfAbsent(operation, key -> new PerformanceStat(WarningContext.defaultWarning(key)));
-        stat.track(elapsed, readEntries, writeEntries);
+        stat.track(elapsed, readEntries, writeEntries, readBytes, writeBytes);
         return stat.count;
     }
 

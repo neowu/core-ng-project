@@ -4,7 +4,9 @@ import core.framework.internal.json.JSONReader;
 import core.framework.internal.redis.RedisException;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.validate.Validator;
+import core.framework.log.ActionLogContext;
 import core.framework.util.Maps;
+import core.framework.util.StopWatch;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,23 +34,35 @@ public class RedisCacheStore implements CacheStore {
     @Nullable
     @Override
     public <T> T get(String key, CacheContext<T> context) {
+        var watch = new StopWatch();
+        long readBytes = 0;
         try {
             byte[] value = redis.getBytes(key);
             if (value == null) return null;
+            readBytes = value.length;
             return deserialize(value, context.reader, context.validator);
         } catch (UncheckedIOException | RedisException e) {
             logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
             return null;
+        } finally {
+            ActionLogContext.track("cache", watch.elapsed(), 1, 0, readBytes, 0);
         }
     }
 
     @Override
     public <T> Map<String, T> getAll(String[] keys, CacheContext<T> context) {
+        var watch = new StopWatch();
+        int readKeys = 0;
+        long readBytes = 0;
         try {
             Map<String, byte[]> redisValues = redis.multiGetBytes(keys);
+            readKeys = redisValues.size();
             Map<String, T> values = Maps.newHashMapWithExpectedSize(redisValues.size());
             for (Map.Entry<String, byte[]> entry : redisValues.entrySet()) {
-                T value = deserialize(entry.getValue(), context.reader, context.validator);
+                byte[] bytes = entry.getValue();
+                readBytes += bytes.length;
+
+                T value = deserialize(bytes, context.reader, context.validator);
                 if (value != null) {
                     values.put(entry.getKey(), value);
                 }
@@ -57,6 +71,8 @@ public class RedisCacheStore implements CacheStore {
         } catch (UncheckedIOException | RedisException e) {
             logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
             return Map.of();
+        } finally {
+            ActionLogContext.track("cache", watch.elapsed(), readKeys, 0, readBytes, 0);
         }
     }
 
@@ -81,34 +97,53 @@ public class RedisCacheStore implements CacheStore {
 
     @Override
     public <T> void put(String key, T value, Duration expiration, CacheContext<T> context) {
+        var watch = new StopWatch();
+        long writeBytes = 0;
         try {
-            redis.set(key, context.writer.toJSON(value), expiration, false);
+            byte[] bytes = context.writer.toJSON(value);
+            writeBytes = bytes.length;
+
+            redis.set(key, bytes, expiration, false);
         } catch (UncheckedIOException | RedisException e) {
             logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
+        } finally {
+            ActionLogContext.track("cache", watch.elapsed(), 0, 1, 0, writeBytes);
         }
     }
 
     @Override
     public <T> void putAll(List<Entry<T>> values, Duration expiration, CacheContext<T> context) {
-        Map<String, byte[]> cacheValues = Maps.newHashMapWithExpectedSize(values.size());
+        var watch = new StopWatch();
+        long writeBytes = 0;
+        int size = values.size();
+        Map<String, byte[]> cacheValues = Maps.newHashMapWithExpectedSize(size);
         for (Entry<T> value : values) {
-            cacheValues.put(value.key(), context.writer.toJSON(value.value()));
+            byte[] bytes = context.writer.toJSON(value.value());
+            writeBytes += bytes.length;
+
+            cacheValues.put(value.key(), bytes);
         }
         try {
             redis.multiSet(cacheValues, expiration);
         } catch (UncheckedIOException | RedisException e) {
             logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
+        } finally {
+            ActionLogContext.track("cache", watch.elapsed(), 0, size, 0, writeBytes);
         }
     }
 
     @Override
     public boolean delete(String... keys) {
+        var watch = new StopWatch();
+        long deletedKeys = 0;
         try {
-            long deletedKeys = redis.del(keys);
+            deletedKeys = redis.del(keys);
             return deletedKeys > 0;
         } catch (UncheckedIOException | RedisException e) {
             logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
             return false;
+        } finally {
+            ActionLogContext.track("cache", watch.elapsed(), 0, (int) deletedKeys, 0, 0);
         }
     }
 }

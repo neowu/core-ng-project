@@ -19,44 +19,56 @@ class PerformanceStat {
 
     int count;
     long totalElapsed;
-    int readEntries;
+    int readEntries;    // rows/docs/keys
     int writeEntries;
+    long readBytes;
+    long writeBytes;
 
     PerformanceStat(@Nullable PerformanceWarning warning) {
         this.warning = warning;
     }
 
-    void track(long elapsed, int readEntries, int writeEntries) {
+    void track(long elapsed, int readEntries, int writeEntries, long readBytes, long writeBytes) {
         count += 1;
         totalElapsed += elapsed;
+
         this.readEntries += readEntries;
         this.writeEntries += writeEntries;
 
-        checkSingleIO(elapsed, readEntries);
+        this.readBytes += readBytes;
+        this.writeBytes += writeBytes;
+
+        checkSingleIO(elapsed, readEntries, readBytes);
     }
 
-    void checkSingleIO(long elapsed, int readEntries) {
+    void checkSingleIO(long elapsed, int readEntries, long readBytes) {
         if (warning == null) return;
 
-        if (warning.maxReads > 0 && readEntries > warning.maxReads) {
-            LOGGER.warn(errorCode("HIGH_" + toUpperCase(warning.operation) + "_IO"), "read too many entries once, operation={}, entries={}", warning.operation, readEntries);
+        if (warning.maxElapsed() > 0 && elapsed > warning.maxElapsed()) {
+            LOGGER.warn(errorCode("SLOW_" + toUpperCase(warning.operation())), "slow operation, operation={}, elapsed={}", warning.operation(), Duration.ofNanos(elapsed));
         }
-        if (warning.maxElapsed > 0 && elapsed > warning.maxElapsed) {
-            LOGGER.warn(errorCode("SLOW_" + toUpperCase(warning.operation)), "slow operation, operation={}, elapsed={}", warning.operation, Duration.ofNanos(elapsed));
+        if (warning.maxReads() > 0 && readEntries > warning.maxReads()) {
+            LOGGER.warn(errorCode("HIGH_" + toUpperCase(warning.operation()) + "_IO"), "read too many entries once, operation={}, entries={}", warning.operation(), readEntries);
+        }
+        if (warning.maxReadBytes() > 0 && readBytes > warning.maxReadBytes()) {
+            LOGGER.warn(errorCode("HIGH_" + toUpperCase(warning.operation()) + "_IO"), "read too many bytes once, operation={}, bytes={}", warning.operation(), readBytes);
         }
     }
 
     void checkTotalIO() {
         if (warning == null) return;
 
-        if (warning.maxOperations > 0 && count > warning.maxOperations) {
-            LOGGER.warn(errorCode("HIGH_" + toUpperCase(warning.operation) + "_IO"), "too many operations, operation={}, count={}", warning.operation, count);
+        if (warning.maxOperations() > 0 && count > warning.maxOperations()) {
+            LOGGER.warn(errorCode("HIGH_" + toUpperCase(warning.operation()) + "_IO"), "too many operations, operation={}, count={}", warning.operation(), count);
         }
-        if (warning.maxTotalReads > 0 && readEntries > warning.maxTotalReads) {
-            LOGGER.warn(errorCode("HIGH_" + toUpperCase(warning.operation) + "_IO"), "read too many entries, operation={}, entries={}", warning.operation, readEntries);
+        if (warning.maxTotalReads() > 0 && readEntries > warning.maxTotalReads()) {
+            LOGGER.warn(errorCode("HIGH_" + toUpperCase(warning.operation()) + "_IO"), "read too many entries, operation={}, entries={}", warning.operation(), readEntries);
         }
-        if (warning.maxTotalWrites > 0 && writeEntries > warning.maxTotalWrites) {
-            LOGGER.warn(errorCode("HIGH_" + toUpperCase(warning.operation) + "_IO"), "write too many entries, operation={}, entries={}", warning.operation, writeEntries);
+        if (warning.maxTotalWrites() > 0 && writeEntries > warning.maxTotalWrites()) {
+            LOGGER.warn(errorCode("HIGH_" + toUpperCase(warning.operation()) + "_IO"), "write too many entries, operation={}, entries={}", warning.operation(), writeEntries);
+        }
+        if (warning.maxTotalReadBytes() > 0 && readBytes > warning.maxTotalReadBytes()) {
+            LOGGER.warn(errorCode("HIGH_" + toUpperCase(warning.operation()) + "_IO"), "read too many bytes, operation={}, bytes={}", warning.operation(), readBytes);
         }
     }
 }

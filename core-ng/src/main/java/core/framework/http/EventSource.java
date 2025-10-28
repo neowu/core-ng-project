@@ -25,6 +25,7 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
     private final ResponseBody body;
     private final int requestBodyLength;
     private int responseBodyLength;
+    private int events;
     private long elapsed;
 
     @Nullable
@@ -45,7 +46,7 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
     @Override
     public void close() {
         LOGGER.debug("[sse] close sse connection");
-        ActionLogContext.track("sse", elapsed, responseBodyLength, requestBodyLength);
+        ActionLogContext.track("sse", elapsed, events, 0, responseBodyLength, requestBodyLength);
         body.close();
     }
 
@@ -83,6 +84,7 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
                         lastId = null;
                         String type = lastType;
                         lastType = null;
+                        events++;
                         return new Event(id, type, line.substring(index + 2));
                     default:    // ignore "retry" and other fields
                 }

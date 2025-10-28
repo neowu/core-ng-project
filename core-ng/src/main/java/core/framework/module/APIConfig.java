@@ -45,7 +45,6 @@ public class APIConfig extends Config {
             .connectTimeout(Duration.ofSeconds(2))
             .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
             .keepAlive(Duration.ofMinutes(5))   // use longer keep alive timeout within cluster, to reduce connection creation overhead
-            .slowOperationThreshold(Duration.ofSeconds(10))
             .maxRetries(5)
             .build();
         writer = new RequestBeanWriter();

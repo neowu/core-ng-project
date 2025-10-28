@@ -42,8 +42,10 @@ public class ActionLogMessageFactory {
             var message = new PerformanceStatMessage();
             message.count = value.count;
             message.totalElapsed = value.totalElapsed;
-            if (value.readEntries != 0) message.readEntries = value.readEntries;
-            if (value.writeEntries != 0) message.writeEntries = value.writeEntries;
+            if (value.readEntries > 0) message.readEntries = value.readEntries;
+            if (value.writeEntries > 0) message.writeEntries = value.writeEntries;
+            if (value.readBytes > 0) message.readBytes = value.readBytes;
+            if (value.writeBytes > 0) message.writeBytes = value.writeBytes;
             messages.put(entry.getKey(), message);
         }
         return messages;

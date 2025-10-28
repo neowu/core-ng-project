@@ -28,8 +28,6 @@ public final class HTTPRequest {
     public Duration connectTimeout;
     @Nullable
     public Duration timeout;            // read and write timeout
-    @Nullable
-    public Duration slowOperationThreshold;
 
     public HTTPRequest(HTTPMethod method, String uri) {
         this.method = method;

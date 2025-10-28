@@ -25,4 +25,8 @@ public @interface IOWarning {   // currently only supports WS/Controller and Mes
     int maxTotalReads() default -1;     // total entries read by one action
 
     int maxTotalWrites() default -1;    // total entries updated by one action
+
+    int maxReadBytes() default -1;         // bytes read by one operation
+
+    int maxTotalReadBytes() default -1;    // total bytes read by one action
 }

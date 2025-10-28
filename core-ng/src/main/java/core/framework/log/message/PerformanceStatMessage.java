@@ -14,4 +14,8 @@ public class PerformanceStatMessage {
     public Integer readEntries;
     @Property(name = "write_entries")
     public Integer writeEntries;
+    @Property(name = "read_bytes")
+    public Long readBytes;
+    @Property(name = "write_bytes")
+    public Long writeBytes;
 }

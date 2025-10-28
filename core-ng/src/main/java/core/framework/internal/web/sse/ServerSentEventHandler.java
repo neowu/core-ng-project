@@ -108,7 +108,7 @@ public class ServerSentEventHandler implements HttpHandler {
             if (handlerContext.rateControl != null) {
                 limitRate(handlerContext.rateControl, support, request.clientIP());
             }
-
+            if (support.warnings != null) actionLog.initializeWarnings(support.warnings);
             channel = new ChannelImpl<>(exchange, sink, support.context, support.builder, actionLog.id, request);
             sink.getWriteSetter().set(channel.writeListener);
             exchange.addExchangeCompleteListener(new ServerSentEventCloseHandler<>(logManager, channel, support));

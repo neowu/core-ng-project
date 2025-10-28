@@ -213,7 +213,7 @@ class MessageListenerThread extends Thread {
             try {
                 initAction(actionLog, topic, process.handler.getClass().getCanonicalName(), process.warnings);
 
-                actionLog.track("kafka", 0, 1, 0);
+                actionLog.track("kafka", 0, 1, 0, message.value.length, 0);
 
                 if (message.trace != null) actionLog.trace = message.trace;
                 if (message.correlationId != null) actionLog.correlationIds = List.of(message.correlationId);
@@ -279,13 +279,13 @@ class MessageListenerThread extends Thread {
 
     <T> List<Message<T>> messages(List<KafkaMessage> messages, ActionLog actionLog, JSONReader<T> reader) throws IOException {
         int size = messages.size();
-        actionLog.track("kafka", 0, size, 0);
         List<Message<T>> messageObjects = new ArrayList<>(size);
         Set<String> correlationIds = new HashSet<>();
         Set<String> clients = new HashSet<>();
         Set<String> refIds = new HashSet<>();
         Set<String> keys = Sets.newHashSetWithExpectedSize(size);
         long minTimestamp = Long.MAX_VALUE;
+        long totalBytes = 0;
 
         for (KafkaMessage message : messages) {
             if (message.trace != null) actionLog.trace = message.trace;   // trigger trace if any message is trace
@@ -293,6 +293,7 @@ class MessageListenerThread extends Thread {
             if (message.client != null) clients.add(message.client);
             if (message.refId != null) refIds.add(message.refId);
             keys.add(message.key);
+            totalBytes += message.value.length;
 
             logger.debug("[message] key={}, value={}, timestamp={}, refId={}, client={}, correlationId={}, trace={}",
                 message.key, new BytesLogParam(message.value), message.timestamp, message.refId, message.client, message.correlationId, message.trace);
@@ -302,6 +303,7 @@ class MessageListenerThread extends Thread {
             T messageObject = reader.fromJSON(message.value);
             messageObjects.add(new Message<>(message.key, messageObject));
         }
+        actionLog.track("kafka", 0, size, 0, totalBytes, 0);
         actionLog.context.put("key", new ArrayList<>(keys));    // keys could contain null
 
         if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);  // action log kafka appender doesn't send headers
