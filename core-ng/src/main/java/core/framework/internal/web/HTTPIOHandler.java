@@ -11,6 +11,7 @@ import io.undertow.server.handlers.form.MultiPartParserDefinition;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.channels.StreamSourceChannel;
@@ -25,13 +26,14 @@ public class HTTPIOHandler implements HttpHandler {
     private final Logger logger = LoggerFactory.getLogger(HTTPIOHandler.class);
 
     private final HTTPHandler httpHandler;
+    @Nullable
     private final ServerSentEventHandler sseHandler;
     private final ShutdownHandler shutdownHandler;
 
     private final FormParserFactory formParserFactory;
     private final long maxEntitySize;
 
-    HTTPIOHandler(HTTPHandler httpHandler, ShutdownHandler shutdownHandler, long maxEntitySize, ServerSentEventHandler sseHandler) {
+    HTTPIOHandler(HTTPHandler httpHandler, ShutdownHandler shutdownHandler, long maxEntitySize, @Nullable ServerSentEventHandler sseHandler) {
         this.httpHandler = httpHandler;
         this.shutdownHandler = shutdownHandler;
         formParserFactory = createFormParserFactory();

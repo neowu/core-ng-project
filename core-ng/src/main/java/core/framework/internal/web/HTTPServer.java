@@ -12,6 +12,7 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.encoding.ContentEncodingRepository;
 import io.undertow.server.handlers.encoding.EncodingHandler;
 import io.undertow.server.handlers.encoding.GzipEncodingProvider;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Options;
@@ -40,7 +41,9 @@ public class HTTPServer {
     private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
     private final ExecutorService worker = ThreadPools.virtualThreadExecutor("http-handler-");
 
+    @Nullable
     public ServerSentEventHandler sseHandler;
+    @Nullable
     private Undertow server;
 
     public HTTPServer(LogManager logManager) {

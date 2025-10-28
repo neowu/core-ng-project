@@ -20,6 +20,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,7 +145,7 @@ public class HTTPHandler implements HttpHandler {
         actionLog.warningContext.maxProcessTimeInNano(maxProcessTime(headers.getFirst(HEADER_TIMEOUT)));
     }
 
-    long maxProcessTime(String timeout) {
+    long maxProcessTime(@Nullable String timeout) {
         if (timeout != null) {
             try {
                 return Long.parseLong(timeout);

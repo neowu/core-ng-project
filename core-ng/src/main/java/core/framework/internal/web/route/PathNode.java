@@ -2,6 +2,7 @@ package core.framework.internal.web.route;
 
 import core.framework.internal.web.request.PathParams;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,13 +13,18 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 class PathNode {
+    @Nullable
     private final String param;
+    @Nullable
     private URLHandler handler;
+    @Nullable
     private Map<String, PathNode> staticNodes;
+    @Nullable
     private PathNode dynamicNode;
+    @Nullable
     private PathNode wildcardNode;
 
-    PathNode(String param) {
+    PathNode(@Nullable String param) {
         this.param = param;
     }
 
@@ -26,7 +32,7 @@ class PathNode {
         return register(pathPattern, Path.parse(pathPattern).next);
     }
 
-    private URLHandler register(String pathPattern, Path currentPath) {
+    private URLHandler register(String pathPattern, @Nullable Path currentPath) {
         if (currentPath == null) {
             if (handler == null) handler = new URLHandler(pathPattern);
             return handler;
@@ -68,10 +74,12 @@ class PathNode {
         return dynamicNode.register(pathPattern, currentPath.next);
     }
 
+    @Nullable
     URLHandler find(String path, PathParams pathParams) {
         return find(Path.parse(path), pathParams);
     }
 
+    @Nullable
     private URLHandler find(Path currentPath, PathParams pathParams) {
         Path nextPath = currentPath.next;
         if (nextPath == null) return handler;
@@ -92,6 +100,7 @@ class PathNode {
         return null;
     }
 
+    @Nullable
     private URLHandler findStatic(Path nextPath, PathParams pathParams) {
         if (staticNodes != null) {
             PathNode nextNode = staticNodes.get(nextPath.value);
@@ -102,6 +111,7 @@ class PathNode {
         return null;
     }
 
+    @Nullable
     private URLHandler findDynamic(Path nextPath, PathParams pathParams) {
         if (dynamicNode != null) {
             URLHandler handler = dynamicNode.find(nextPath, pathParams);

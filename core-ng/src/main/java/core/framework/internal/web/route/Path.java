@@ -1,5 +1,7 @@
 package core.framework.internal.web.route;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author neo
  */
@@ -28,6 +30,7 @@ public final class Path {
     }
 
     public final String value;
+    @Nullable
     public Path next;
 
     private Path(String value) {

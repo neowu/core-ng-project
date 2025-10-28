@@ -19,6 +19,7 @@ import core.framework.web.service.RemoteServiceException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,7 @@ import java.util.List;
 public class HTTPErrorHandler {
     private final Logger logger = LoggerFactory.getLogger(HTTPErrorHandler.class);
     private final ResponseHandler responseHandler;
+    @Nullable
     public ErrorHandler customErrorHandler;
 
     HTTPErrorHandler(ResponseHandler responseHandler) {
