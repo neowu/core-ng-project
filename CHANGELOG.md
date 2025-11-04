@@ -6,7 +6,7 @@
 * cache: track redis store read/write bytes and elapsed time (included json serialization/deserialization time)
 * http: unified http slow threshold config, use @IOWarning to config for each action
 * sse: support @IOWarning on handler
-* http: update okhttp to 5.2.1
+* http: update okhttp to 5.3.0
 
 ### 9.3.0 (8/27/2025 - 10/8/2025) !!! only support java 25
 
