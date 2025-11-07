@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.3.1 (10/8/2025 - )
+### 9.3.1 (10/8/2025 - 11/7/2025)
 
 * tracking: add readBytes/writeBytes to perf_test, to separate read row/doc/keys and read bytes
 * cache: track redis store read/write bytes and elapsed time (included json serialization/deserialization time)

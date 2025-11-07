@@ -1,5 +1,5 @@
 [
-  {"attributes": {"buildNum": 70281, "defaultIndex": "action-pattern", "notifications:banner": "${NOTIFICATION_BANNER}", "defaultRoute": "/app/discover#/", "dateFormat": "YYYY-MM-DD HH:mm:ss.SSS", "dateNanosFormat": "YYYY-MM-DD HH:mm:ss.SSSSSS"}, "id": "9.2.0", "type": "config"},
+  {"attributes": {"defaultIndex": "action-pattern", "notifications:banner": "${NOTIFICATION_BANNER}", "defaultRoute": "/app/discover#/", "dateFormat": "YYYY-MM-DD HH:mm:ss.SSS", "dateNanosFormat": "YYYY-MM-DD HH:mm:ss.SSSSSS"}, "id": "9.2.0", "type": "config"},
   {
     "id": "action-pattern", "type": "index-pattern",
     "attributes": {
