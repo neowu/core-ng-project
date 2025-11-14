@@ -36,6 +36,7 @@ class IndexServiceTest {
         assertThat(indexService.createdDate("stat-2015.11.15")).hasValue(LocalDate.of(2015, Month.NOVEMBER, 15));
         assertThat(indexService.createdDate("metricbeat-6.3.2-2018.08.19")).hasValue(LocalDate.of(2018, Month.AUGUST, 19));
         assertThat(indexService.createdDate(".kibana")).isNotPresent();
+        assertThat(indexService.createdDate(".ds-.edr-workflow-insights-default-2025.04.24-000001")).isNotPresent();
     }
 
     @Test
