@@ -38,14 +38,14 @@ project("core-ng") {
         implementation("org.javassist:javassist:3.30.2-GA")
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
-        implementation("com.squareup.okhttp3:okhttp:5.3.0")
+        implementation("com.squareup.okhttp3:okhttp:5.3.1")
         implementation("io.undertow:undertow-core:2.3.20.Final")
         implementation("org.apache.kafka:kafka-clients:4.1.0") {
             exclude("org.xerial.snappy")
             exclude("org.lz4")
         }
         compileOnly("org.jboss.logging:jboss-logging-annotations:2.2.1.Final")
-        compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.3")
+        compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.8")
         testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
         testImplementation("org.mockito:mockito-junit-jupiter:${mockitoVersion}")
         testImplementation("org.assertj:assertj-core:${assertjVersion}")
