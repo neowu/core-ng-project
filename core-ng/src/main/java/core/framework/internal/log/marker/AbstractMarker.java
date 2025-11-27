@@ -1,5 +1,6 @@
 package core.framework.internal.log.marker;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Marker;
 
 import java.io.Serial;
@@ -32,6 +33,7 @@ public abstract class AbstractMarker implements Marker {
         return false;
     }
 
+    @Nullable
     @Override
     public Iterator<Marker> iterator() {
         return null;

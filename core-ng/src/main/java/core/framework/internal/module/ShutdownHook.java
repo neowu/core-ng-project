@@ -2,6 +2,7 @@ package core.framework.internal.module;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ public final class ShutdownHook implements Runnable {
     public final long shutdownTimeoutInNano;
     private final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
     private final LogManager logManager;
-    private final Stage[] stages = new Stage[STAGE_8 + 1];
+    private final @Nullable Stage[] stages = new Stage[STAGE_8 + 1];
     private final long shutdownDelayInSec;
 
     ShutdownHook(LogManager logManager) {
@@ -65,8 +66,12 @@ public final class ShutdownHook implements Runnable {
     }
 
     public void add(int stage, Shutdown shutdown) {
-        if (stages[stage] == null) stages[stage] = new Stage();
-        stages[stage].shutdowns.add(shutdown);
+        Stage target = stages[stage];
+        if (target == null) {
+            target = new Stage();
+            stages[stage] = target;
+        }
+        target.shutdowns.add(shutdown);
     }
 
     @Override

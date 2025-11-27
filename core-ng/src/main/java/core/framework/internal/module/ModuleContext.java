@@ -50,6 +50,7 @@ public class ModuleContext {    // after core.framework.module.App.start(), enti
     public final BeanClassValidator beanClassValidator = new BeanClassValidator();
     protected final Map<String, Config> configs = Maps.newHashMap();
     final PropertyValidator propertyValidator = new PropertyValidator();
+    @Nullable
     private BackgroundTaskExecutor backgroundTask;
 
     public ModuleContext(LogManager logManager) {

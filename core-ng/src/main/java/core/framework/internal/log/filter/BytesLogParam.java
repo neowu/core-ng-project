@@ -1,6 +1,7 @@
 package core.framework.internal.log.filter;
 
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.Charset;
 import java.util.Set;
@@ -11,14 +12,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author neo
  */
 public class BytesLogParam implements LogParam {    // for text based value, detect if in json format, and mask if needed
-    private final byte[] bytes;
+    private final byte @Nullable [] bytes;
     private final Charset charset;
 
-    public BytesLogParam(byte[] bytes) {
+    public BytesLogParam(byte @Nullable [] bytes) {
         this(bytes, UTF_8);
     }
 
-    public BytesLogParam(byte[] bytes, Charset charset) {
+    public BytesLogParam(byte @Nullable [] bytes, Charset charset) {
         this.bytes = bytes;
         this.charset = charset;
     }
@@ -69,7 +70,7 @@ public class BytesLogParam implements LogParam {    // for text based value, det
     }
 
     // find first json "string" range from start, only mask string field value, ignore if target field value is list or object
-    private int[] maskRange(StringBuilder builder, int start) {
+    private int @Nullable [] maskRange(StringBuilder builder, int start) {
         boolean escaped = false;
         int maskStart = -1;
         int length = builder.length();

@@ -1,6 +1,7 @@
 package core.framework.internal.log.filter;
 
 import core.framework.util.Sets;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -12,7 +13,7 @@ public class LogFilter {
     private static final int MAX_PARAM_LENGTH = 10000; // limit long param string to 10k
     public final Set<String> maskedFields = Sets.newHashSet();
 
-    public void append(StringBuilder builder, String message, Object... arguments) {
+    public void append(StringBuilder builder, @Nullable String message, Object @Nullable ... arguments) {
         if (message == null || arguments == null) {
             builder.append(message);
             return;
@@ -34,7 +35,7 @@ public class LogFilter {
         }
     }
 
-    private void appendArgument(StringBuilder builder, Object argument) {
+    private void appendArgument(StringBuilder builder, @Nullable Object argument) {
         if (argument == null) {
             builder.append("null");
             return;
@@ -57,7 +58,7 @@ public class LogFilter {
         LogParamHelper.append(builder, value, maxLength);
     }
 
-    private String arrayArgument(Object argument) {
+    private String arrayArgument(@Nullable Object argument) {
         return switch (argument) {
             case final Object[] value -> Arrays.toString(value);
             case final int[] value -> Arrays.toString(value);
