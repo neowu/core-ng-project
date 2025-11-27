@@ -7,6 +7,7 @@ import core.framework.internal.validate.ClassValidator;
 import core.framework.internal.validate.ClassVisitor;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -55,7 +56,7 @@ public class JSONClassValidator implements ClassVisitor {
     }
 
     @Override
-    public void visitField(Field field, String parentPath) {
+    public void visitField(Field field, @Nullable String parentPath) {
         Property property = field.getDeclaredAnnotation(Property.class);
         if (property == null)
             throw new Error("field must have @Property, field=" + Fields.path(field));

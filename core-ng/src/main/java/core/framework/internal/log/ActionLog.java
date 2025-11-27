@@ -37,14 +37,19 @@ public final class ActionLog {
     public LogLevel result = LogLevel.INFO;
     public Trace trace = Trace.NONE;        // whether flush trace log for all subsequent actions
     public String action = "unassigned";
+    @Nullable
     public List<String> correlationIds;     // with bulk message handler, there will be multiple correlationIds handled by one batch
+    @Nullable
     public List<String> clients;
+    @Nullable
     public List<String> refIds;
-    public String errorMessage;
     long elapsed;
+    @Nullable
+    public String errorMessage;
+    @Nullable
     private String errorCode;
 
-    public ActionLog(String message, String id) {
+    public ActionLog(String message, @Nullable String id) {
         startTime = System.nanoTime();
         date = Instant.now();
         if (id == null) {

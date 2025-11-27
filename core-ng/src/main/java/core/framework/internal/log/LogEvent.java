@@ -17,12 +17,14 @@ final class LogEvent {
 
     private final long time = System.nanoTime();
     private final String logger;
+    @Nullable
     private final Marker marker;
     private final String message;
-    private final Object[] arguments;
+    private final Object @Nullable [] arguments;
+    @Nullable
     private final Throwable exception;
 
-    LogEvent(String logger, Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
+    LogEvent(String logger, @Nullable Marker marker, LogLevel level, String message, Object @Nullable [] arguments, @Nullable Throwable exception) {
         this.logger = logger;
         this.marker = marker;
         this.level = level;

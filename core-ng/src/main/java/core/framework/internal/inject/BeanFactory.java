@@ -34,7 +34,7 @@ public class BeanFactory {
             throw new Error(format("found duplicate bean, type={}, name={}, previous={}", type.getTypeName(), name, previous));
     }
 
-    public Object bean(Type type, String name) {
+    public Object bean(Type type, @Nullable String name) {
         Object bean = beans.get(new Key(type, name));
         if (bean == null) throw new Error(format("can not find bean, type={}, name={}", type.getTypeName(), name));
         return bean;

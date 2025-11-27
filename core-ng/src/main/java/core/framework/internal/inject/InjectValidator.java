@@ -3,6 +3,7 @@ package core.framework.internal.inject;
 import core.framework.inject.Inject;
 import core.framework.internal.reflect.Fields;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -61,6 +62,7 @@ public class InjectValidator {
         return !visitedObjects.contains(value);
     }
 
+    @Nullable
     private Object fieldValue(Field field, Object instance) {
         if (field.trySetAccessible()) {
             try {

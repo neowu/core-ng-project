@@ -50,6 +50,7 @@ public final class WarningContext {
         return results;
     }
 
+    @Nullable
     static PerformanceWarning defaultWarning(String operation) {
         return switch (operation) {
             case "db" -> new PerformanceWarning("db", 2000, Duration.ofSeconds(5).toNanos(), 2_000, 10_000, 10_000, -1, -1);

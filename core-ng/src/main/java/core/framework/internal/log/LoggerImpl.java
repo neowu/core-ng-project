@@ -1,6 +1,7 @@
 package core.framework.internal.log;
 
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Marker;
 
 import java.io.PrintStream;
@@ -38,7 +39,7 @@ public final class LoggerImpl extends AbstractLogger {
     }
 
     @Override
-    public void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
+    public void log(@Nullable Marker marker, LogLevel level, String message, @Nullable Object[] arguments, @Nullable Throwable exception) {
         if (level.value >= traceLevel.value) {
             var event = new LogEvent(name, marker, level, message, arguments, exception);
 

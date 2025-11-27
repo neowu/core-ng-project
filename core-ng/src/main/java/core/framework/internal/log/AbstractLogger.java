@@ -1,5 +1,6 @@
 package core.framework.internal.log;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
@@ -13,23 +14,23 @@ abstract class AbstractLogger implements Logger {
         this.name = name;
     }
 
-    abstract void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception);
+    abstract void log(@Nullable Marker marker, LogLevel level, String message, @Nullable Object[] arguments, @Nullable Throwable exception);
 
-    private void logWithOneArgument(Marker marker, LogLevel level, String format, Object arg) {
+    private void logWithOneArgument(@Nullable Marker marker, LogLevel level, String format, Object arg) {
         if (arg instanceof Throwable exception)
             log(marker, level, format, null, exception);
         else
             log(marker, level, format, new Object[]{arg}, null);
     }
 
-    private void logWithTwoArguments(Marker marker, LogLevel level, String format, Object arg1, Object arg2) {
+    private void logWithTwoArguments(@Nullable Marker marker, LogLevel level, String format, Object arg1, Object arg2) {
         if (arg2 instanceof Throwable exception)
             log(marker, level, format, new Object[]{arg1}, exception);
         else
             log(marker, level, format, new Object[]{arg1, arg2}, null);
     }
 
-    private void logWithArguments(Marker marker, LogLevel level, String format, Object... arguments) {
+    private void logWithArguments(@Nullable Marker marker, LogLevel level, String format, Object... arguments) {
         if (arguments.length > 0 && arguments[arguments.length - 1] instanceof Throwable exception) {
             Object[] messageArguments = new Object[arguments.length - 1];
             System.arraycopy(arguments, 0, messageArguments, 0, arguments.length - 1);

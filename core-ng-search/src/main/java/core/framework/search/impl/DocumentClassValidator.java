@@ -29,7 +29,7 @@ final class DocumentClassValidator extends JSONClassValidator {
     }
 
     @Override
-    public void visitField(Field field, String parentPath) {
+    public void visitField(Field field, @Nullable String parentPath) {
         super.visitField(field, parentPath);
 
         try {

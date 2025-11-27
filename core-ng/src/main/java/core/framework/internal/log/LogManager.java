@@ -53,6 +53,7 @@ public class LogManager {
     }
 
     private final ActionLogMessageFactory actionLogMessageFactory = new ActionLogMessageFactory();
+    @Nullable
     public LogAppender appender;
 
     // this is internal api, to simplify the design, task must not throw exceptions, all callers catch throwable and log error

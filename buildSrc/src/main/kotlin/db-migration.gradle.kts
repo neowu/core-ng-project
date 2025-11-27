@@ -5,7 +5,7 @@ plugins {
 }
 
 tasks.withType<AbstractFlywayTask> {
-    notCompatibleWithConfigurationCache("https://github.com/flyway/flyway/issues/3550")
+    notCompatibleWithConfigurationCache("https://github.com/flyway/flyway/issues/4107")
 
     val migrationDir = file("src/main/resources/db/migration")
     if (!migrationDir.exists()) throw Error("$migrationDir does not exist")
