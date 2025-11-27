@@ -13,6 +13,7 @@ public class LogFilter {
     private static final int MAX_PARAM_LENGTH = 10000; // limit long param string to 10k
     public final Set<String> maskedFields = Sets.newHashSet();
 
+    @SuppressWarnings("NoWhitespaceBefore") // false positive for "Object @Nullable ..."
     public void append(StringBuilder builder, @Nullable String message, Object @Nullable ... arguments) {
         if (message == null || arguments == null) {
             builder.append(message);
