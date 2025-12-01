@@ -21,6 +21,7 @@ import core.framework.internal.web.route.PathPatternValidator;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -37,9 +38,13 @@ import static core.framework.util.Strings.format;
 public class WebServiceInterfaceValidator {
     private final Class<?> serviceInterface;
     private final BeanClassValidator validator;
+    @Nullable
     public RequestBeanReader requestBeanReader;
+    @Nullable
     public RequestBeanWriter requestBeanWriter;
+    @Nullable
     public ResponseBeanReader responseBeanReader;
+    @Nullable
     public ResponseBeanWriter responseBeanWriter;
 
     public WebServiceInterfaceValidator(Class<?> serviceInterface, BeanClassValidator validator) {

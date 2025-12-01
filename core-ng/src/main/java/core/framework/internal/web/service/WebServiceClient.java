@@ -17,6 +17,7 @@ import core.framework.log.Severity;
 import core.framework.util.Maps;
 import core.framework.web.service.RemoteServiceException;
 import core.framework.web.service.WebServiceClientInterceptor;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +52,7 @@ public class WebServiceClient {
     private final HTTPClient httpClient;
     private final RequestBeanWriter writer;
     private final ResponseBeanReader reader;
+    @Nullable
     private WebServiceClientInterceptor interceptor;
 
     public WebServiceClient(String serviceURL, HTTPClient httpClient, RequestBeanWriter writer, ResponseBeanReader reader) {
@@ -61,7 +63,8 @@ public class WebServiceClient {
     }
 
     // used by generated code, must be public
-    public <T> Object execute(HTTPMethod method, String path, Class<T> requestBeanClass, T requestBean, Type responseType) {
+    @Nullable
+    public <T> Object execute(HTTPMethod method, String path, @Nullable Class<T> requestBeanClass, T requestBean, Type responseType) {
         var request = new HTTPRequest(method, serviceURL + path);
         request.accept(ContentType.APPLICATION_JSON);
         linkContext(request);
@@ -155,7 +158,7 @@ public class WebServiceClient {
         }
     }
 
-    private Severity parseSeverity(String severity) {
+    private Severity parseSeverity(@Nullable String severity) {
         if (severity == null) return Severity.ERROR;
         return Severity.valueOf(severity);
     }

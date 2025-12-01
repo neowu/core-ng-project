@@ -3,6 +3,7 @@ package core.framework.internal.web.bean;
 import core.framework.internal.web.service.PathParamHelper;
 import core.framework.json.JSON;
 import core.framework.web.exception.BadRequestException;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,57 +17,68 @@ import java.time.format.DateTimeParseException;
  * @author neo
  */
 final class QueryParamHelper {   // used by generated QueryParamMapper
-    public static String toString(Number value) {
+    @Nullable
+    public static String toString(@Nullable Number value) {
         if (value == null) return null;
         return value.toString();
     }
 
-    public static String toString(Boolean value) {
+    @Nullable
+    public static String toString(@Nullable Boolean value) {
         if (value == null) return null;
         return value.toString();
     }
 
-    public static String toString(LocalDateTime dateTime) {
+    @Nullable
+    public static String toString(@Nullable LocalDateTime dateTime) {
         if (dateTime == null) return null;
         return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateTime);
     }
 
-    public static String toString(LocalDate date) {
+    @Nullable
+    public static String toString(@Nullable LocalDate date) {
         if (date == null) return null;
         return DateTimeFormatter.ISO_LOCAL_DATE.format(date);
     }
 
-    public static String toString(LocalTime time) {
+    @Nullable
+    public static String toString(@Nullable LocalTime time) {
         if (time == null) return null;
         return DateTimeFormatter.ISO_LOCAL_TIME.format(time);
     }
 
-    public static String toString(ZonedDateTime dateTime) {
+    @Nullable
+    public static String toString(@Nullable ZonedDateTime dateTime) {
         if (dateTime == null) return null;
         return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(dateTime);
     }
 
-    public static <T extends Enum<?>> String toString(T enumValue) {
+    @Nullable
+    public static <T extends Enum<?>> String toString(@Nullable T enumValue) {
         if (enumValue == null) return null;
         return JSON.toEnumValue(enumValue);
     }
 
     // deserialization helpers
+    @Nullable
     public static String toString(String value) {
         if (value.isEmpty()) return null;
         return value;
     }
 
+    @Nullable
     public static Integer toInt(String value) {
         if (value.isEmpty()) return null;
         return PathParamHelper.toInt(value);
     }
 
+    @Nullable
     public static Long toLong(String value) {
         if (value.isEmpty()) return null;
         return PathParamHelper.toLong(value);
     }
 
+    @Nullable
     public static Double toDouble(String value) {
         if (value.isEmpty()) return null;
         try {
@@ -76,6 +88,7 @@ final class QueryParamHelper {   // used by generated QueryParamMapper
         }
     }
 
+    @Nullable
     public static BigDecimal toBigDecimal(String value) {
         if (value.isEmpty()) return null;
         try {
@@ -85,16 +98,19 @@ final class QueryParamHelper {   // used by generated QueryParamMapper
         }
     }
 
+    @Nullable
     public static Boolean toBoolean(String value) {
         if (value.isEmpty()) return null;
         return Boolean.valueOf(value);  // Boolean.parseBoolean does not throw exception
     }
 
+    @Nullable
     public static <T extends Enum<?>> T toEnum(String value, Class<T> valueClass) {
         if (value.isEmpty()) return null;
         return PathParamHelper.toEnum(value, valueClass);
     }
 
+    @Nullable
     public static ZonedDateTime toZonedDateTime(String value) {
         if (value.isEmpty()) return null;
         try {
@@ -104,6 +120,7 @@ final class QueryParamHelper {   // used by generated QueryParamMapper
         }
     }
 
+    @Nullable
     public static LocalDateTime toDateTime(String value) {
         if (value.isEmpty()) return null;
         try {
@@ -113,6 +130,7 @@ final class QueryParamHelper {   // used by generated QueryParamMapper
         }
     }
 
+    @Nullable
     public static LocalTime toTime(String value) {
         if (value.isEmpty()) return null;
         try {
@@ -122,6 +140,7 @@ final class QueryParamHelper {   // used by generated QueryParamMapper
         }
     }
 
+    @Nullable
     public static LocalDate toDate(String value) {
         if (value.isEmpty()) return null;
         try {

@@ -35,14 +35,14 @@ public final class Validator<T> {
         this.validator = builder.build();
     }
 
-    public void validate(T bean, boolean partial) {
+    public void validate(@Nullable T bean, boolean partial) {
         Map<String, String> errors = errors(bean, partial);
         if (errors != null) throw new ValidationException(errors);
     }
 
     // used only internally, for places don't want to catch exception
     @Nullable
-    public Map<String, String> errors(T bean, boolean partial) {
+    public Map<String, String> errors(@Nullable T bean, boolean partial) {
         if (bean == null) {
             return Map.of("bean", "bean must not be null");
         }

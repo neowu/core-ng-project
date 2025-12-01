@@ -7,6 +7,7 @@ import core.framework.internal.reflect.GenericTypes;
 import core.framework.internal.validate.Validator;
 import core.framework.internal.web.service.InternalErrorResponse;
 import core.framework.util.Maps;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -36,6 +37,7 @@ public class ResponseBeanReader {   // used by webservice client
         }
     }
 
+    @Nullable
     public Object fromJSON(Type responseType, byte[] body) throws IOException {
         if (void.class == responseType) return null;
 
