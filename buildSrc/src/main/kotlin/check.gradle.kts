@@ -16,7 +16,7 @@ apply(plugin = "jacoco-report-aggregation")
 
 checkstyle {
     dependencies {
-        checkstyle("com.puppycrawl.tools:checkstyle:12.1.1")
+        checkstyle("com.puppycrawl.tools:checkstyle:12.2.0")
         checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
     }
 
@@ -44,7 +44,7 @@ checkstyle {
 pmd {
     ruleSets = listOf()
     ruleSetFiles = rootProject.files("buildSrc/src/main/check/pmd.xml")
-    toolVersion = "7.18.0"
+    toolVersion = "7.19.0"
     isConsoleOutput = true
 
     tasks.withType<Pmd> {

@@ -38,9 +38,9 @@ project("core-ng") {
         implementation("org.javassist:javassist:3.30.2-GA")
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
-        implementation("com.squareup.okhttp3:okhttp:5.3.1")
+        implementation("com.squareup.okhttp3:okhttp:5.3.2")
         implementation("io.undertow:undertow-core:2.3.20.Final")
-        implementation("org.apache.kafka:kafka-clients:4.1.0") {
+        implementation("org.apache.kafka:kafka-clients:4.1.1") {
             exclude("org.xerial.snappy")
             exclude("org.lz4")
         }
