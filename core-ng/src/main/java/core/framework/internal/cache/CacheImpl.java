@@ -70,9 +70,12 @@ public class CacheImpl<T> implements Cache<T> {
             String cacheKey = cacheKeys[index];
             T result = cacheValues.get(cacheKey);
             if (result == null) {
-                logger.debug("load value, key={}", key);
-                result = load(loader, key);
-                newValues.add(new CacheStore.Entry<>(cacheKey, result));
+                result = values.get(cacheKey);
+                if (result == null) {
+                    logger.debug("load value, key={}", key);
+                    result = load(loader, key);
+                    newValues.add(new CacheStore.Entry<>(cacheKey, result));
+                }
             }
             values.put(key, result);
             index++;
