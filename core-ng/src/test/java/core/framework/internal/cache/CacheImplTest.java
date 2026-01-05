@@ -79,10 +79,10 @@ class CacheImplTest {
     void getAllWhenMiss() {
         var values = Map.of("name:key1", cacheItem("v1"),
             "name:key3", cacheItem("v3"));
-        when(cacheStore.getAll(new String[]{"name:key1", "name:key2", "name:key3"}, cache.context)).thenReturn(values);
+        when(cacheStore.getAll(new String[]{"name:key1", "name:key2", "name:key2", "name:key3"}, cache.context)).thenReturn(values);
 
         TestCache item2 = cacheItem("v2");
-        Map<String, TestCache> results = cache.getAll(Arrays.asList("key1", "key2", "key3"), key -> item2);
+        Map<String, TestCache> results = cache.getAll(Arrays.asList("key1", "key2", "key2", "key3"), key -> item2);
         assertThat(results).containsKeys("key1", "key2", "key3");
         assertThat(results.get("key1").stringField).isEqualTo("v1");
         assertThat(results.get("key2").stringField).isEqualTo("v2");
