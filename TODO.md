@@ -15,7 +15,7 @@
 * log diagram, fix d3 tooltip (generate separated json, and make d3 tooltip show other non-HTML info)
 
 * redis using ping/pong to validate connection? for zero downtime upgrading e.g. with gcloud memory store
-* migrate to dragonflydb and support RESP3 (cluster / MOVED handling) ?
+* migrate to valkey or dragonflydb?
 
 * migrate to opensearch ? or update ES to 9.x
 

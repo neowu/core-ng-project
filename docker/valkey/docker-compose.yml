@@ -1,0 +1,5 @@
+services:
+  valkey:
+    image: valkey/valkey:9-alpine
+    ports:
+    - 6379:6379
