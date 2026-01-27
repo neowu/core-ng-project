@@ -1,8 +1,15 @@
 ## Change log
 
-### 9.3.2 ( - )
+### 9.4.0-b0 (1/26/26 - )
 
 * log: for rust version of log-processor/log-collector/log-exporter, refer to https://github.com/neowu/core_rs_workspace
+* db: removed mysql sslmode property, SSL mode will be detected by driver automatically
+* db: actively inspect query plan once every 24 hours
+  > via `explain`, support both MySQL and PostgreSQL, table scan more than 2000 rows is considered inefficient
+  > removed Database.suppressSlowSQLWarning(false);
+  > removed old error code `SLOW_SQL`, replaced with `INEFFICIENT_QUERY`
+  > print query plan if SLOW_DB
+* log: make ActionLogContext.track() return void
 
 ### 9.3.1 (10/8/2025 - 11/7/2025)
 

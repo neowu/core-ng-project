@@ -11,7 +11,7 @@ import java.util.UUID;
  * @author neo
  */
 @FunctionalInterface
-interface RowMapper<T> {
+public interface RowMapper<T> {
     static void checkColumnCount(ResultSetWrapper resultSet) {
         int count = resultSet.columnCount();
         if (count > 1) throw new Error("returned column count must be one, count=" + count);

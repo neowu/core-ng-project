@@ -62,7 +62,7 @@ public final class ResultSetWrapper {
     }
 
     @Nullable
-    Integer getInt(String column) throws SQLException {
+    public Integer getInt(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getInt(index);
@@ -73,7 +73,7 @@ public final class ResultSetWrapper {
     }
 
     @Nullable
-    Boolean getBoolean(String column) throws SQLException {
+    public Boolean getBoolean(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getBoolean(index);
@@ -84,7 +84,7 @@ public final class ResultSetWrapper {
     }
 
     @Nullable
-    Long getLong(String column) throws SQLException {
+    public Long getLong(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getLong(index);
@@ -95,7 +95,7 @@ public final class ResultSetWrapper {
     }
 
     @Nullable
-    Double getDouble(String column) throws SQLException {
+    public Double getDouble(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getDouble(index);
@@ -106,7 +106,7 @@ public final class ResultSetWrapper {
     }
 
     @Nullable
-    String getString(String column) throws SQLException {
+    public String getString(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getString(index);
@@ -117,7 +117,7 @@ public final class ResultSetWrapper {
     }
 
     @Nullable
-    BigDecimal getBigDecimal(String column) throws SQLException {
+    public BigDecimal getBigDecimal(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getBigDecimal(index);
@@ -128,7 +128,7 @@ public final class ResultSetWrapper {
     }
 
     @Nullable
-    LocalDateTime getLocalDateTime(String column) throws SQLException {
+    public LocalDateTime getLocalDateTime(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getLocalDateTime(index);
@@ -139,7 +139,7 @@ public final class ResultSetWrapper {
     }
 
     @Nullable
-    LocalDate getLocalDate(String column) throws SQLException {
+    public LocalDate getLocalDate(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getLocalDate(index);
@@ -150,7 +150,7 @@ public final class ResultSetWrapper {
     }
 
     @Nullable
-    ZonedDateTime getZonedDateTime(String column) throws SQLException {
+    public ZonedDateTime getZonedDateTime(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getZonedDateTime(index);
@@ -165,7 +165,7 @@ public final class ResultSetWrapper {
     }
 
     @Nullable
-    UUID getUUID(String column) throws SQLException {
+    public UUID getUUID(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getUUID(index);

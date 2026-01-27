@@ -22,7 +22,7 @@ class ActionLogContextTest {
 
         ActionLogContext.stat("stat", 1);
 
-        assertThat(ActionLogContext.track("db", 100)).isEqualTo(1);
+        ActionLogContext.track("db", 100);
     }
 
     @Test
@@ -39,8 +39,7 @@ class ActionLogContextTest {
             putNullContextValue();
             assertThat(ActionLogContext.get("nullValue")).contains("null");
 
-            assertThat(ActionLogContext.track("db", 100)).isEqualTo(1);
-            assertThat(ActionLogContext.track("db", 100)).isEqualTo(2);
+            ActionLogContext.track("db", 100);
             return null;
         });
     }

@@ -43,9 +43,9 @@ public final class ActionLog {
     public List<String> clients;
     @Nullable
     public List<String> refIds;
-    long elapsed;
     @Nullable
     public String errorMessage;
+    long elapsed;
     @Nullable
     private String errorCode;
 
@@ -116,6 +116,7 @@ public final class ActionLog {
         return trace != Trace.NONE || result.value >= WARN.value;
     }
 
+    @Nullable
     public String errorCode() {
         if (errorCode != null) return errorCode;
         if (result.value >= WARN.value) return "UNASSIGNED";
@@ -152,10 +153,9 @@ public final class ActionLog {
         }
     }
 
-    public int track(String operation, long elapsed, int readEntries, int writeEntries, long readBytes, long writeBytes) {
+    public TrackResult track(String operation, long elapsed, int readEntries, int writeEntries, long readBytes, long writeBytes) {
         PerformanceStat stat = performanceStats.computeIfAbsent(operation, key -> new PerformanceStat(WarningContext.defaultWarning(key)));
-        stat.track(elapsed, readEntries, writeEntries, readBytes, writeBytes);
-        return stat.count;
+        return stat.track(elapsed, readEntries, writeEntries, readBytes, writeBytes);
     }
 
     public String correlationId() {

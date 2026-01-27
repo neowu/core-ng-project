@@ -1,15 +1,10 @@
 package core.framework.internal.db;
 
 import core.framework.db.Dialect;
-import core.framework.db.QueryDiagnostic;
 import core.framework.db.UncheckedSQLException;
-import core.framework.internal.log.ActionLog;
-import core.framework.internal.log.LogManager;
 import core.framework.internal.resource.PoolItem;
 import core.framework.util.Lists;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -26,7 +21,6 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.UUID;
 
-import static core.framework.log.Markers.errorCode;
 import static core.framework.util.Strings.format;
 
 /**
@@ -34,7 +28,6 @@ import static core.framework.util.Strings.format;
  */
 public class DatabaseOperation {
     final EnumDBMapper enumMapper = new EnumDBMapper();
-    private final Logger logger = LoggerFactory.getLogger(DatabaseOperation.class);
     private final TransactionManager transactionManager;
     Dialect dialect;
     int queryTimeoutInSeconds;
@@ -50,9 +43,7 @@ public class DatabaseOperation {
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
             setParams(statement, params);
-            int result = statement.executeUpdate();
-            logSlowQuery(statement);
-            return result;
+            return statement.executeUpdate();
         } catch (SQLException e) {
             Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
@@ -71,9 +62,7 @@ public class DatabaseOperation {
                 setParams(statement, batchParams);
                 statement.addBatch();
             }
-            int[] results = statement.executeBatch();
-            logSlowQuery(statement);
-            return results;
+            return statement.executeBatch();
         } catch (SQLException e) {
             Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
@@ -96,7 +85,7 @@ public class DatabaseOperation {
         }
     }
 
-    <T> List<T> select(String sql, RowMapper<T> mapper, Object... params) {
+    public <T> List<T> select(String sql, RowMapper<T> mapper, Object... params) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
@@ -155,8 +144,6 @@ public class DatabaseOperation {
 
     private <T> Optional<T> fetchOne(PreparedStatement statement, RowMapper<T> mapper) throws SQLException {
         try (ResultSet resultSet = statement.executeQuery()) {
-            logSlowQuery(statement);
-
             T result = null;
             if (resultSet.next()) {
                 result = mapper.map(new ResultSetWrapper(resultSet, dialect));
@@ -169,8 +156,6 @@ public class DatabaseOperation {
 
     private <T> List<T> fetch(PreparedStatement statement, RowMapper<T> mapper) throws SQLException {
         try (ResultSet resultSet = statement.executeQuery()) {
-            logSlowQuery(statement);
-
             var wrapper = new ResultSetWrapper(resultSet, dialect);
             List<T> results = Lists.newArrayList();
             while (resultSet.next()) {
@@ -264,24 +249,6 @@ public class DatabaseOperation {
             }
             case null -> statement.setNull(index, Types.NULL);   // both mysql/hsql driver are not using sqlType param
             default -> throw new Error(format("unsupported param type, type={}, value={}", param.getClass().getCanonicalName(), param));
-        }
-    }
-
-    void logSlowQuery(PreparedStatement statement) {
-        if (statement instanceof QueryDiagnostic diagnostic) {
-            boolean noIndexUsed = diagnostic.noIndexUsed();
-            boolean badIndexUsed = diagnostic.noGoodIndexUsed();
-            if (!noIndexUsed && !badIndexUsed) return;
-
-            ActionLog actionLog = LogManager.currentActionLog();
-            boolean warning = actionLog == null || !actionLog.warningContext.suppressSlowSQLWarning;
-            String message = noIndexUsed ? "no index used" : "bad index used";
-            String sqlValue = diagnostic.sql();
-            if (warning) {
-                logger.warn(errorCode("SLOW_SQL"), "{}, sql={}", message, sqlValue);
-            } else {
-                logger.debug("{}, sql={}", message, sqlValue);
-            }
         }
     }
 }

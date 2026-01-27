@@ -28,7 +28,7 @@ class PerformanceStat {
         this.warning = warning;
     }
 
-    void track(long elapsed, int readEntries, int writeEntries, long readBytes, long writeBytes) {
+    TrackResult track(long elapsed, int readEntries, int writeEntries, long readBytes, long writeBytes) {
         count += 1;
         totalElapsed += elapsed;
 
@@ -38,14 +38,18 @@ class PerformanceStat {
         this.readBytes += readBytes;
         this.writeBytes += writeBytes;
 
-        checkSingleIO(elapsed, readEntries, readBytes);
+        boolean slow = checkSingleIO(elapsed, readEntries, readBytes);
+        return new TrackResult(count, slow);
     }
 
-    void checkSingleIO(long elapsed, int readEntries, long readBytes) {
-        if (warning == null) return;
+    // return if slow
+    boolean checkSingleIO(long elapsed, int readEntries, long readBytes) {
+        if (warning == null) return false;
 
+        boolean slow = false;
         if (warning.maxElapsed() > 0 && elapsed > warning.maxElapsed()) {
             LOGGER.warn(errorCode("SLOW_" + toUpperCase(warning.operation())), "slow operation, operation={}, elapsed={}", warning.operation(), Duration.ofNanos(elapsed));
+            slow = true;
         }
         if (warning.maxReads() > 0 && readEntries > warning.maxReads()) {
             LOGGER.warn(errorCode("HIGH_" + toUpperCase(warning.operation()) + "_IO"), "read too many entries once, operation={}, entries={}", warning.operation(), readEntries);
@@ -53,6 +57,7 @@ class PerformanceStat {
         if (warning.maxReadBytes() > 0 && readBytes > warning.maxReadBytes()) {
             LOGGER.warn(errorCode("HIGH_" + toUpperCase(warning.operation()) + "_IO"), "read too many bytes once, operation={}, bytes={}", warning.operation(), readBytes);
         }
+        return slow;
     }
 
     void checkTotalIO() {

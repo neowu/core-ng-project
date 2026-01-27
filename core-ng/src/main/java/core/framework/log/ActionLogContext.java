@@ -46,19 +46,19 @@ public final class ActionLogContext {
         }
     }
 
-    public static int track(String operation, long elapsed) {
-        return track(operation, elapsed, 0, 0);
+    public static void track(String operation, long elapsed) {
+        track(operation, elapsed, 0, 0);
     }
 
-    public static int track(String operation, long elapsed, int readEntries, int writeEntries) {
-        return track(operation, elapsed, readEntries, writeEntries, 0, 0);
+    public static void track(String operation, long elapsed, int readEntries, int writeEntries) {
+        track(operation, elapsed, readEntries, writeEntries, 0, 0);
     }
 
     // return the total count of operations within current action
-    public static int track(String operation, long elapsed, int readEntries, int writeEntries, long readBytes, long writeBytes) {
+    public static void track(String operation, long elapsed, int readEntries, int writeEntries, long readBytes, long writeBytes) {
         ActionLog actionLog = LogManager.currentActionLog();
-        if (actionLog == null) return 1;    // be called without action context
-        return actionLog.track(operation, elapsed, readEntries, writeEntries, readBytes, writeBytes);
+        if (actionLog == null) return;    // be called without action context
+        actionLog.track(operation, elapsed, readEntries, writeEntries, readBytes, writeBytes);
     }
 
     public static void triggerTrace(boolean cascade) {

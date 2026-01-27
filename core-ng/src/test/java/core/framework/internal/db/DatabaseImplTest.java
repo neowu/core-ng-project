@@ -1,5 +1,6 @@
 package core.framework.internal.db;
 
+import core.framework.db.CloudAuthProvider;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
 import core.framework.internal.db.cloud.GCloudAuthProvider;
@@ -128,24 +129,7 @@ class DatabaseImplTest {
             .hasMessageContaining("sql must not contain single quote(')");
     }
 
-    @Test
-    void validateSQLWithDDL() {
-        database.validateSQL("""
-            CREATE TYPE status AS ENUM ('ACTIVE', 'INACTIVE')""");
-    }
 
-    @Test
-    void validateSQLWithAsterisk() {
-        database.validateSQL("select column * 10 from table");
-        database.validateSQL("select 3*5, 4*2 from table");
-        database.validateSQL("select 3 * ? from table");
-
-        assertThatThrownBy(() -> database.validateSQL("select * from table")).isInstanceOf(Error.class);
-        assertThatThrownBy(() -> database.validateSQL("select * from")).isInstanceOf(Error.class);
-        assertThatThrownBy(() -> database.validateSQL("select t.* , t.column from table t")).isInstanceOf(Error.class);
-        assertThatThrownBy(() -> database.validateSQL("select 3*4, * from table")).isInstanceOf(Error.class);
-        assertThatThrownBy(() -> database.validateSQL("select *")).isInstanceOf(Error.class);
-    }
 
     @Test
     void commitTransaction() {
@@ -233,7 +217,6 @@ class DatabaseImplTest {
         Properties properties = database.driverProperties("jdbc:mysql://localhost/demo");
         assertThat(properties)
             .doesNotContainKeys("user", "password")
-            .containsEntry("sslMode", "DISABLED")
             .containsEntry("characterEncoding", "utf-8");
 
         properties = database.driverProperties("jdbc:mysql://localhost/demo?sslMode=REQUIRED&characterEncoding=latin1");
@@ -247,7 +230,7 @@ class DatabaseImplTest {
         database.authProvider = new GCloudAuthProvider();
         properties = database.driverProperties("jdbc:mysql://localhost/demo");
         assertThat(properties)
-            .containsEntry("sslMode", "PREFERRED");
+            .containsEntry(CloudAuthProvider.Provider.CLOUD_AUTH, "true");
     }
 
     @Test

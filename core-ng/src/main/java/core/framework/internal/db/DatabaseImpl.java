@@ -7,10 +7,13 @@ import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
+import core.framework.internal.db.inspector.MySQLQueryAnalyzer;
+import core.framework.internal.db.inspector.PostgreSQLQueryAnalyzer;
+import core.framework.internal.db.inspector.QueryInspector;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.log.TrackResult;
 import core.framework.internal.resource.Pool;
-import core.framework.util.ASCII;
 import core.framework.util.StopWatch;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -57,6 +60,7 @@ public final class DatabaseImpl implements Database {
     private @Nullable Properties driverProperties;
     private Duration timeout;
     private Driver driver;
+    private QueryInspector inspector;
 
     public DatabaseImpl(String name) {
         initializeRowMappers();
@@ -130,17 +134,12 @@ public final class DatabaseImpl implements Database {
             properties.setProperty("logger", "Slf4JLogger");
             properties.setProperty("cachePrepStmts", "true");
 
-            int index = url.indexOf('?');
-            // mysql with ssl has overhead, usually we ensure security on arch level, e.g. gcloud sql proxy or firewall rule
-            // with gcloud/azure iam / clear_text_password plugin, ssl is required
-            // refer to https://cloud.google.com/sql/docs/mysql/authentication
+            // with gcloud/azure iam / clear_text_password plugin, ssl is required, refer to https://cloud.google.com/sql/docs/mysql/authentication
             if (authProvider != null) {
-                properties.setProperty("sslMode", "PREFERRED");
                 properties.setProperty(CloudAuthProvider.Provider.CLOUD_AUTH, "true");
-            } else if (index == -1 || url.indexOf("sslMode=", index + 1) == -1) {
-                properties.setProperty("sslMode", "DISABLED");
             }
             // refer to https://dev.mysql.com/doc/connector-j/en/connector-j-reference-charsets.html
+            int index = url.indexOf('?');
             if (index == -1 || url.indexOf("characterEncoding=", index + 1) == -1)
                 properties.setProperty("characterEncoding", "utf-8");
         } else if (url.startsWith("jdbc:postgresql:")) {
@@ -175,12 +174,15 @@ public final class DatabaseImpl implements Database {
     private Driver driver(String url) {
         if (url.startsWith("jdbc:mysql:")) {
             operation.dialect = Dialect.MYSQL;
+            inspector = new QueryInspector(new MySQLQueryAnalyzer(operation));
             return createDriver("com.mysql.cj.jdbc.Driver");
         } else if (url.startsWith("jdbc:postgresql:")) {
             operation.dialect = Dialect.POSTGRESQL;
+            inspector = new QueryInspector(new PostgreSQLQueryAnalyzer(operation));
             return createDriver("org.postgresql.Driver");
         } else if (url.startsWith("jdbc:hsqldb:")) {
             operation.dialect = Dialect.MYSQL;    // unit test use mysql dialect
+            inspector = new QueryInspector(null);
             return createDriver("org.hsqldb.jdbc.JDBCDriver");
         } else {
             throw new Error("not supported database, url=" + url);
@@ -224,7 +226,8 @@ public final class DatabaseImpl implements Database {
     @Override
     public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
         var watch = new StopWatch();
-        validateSQL(sql);
+        inspector.inspect(sql, params);
+
         int returnedRows = 0;
         try {
             List<T> results = operation.select(sql, rowMapper(viewClass), params);
@@ -233,14 +236,19 @@ public final class DatabaseImpl implements Database {
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("select, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
-            track(elapsed, returnedRows, 0, 1);   // check after sql debug log, to make log easier to read
+            boolean slow = track(elapsed, returnedRows, 0, 1);   // check after sql debug log, to make log easier to read
+            if (slow) {
+                String plan = inspector.explain(sql, params);
+                logger.debug("plan=\n{}", plan);
+            }
         }
     }
 
     @Override
     public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
         var watch = new StopWatch();
-        validateSQL(sql);
+        inspector.inspect(sql, params);
+
         int returnedRows = 0;
         try {
             Optional<T> result = operation.selectOne(sql, rowMapper(viewClass), params);
@@ -249,14 +257,19 @@ public final class DatabaseImpl implements Database {
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("selectOne, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
-            track(elapsed, returnedRows, 0, 1);
+            boolean slow = track(elapsed, returnedRows, 0, 1);
+            if (slow) {
+                String plan = inspector.explain(sql, params);
+                logger.debug("plan=\n{}", plan);
+            }
         }
     }
 
     @Override
     public int execute(String sql, Object... params) {
         var watch = new StopWatch();
-        validateSQL(sql);
+        inspector.inspect(sql, params);
+
         int affectedRows = 0;
         try {
             affectedRows = operation.update(sql, params);
@@ -271,8 +284,9 @@ public final class DatabaseImpl implements Database {
     @Override
     public int[] batchExecute(String sql, List<Object[]> params) {
         var watch = new StopWatch();
-        validateSQL(sql);
         if (params.isEmpty()) throw new Error("params must not be empty");
+        inspector.inspect(sql, params.getFirst());
+
         int affectedRows = 0;
         try {
             int[] results = operation.batchUpdate(sql, params);
@@ -307,39 +321,14 @@ public final class DatabaseImpl implements Database {
         rowMappers.put(viewClass, mapper);
     }
 
-    void track(long elapsed, int readRows, int writeRows, int queries) {
+    // return if slow
+    boolean track(long elapsed, int readRows, int writeRows, int queries) {
         ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog != null) {
             actionLog.stats.compute("db_queries", (k, oldValue) -> (oldValue == null) ? queries : oldValue + queries);
-            actionLog.track("db", elapsed, readRows, writeRows, 0, 0);
+            TrackResult result = actionLog.track("db", elapsed, readRows, writeRows, 0, 0);
+            return result.slow();
         }
-    }
-
-    void validateSQL(String sql) {
-        if (sql.startsWith("CREATE ")) return;  // ignore DDL
-
-        // validate asterisk
-        // execute() could have select part, e.g. insert into select
-        int index = sql.indexOf('*');
-        while (index > -1) {   // check whether it's wildcard or multiply operator
-            int length = sql.length();
-            char ch = 0;
-            index++;
-            for (; index < length; index++) {
-                ch = sql.charAt(index);
-                if (ch != ' ') break;   // seek to next non-whitespace
-            }
-            if (ch == ','
-                || index == length  // sql ends with *
-                || index + 4 <= length && ASCII.toUpperCase(ch) == 'F' && "FROM".equals(ASCII.toUpperCase(sql.substring(index, index + 4))))
-                throw new Error("sql must not contain wildcard(*), please only select columns needed, sql=" + sql);
-            index = sql.indexOf('*', index + 1);
-        }
-
-        // validate string value
-        // by this way, it also disallows functions with string values, e.g. IFNULL(column, 'value'), but it usually can be prevented by different design,
-        // and we prefer to simplify db usage if possible, and shift complexity to application layer
-        if (sql.indexOf('\'') != -1)
-            throw new Error("sql must not contain single quote('), please use prepared statement and question mark(?), sql=" + sql);
+        return false;
     }
 }
