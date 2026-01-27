@@ -31,13 +31,19 @@ class MySQLQueryAnalyzerTest {
 
     @Test
     void isEfficient() {
-        var explain = parse("1|SIMPLE|t1||ALL|idx_col1_col2|idx_col1_col2|13|const|100||Using where; Using index; Using filesort");
+        var explain = parse("1|SIMPLE|t1||ALL|idx_col1_col2|idx_col1_col2|13|const|3000||Using where; Using index; Using filesort");
         assertThat(analyzer.isEfficient(explain)).isFalse();
 
         explain = parse("1|SIMPLE|t1||ALL|idx_col1_col2|idx_col1_col2|13|const|100||Using where; Using index");
         assertThat(analyzer.isEfficient(explain)).isTrue(); // scan less than 2000 rows
 
         explain = parse("1|SIMPLE|daily_individual_stats||index_merge|PRIMARY,idx_customer_id|idx_customer_id,PRIMARY|149,149||1|100|Using intersect(idx_customer_id,PRIMARY); Using where");
+        assertThat(analyzer.isEfficient(explain)).isTrue();
+
+        explain = parse("1|SIMPLE|role||ALL|||||24|100|Using filesort");
+        assertThat(analyzer.isEfficient(explain)).isTrue();
+
+        explain = parse("1|SIMPLE|stat||range|PRIMARY,idx_customer_id|PRIMARY|3||7942|100.0|Using where; Using temporary; Using filesort");
         assertThat(analyzer.isEfficient(explain)).isTrue();
     }
 

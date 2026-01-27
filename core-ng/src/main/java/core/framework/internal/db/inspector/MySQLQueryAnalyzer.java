@@ -30,12 +30,12 @@ public class MySQLQueryAnalyzer implements QueryAnalyzer {
 
     boolean isEfficient(Explain explain) {
         if ("ALL".equals(explain.type)) {
-            if (explain.rows != null && explain.rows > 2000) {
+            if (explain.rowsGreaterThan(2000)) {
                 return false;
             }
         }
-        if (explain.extra != null) {
-            if (explain.extra.contains("Using temporary") || explain.extra.contains("Using filesort")) {
+        if (explain.extra != null && (explain.extra.contains("Using temporary") || explain.extra.contains("Using filesort"))) {
+            if (explain.rowsGreaterThan(10_000)) {
                 return false;
             }
         }
@@ -76,6 +76,10 @@ public class MySQLQueryAnalyzer implements QueryAnalyzer {
         Long rows;
         String filtered;
         String extra;
+
+        boolean rowsGreaterThan(long threshold) {
+            return rows != null && rows > threshold;
+        }
     }
 
     static class ExplainRowMapper implements RowMapper<Explain> {
