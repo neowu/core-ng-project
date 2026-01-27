@@ -20,12 +20,26 @@ public class MySQLQueryAnalyzer implements QueryAnalyzer {
         String plan = format(explains);
 
         for (Explain explain : explains) {
-            if ("ALL".equals(explain.type) && explain.rows != null && explain.rows > 2000) {
+            if (!isEfficient(explain)) {
                 return new QueryPlan(plan, false);
             }
         }
 
         return new QueryPlan(plan, true);
+    }
+
+    boolean isEfficient(Explain explain) {
+        if ("ALL".equals(explain.type)) {
+            if (explain.rows != null && explain.rows > 2000) {
+                return false;
+            }
+        }
+        if (explain.extra != null) {
+            if (explain.extra.contains("Using temporary") || explain.extra.contains("Using filesort")) {
+                return false;
+            }
+        }
+        return true;
     }
 
     String format(List<Explain> explains) {
@@ -57,7 +71,7 @@ public class MySQLQueryAnalyzer implements QueryAnalyzer {
         String type;
         String possibleKeys;
         String key;
-        Long keyLength;
+        String keyLength;
         String ref;
         Long rows;
         String filtered;
@@ -75,7 +89,7 @@ public class MySQLQueryAnalyzer implements QueryAnalyzer {
             plan.type = resultSet.getString("type");
             plan.possibleKeys = resultSet.getString("possible_keys");
             plan.key = resultSet.getString("key");
-            plan.keyLength = resultSet.getLong("key_len");
+            plan.keyLength = resultSet.getString("key_len");
             plan.ref = resultSet.getString("ref");
             plan.rows = resultSet.getLong("rows");
             plan.filtered = resultSet.getString("filtered");

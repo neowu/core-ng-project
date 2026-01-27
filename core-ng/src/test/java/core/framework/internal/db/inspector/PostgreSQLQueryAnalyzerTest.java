@@ -20,7 +20,7 @@ class PostgreSQLQueryAnalyzerTest {
         assertThat(analyzer.isEfficient("Seq Scan on orders  (cost=0.00..716.33 rows=19 width=90)"))
             .isTrue();
 
-        assertThat(analyzer.isEfficient("Bitmap Heap Scan on orders  (cost=77.85..471.70 rows=24 width=90)"))
+        assertThat(analyzer.isEfficient("Bitmap Heap Scan on orders  (cost=77.85..471.70 rows=3000 width=90)"))
             .isTrue();
     }
 }
