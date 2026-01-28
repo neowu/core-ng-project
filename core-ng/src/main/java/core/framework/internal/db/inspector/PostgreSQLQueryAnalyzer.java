@@ -29,21 +29,24 @@ public class PostgreSQLQueryAnalyzer implements QueryAnalyzer {
 
     // Seq Scan on some_table (cost=0.00..657.94 rows=976 width=96)
     boolean isEfficient(String queryPlan) {
-        int index = queryPlan.indexOf("Seq Scan");
-        if (index >= 0) {
-            long rows = parseRows(queryPlan, index + 8);
+        if (queryPlan.contains("Seq Scan")) {
+            long rows = parseRows(queryPlan);
             return rows <= 2000; // accept seq scan for small table
+        } else if (queryPlan.contains("Hash") && queryPlan.contains("Join")) {
+            // hash join may load large table into memory, consider inefficient
+            long rows = parseRows(queryPlan);
+            return rows <= 50_000;
         }
         return true;
     }
 
-    private long parseRows(String queryPlan, int startIndex) {
-        int rowsIndex = queryPlan.indexOf("rows=", startIndex);
+    private long parseRows(String queryPlan) {
+        int rowsIndex = queryPlan.indexOf(" rows=");
         if (rowsIndex < 0) return -1;
         int spaceIndex = queryPlan.indexOf(' ', rowsIndex + 5);
         if (spaceIndex < 0) return -1;
         try {
-            return Long.parseLong(queryPlan.substring(rowsIndex + 5, spaceIndex));
+            return Long.parseLong(queryPlan.substring(rowsIndex + 6, spaceIndex));
         } catch (NumberFormatException e) {
             logger.warn("failed to parse query plan, plan={}", queryPlan, e);
             return -1;

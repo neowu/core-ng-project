@@ -1,37 +1,39 @@
 package core.framework.internal.db.inspector;
 
+import core.framework.internal.db.inspector.QueryAnalyzer.QueryPlan;
 import core.framework.util.ASCII;
-import core.framework.util.Sets;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Set;
-
-import static core.framework.log.Markers.errorCode;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class QueryInspector {
-    final Set<String> checkedQueries = Sets.newConcurrentHashSet();
-    private final Logger logger = LoggerFactory.getLogger(QueryInspector.class);
+    final Map<String, Long> lastCheckTimestamps = new ConcurrentHashMap<>();
     private final @Nullable QueryAnalyzer analyzer;
 
     public QueryInspector(@Nullable QueryAnalyzer analyzer) {
         this.analyzer = analyzer;
     }
 
-    public void inspect(String sql, Object[] params) {
-        if (checkedQueries.contains(sql)) return;
+    // return plan to log if inefficient, for internal only
+    @Nullable
+    public String inspect(String sql, Object[] params) {
+        Long timestamp = lastCheckTimestamps.get(sql);
 
-        validateSQL(sql);
+        long now = System.currentTimeMillis();
+        if (timestamp != null && now - timestamp < 21_600_000) return null; // check every 6 hours
 
-        checkedQueries.add(sql);        // to avoid duplicate analysis as much as possible
+        if (timestamp == null) validateSQL(sql);    // validate sql only once
 
-        if (analyzer == null) return;   // only unit tests don't have analyzer
+        lastCheckTimestamps.put(sql, now);        // to avoid duplicate analysis as much as possible
+
+        if (analyzer == null) return null;   // only unit tests don't have analyzer
 
         QueryPlan plan = analyzer.explain(sql, params);
         if (!plan.efficient()) {
-            logger.warn(errorCode("INEFFICIENT_QUERY"), "inefficient query, sql={}, plan=\n{}", sql, plan.plan());
+            return plan.plan();
         }
+        return null;
     }
 
     public String explain(String sql, Object[] params) {

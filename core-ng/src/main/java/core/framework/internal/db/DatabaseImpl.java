@@ -34,6 +34,8 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
 
+import static core.framework.log.Markers.errorCode;
+
 /**
  * @author neo
  */
@@ -224,9 +226,9 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
-        var watch = new StopWatch();
-        inspector.inspect(sql, params);
+        String inefficientPlan = inspector.inspect(sql, params);
 
+        var watch = new StopWatch();
         int returnedRows = 0;
         try {
             List<T> results = operation.select(sql, rowMapper(viewClass), params);
@@ -236,18 +238,15 @@ public final class DatabaseImpl implements Database {
             long elapsed = watch.elapsed();
             logger.debug("select, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
             boolean slow = track(elapsed, returnedRows, 0, 1);   // check after sql debug log, to make log easier to read
-            if (slow) {
-                String plan = inspector.explain(sql, params);
-                logger.debug("plan=\n{}", plan);
-            }
+            logQueryPlan(inefficientPlan, slow, sql, params);
         }
     }
 
     @Override
     public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
-        var watch = new StopWatch();
-        inspector.inspect(sql, params);
+        String inefficientPlan = inspector.inspect(sql, params);
 
+        var watch = new StopWatch();
         int returnedRows = 0;
         try {
             Optional<T> result = operation.selectOne(sql, rowMapper(viewClass), params);
@@ -257,18 +256,15 @@ public final class DatabaseImpl implements Database {
             long elapsed = watch.elapsed();
             logger.debug("selectOne, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
             boolean slow = track(elapsed, returnedRows, 0, 1);
-            if (slow) {
-                String plan = inspector.explain(sql, params);
-                logger.debug("plan=\n{}", plan);
-            }
+            logQueryPlan(inefficientPlan, slow, sql, params);
         }
     }
 
     @Override
     public int execute(String sql, Object... params) {
-        var watch = new StopWatch();
-        inspector.inspect(sql, params);
+        String inefficientPlan = inspector.inspect(sql, params);
 
+        var watch = new StopWatch();
         int affectedRows = 0;
         try {
             affectedRows = operation.update(sql, params);
@@ -276,16 +272,17 @@ public final class DatabaseImpl implements Database {
         } finally {
             long elapsed = watch.elapsed();
             logger.debug("execute, sql={}, params={}, affectedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), affectedRows, elapsed);
-            track(elapsed, 0, affectedRows, 1);
+            boolean slow = track(elapsed, 0, affectedRows, 1);
+            logQueryPlan(inefficientPlan, slow, sql, params);
         }
     }
 
     @Override
     public int[] batchExecute(String sql, List<Object[]> params) {
-        var watch = new StopWatch();
         if (params.isEmpty()) throw new Error("params must not be empty");
-        inspector.inspect(sql, params.getFirst());
+        String inefficientPlan = inspector.inspect(sql, params.getFirst());
 
+        var watch = new StopWatch();
         int affectedRows = 0;
         try {
             int[] results = operation.batchUpdate(sql, params);
@@ -300,11 +297,12 @@ public final class DatabaseImpl implements Database {
             long elapsed = watch.elapsed();
             int size = params.size();
             logger.debug("batchExecute, sql={}, params={}, size={}, affectedRows={}, elapsed={}", sql, new SQLBatchParams(operation.enumMapper, params), size, affectedRows, elapsed);
-            track(elapsed, 0, affectedRows, size);
+            boolean slow = track(elapsed, 0, affectedRows, size);
+            logQueryPlan(inefficientPlan, slow, sql, params.getFirst());
         }
     }
 
-    private <T> RowMapper<T> rowMapper(Class<T> viewClass) {
+    <T> RowMapper<T> rowMapper(Class<T> viewClass) {
         @SuppressWarnings("unchecked")
         RowMapper<T> mapper = (RowMapper<T>) rowMappers.get(viewClass);
         if (mapper == null)
@@ -328,5 +326,13 @@ public final class DatabaseImpl implements Database {
             return actionLog.track("db", elapsed, readRows, writeRows, 0, 0);
         }
         return false;
+    }
+
+    private void logQueryPlan(@Nullable String inefficientPlan, boolean slow, String sql, Object[] params) {
+        if (inefficientPlan != null) {
+            logger.warn(errorCode("INEFFICIENT_QUERY"), "inefficient query, plan:\n{}", inefficientPlan);
+        } else if (slow) {
+            logger.debug("plan:\n{}", inspector.explain(sql, params));
+        }
     }
 }

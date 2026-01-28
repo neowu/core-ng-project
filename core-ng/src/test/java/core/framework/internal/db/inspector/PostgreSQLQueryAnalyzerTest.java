@@ -17,10 +17,14 @@ class PostgreSQLQueryAnalyzerTest {
     void isEfficient() {
         assertThat(analyzer.isEfficient("Seq Scan on orders  (cost=0.00..657.94 rows=2001 width=96)"))
             .isFalse();
+
         assertThat(analyzer.isEfficient("Seq Scan on orders  (cost=0.00..716.33 rows=19 width=90)"))
             .isTrue();
 
         assertThat(analyzer.isEfficient("Bitmap Heap Scan on orders  (cost=77.85..471.70 rows=3000 width=90)"))
             .isTrue();
+
+        assertThat(analyzer.isEfficient("Hash Left Join  (cost=9.55..1022.19 rows=82092 width=18)"))
+            .isFalse();
     }
 }

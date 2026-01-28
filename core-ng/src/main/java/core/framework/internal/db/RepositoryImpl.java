@@ -49,9 +49,21 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public Optional<T> get(Object... primaryKeys) {
-        if (primaryKeys.length != selectQuery.primaryKeyColumns)
+        var watch = new StopWatch();
+        if (primaryKeys.length != selectQuery.primaryKeyColumns) {
             throw new Error(Strings.format("the length of primary keys does not match columns, primaryKeys={}, columns={}", selectQuery.primaryKeyColumns, primaryKeys.length));
-        return database.selectOne(selectQuery.getSQL, entityClass, primaryKeys);
+        }
+        String sql = selectQuery.getSQL;
+        int returnedRows = 0;
+        try {
+            Optional<T> result = database.operation.selectOne(sql, database.rowMapper(entityClass), primaryKeys);
+            if (result.isPresent()) returnedRows = 1;
+            return result;
+        } finally {
+            long elapsed = watch.elapsed();
+            logger.debug("get, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, primaryKeys), returnedRows, elapsed);
+            database.track(elapsed, returnedRows, 0, 1);
+        }
     }
 
     @Override

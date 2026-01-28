@@ -1,10 +1,10 @@
 ## Change log
 
-### 9.4.0-b4 (1/26/26 - )
+### 9.4.0-b5 (1/26/26 - )
 
 * log: for rust version of log-processor/log-collector/log-exporter, refer to https://github.com/neowu/core_rs_workspace
 * db: removed mysql sslmode property, SSL mode will be detected by driver automatically
-* db: actively inspect query plan once per SQL
+* db: actively inspect query plan every 6 hours per SQL
   > !!! update MySQL driver to "core.framework.mysql:mysql-connector-j:8.4.0-r6" first if you are using customized mysql driver (due to QueryDiagnostic class deleted)
   > via `explain`, support both MySQL and PostgreSQL, table scan more than 2000 rows is considered inefficient
   > removed Database.suppressSlowSQLWarning(false);

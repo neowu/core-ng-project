@@ -31,9 +31,7 @@ class InsertQueryBuilder<T> {
     private String generatedColumn;     // db entity must not have more than one auto incremental primary key, validated by DatabaseClassValidator
     private List<ParamField> paramFields;
     private String insertSQL;
-    @Nullable
     private String insertIgnoreSQL;
-    @Nullable
     private String upsertSQL;
 
     InsertQueryBuilder(Class<T> entityClass, Dialect dialect) {

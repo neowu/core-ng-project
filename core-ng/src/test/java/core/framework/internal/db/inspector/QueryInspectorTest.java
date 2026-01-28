@@ -1,5 +1,6 @@
 package core.framework.internal.db.inspector;
 
+import core.framework.internal.db.inspector.QueryAnalyzer.QueryPlan;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +16,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class QueryInspectorTest {
-    private QueryInspector inspector;
     @Mock
     QueryAnalyzer analyzer;
+    private QueryInspector inspector;
 
     @BeforeEach
     void createQueryInspector() {

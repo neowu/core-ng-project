@@ -56,12 +56,12 @@ public class QueryImpl<T> implements Query<T> {
     }
 
     @Override
-    public void skip(Integer skip) {
+    public void skip(@Nullable Integer skip) {
         this.skip = skip;
     }
 
     @Override
-    public void limit(Integer limit) {
+    public void limit(@Nullable Integer limit) {
         if (limit != null && limit <= 0) throw new Error("limit must be greater than 0, limit=" + limit);
         this.limit = limit;
     }

@@ -73,7 +73,7 @@ class MySQLQueryAnalyzerTest {
         explain.key = parseString(parts[6]);
         explain.keyLength = parseString(parts[7]);
         explain.ref = parseString(parts[8]);
-        explain.rows = parts[9].isEmpty() ? null : Long.parseLong(parts[9].trim());
+        explain.rows = parts[9].isEmpty() ? null : Long.valueOf(parts[9].trim());
         explain.filtered = parseString(parts[10]);
         explain.extra = parseString(parts[11]);
         return explain;
@@ -82,7 +82,7 @@ class MySQLQueryAnalyzerTest {
     String parseString(String value) {
         if (value.isEmpty()) return null;
         String trim = value.trim();
-        if (trim.equalsIgnoreCase("null")) return null;
+        if ("null".equalsIgnoreCase(trim)) return null;
         return trim;
     }
 }

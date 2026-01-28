@@ -1,5 +1,7 @@
 package core.framework.db;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -13,9 +15,9 @@ public interface Query<T> {
 
     void groupBy(String groupBy);
 
-    void skip(Integer skip);    // pass null to reset skip
+    void skip(@Nullable Integer skip);    // pass null to reset skip
 
-    void limit(Integer limit);  // pass null to reset limit
+    void limit(@Nullable Integer limit);  // pass null to reset limit
 
     List<T> fetch();
 

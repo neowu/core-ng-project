@@ -54,7 +54,7 @@ final class SelectQuery<T> {
         return builder.toString();
     }
 
-    String fetchSQL(StringBuilder where, String sort, Integer skip, Integer limit) {
+    String fetchSQL(StringBuilder where, String sort, @Nullable Integer skip, @Nullable Integer limit) {
         return sql(columns, where, null, sort, skip, limit);
     }
 
