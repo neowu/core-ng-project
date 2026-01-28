@@ -17,8 +17,8 @@ class MySQLQueryAnalyzerTest {
 
     @Test
     void format() {
-        var explain1 = parse("1|SIMPLE|user|p0|ALL|idx_user|idx_user |4|const|10|100.00|Using where");
-        var explain2 = parse("2|PRIMARY|order|p1|range|idx_order|idx_order|8|user.id|5|50.00|Using index");
+        var explain1 = parse("1 | SIMPLE | user | p0 | ALL | idx_user | idx_user | 4 | const | 10 | 100.00 | Using where");
+        var explain2 = parse("2 | PRIMARY | order | p1 | range | idx_order | idx_order | 8 | user.id | 5 | 50.00 | Using index");
 
         var explains = List.of(explain1, explain2);
         String plan = analyzer.format(explains);

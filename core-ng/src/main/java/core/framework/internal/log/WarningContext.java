@@ -53,7 +53,7 @@ public final class WarningContext {
     @Nullable
     static PerformanceWarning defaultWarning(String operation) {
         return switch (operation) {
-            case "db" -> new PerformanceWarning("db", 2000, Duration.ofSeconds(2).toNanos(), 2_000, 10_000, 10_000, -1, -1);
+            case "db" -> new PerformanceWarning("db", 2000, Duration.ofSeconds(5).toNanos(), 2_000, 10_000, 10_000, -1, -1);
             case "redis" -> new PerformanceWarning("redis", 2000, Duration.ofMillis(500).toNanos(), 1_000, 10_000, 10_000, -1, -1);
             case "elasticsearch" -> new PerformanceWarning("elasticsearch", 2000, Duration.ofSeconds(5).toNanos(), 2_000, 10_000, 10_000, -1, -1);
             case "mongo" -> new PerformanceWarning("mongo", 2000, Duration.ofSeconds(5).toNanos(), 2_000, 10_000, 10_000, -1, -1);

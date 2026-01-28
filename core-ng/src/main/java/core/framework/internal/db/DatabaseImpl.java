@@ -12,7 +12,6 @@ import core.framework.internal.db.inspector.PostgreSQLQueryAnalyzer;
 import core.framework.internal.db.inspector.QueryInspector;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
-import core.framework.internal.log.TrackResult;
 import core.framework.internal.resource.Pool;
 import core.framework.util.StopWatch;
 import org.jspecify.annotations.Nullable;
@@ -326,8 +325,7 @@ public final class DatabaseImpl implements Database {
         ActionLog actionLog = LogManager.currentActionLog();
         if (actionLog != null) {
             actionLog.stats.compute("db_queries", (k, oldValue) -> (oldValue == null) ? queries : oldValue + queries);
-            TrackResult result = actionLog.track("db", elapsed, readRows, writeRows, 0, 0);
-            return result.slow();
+            return actionLog.track("db", elapsed, readRows, writeRows, 0, 0);
         }
         return false;
     }

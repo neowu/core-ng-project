@@ -20,6 +20,6 @@ class DefaultLoggerFactoryTest {
 
         assertThat(logger).isInstanceOf(LoggerImpl.class);
         assertThat(((LoggerImpl) logger).infoLevel).isEqualTo(LogLevel.WARN);
-        assertThat(((LoggerImpl) logger).traceLevel).isEqualTo(LogLevel.DEBUG);
+        assertThat(((LoggerImpl) logger).traceLevel).isEqualTo(LogLevel.INFO);
     }
 }

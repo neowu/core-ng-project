@@ -28,7 +28,8 @@ class PerformanceStat {
         this.warning = warning;
     }
 
-    TrackResult track(long elapsed, int readEntries, int writeEntries, long readBytes, long writeBytes) {
+    // return if slow, internal use only, to keep it simple and efficient
+    boolean track(long elapsed, int readEntries, int writeEntries, long readBytes, long writeBytes) {
         count += 1;
         totalElapsed += elapsed;
 
@@ -38,11 +39,10 @@ class PerformanceStat {
         this.readBytes += readBytes;
         this.writeBytes += writeBytes;
 
-        boolean slow = checkSingleIO(elapsed, readEntries, readBytes);
-        return new TrackResult(count, slow);
+        return checkSingleIO(elapsed, readEntries, readBytes);
     }
 
-    // return if slow
+    // return if slow, internal use only, to keep it simple and efficient
     boolean checkSingleIO(long elapsed, int readEntries, long readBytes) {
         if (warning == null) return false;
 

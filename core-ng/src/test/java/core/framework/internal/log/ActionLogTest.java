@@ -98,14 +98,15 @@ class ActionLogTest {
 
     @Test
     void track() {
-        assertThat(log.track("db", 1000, 1, 0, 0, 0).count()).isEqualTo(1);
+        log.track("db", 1000, 1, 0, 0, 0);
+
         PerformanceStat stat = log.performanceStats.get("db");
         assertThat(stat.count).isEqualTo(1);
         assertThat(stat.totalElapsed).isEqualTo(1000);
         assertThat(stat.readEntries).isEqualTo(1);
         assertThat(stat.writeEntries).isEqualTo(0);
 
-        assertThat(log.track("db", 1000, 1, 1, 0, 0).count()).isEqualTo(2);
+        log.track("db", 1000, 1, 1, 0, 0);
         stat = log.performanceStats.get("db");
         assertThat(stat.count).isEqualTo(2);
         assertThat(stat.totalElapsed).isEqualTo(2000);
@@ -114,7 +115,7 @@ class ActionLogTest {
         assertThat(stat.readBytes).isZero();
         assertThat(stat.writeBytes).isZero();
 
-        assertThat(log.track("http", 3000, 0, 0, 1000, 2000).count()).isEqualTo(1);
+        log.track("http", 3000, 0, 0, 1000, 2000);
         stat = log.performanceStats.get("http");
         assertThat(stat.count).isEqualTo(1);
         assertThat(stat.totalElapsed).isEqualTo(3000);

@@ -153,7 +153,8 @@ public final class ActionLog {
         }
     }
 
-    public TrackResult track(String operation, long elapsed, int readEntries, int writeEntries, long readBytes, long writeBytes) {
+    // return if slow, internal use only, to keep it simple and efficient
+    public boolean track(String operation, long elapsed, int readEntries, int writeEntries, long readBytes, long writeBytes) {
         PerformanceStat stat = performanceStats.computeIfAbsent(operation, key -> new PerformanceStat(WarningContext.defaultWarning(key)));
         return stat.track(elapsed, readEntries, writeEntries, readBytes, writeBytes);
     }

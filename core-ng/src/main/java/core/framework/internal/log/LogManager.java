@@ -58,7 +58,7 @@ public class LogManager {
 
     // this is internal api, to simplify the design, task must not throw exceptions, all callers catch throwable and log error
     // if task throws exception, current action log may not be marked as error
-    public <T> T run(String action, String id, ActionLogCallable<T> task) {
+    public <T> T run(String action, @Nullable String id, ActionLogCallable<T> task) {
         var log = new ActionLog("=== " + action + " begin ===", id);
         return where(CURRENT_ACTION_LOG, log).call(() -> {
             try {
