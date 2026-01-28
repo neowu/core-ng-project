@@ -29,15 +29,15 @@ public class MySQLQueryAnalyzer implements QueryAnalyzer {
     }
 
     boolean isEfficient(Explain explain) {
-        if ("ALL".equals(explain.type)) {
-            if (explain.rowsGreaterThan(2000)) {
-                return false;
-            }
+        if (explain.table != null && explain.table.startsWith("<derived")) {
+            return true; // skip derived table
         }
-        if (explain.extra != null && (explain.extra.contains("Using temporary") || explain.extra.contains("Using filesort"))) {
-            if (explain.rowsGreaterThan(10_000)) {
-                return false;
-            }
+        if ("ALL".equals(explain.type) && explain.rowsGreaterThan(2000)) {
+            return false;
+        }
+        if (explain.extra != null && (explain.extra.contains("Using temporary") || explain.extra.contains("Using filesort"))
+            && explain.rowsGreaterThan(50_000)) {
+            return false;
         }
         return true;
     }

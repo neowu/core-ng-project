@@ -36,7 +36,8 @@ public final class DefaultLoggerFactory implements ILoggerFactory {
     private LogLevel traceLevel(String name) {
         if (name.startsWith("org.elasticsearch.")
             || name.startsWith("org.mongodb.")
-            || name.startsWith("org.xnio.")) {
+            || name.startsWith("org.xnio.")
+            || name.startsWith("org.apache.")) {
             return LogLevel.INFO;
         }
         return LogLevel.DEBUG;

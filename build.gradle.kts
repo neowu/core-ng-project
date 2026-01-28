@@ -6,7 +6,7 @@ plugins {
 
 subprojects {
     group = "core.framework"
-    version = "9.4.0-b1"
+    version = "9.4.0-b3"
     repositories {
         maven {
             url = uri("https://neowu.github.io/maven-repo/")
