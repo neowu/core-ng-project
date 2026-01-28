@@ -46,7 +46,7 @@ class MySQLQueryAnalyzerTest {
         // not check derived table
         // select cust.group AS group, cust.count from (SELECT group, COUNT(*) AS count FROM customer GROUP BY group) cust
         // 1|PRIMARY|<derived2>||ALL|||||196830|100|
-        // 2|DERIVED|customer||index|idx_deposit_group|idx_deposit_group|82||196830|100|Using index
+        // 2|DERIVED|customer||index|idx_group|idx_group|82||196830|100|Using index
         explain = parse("1|PRIMARY|<derived2>||ALL|||||196830|100|");
         assertThat(analyzer.isEfficient(explain)).isTrue();
 
