@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class QueryInspector {
-    final Map<String, Long> lastCheckTimestamps = new ConcurrentHashMap<>();
+    private final Map<String, Long> lastCheckTimestamps = new ConcurrentHashMap<>();
     private final @Nullable QueryAnalyzer analyzer;
 
     public QueryInspector(@Nullable QueryAnalyzer analyzer) {
