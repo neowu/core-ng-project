@@ -1,6 +1,5 @@
 package core.framework.internal.db.inspector;
 
-import core.framework.internal.db.inspector.QueryAnalyzer.QueryPlan;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,14 +44,26 @@ class QueryInspectorTest {
     }
 
     @Test
-    void inspect() {
+    void explain() {
         String sql = "select column from table";
         Object[] params = new Object[0];
         when(analyzer.explain(anyString(), any())).thenReturn(new QueryPlan("plan", false));
 
-        inspector.inspect(sql, params);
-        inspector.inspect(sql, params);
+        inspector.explain(sql, params, false);
+        inspector.explain(sql, params, false);
 
         verify(analyzer, times(1)).explain(sql, params);
+    }
+
+    @Test
+    void forceExplain() {
+        String sql = "select column from table";
+        Object[] params = new Object[0];
+        when(analyzer.explain(anyString(), any())).thenReturn(new QueryPlan("plan", false));
+
+        inspector.explain(sql, params, true);
+        inspector.explain(sql, params, true);
+
+        verify(analyzer, times(2)).explain(sql, params);
     }
 }

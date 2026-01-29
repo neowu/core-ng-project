@@ -1,6 +1,5 @@
 package core.framework.internal.db.inspector;
 
-import core.framework.internal.db.inspector.QueryAnalyzer.QueryPlan;
 import core.framework.util.ASCII;
 import org.jspecify.annotations.Nullable;
 
@@ -15,35 +14,21 @@ public class QueryInspector {
         this.analyzer = analyzer;
     }
 
-    // return plan to log if inefficient, for internal only
     @Nullable
-    public String inspect(String sql, Object[] params) {
-        Long timestamp = lastCheckTimestamps.get(sql);
+    public QueryPlan explain(String sql, Object[] params, boolean force) {
+        if (analyzer == null) return null;    // only unit tests don't have analyzer
 
-        long now = System.currentTimeMillis();
-        if (timestamp != null && now - timestamp < 21_600_000) return null; // check every 6 hours
-
-        if (timestamp == null) validateSQL(sql);    // validate sql only once
-
-        lastCheckTimestamps.put(sql, now);        // to avoid duplicate analysis as much as possible
-
-        if (analyzer == null) return null;   // only unit tests don't have analyzer
-
-        QueryPlan plan = analyzer.explain(sql, params);
-        if (!plan.efficient()) {
-            return plan.plan();
+        if (!force) {
+            Long timestamp = lastCheckTimestamps.get(sql);
+            long now = System.currentTimeMillis();
+            if (timestamp != null && now - timestamp < 21_600_000) return null; // check every 6 hours
+            lastCheckTimestamps.put(sql, now);        // to avoid duplicate analysis as much as possible
         }
-        return null;
+
+        return analyzer.explain(sql, params);
     }
 
-    public String explain(String sql, Object[] params) {
-        if (analyzer == null) return "";    // only unit tests don't have analyzer
-
-        QueryPlan plan = analyzer.explain(sql, params);
-        return plan.plan();
-    }
-
-    void validateSQL(String sql) {
+    public void validateSQL(String sql) {
         if (sql.startsWith("CREATE ")) return;  // ignore DDL
 
         // validate asterisk

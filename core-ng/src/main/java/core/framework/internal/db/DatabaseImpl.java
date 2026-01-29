@@ -10,6 +10,7 @@ import core.framework.db.UncheckedSQLException;
 import core.framework.internal.db.inspector.MySQLQueryAnalyzer;
 import core.framework.internal.db.inspector.PostgreSQLQueryAnalyzer;
 import core.framework.internal.db.inspector.QueryInspector;
+import core.framework.internal.db.inspector.QueryPlan;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.resource.Pool;
@@ -226,7 +227,7 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
-        String inefficientPlan = inspector.inspect(sql, params);
+        inspector.validateSQL(sql);
 
         var watch = new StopWatch();
         int returnedRows = 0;
@@ -238,13 +239,14 @@ public final class DatabaseImpl implements Database {
             long elapsed = watch.elapsed();
             logger.debug("select, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
             boolean slow = track(elapsed, returnedRows, 0, 1);   // check after sql debug log, to make log easier to read
-            logQueryPlan(inefficientPlan, slow, sql, params);
+            logQueryPlan(sql, params, slow);
         }
     }
 
+
     @Override
     public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
-        String inefficientPlan = inspector.inspect(sql, params);
+        inspector.validateSQL(sql);
 
         var watch = new StopWatch();
         int returnedRows = 0;
@@ -256,13 +258,13 @@ public final class DatabaseImpl implements Database {
             long elapsed = watch.elapsed();
             logger.debug("selectOne, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
             boolean slow = track(elapsed, returnedRows, 0, 1);
-            logQueryPlan(inefficientPlan, slow, sql, params);
+            logQueryPlan(sql, params, slow);
         }
     }
 
     @Override
     public int execute(String sql, Object... params) {
-        String inefficientPlan = inspector.inspect(sql, params);
+        inspector.validateSQL(sql);
 
         var watch = new StopWatch();
         int affectedRows = 0;
@@ -273,14 +275,14 @@ public final class DatabaseImpl implements Database {
             long elapsed = watch.elapsed();
             logger.debug("execute, sql={}, params={}, affectedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), affectedRows, elapsed);
             boolean slow = track(elapsed, 0, affectedRows, 1);
-            logQueryPlan(inefficientPlan, slow, sql, params);
+            logQueryPlan(sql, params, slow);
         }
     }
 
     @Override
     public int[] batchExecute(String sql, List<Object[]> params) {
         if (params.isEmpty()) throw new Error("params must not be empty");
-        String inefficientPlan = inspector.inspect(sql, params.getFirst());
+        inspector.validateSQL(sql);
 
         var watch = new StopWatch();
         int affectedRows = 0;
@@ -298,7 +300,7 @@ public final class DatabaseImpl implements Database {
             int size = params.size();
             logger.debug("batchExecute, sql={}, params={}, size={}, affectedRows={}, elapsed={}", sql, new SQLBatchParams(operation.enumMapper, params), size, affectedRows, elapsed);
             boolean slow = track(elapsed, 0, affectedRows, size);
-            logQueryPlan(inefficientPlan, slow, sql, params.getFirst());
+            logQueryPlan(sql, params.getFirst(), slow);
         }
     }
 
@@ -328,11 +330,14 @@ public final class DatabaseImpl implements Database {
         return false;
     }
 
-    private void logQueryPlan(@Nullable String inefficientPlan, boolean slow, String sql, Object[] params) {
-        if (inefficientPlan != null) {
-            logger.warn(errorCode("INEFFICIENT_QUERY"), "inefficient query, plan:\n{}", inefficientPlan);
-        } else if (slow) {
-            logger.debug("plan:\n{}", inspector.explain(sql, params));
+    private void logQueryPlan(String sql, Object[] params, boolean slow) {
+        QueryPlan plan = inspector.explain(sql, params, slow);
+        if (plan != null) {
+            if (!plan.efficient()) {
+                logger.warn(errorCode("INEFFICIENT_QUERY"), "inefficient query, plan:\n{}", plan.plan());
+            } else {
+                logger.debug("plan:\n{}", plan.plan());
+            }
         }
     }
 }

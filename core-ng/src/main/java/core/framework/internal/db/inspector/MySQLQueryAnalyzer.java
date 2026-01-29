@@ -18,13 +18,11 @@ public class MySQLQueryAnalyzer implements QueryAnalyzer {
     public QueryPlan explain(String sql, Object[] params) {
         List<Explain> explains = operation.select("EXPLAIN " + sql, new ExplainRowMapper(), params);
         String plan = format(explains);
-
         for (Explain explain : explains) {
             if (!isEfficient(explain)) {
                 return new QueryPlan(plan, false);
             }
         }
-
         return new QueryPlan(plan, true);
     }
 
