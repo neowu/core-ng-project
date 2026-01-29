@@ -10,7 +10,6 @@ import core.framework.db.UncheckedSQLException;
 import core.framework.internal.db.inspector.MySQLQueryAnalyzer;
 import core.framework.internal.db.inspector.PostgreSQLQueryAnalyzer;
 import core.framework.internal.db.inspector.QueryInspector;
-import core.framework.internal.db.inspector.QueryPlan;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.resource.Pool;
@@ -34,8 +33,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
-
-import static core.framework.log.Markers.errorCode;
 
 /**
  * @author neo
@@ -239,7 +236,7 @@ public final class DatabaseImpl implements Database {
             long elapsed = watch.elapsed();
             logger.debug("select, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
             boolean slow = track(elapsed, returnedRows, 0, 1);   // check after sql debug log, to make log easier to read
-            logQueryPlan(sql, params, slow);
+            inspector.explain(sql, params, slow);
         }
     }
 
@@ -258,7 +255,7 @@ public final class DatabaseImpl implements Database {
             long elapsed = watch.elapsed();
             logger.debug("selectOne, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
             boolean slow = track(elapsed, returnedRows, 0, 1);
-            logQueryPlan(sql, params, slow);
+            inspector.explain(sql, params, slow);
         }
     }
 
@@ -275,7 +272,7 @@ public final class DatabaseImpl implements Database {
             long elapsed = watch.elapsed();
             logger.debug("execute, sql={}, params={}, affectedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), affectedRows, elapsed);
             boolean slow = track(elapsed, 0, affectedRows, 1);
-            logQueryPlan(sql, params, slow);
+            inspector.explain(sql, params, slow);
         }
     }
 
@@ -300,7 +297,7 @@ public final class DatabaseImpl implements Database {
             int size = params.size();
             logger.debug("batchExecute, sql={}, params={}, size={}, affectedRows={}, elapsed={}", sql, new SQLBatchParams(operation.enumMapper, params), size, affectedRows, elapsed);
             boolean slow = track(elapsed, 0, affectedRows, size);
-            logQueryPlan(sql, params.getFirst(), slow);
+            inspector.explain(sql, params.getFirst(), slow);
         }
     }
 
@@ -328,16 +325,5 @@ public final class DatabaseImpl implements Database {
             return actionLog.track("db", elapsed, readRows, writeRows, 0, 0);
         }
         return false;
-    }
-
-    private void logQueryPlan(String sql, Object[] params, boolean slow) {
-        QueryPlan plan = inspector.explain(sql, params, slow);
-        if (plan != null) {
-            if (!plan.efficient()) {
-                logger.warn(errorCode("INEFFICIENT_QUERY"), "inefficient query, plan:\n{}", plan.plan());
-            } else {
-                logger.debug("plan:\n{}", plan.plan());
-            }
-        }
     }
 }

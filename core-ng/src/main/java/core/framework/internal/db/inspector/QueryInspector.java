@@ -1,12 +1,18 @@
 package core.framework.internal.db.inspector;
 
+import core.framework.internal.db.inspector.QueryAnalyzer.QueryPlan;
 import core.framework.util.ASCII;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static core.framework.log.Markers.errorCode;
+
 public class QueryInspector {
+    private final Logger logger = LoggerFactory.getLogger(QueryInspector.class);
     private final Map<String, Long> lastCheckTimestamps = new ConcurrentHashMap<>();
     private final @Nullable QueryAnalyzer analyzer;
 
@@ -14,18 +20,24 @@ public class QueryInspector {
         this.analyzer = analyzer;
     }
 
-    @Nullable
-    public QueryPlan explain(String sql, Object[] params, boolean force) {
-        if (analyzer == null) return null;    // only unit tests don't have analyzer
+    public void explain(String sql, Object[] params, boolean force) {
+        if (analyzer == null) return;    // only unit tests don't have analyzer
 
         if (!force) {
             Long timestamp = lastCheckTimestamps.get(sql);
             long now = System.currentTimeMillis();
-            if (timestamp != null && now - timestamp < 21_600_000) return null; // check every 6 hours
+            if (timestamp != null && now - timestamp < 21_600_000) return; // check every 6 hours
             lastCheckTimestamps.put(sql, now);        // to avoid duplicate analysis as much as possible
         }
 
-        return analyzer.explain(sql, params);
+        QueryPlan plan = analyzer.explain(sql, params);
+        if (plan != null) {
+            if (!plan.efficient()) {
+                logger.warn(errorCode("INEFFICIENT_QUERY"), "inefficient query, plan:\n{}", plan.plan());
+            } else if (force) {
+                logger.debug("plan:\n{}", plan.plan());
+            }
+        }
     }
 
     public void validateSQL(String sql) {

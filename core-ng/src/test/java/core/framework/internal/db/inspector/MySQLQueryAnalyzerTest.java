@@ -58,6 +58,11 @@ class MySQLQueryAnalyzerTest {
         // SELECT type, COUNT(1) AS count FROM customer WHERE created_time < ? GROUP BY type
         explain = parse("1 | SIMPLE | customer | null | ALL | idx_created_time | null | null | null | 203510 | 50.0 | Using where; Using temporary");
         assertThat(analyzer.isEfficient(explain)).isFalse();
+
+        // date range filtering with group by always using temporary
+        // SELECT customer_id, SUM(value) AS value FROM orders WHERE updated_time >= ? AND updated_time <= ? GROUP BY customer_id
+        explain = parse("1 | SIMPLE | orders | null | range | idx_updated_time | idx_updated_time | 7 | null | 112304 | 100 | Using index condition; Using temporary");
+        assertThat(analyzer.isEfficient(explain)).isTrue();
     }
 
     // 1|SIMPLE|daily_individual_stats||index_merge|PRIMARY,idx_customer_id|idx_customer_id,PRIMARY|149,149||1|100|Using intersect(idx_customer_id,PRIMARY); Using where

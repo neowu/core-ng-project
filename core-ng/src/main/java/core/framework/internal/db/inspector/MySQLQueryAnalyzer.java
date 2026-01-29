@@ -31,10 +31,13 @@ public class MySQLQueryAnalyzer implements QueryAnalyzer {
             return true; // skip derived table
         }
         if ("ALL".equals(explain.type) && explain.rowsGreaterThan(2000)) {
+            return false;   // table scan more than 2000 rows is inefficient
+        }
+        if (explain.extraContains("Using filesort") && explain.rowsGreaterThan(50_000)) {
             return false;
         }
-        if (explain.extra != null && (explain.extra.contains("Using temporary") || explain.extra.contains("Using filesort"))
-            && explain.rowsGreaterThan(50_000)) {
+        // only allow Using temporary for range queries
+        if (explain.extraContains("Using temporary") && !"range".equals(explain.type) && explain.rowsGreaterThan(50_000)) {
             return false;
         }
         return true;
@@ -77,6 +80,10 @@ public class MySQLQueryAnalyzer implements QueryAnalyzer {
 
         boolean rowsGreaterThan(long threshold) {
             return rows != null && rows > threshold;
+        }
+
+        boolean extraContains(String keyword) {
+            return extra != null && extra.contains(keyword);
         }
     }
 

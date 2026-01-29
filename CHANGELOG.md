@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.4.0 (1/26/26 - 1/29/26)
+### 9.4.1 (1/26/26 - 1/29/26)
 
 * log: for rust version of log-processor/log-collector/log-exporter, refer to https://github.com/neowu/core_rs_workspace
 * db: removed mysql sslmode property, SSL mode will be detected by driver automatically
