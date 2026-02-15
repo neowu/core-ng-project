@@ -78,6 +78,7 @@ public class HTTPServer {
                 .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620_000)         // 620s
                 .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10_000)            // 10s
                 .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, config.maxEntitySize)
+                .setServerOption(UndertowOptions.MULTIPART_MAX_ENTITY_SIZE, config.maxEntitySize)
                 .setServerOption(UndertowOptions.RECORD_REQUEST_START_TIME, Boolean.TRUE);
 
             builder.setWorker(Xnio.getInstance().createWorkerBuilder()
