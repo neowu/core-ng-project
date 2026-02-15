@@ -11,6 +11,7 @@
   > removed old error code `SLOW_SQL`, replaced with `INEFFICIENT_QUERY`
   > print query plan if SLOW_DB
 * log: make ActionLogContext.track() return void
+* http: set undertow MULTIPART_MAX_ENTITY_SIZE same as MAX_ENTITY_SIZE
 
 ### 9.3.1 (10/8/2025 - 11/7/2025)
 
