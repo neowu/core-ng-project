@@ -6,7 +6,7 @@ plugins {
 
 subprojects {
     group = "core.framework"
-    version = "9.4.1"
+    version = "9.4.2"
     repositories {
         maven {
             url = uri("https://neowu.github.io/maven-repo/")
@@ -39,7 +39,7 @@ project("core-ng") {
         implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
         implementation("com.squareup.okhttp3:okhttp:5.3.2")
-        implementation("io.undertow:undertow-core:2.3.22.Final")
+        implementation("io.undertow:undertow-core:2.3.23.Final")
         implementation("org.apache.kafka:kafka-clients:4.1.1") {
             exclude("org.xerial.snappy")
             exclude("org.lz4")
