@@ -10,6 +10,7 @@
             <property name="allowSamelineParameterizedAnnotation" value="true"/>
         </module>
         <module name="AnnotationUseStyle"/>                 <!--This check controls the style with the usage of annotations.-->
+        <module name="MissingOverrideOnRecordAccessor"/>    <!--Verifies that explicitly declared record accessor methods include the @Override annotation.-->
         <module name="SuppressWarnings">                    <!--Verifies unchecked can only used on variable, parameter and method-->
             <property name="format" value="^unchecked$"/>
             <property name="tokens" value="CLASS_DEF,INTERFACE_DEF,ENUM_DEF,ANNOTATION_DEF,ANNOTATION_FIELD_DEF,ENUM_CONSTANT_DEF"/>
@@ -80,6 +81,7 @@
         <module name="UnnecessarySemicolonAfterTypeMemberDeclaration"/>
         <module name="UnnecessarySemicolonInEnumeration"/>
         <module name="UnnecessarySemicolonInTryWithResources"/>
+        <module name="UseEnhancedSwitch"/>
 
         <!--Imports:-->
         <module name="AvoidStarImport"/>

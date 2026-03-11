@@ -73,20 +73,18 @@ public final class EventSource implements AutoCloseable, Iterable<EventSource.Ev
 
                 String field = line.substring(0, index);
                 switch (field) {
-                    case "id":
-                        lastId = line.substring(index + 2);
-                        break;
-                    case "event":
-                        lastType = line.substring(index + 2);
-                        break;
-                    case "data":
+                    case "id" -> lastId = line.substring(index + 2);
+                    case "event" -> lastType = line.substring(index + 2);
+                    case "data" -> {
                         String id = lastId;
                         lastId = null;
                         String type = lastType;
                         lastType = null;
                         events++;
                         return new Event(id, type, line.substring(index + 2));
-                    default:    // ignore "retry" and other fields
+                    }
+                    default -> {
+                    }
                 }
             }
         } catch (IOException e) {

@@ -1,22 +1,16 @@
 import com.github.spotbugs.snom.Confidence
 
 plugins {
-    checkstyle apply false
-    pmd apply false
-    id("com.github.spotbugs") apply false
-    jacoco apply false
-    id("jacoco-report-aggregation") apply false
+    checkstyle
+    pmd
+    id("com.github.spotbugs")
+    jacoco
+    id("jacoco-report-aggregation")
 }
-
-apply(plugin = "checkstyle")
-apply(plugin = "pmd")
-apply(plugin = "com.github.spotbugs")
-apply(plugin = "jacoco")
-apply(plugin = "jacoco-report-aggregation")
 
 checkstyle {
     dependencies {
-        checkstyle("com.puppycrawl.tools:checkstyle:12.2.0")
+        checkstyle("com.puppycrawl.tools:checkstyle:13.3.0")
         checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
     }
 
@@ -44,7 +38,7 @@ checkstyle {
 pmd {
     ruleSets = listOf()
     ruleSetFiles = rootProject.files("buildSrc/src/main/check/pmd.xml")
-    toolVersion = "7.19.0"
+    toolVersion = "7.22.0"
     isConsoleOutput = true
 
     tasks.withType<Pmd> {

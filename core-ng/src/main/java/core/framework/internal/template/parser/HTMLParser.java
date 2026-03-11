@@ -42,28 +42,31 @@ public class HTMLParser {
         while (true) {
             HTMLTokenType type = lexer.nextNodeToken();
             switch (type) {
-                case EOF:
+                case EOF -> {
                     break end;
-                case TEXT:
+                }
+                case TEXT -> {
                     nodes.peek().add(new Text(lexer.currentToken()));
-                    break;
-                case START_COMMENT:
+                }
+                case START_COMMENT -> {
                     lexer.nextEndCommentToken();
                     nodes.peek().add(new Comment(lexer.currentToken()));
-                    break;
-                case START_TAG:
+                }
+                case START_TAG -> {
                     String tagName = validateTagName(lexer.currentToken().substring(1));
                     parseElement(tagName);
-                    break;
-                case END_TAG:
+                }
+                case END_TAG -> {
                     String endTag = lexer.currentToken();
+
                     String endTagName = validateTagName(endTag.substring(2, endTag.length() - 1));
                     if (voidElements.contains(endTagName))
                         throw new Error(format("void element must not have close tag, tag={}, location={}", endTagName, lexer.currentLocation()));
                     closeTag(endTagName);
-                    break;
-                default:
+                }
+                default -> {
                     throw new Error(format("unexpected type, type={}, location={}", type, lexer.currentLocation()));
+                }
             }
         }
         return document;

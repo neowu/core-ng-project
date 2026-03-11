@@ -36,15 +36,11 @@ public class TextContentFragment implements Fragment {
         for (; index < length; index++) {
             char ch = text.charAt(index);
             switch (ch) {
-                case '<':
-                case '>':
-                case '"':
-                case '&':
-                case '\'':
-                case '/':
+                case '<', '>', '"', '&', '\'', '/' -> {
                     return index;
-                default:
-                    break;
+                }
+                default -> {
+                }
             }
         }
         return index;
