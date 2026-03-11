@@ -64,7 +64,7 @@ public final class FileBody implements Body {
 
         UncheckedIOException convertException(IOException exception) {
             // convert client abort exception to warning, e.g. user closed browser before content is transferred completely
-            if (exception instanceof ClosedChannelException) {
+            if (exception instanceof ClosedChannelException || "Connection reset by peer".equals(exception.getMessage())) {
                 return new ClientAbortException(exception);
             }
             return new UncheckedIOException(exception);
