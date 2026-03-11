@@ -40,6 +40,15 @@ class RedisHashOperationTest extends AbstractRedisOperationTest {
     }
 
     @Test
+    void multiGet() {
+        response("*2\r\n$2\r\nv1\r\n$-1\r\n");
+        Map<String, String> values = redis.hash().multiGet("key", "f1", "f2");
+
+        assertThat(values).containsOnly(entry("f1", "v1"));
+        assertRequestEquals("*4\r\n$5\r\nHMGET\r\n$3\r\nkey\r\n$2\r\nf1\r\n$2\r\nf2\r\n");
+    }
+
+    @Test
     void multiSet() {
         response("+OK\r\n");
         Map<String, String> values = new LinkedHashMap<>();

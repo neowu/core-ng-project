@@ -80,6 +80,7 @@ final class Protocol {
 
         static final byte[] HGET = Strings.bytes("HGET");
         static final byte[] HGETALL = Strings.bytes("HGETALL");
+        static final byte[] HMGET = Strings.bytes("HMGET");
         static final byte[] HSET = Strings.bytes("HSET");
         static final byte[] HMSET = Strings.bytes("HMSET");
         static final byte[] HDEL = Strings.bytes("HDEL");

@@ -42,6 +42,15 @@ class MockRedisHashTest {
     }
 
     @Test
+    void multiGet() {
+        redis.hash().set("key6", "field1", "value1");
+        redis.hash().set("key6", "field2", "value2");
+
+        Map<String, String> values = redis.hash().multiGet("key6", "field1", "field2", "field3");
+        assertThat(values).containsOnly(entry("field1", "value1"), entry("field2", "value2"));
+    }
+
+    @Test
     void del() {
         redis.hash().set("key1", "field1", "value1");
         redis.hash().set("key1", "field2", "value2");

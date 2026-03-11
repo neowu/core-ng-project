@@ -14,6 +14,8 @@ public interface RedisHash {
 
     Map<String, String> getAll(String key);
 
+    Map<String, String> multiGet(String key, String... fields);
+
     void set(String key, String field, String value);
 
     void multiSet(String key, Map<String, String> values);

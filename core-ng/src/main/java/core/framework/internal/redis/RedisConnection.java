@@ -107,6 +107,7 @@ public class RedisConnection implements AutoCloseable {
         return (long) Protocol.read(inputStream);
     }
 
+    @Nullable
     Object @Nullable [] readArray() throws IOException {
         return (Object[]) Protocol.read(inputStream);
     }

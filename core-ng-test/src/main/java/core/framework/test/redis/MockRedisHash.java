@@ -59,6 +59,21 @@ public final class MockRedisHash implements RedisHash {
     }
 
     @Override
+    public Map<String, String> multiGet(String key, String... fields) {
+        assertThat(fields).isNotEmpty();
+        var value = store.get(key);
+        if (value == null) return Map.of();
+
+        Map<String, MockRedisStore.HashValue> hash = value.hash();
+        Map<String, String> results = Maps.newHashMapWithExpectedSize(fields.length);
+        for (String field : fields) {
+            String fieldValue = get(hash, field);
+            if (fieldValue != null) results.put(field, fieldValue);
+        }
+        return results;
+    }
+
+    @Override
     public void set(String key, String field, String value) {
         var hash = store.putIfAbsent(key, new HashMap<>()).hash();
         hash.put(field, new MockRedisStore.HashValue(value));

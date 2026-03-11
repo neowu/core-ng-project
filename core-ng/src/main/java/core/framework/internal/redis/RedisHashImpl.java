@@ -20,6 +20,7 @@ import static core.framework.internal.redis.Protocol.Command.HDEL;
 import static core.framework.internal.redis.Protocol.Command.HGET;
 import static core.framework.internal.redis.Protocol.Command.HGETALL;
 import static core.framework.internal.redis.Protocol.Command.HINCRBY;
+import static core.framework.internal.redis.Protocol.Command.HMGET;
 import static core.framework.internal.redis.Protocol.Command.HMSET;
 import static core.framework.internal.redis.Protocol.Command.HPEXPIRE;
 import static core.framework.internal.redis.Protocol.Command.HSET;
@@ -89,6 +90,33 @@ public final class RedisHashImpl implements RedisHash {
             logger.debug("hgetAll, key={}, returnedValues={}, elapsed={}", key, values, elapsed);
             int readEntries = values == null ? 0 : values.size();
             ActionLogContext.track("redis", elapsed, readEntries, 0);
+        }
+    }
+
+    @Override
+    public Map<String, String> multiGet(String key, String... fields) {
+        var watch = new StopWatch();
+        validate("key", key);
+        validate("fields", fields);
+        Map<String, String> values = Maps.newHashMapWithExpectedSize(fields.length);
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.writeKeyArgumentsCommand(HMGET, key, fields);
+            Object[] response = connection.readArray();
+            for (int i = 0; i < response.length; i++) {
+                byte[] value = (byte[]) response[i];
+                if (value != null) values.put(fields[i], decode(value));
+            }
+            return values;
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            logger.debug("hmget, key={}, fields={}, returnedValues={}, elapsed={}", key, new ArrayLogParam(fields), values, elapsed);
+            ActionLogContext.track("redis", elapsed, values.size(), 0);
         }
     }
 

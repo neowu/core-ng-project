@@ -1,5 +1,10 @@
 ## Change log
 
+### 9.4.3 (2/25/26 - )
+
+* kafka: update to 4.2.0
+* redis: support HMGET
+
 ### 9.4.2 (1/26/26 - 2/15/26)
 
 * log: for rust version of log-processor/log-collector/log-exporter, refer to https://github.com/neowu/core_rs_workspace
