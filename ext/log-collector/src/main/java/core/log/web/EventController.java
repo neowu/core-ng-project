@@ -125,7 +125,7 @@ public class EventController {
         byte[] body = request.body().orElse(null);
         if (body == null) {
             String contentType = request.header(HTTPHeaders.CONTENT_TYPE).orElse(null);
-            // different browser/privacy setting/plugin impacts sendBeacon behaviour, here to ignore empty body if not ajax with application/json
+            // different browser/privacy setting/plugin impacts sendBeacon behavior, here to ignore empty body if not ajax with application/json
             if (contentType == null || contentType.startsWith(ContentType.TEXT_PLAIN.mediaType)) return null;
             throw new BadRequestException("body must not be null", "INVALID_HTTP_REQUEST");
         }
