@@ -67,11 +67,12 @@ class InsertQueryBuilder<T> {
                 primaryKeyColumns.add(columnName);
             } else {
                 if (dialect == Dialect.MYSQL) {
-                    // VALUES(column) syntax is deprecated since MySQL 8.0.20, this is to keep compatible with old MySQL (gcloud still has 8.0.18)
-                    // will update to new syntax in future
-                    updates.add(Strings.format("{} = VALUES({})", columnName, columnName));
+                    updates.add(Strings.format("{} = new.{}", columnName, columnName));
                 } else if (dialect == Dialect.POSTGRESQL) {
                     updates.add(Strings.format("{} = EXCLUDED.{}", columnName, columnName));
+                } else if (dialect == Dialect.HSQL) {
+                    // HSQL MySQL compatible syntax doesn't support latest MySQL `ON DUPLICATE KEY UPDATE` syntax
+                    updates.add(Strings.format("{} = VALUES({})", columnName, columnName));
                 }
             }
             paramFields.add(new ParamField(field.getName(), column.json()));
@@ -90,16 +91,18 @@ class InsertQueryBuilder<T> {
 
         if (generatedColumn != null) return;  // auto-increment entity doesn't need insert ignore and upsert, refer to core.framework.internal.db.RepositoryImpl.insertIgnore
 
-        if (dialect == Dialect.MYSQL) {
+        if (dialect == Dialect.MYSQL || dialect == Dialect.HSQL) {
             insertIgnoreSQL = new StringBuilder(insertSQL).insert(6, " IGNORE").toString();
         } else if (dialect == Dialect.POSTGRESQL) {
             insertIgnoreSQL = insertSQL + " ON CONFLICT DO NOTHING";
         }
 
         if (dialect == Dialect.MYSQL) {
-            builder.append(" ON DUPLICATE KEY UPDATE ").appendCommaSeparatedValues(updates);
+            builder.append(" AS new ON DUPLICATE KEY UPDATE ").appendCommaSeparatedValues(updates);
         } else if (dialect == Dialect.POSTGRESQL) {
             builder.append(" ON CONFLICT (").appendCommaSeparatedValues(primaryKeyColumns).append(") DO UPDATE SET ").appendCommaSeparatedValues(updates);
+        } else if (dialect == Dialect.HSQL) {
+            builder.append(" ON DUPLICATE KEY UPDATE ").appendCommaSeparatedValues(updates);
         }
         upsertSQL = builder.build();
     }

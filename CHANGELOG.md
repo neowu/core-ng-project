@@ -4,6 +4,8 @@
 
 * kafka: update to 4.2.0
 * redis: support HMGET
+* db: updated upsert SQL with latest syntax for MySQL
+  > refer to https://dev.mysql.com/doc/refman/8.4/en/insert-on-duplicate.html
 
 ### 9.4.2 (1/26/26 - 2/15/26)
 

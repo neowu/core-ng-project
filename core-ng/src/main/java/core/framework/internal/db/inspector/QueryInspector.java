@@ -22,6 +22,7 @@ public class QueryInspector {
 
     public void explain(String sql, Object[] params, boolean force) {
         if (analyzer == null) return;    // only unit tests don't have analyzer
+        if (sql.startsWith("CREATE ") || sql.startsWith("DROP ") || sql.startsWith("TRUNCATE ")) return;  // ignore DDL
 
         if (!force) {
             Long timestamp = lastCheckTimestamps.get(sql);

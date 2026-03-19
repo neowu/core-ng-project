@@ -65,7 +65,7 @@ final class SelectQuery<T> {
         if (groupBy != null) builder.append(" GROUP BY ").append(groupBy);
         if (sort != null) builder.append(" ORDER BY ").append(sort);
         if (skip != null || limit != null) {
-            if (dialect == Dialect.MYSQL) {
+            if (dialect == Dialect.MYSQL || dialect == Dialect.HSQL) {
                 builder.append(" LIMIT ?,?");
             } else if (dialect == Dialect.POSTGRESQL) {
                 builder.append(" OFFSET ? LIMIT ?");

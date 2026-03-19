@@ -19,7 +19,7 @@ class InsertQueryBuilderTest {
 
         assertThat(query.insertSQL).isEqualTo("INSERT INTO assigned_id_entity (id, string_field, int_field, big_decimal_field, date_field, zoned_date_time_field) VALUES (?, ?, ?, ?, ?, ?)");
         assertThat(query.insertIgnoreSQL).isEqualTo("INSERT IGNORE INTO assigned_id_entity (id, string_field, int_field, big_decimal_field, date_field, zoned_date_time_field) VALUES (?, ?, ?, ?, ?, ?)");
-        assertThat(query.upsertSQL).isEqualTo("INSERT INTO assigned_id_entity (id, string_field, int_field, big_decimal_field, date_field, zoned_date_time_field) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE string_field = VALUES(string_field), int_field = VALUES(int_field), big_decimal_field = VALUES(big_decimal_field), date_field = VALUES(date_field), zoned_date_time_field = VALUES(zoned_date_time_field)");
+        assertThat(query.upsertSQL).isEqualTo("INSERT INTO assigned_id_entity (id, string_field, int_field, big_decimal_field, date_field, zoned_date_time_field) VALUES (?, ?, ?, ?, ?, ?) AS new ON DUPLICATE KEY UPDATE string_field = new.string_field, int_field = new.int_field, big_decimal_field = new.big_decimal_field, date_field = new.date_field, zoned_date_time_field = new.zoned_date_time_field");
         assertThat(query.generatedColumn).isNull();
     }
 
@@ -54,7 +54,7 @@ class InsertQueryBuilderTest {
         InsertQueryBuilder<CompositeKeyEntity> builder = new InsertQueryBuilder<>(CompositeKeyEntity.class, Dialect.MYSQL);
         InsertQuery<CompositeKeyEntity> query = builder.build();
 
-        assertThat(query.upsertSQL).isEqualTo("INSERT INTO composite_key_entity (id1, id_2, boolean_field, long_field) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE boolean_field = VALUES(boolean_field), long_field = VALUES(long_field)");
+        assertThat(query.upsertSQL).isEqualTo("INSERT INTO composite_key_entity (id1, id_2, boolean_field, long_field) VALUES (?, ?, ?, ?) AS new ON DUPLICATE KEY UPDATE boolean_field = new.boolean_field, long_field = new.long_field");
     }
 
     @Test

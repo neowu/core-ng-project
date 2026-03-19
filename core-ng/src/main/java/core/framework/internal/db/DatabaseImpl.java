@@ -180,7 +180,7 @@ public final class DatabaseImpl implements Database {
             inspector = new QueryInspector(new PostgreSQLQueryAnalyzer(operation));
             return createDriver("org.postgresql.Driver");
         } else if (url.startsWith("jdbc:hsqldb:")) {
-            operation.dialect = Dialect.MYSQL;    // unit test use mysql dialect
+            operation.dialect = Dialect.HSQL;    // unit test uses HSQL/MySQL dialect variation
             inspector = new QueryInspector(null);
             return createDriver("org.hsqldb.jdbc.JDBCDriver");
         } else {
