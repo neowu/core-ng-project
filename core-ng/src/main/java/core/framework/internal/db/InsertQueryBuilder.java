@@ -90,13 +90,11 @@ class InsertQueryBuilder<T> {
         insertSQL = builder.build();
 
         if (generatedColumn != null) return;  // auto-increment entity doesn't need insert ignore and upsert, refer to core.framework.internal.db.RepositoryImpl.insertIgnore
+        buildInsertIgnore();
+        buildUpsert(builder, updates);
+    }
 
-        if (dialect == Dialect.MYSQL || dialect == Dialect.HSQL) {
-            insertIgnoreSQL = new StringBuilder(insertSQL).insert(6, " IGNORE").toString();
-        } else if (dialect == Dialect.POSTGRESQL) {
-            insertIgnoreSQL = insertSQL + " ON CONFLICT DO NOTHING";
-        }
-
+    private void buildUpsert(CodeBuilder builder, List<String> updates) {
         if (dialect == Dialect.MYSQL) {
             builder.append(" AS new ON DUPLICATE KEY UPDATE ").appendCommaSeparatedValues(updates);
         } else if (dialect == Dialect.POSTGRESQL) {
@@ -105,6 +103,14 @@ class InsertQueryBuilder<T> {
             builder.append(" ON DUPLICATE KEY UPDATE ").appendCommaSeparatedValues(updates);
         }
         upsertSQL = builder.build();
+    }
+
+    private void buildInsertIgnore() {
+        if (dialect == Dialect.MYSQL || dialect == Dialect.HSQL) {
+            insertIgnoreSQL = new StringBuilder(insertSQL).insert(6, " IGNORE").toString();
+        } else if (dialect == Dialect.POSTGRESQL) {
+            insertIgnoreSQL = insertSQL + " ON CONFLICT DO NOTHING";
+        }
     }
 
     private String applyMethod() {
