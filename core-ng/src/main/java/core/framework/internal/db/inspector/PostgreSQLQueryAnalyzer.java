@@ -32,10 +32,10 @@ public class PostgreSQLQueryAnalyzer implements QueryAnalyzer {
         if (queryPlan.contains("Seq Scan")) {
             long rows = parseRows(queryPlan);
             return rows <= 2000; // accept seq scan for small table
-        } else if (queryPlan.contains("Hash") && queryPlan.contains("Join")) {
-            // hash join may load large table into memory, consider inefficient
+        } else if (queryPlan.contains("Hash") && !queryPlan.contains("Join")) {
+            // hash join may load large table into memory, consider inefficient, only check hash part
             long rows = parseRows(queryPlan);
-            return rows <= 50_000;
+            return rows <= 10_000;
         }
         return true;
     }
