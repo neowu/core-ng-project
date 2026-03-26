@@ -50,8 +50,8 @@ public class SearchConfig extends Config {
         search.hosts = ElasticSearchHost.parse(host);
     }
 
-    public void auth(String apiKeyId, String apiKeySecret) {
-        search.auth(apiKeyId, apiKeySecret);
+    public void auth(String apiKey) {
+        search.auth(apiKey);
         auth = true;
     }
 

@@ -6,8 +6,6 @@ import core.framework.internal.json.JSONReader;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,13 +25,9 @@ public final class Bean {
 
     public static <T> T fromJSON(Class<T> beanClass, String json) {
         Context<T> context = context(beanClass);
-        try {
-            T instance = context.reader.fromJSON(json);
-            context.validator.validate(instance, false);
-            return instance;
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        T instance = context.reader.fromJSON(json);
+        context.validator.validate(instance, false);
+        return instance;
     }
 
     public static <T> String toJSON(T bean) {

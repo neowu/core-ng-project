@@ -19,7 +19,6 @@ import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.List;
 
 import static core.framework.log.Markers.errorCode;
@@ -76,7 +75,7 @@ public class KafkaController {
         return Response.text(Strings.format("message handled, id={}, topic={}, key={}, message={}", actionLog.id, topic, key, new String(body, UTF_8)));
     }
 
-    private Object message(String topic, String key, byte[] body, MessageProcess<Object> process, ActionLog actionLog) throws IOException {
+    private Object message(String topic, String key, byte[] body, MessageProcess<Object> process, ActionLog actionLog) {
         Object message = process.reader.fromJSON(body);
         process.validator.validate(message, false);
         logger.debug("[message] topic={}, key={}, value={}", topic, key, new BytesLogParam(Strings.bytes(JSON.toJSON(message))));    // log converted message

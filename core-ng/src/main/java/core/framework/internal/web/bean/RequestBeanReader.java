@@ -9,7 +9,6 @@ import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
 import core.framework.web.exception.BadRequestException;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Map;
 
@@ -55,7 +54,7 @@ public class RequestBeanReader {    // used by controller and web service
         return bean;
     }
 
-    public <T> T fromJSON(Class<T> beanClass, byte[] body) throws IOException {
+    public <T> T fromJSON(Class<T> beanClass, byte[] body) {
         BeanContext<T> context = context(beanContext, beanClass, false);
         T bean = context.reader.fromJSON(body);
         context.validator.validate(bean, false);

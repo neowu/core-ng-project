@@ -1,6 +1,7 @@
 package core.framework.internal.web.service;
 
 import core.framework.json.JSON;
+import core.framework.json.JSONException;
 import core.framework.util.Encodings;
 import core.framework.web.exception.BadRequestException;
 
@@ -13,7 +14,7 @@ public final class PathParamHelper {    // used by generated WebServiceControlle
     public static <T extends Enum<?>> T toEnum(String value, Class<T> valueClass) {
         try {
             return JSON.fromEnumValue(valueClass, value);
-        } catch (IllegalArgumentException e) {
+        } catch (JSONException e) {
             throw new BadRequestException(format("failed to parse enum, enumClass={}, value={}", valueClass.getCanonicalName(), value), "INVALID_HTTP_REQUEST", e);
         }
     }

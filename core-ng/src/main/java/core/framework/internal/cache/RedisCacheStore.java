@@ -4,6 +4,7 @@ import core.framework.internal.json.JSONReader;
 import core.framework.internal.redis.RedisException;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.validate.Validator;
+import core.framework.json.JSONException;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
@@ -11,7 +12,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.List;
@@ -89,7 +89,7 @@ public class RedisCacheStore implements CacheStore {
             }
 
             return result;
-        } catch (IOException e) {
+        } catch (JSONException e) {
             logger.warn(errorCode("INVALID_CACHE_DATA"), "failed to deserialize value from cache, will reload, error={}", e.getMessage(), e);
             return null;
         }

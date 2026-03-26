@@ -1,12 +1,16 @@
 ## Change log
 
-### 9.4.3 (2/25/26 - )
+### 9.5.0 (2/25/26 - )
 
 * kafka: update to 4.2.0
 * redis: support HMGET
 * db: updated upsert SQL with latest syntax for MySQL
   > refer to https://dev.mysql.com/doc/refman/8.4/en/insert-on-duplicate.html
 * db: tweak postgres query analyzer rules
+* es: updated to 9.3.2
+  > underlying rest5client is using apache http async client + jackson 3.0
+* json: updated jackson api to 3.1.0
+  > major jackson api update, now deserialization throws JSONException if json is invalid, instead of UncheckedIOException
 
 ### 9.4.2 (1/26/26 - 2/15/26)
 

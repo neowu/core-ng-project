@@ -1,10 +1,7 @@
 package core.framework.internal.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import core.framework.util.Strings;
-
-import java.io.UncheckedIOException;
+import tools.jackson.databind.ObjectWriter;
 
 
 /**
@@ -20,18 +17,10 @@ public final class JSONWriter<T> {
     // with jdk 11, write to String then covert to byte[] is faster than write to byte[]
     // toJSON won't throw exception especially instance class will be validated before
     public byte[] toJSON(T instance) {
-        try {
-            return Strings.bytes(writer.writeValueAsString(instance));
-        } catch (JsonProcessingException e) {
-            throw new UncheckedIOException(e);
-        }
+        return Strings.bytes(writer.writeValueAsString(instance));
     }
 
     public String toJSONString(T instance) {
-        try {
-            return writer.writeValueAsString(instance);
-        } catch (JsonProcessingException e) {
-            throw new UncheckedIOException(e);
-        }
+        return writer.writeValueAsString(instance);
     }
 }

@@ -16,6 +16,6 @@ class TestSearchConfigTest {
 
     @Test
     void auth() {
-        config.auth("id", "secret");
+        config.auth("apiKey");
     }
 }

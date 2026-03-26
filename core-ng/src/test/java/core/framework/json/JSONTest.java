@@ -4,7 +4,6 @@ import core.framework.util.Types;
 import core.framework.util.UUIDv7;
 import org.junit.jupiter.api.Test;
 
-import java.io.UncheckedIOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -72,7 +71,9 @@ class JSONTest {
 
         String json = JSON.toJSON(bean);
         assertThat(json).contains("""
-            "list":["value1","value2"],"children":[{"boolean":true,"long":null,"double":null},{"boolean":false,"long":null,"double":null}]""");
+                "list":["value1","value2"]""")
+            .contains("""
+                "children":[{"boolean":true,"long":null,"double":null},{"boolean":false,"long":null,"double":null}]""");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertThat(parsedBean).usingRecursiveComparison().isEqualTo(bean);
@@ -139,6 +140,9 @@ class JSONTest {
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
 
         assertThat(parsedBean.enumField).isEqualTo(bean.enumField);
+
+        assertThatThrownBy(() -> JSON.fromJSON(TestBean.class, "{\"enum\": 1}"))
+            .isInstanceOf(JSONException.class);
     }
 
     @Test
@@ -182,7 +186,7 @@ class JSONTest {
 
         // ordinal should be treated as invalid value
         assertThatThrownBy(() -> JSON.fromEnumValue(TestBean.TestEnum.class, "0"))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(JSONException.class);
     }
 
     @Test
@@ -206,15 +210,15 @@ class JSONTest {
     @Test
     void invalidJSON() {
         assertThatThrownBy(() -> JSON.fromJSON(TestBean.class, "{"))
-            .isInstanceOf(UncheckedIOException.class);
+            .isInstanceOf(JSONException.class);
 
         assertThatThrownBy(() -> JSON.fromJSON(Types.list(TestBean.class), "{"))
-            .isInstanceOf(UncheckedIOException.class);
+            .isInstanceOf(JSONException.class);
     }
 
     @Test
     void invalidInteger() {
         assertThatThrownBy(() -> JSON.fromJSON(Integer.class, "\"\""))
-            .isInstanceOf(UncheckedIOException.class);
+            .isInstanceOf(JSONException.class);
     }
 }

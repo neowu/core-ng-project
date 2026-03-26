@@ -8,6 +8,7 @@ import core.framework.internal.json.JSONReader;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.validate.ValidationException;
 import core.framework.json.JSON;
+import core.framework.json.JSONException;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.EventMessage;
 import core.framework.web.CookieSpec;
@@ -16,7 +17,6 @@ import core.framework.web.Response;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.ForbiddenException;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,7 +135,7 @@ public class EventController {
             return eventRequest;
         } catch (ValidationException e) {
             throw new BadRequestException(e.getMessage(), e.errorCode(), e);
-        } catch (IOException e) {
+        } catch (JSONException e) {
             throw new BadRequestException(e.getMessage(), "INVALID_HTTP_REQUEST", e);
         }
     }

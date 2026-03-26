@@ -31,7 +31,7 @@ class SearchConfigTest {
 
     @Test
     void auth() {
-        config.auth("key", "secret");
+        config.auth("apiKey");
         assertThat(config.auth).isTrue();
     }
 }

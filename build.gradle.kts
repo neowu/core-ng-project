@@ -6,7 +6,7 @@ plugins {
 
 subprojects {
     group = "core.framework"
-    version = "9.4.3"
+    version = "9.5.0"
     repositories {
         maven {
             url = uri("https://neowu.github.io/maven-repo/")
@@ -17,8 +17,8 @@ subprojects {
     }
 }
 
-val elasticVersion = "8.18.1"
-val jacksonVersion = "2.20.1"
+val elasticVersion = "9.3.2"
+val jacksonVersion = "3.1.0"
 val junitVersion = "6.0.0"
 val mockitoVersion = "5.20.0"
 val assertjVersion = "3.27.6"
@@ -36,8 +36,8 @@ project("core-ng") {
         api(project(":core-ng-api"))
         api("org.slf4j:slf4j-api:2.0.17")
         implementation("org.javassist:javassist:3.30.2-GA")
-        implementation("com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}")
-        implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
+        implementation("tools.jackson.module:jackson-module-afterburner:${jacksonVersion}")
+        implementation("tools.jackson.core:jackson-databind:${jacksonVersion}")
         implementation("com.squareup.okhttp3:okhttp:5.3.2")
         implementation("io.undertow:undertow-core:2.3.23.Final")
         implementation("org.apache.kafka:kafka-clients:4.2.0") {
@@ -92,8 +92,11 @@ project("core-ng-search") {
         api(project(":core-ng"))
         api("co.elastic.clients:elasticsearch-java:${elasticVersion}") {
             exclude(group = "io.opentelemetry")
+            exclude(group = "io.opentelemetry.semconv")
+            exclude(group = "com.fasterxml.jackson.core")
         }
-        implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+        implementation("co.elastic.clients:elasticsearch-rest5-client:${elasticVersion}")
+        implementation("tools.jackson.core:jackson-databind:${jacksonVersion}")
         testImplementation(project(":core-ng-test"))
     }
 }

@@ -4,6 +4,7 @@ import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.validate.ValidationException;
 import core.framework.internal.web.bean.RequestBeanReader;
+import core.framework.json.JSONException;
 import core.framework.util.Maps;
 import core.framework.web.CookieSpec;
 import core.framework.web.MultipartFile;
@@ -13,7 +14,6 @@ import core.framework.web.exception.BadRequestException;
 import io.undertow.server.HttpServerExchange;
 import org.jspecify.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -142,7 +142,7 @@ public final class RequestImpl implements Request {
             }
         } catch (ValidationException e) {
             throw new BadRequestException(e.getMessage(), e.errorCode(), e);
-        } catch (IOException e) {  // for invalid json string
+        } catch (JSONException e) {  // for invalid json string
             // for security concern, to hide original error message, jackson may return detailed info, e.g. possible allowed values for enum
             // detailed info can still be found in trace log or exception stack trace
             throw new BadRequestException("failed to deserialize request, beanClass=" + beanClass.getCanonicalName(), "INVALID_HTTP_REQUEST", e);

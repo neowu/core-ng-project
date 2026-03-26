@@ -26,6 +26,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -123,7 +124,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
             .filter(term("enum_field", JSON.toEnumValue(TestDocument.TestEnum.VALUE1))));
 
         request.sorts.add(SortOptions.of(builder -> builder.script(s ->
-            s.script(script -> script.source("doc['int_field'].value * 3")).type(ScriptSortType.Number))));
+            s.script(script -> script.source(source -> source.scriptString("doc['int_field'].value * 3"))).type(ScriptSortType.Number))));
 
         SearchResponse<TestDocument> response = documentType.search(request);
 
@@ -169,7 +170,8 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         assertThat(response.hits.stream().map(document -> document.stringField).toList())
             .containsOnly("value3", "value4");
 
-        request.query = range("zoned_date_time_field", from.toLocalDate(), to.toLocalDate());
+        // elasticsearch uses UTC internally for date field, here to convert to utc local date for query
+        request.query = range("zoned_date_time_field", from.withZoneSameInstant(ZoneOffset.UTC).toLocalDate(), to.withZoneSameInstant(ZoneOffset.UTC).toLocalDate());
         request.sorts.add(Sorts.fieldSort("id", SortOrder.Asc));
         response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(3);

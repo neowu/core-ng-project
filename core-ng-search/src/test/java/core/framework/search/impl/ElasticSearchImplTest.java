@@ -18,10 +18,10 @@ class ElasticSearchImplTest {
 
     @Test
     void auth() {
-        elasticSearch.auth("key", "secret");
+        elasticSearch.auth("apiKeyValue");
         assertThat(elasticSearch.authHeader.getName())
             .isEqualTo("Authorization");
         assertThat(elasticSearch.authHeader.getValue())
-            .isEqualTo("ApiKey a2V5OnNlY3JldA==");
+            .isEqualTo("ApiKey apiKeyValue");
     }
 }

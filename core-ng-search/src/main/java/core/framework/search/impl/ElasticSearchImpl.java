@@ -3,30 +3,30 @@ package core.framework.search.impl;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.ErrorCause;
+import co.elastic.clients.elasticsearch.cluster.state.ClusterStateMetric;
 import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
 import co.elastic.clients.json.JsonData;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.instrumentation.NoopInstrumentation;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
+import co.elastic.clients.json.jackson.Jackson3JsonpMapper;
+import co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
+import co.elastic.clients.transport.rest5_client.low_level.Request;
+import co.elastic.clients.transport.rest5_client.low_level.Response;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import core.framework.internal.json.JSONMapper;
 import core.framework.log.ActionLogContext;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.SearchException;
-import core.framework.util.Encodings;
 import core.framework.util.StopWatch;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,26 +49,30 @@ public class ElasticSearchImpl implements ElasticSearch {
     ElasticsearchClient client;
     @Nullable
     Header authHeader;
-    private RestClient restClient;
-    private ObjectMapper mapper;
+    private Rest5Client restClient;
+    private Jackson3JsonpMapper mapper;
 
     // initialize will be called in startup hook, no need to synchronize
     public void initialize() {
         if (client == null) {   // initialize can be called by initSearch explicitly during test,
-            RestClientBuilder builder = RestClient.builder(hosts);
+            Rest5ClientBuilder builder = Rest5Client.builder(hosts)
+                .setCompressionEnabled(true);
             if (authHeader != null) {
                 builder.setDefaultHeaders(new Header[]{authHeader});
             }
-            builder.setRequestConfigCallback(config -> config.setConnectionRequestTimeout(5_000)    // timeout of requesting connection from connection pool
-                .setConnectTimeout(5_000)   // 5s, usually es is within same network, use shorter timeout to fail fast
-                .setSocketTimeout((int) timeout.toMillis()));
-            builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
-                .setMaxConnPerRoute(100)
-                .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis())
-                .addInterceptorFirst(new ElasticSearchLogInterceptor()));
+            builder.setConnectionConfigCallback(config -> config.setConnectTimeout(Timeout.ofSeconds(5)));    // 5s, usually es is within same network, use shorter timeout to fail fast
+            builder.setRequestConfigCallback(config -> config.setConnectionRequestTimeout(Timeout.ofSeconds(5))    // timeout of requesting connection from connection pool
+                .setResponseTimeout(Timeout.of(timeout)));
+            builder.setConnectionManagerCallback(config -> config.setMaxConnPerRoute(100)
+                .setMaxConnTotal(100));
+            builder.setHttpClientConfigCallback(config -> config
+                .setKeepAliveStrategy((response, context) -> TimeValue.ofSeconds(30)));
             restClient = builder.build();
-            mapper = JSONMapper.builder().defaultPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL)).build();
-            client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper(mapper), null, NoopInstrumentation.INSTANCE));
+            mapper = new Jackson3JsonpMapper(JSONMapper.builder()
+                // only include not null fields for partial update
+                .changeDefaultPropertyInclusion(_ -> JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL))
+                .build());
+            client = new ElasticsearchClient(new Rest5ClientTransport(restClient, mapper, null, new LogInstrumentation()));
         }
     }
 
@@ -81,9 +86,10 @@ public class ElasticSearchImpl implements ElasticSearch {
         }
     }
 
-    public void auth(String apiKeyId, String apiKeySecret) {
-        if (apiKeyId == null) throw new Error("apiKeyId must not be null");
-        authHeader = new BasicHeader("Authorization", "ApiKey " + Encodings.base64(apiKeyId + ":" + apiKeySecret));
+    // refer to co.elastic.clients.transport.rest5_client.Rest5ClientTransport.buildRest5Client
+    public void auth(String apiKey) {
+        if (apiKey == null) throw new Error("apiKey must not be null");
+        authHeader = new BasicHeader("Authorization", "ApiKey " + apiKey);
     }
 
     public void close() throws IOException {
@@ -109,7 +115,7 @@ public class ElasticSearchImpl implements ElasticSearch {
                 // only try to update mappings, as for settings it generally requires closing index first then open after update
                 logger.info("index already exists, update mapping, index={}", index);
                 request = new Request("PUT", "/" + index + "/_mapping");
-                request.setJsonEntity(mapper.readTree(source).get("mappings").toString());
+                request.setJsonEntity(mapper.objectMapper().readTree(source).get("mappings").toString());
             }
             Response response = restClient.performRequest(request);
             entity = response.getEntity();
@@ -186,7 +192,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public ClusterStateResponse state() {
         var watch = new StopWatch();
         try {
-            return client.cluster().state(builder -> builder.metric("metadata")).valueBody().to(ClusterStateResponse.class);
+            return client.cluster().state(builder -> builder.metric(List.of(ClusterStateMetric.Metadata))).state().to(ClusterStateResponse.class);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ElasticsearchException e) {

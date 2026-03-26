@@ -62,7 +62,7 @@ class ElasticSearchAggregationIntegrationTest extends IntegrationTest {
         assertThat(response.hits).hasSize(1);
         assertThat(response.aggregations).containsKeys("total_value");
 
-        int sum = (int) response.aggregations.get("total_value").sum().value();
+        int sum = response.aggregations.get("total_value").sum().value().intValue();
         assertThat(sum).isEqualTo(21);
     }
 

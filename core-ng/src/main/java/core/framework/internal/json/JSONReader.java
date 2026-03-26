@@ -1,9 +1,9 @@
 package core.framework.internal.json;
 
-import com.fasterxml.jackson.databind.ObjectReader;
+import core.framework.json.JSONException;
 import org.jspecify.annotations.Nullable;
-
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectReader;
 
 
 /**
@@ -19,12 +19,16 @@ public final class JSONReader<T> {
     }
 
     @Nullable
-    public T fromJSON(byte[] json) throws IOException {
-        return reader.readValue(json);
+    public T fromJSON(byte[] json) {
+        try {
+            return reader.readValue(json);
+        } catch (JacksonException e) {
+            throw new JSONException(e);
+        }
     }
 
     @Nullable
-    public T fromJSON(String json) throws IOException {
+    public T fromJSON(String json) {
         return reader.readValue(json);
     }
 }

@@ -1,13 +1,13 @@
 package core.framework.internal.json;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
-import com.fasterxml.jackson.databind.PropertyName;
-import com.fasterxml.jackson.databind.cfg.MapperConfig;
-import com.fasterxml.jackson.databind.introspect.Annotated;
-import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
-import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import core.framework.api.json.Property;
+import tools.jackson.core.Version;
+import tools.jackson.databind.AnnotationIntrospector;
+import tools.jackson.databind.PropertyName;
+import tools.jackson.databind.cfg.MapperConfig;
+import tools.jackson.databind.introspect.Annotated;
+import tools.jackson.databind.introspect.AnnotatedClass;
+import tools.jackson.databind.introspect.AnnotatedField;
 
 import java.io.Serial;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class JSONAnnotationIntrospector extends AnnotationIntrospector {
     }
 
     @Override
-    public PropertyName findNameForSerialization(Annotated annotated) {
+    public PropertyName findNameForSerialization(MapperConfig<?> config, Annotated annotated) {
         return propertyName(annotated);
     }
 
@@ -58,14 +58,14 @@ public class JSONAnnotationIntrospector extends AnnotationIntrospector {
     }
 
     @Override
-    public PropertyName findNameForDeserialization(Annotated annotated) {
+    public PropertyName findNameForDeserialization(MapperConfig<?> config, Annotated annotated) {
         return propertyName(annotated);
     }
 
     private PropertyName propertyName(Annotated annotated) {
         Property element = annotated.getAnnotation(Property.class);
         if (element != null) {
-            return new PropertyName(element.name(), null);
+            return new PropertyName(element.name());
         }
         return null;
     }

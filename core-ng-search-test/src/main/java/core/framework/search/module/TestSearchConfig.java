@@ -3,20 +3,22 @@ package core.framework.search.module;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.search.impl.LocalElasticSearch;
-import org.apache.http.HttpHost;
+import org.apache.hc.core5.http.HttpHost;
 import org.elasticsearch.common.logging.LogConfigurator;
 import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author neo
  */
 public class TestSearchConfig extends SearchConfig {
     static {
-        // org.apache.lucene.store.MemorySegmentIndexInputProvider <init>
-        // INFO: Using MemorySegmentIndexInput with Java 21 or later; to disable start with -Dorg.apache.lucene.store.MMapDirectory.enableMemorySegments=false
-        System.setProperty("org.apache.lucene.store.MMapDirectory.enableMemorySegments", "false");
+        // disable WARN from org.apache.lucene.internal.vectorization.VectorizationProvider.lookup, which uses java.util.Logger
+        Logger rootLogger = Logger.getLogger("");
+        rootLogger.setLevel(Level.SEVERE);
     }
 
     private static final ReentrantLock LOCK = new ReentrantLock();
@@ -55,6 +57,6 @@ public class TestSearchConfig extends SearchConfig {
     }
 
     @Override
-    public void auth(String apiKeyId, String apiKeySecret) {
+    public void auth(String apiKey) {
     }
 }

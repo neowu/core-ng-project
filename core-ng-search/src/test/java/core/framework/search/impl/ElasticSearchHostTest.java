@@ -1,6 +1,6 @@
 package core.framework.search.impl;
 
-import org.apache.http.HttpHost;
+import org.apache.hc.core5.http.HttpHost;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,10 +28,10 @@ class ElasticSearchHostTest {
     @Test
     void parseWithHTTPS() {
         assertThat(ElasticSearchHost.parse("https://es-cloud.io"))
-            .containsExactly(new HttpHost("es-cloud.io", 9200, "https"));
+            .containsExactly(new HttpHost("https", "es-cloud.io", 9200));
 
         assertThat(ElasticSearchHost.parse("https://es-cloud.io:9545"))
-            .containsExactly(new HttpHost("es-cloud.io", 9545, "https"));
+            .containsExactly(new HttpHost("https", "es-cloud.io", 9545));
     }
 
     @Test
