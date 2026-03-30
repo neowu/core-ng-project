@@ -1,5 +1,6 @@
 package app.monitor.job;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ public class JMXClient {
 
     private final Logger logger = LoggerFactory.getLogger(JMXClient.class);
     private final JMXServiceURL serviceURL;
-    private JMXConnector jmx;
+    private @Nullable JMXConnector jmx;
 
     public JMXClient(String host) {
         try {
@@ -67,7 +68,7 @@ public class JMXClient {
         return jmx.getMBeanServerConnection();
     }
 
-    boolean check(JMXConnector jmx) {
+    boolean check(@Nullable JMXConnector jmx) {
         if (jmx == null) return false;
         try {
             jmx.getConnectionId();

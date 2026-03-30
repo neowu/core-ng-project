@@ -87,7 +87,11 @@ public class MonitorConfig {
         @NotNull
         @Min(0)
         @Property(name = "highDiskSizeThreshold")
-        public Long highDiskSizeThreshold = 50_000_000_000L;    // use 50G as default, kafka jmx doesn't provide disk limit, usually in cloud/kube env, pod pvc disk usage can be monitored by cloud monitoring as well
+        public Double highDiskSizeThreshold = 0.7;
+
+        @NotNull
+        @Property(name = "logPath")
+        public String logPath = "/var/lib/kafka/data/kafka";
     }
 
     public static class MongoConfig {

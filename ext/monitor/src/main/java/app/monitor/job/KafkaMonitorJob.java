@@ -18,7 +18,10 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeData;
 import java.io.IOException;
-import java.util.Set;
+import java.nio.file.FileStore;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static app.monitor.job.JMXClient.objectName;
 
@@ -41,7 +44,8 @@ public class KafkaMonitorJob implements Job {
     private final GCStat youngGCStats = new GCStat("young");
     private final GCStat oldGCStats = new GCStat("old");
     public double highHeapUsageThreshold;
-    public long highDiskSizeThreshold;
+    public String logPath;
+    public double highDiskSizeThreshold;
 
     public KafkaMonitorJob(JMXClient jmxClient, String app, String host, MessagePublisher<StatMessage> publisher) {
         this.jmxClient = jmxClient;
@@ -88,14 +92,15 @@ public class KafkaMonitorJob implements Job {
     }
 
     private void collectDiskUsage(Stats stats, MBeanServerConnection connection) throws IOException, MBeanException, AttributeNotFoundException, InstanceNotFoundException, ReflectionException {
-        long diskUsed = 0;
-        Set<ObjectName> sizeBeans = connection.queryNames(LOG_SIZE_BEAN, null); // return one object bean per topic/partition
-        for (ObjectName sizeBean : sizeBeans) {
-            long size = (Long) connection.getAttribute(sizeBean, "Value");
-            diskUsed += size;
-        }
-        stats.put("kafka_disk_used", diskUsed);
-        boolean highUsage = stats.checkHighUsage((double) diskUsed / highDiskSizeThreshold, 1.0, "disk");
+        Path path = Paths.get(logPath);
+        FileStore store = Files.getFileStore(path);
+
+        long total = store.getTotalSpace();
+        stats.put("kafka_disk_max", total);
+        long usable = store.getUsableSpace();
+        stats.put("kafka_disk_used", usable);
+
+        boolean highUsage = stats.checkHighUsage((double) (total - usable) / total, 1.0, "disk");
         if (highUsage) {
             stats.severity = Severity.ERROR;
         }

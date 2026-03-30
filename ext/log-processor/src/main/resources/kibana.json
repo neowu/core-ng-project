@@ -1,5 +1,5 @@
 [
-  {"attributes": {"defaultIndex": "action-pattern", "notifications:banner": "${NOTIFICATION_BANNER}", "defaultRoute": "/app/discover#/", "dateFormat": "YYYY-MM-DD HH:mm:ss.SSS", "dateNanosFormat": "YYYY-MM-DD HH:mm:ss.SSSSSS"}, "id": "9.2.0", "type": "config"},
+  {"attributes": {"defaultIndex": "action-pattern", "notifications:banner": "${NOTIFICATION_BANNER}", "defaultRoute": "/app/discover#/", "dateFormat": "YYYY-MM-DD HH:mm:ss.SSS", "dateNanosFormat": "YYYY-MM-DD HH:mm:ss.SSSSSS"}, "id": "9.3.2", "type": "config"},
   {
     "id": "action-pattern", "type": "index-pattern",
     "attributes": {
@@ -708,7 +708,7 @@
     "attributes": {
       "title": "stat-kafka_disk",
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{}"},
-      "visState": "{\"title\":\"stat-kafka_disk\",\"type\":\"metrics\",\"params\":{\"id\":\"stat-kafka_disk\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"stat-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"max-stats-kafka_disk_used\",\"label\":\"used disk size\",\"color\":\"#F9844A\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.kafka_disk_used\"}]}]}}"
+      "visState": "{\"title\":\"stat-kafka_disk\",\"type\":\"metrics\",\"params\":{\"id\":\"stat-kafka_disk\",\"type\":\"timeseries\",\"time_field\":\"@timestamp\",\"index_pattern\":\"stat-*\",\"axis_scale\":\"normal\",\"axis_position\":\"left\",\"show_legend\":0,\"show_grid\":1,\"series\":[{\"id\":\"max-stats-kafka_disk_max\",\"label\":\"max disk\",\"color\":\"#F9844A\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.kafka_disk_max\"}]},{\"id\":\"max-stats-kafka_disk_used\",\"label\":\"used disk\",\"color\":\"#F9844A\",\"split_mode\":\"everything\",\"separate_axis\":0,\"formatter\":\"bytes\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"metrics\":[{\"id\":\"max\",\"type\":\"max\",\"field\":\"stats.kafka_disk_used\"}]}]}}"
     }
   },
   {
