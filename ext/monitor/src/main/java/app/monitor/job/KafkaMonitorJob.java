@@ -68,7 +68,7 @@ public class KafkaMonitorJob implements Job {
     Stats collect(MBeanServerConnection connection) throws JMException, IOException {
         var stats = new Stats();
 
-        collectDiskUsage(stats);    // disk usage is most important to check, if disk usage is high, requires to expand disk immediately
+        collectDiskUsage(stats, connection);    // disk usage is most important to check, if disk usage is high, requires to expand disk immediately
 
         CompositeData heap = (CompositeData) connection.getAttribute(MEMORY_BEAN, "HeapMemoryUsage");
         double heapUsed = (Long) heap.get("used");
@@ -90,7 +90,7 @@ public class KafkaMonitorJob implements Job {
         return stats;
     }
 
-    private void collectDiskUsage(Stats stats) throws IOException {
+    private void collectDiskUsage(Stats stats, MBeanServerConnection connection) throws IOException, MBeanException, AttributeNotFoundException, InstanceNotFoundException, ReflectionException {
         Path path = Paths.get(logPath);
         FileStore store = Files.getFileStore(path);
 
