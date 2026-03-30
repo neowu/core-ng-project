@@ -6,7 +6,7 @@ plugins {
 
 subprojects {
     group = "core.framework"
-    version = "9.5.0"
+    version = "9.5.0-b0"
     repositories {
         maven {
             url = uri("https://neowu.github.io/maven-repo/")
@@ -118,7 +118,7 @@ project("core-ng-search-test") {
     }
 }
 
-val mavenURL = project.properties["mavenURL"] as String?    // usage: "gradlew -PmavenURL=/path clean publish"
+val mavenURL = project.properties["mavenURL"]    // usage: "gradlew -PmavenURL=/path clean publish"
 
 subprojects {
     if (mavenURL != null && project.name.startsWith("core-ng")) {

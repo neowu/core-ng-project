@@ -405,8 +405,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     }
 
     @Nullable
-    private Refresh refreshValue(Boolean value) {
+    private Refresh refreshValue(@Nullable Boolean value) {
         if (value == null) return null;
-        return Boolean.TRUE.equals(value) ? Refresh.True : Refresh.False;
+        return value ? Refresh.True : Refresh.False;
     }
 }

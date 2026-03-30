@@ -6,6 +6,7 @@ import co.elastic.clients.transport.http.TransportHttpClient;
 import co.elastic.clients.transport.instrumentation.Instrumentation;
 import co.elastic.clients.util.BinaryData;
 import core.framework.internal.http.HTTPRequestHelper;
+import core.framework.internal.log.filter.FieldMapLogParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +42,7 @@ public final class LogInstrumentation implements Instrumentation {
         @Override
         public void beforeSendingHttpRequest(TransportHttpClient.Request request, TransportOptions options) {
             LOGGER.debug("[request] method={}, uri={}", request.method(), uri(request.path(), request.queryParams()));
+            LOGGER.debug("[request] headers={}", new FieldMapLogParam(request.headers()));
             Iterable<ByteBuffer> body = request.body();
             if (body != null) {
                 for (ByteBuffer buffer : body) {
@@ -52,6 +54,14 @@ public final class LogInstrumentation implements Instrumentation {
         @Override
         public void afterReceivingHttpResponse(TransportHttpClient.Response response) {
             LOGGER.debug("[response] status={}", response.statusCode());
+            // currently response headers don't include useful info,
+            // e.g. [response] headers={content-length=456, content-type=application/vnd.elasticsearch+json;compatible-with=9, X-elastic-product=Elasticsearch, content-encoding=gzip}
+            // co.elastic.clients.transport.rest5_client.low_level.Response original = (co.elastic.clients.transport.rest5_client.low_level.Response) response.originalResponse();
+            // Map<String, String> headers = Maps.newHashMapWithExpectedSize(4);
+            // for (Header header : original.getHeaders()) {
+            //     headers.put(header.getName(), header.getValue());
+            // }
+            // LOGGER.debug("[response] headers={}", new FieldMapLogParam(headers));
             try {
                 BinaryData body = response.body();
                 if (body != null) {
