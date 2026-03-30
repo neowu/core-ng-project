@@ -78,4 +78,9 @@ class KafkaMonitorJobTest {
                                                      && "ERROR".equals(message.result)
                                                      && "FAILED_TO_COLLECT".equals(message.errorCode)));
     }
+
+    @Test
+    void highDiskUsageErrorMessage() {
+        assertThat(job.highDiskUsageErrorMessage(67_123_456_789L)).contains("usage=67.12GB");
+    }
 }

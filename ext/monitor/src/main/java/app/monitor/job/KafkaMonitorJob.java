@@ -18,6 +18,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeData;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Set;
 
 import static app.monitor.job.JMXClient.objectName;
@@ -95,10 +96,17 @@ public class KafkaMonitorJob implements Job {
             diskUsed += size;
         }
         stats.put("kafka_disk_used", diskUsed);
-        boolean highUsage = stats.checkHighUsage((double) diskUsed / highDiskSizeThreshold, 1.0, "disk");
-        if (highUsage) {
+
+        if (diskUsed >= highDiskSizeThreshold) {
             stats.severity = Severity.ERROR;
+            stats.errorCode = "HIGH_DISK_USAGE";
+            stats.errorMessage = highDiskUsageErrorMessage(diskUsed);
         }
+    }
+
+    String highDiskUsageErrorMessage(long diskUsed) {
+        var format = new DecimalFormat("#,##0.00GB");
+        return "kafka disk usage is too high, usage=" + format.format((double) diskUsed / 1_000_000_000L);
     }
 
     private void collectGCStats(Stats stats, MBeanServerConnection connection, GCStat gcStats, ObjectName gcBean) throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException, IOException {
