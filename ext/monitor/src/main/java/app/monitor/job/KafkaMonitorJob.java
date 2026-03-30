@@ -34,6 +34,7 @@ public class KafkaMonitorJob implements Job {
     static final ObjectName OLD_GC_BEAN = objectName("java.lang:name=G1 Old Generation,type=GarbageCollector");
     static final ObjectName BYTES_IN_RATE_BEAN = objectName("kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec");
     static final ObjectName BYTES_OUT_RATE_BEAN = objectName("kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec");
+    static final ObjectName LOG_SIZE_BEAN = objectName("kafka.log:type=Log,name=Size,topic=*,partition=*");
 
     private final Logger logger = LoggerFactory.getLogger(KafkaMonitorJob.class);
     private final JMXClient jmxClient;
