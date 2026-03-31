@@ -63,10 +63,8 @@ public class ElasticSearchImpl implements ElasticSearch {
             builder.setConnectionConfigCallback(config -> config.setConnectTimeout(Timeout.ofSeconds(5)));    // 5s, usually es is within same network, use shorter timeout to fail fast
             builder.setRequestConfigCallback(config -> config.setConnectionRequestTimeout(Timeout.ofSeconds(5))    // timeout of requesting connection from connection pool
                 .setResponseTimeout(Timeout.of(timeout)));
-            builder.setConnectionManagerCallback(config -> config.setMaxConnPerRoute(100)
-                .setMaxConnTotal(100));
             builder.setHttpClientConfigCallback(config -> config
-                .setKeepAliveStrategy((response, context) -> TimeValue.ofSeconds(30)));
+                .setKeepAliveStrategy((_, _) -> TimeValue.ofSeconds(30)));
             restClient = builder.build();
             mapper = new Jackson3JsonpMapper(JSONMapper.builder()
                 // only include not null fields for partial update

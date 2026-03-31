@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.5.0 (2/25/26 - )
+### 9.5.0 (2/25/26 - 3/31/26)
 
 * kafka: update to 4.2.0
 * redis: support HMGET

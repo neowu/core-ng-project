@@ -46,7 +46,7 @@ public final class LogInstrumentation implements Instrumentation {
             Iterable<ByteBuffer> body = request.body();
             if (body != null) {
                 for (ByteBuffer buffer : body) {
-                    LOGGER.debug("[request] body={}", new ByteBufferParam(buffer));
+                    LOGGER.debug("[request] body={}", new ByteBufferParam(buffer.duplicate()));
                 }
             }
         }
