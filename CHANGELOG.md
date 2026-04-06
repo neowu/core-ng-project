@@ -1,5 +1,10 @@
 ## Change log
 
+### 9.5.1 (4/5/26 - )
+
+* json: tweak json deserialize error message
+  > JSON/Bean will not output source json info, detailed error will be in cause JacksonException
+
 ### 9.5.0 (2/25/26 - 3/31/26)
 
 * kafka: update to 4.2.0

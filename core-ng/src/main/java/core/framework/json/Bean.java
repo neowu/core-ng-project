@@ -5,6 +5,7 @@ import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
+import tools.jackson.core.JacksonException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,10 +25,16 @@ public final class Bean {
     }
 
     public static <T> T fromJSON(Class<T> beanClass, String json) {
-        Context<T> context = context(beanClass);
-        T instance = context.reader.fromJSON(json);
-        context.validator.validate(instance, false);
-        return instance;
+        try {
+            Context<T> context = context(beanClass);
+            T instance = context.reader.fromJSON(json);
+            context.validator.validate(instance, false);
+            return instance;
+        } catch (JacksonException e) {
+            // jackson exception contains source info, refer to StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
+            // not leak internal info to external, root cause can be viewed in trace
+            throw new JSONException("failed to deserialize json, class=" + beanClass.getCanonicalName(), e);
+        }
     }
 
     public static <T> String toJSON(T bean) {

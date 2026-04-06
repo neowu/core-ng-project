@@ -1,5 +1,6 @@
 package core.framework.internal.json;
 
+import tools.jackson.core.StreamReadFeature;
 import tools.jackson.core.StreamWriteFeature;
 import tools.jackson.core.Version;
 import tools.jackson.core.json.JsonFactory;
@@ -73,11 +74,12 @@ public class JSONMapper {
             // only detect public fields, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
             .changeDefaultVisibility(_ -> new VisibilityChecker(PUBLIC_ONLY, NONE, NONE, NONE, NONE, NONE))
             .enable(StreamWriteFeature.USE_FAST_DOUBLE_WRITER)
+            .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
             .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
-            .enable(EnumFeature.FAIL_ON_NUMBERS_FOR_ENUMS)
-            .disable(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
             // e.g. disable convert empty string to Integer null
             .disable(MapperFeature.ALLOW_COERCION_OF_SCALARS)
+            .enable(EnumFeature.FAIL_ON_NUMBERS_FOR_ENUMS)
+            .disable(EnumFeature.WRITE_ENUMS_USING_TO_STRING)
             .annotationIntrospector(new JSONAnnotationIntrospector())
             .deactivateDefaultTyping();
     }

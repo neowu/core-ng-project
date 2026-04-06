@@ -1,5 +1,6 @@
 package core.framework.json;
 
+import core.framework.internal.reflect.GenericTypes;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JavaType;
 
@@ -18,7 +19,9 @@ public final class JSON {
             if (result == null) throw new Error("invalid json value, value=" + json);   // not allow passing "null" as json value
             return result;
         } catch (JacksonException e) {
-            throw new JSONException(e);
+            // jackson exception contains source info, refer to StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
+            // not leak internal info to external, root cause can be viewed in trace
+            throw new JSONException("failed to deserialize json, class=" + GenericTypes.rawClass(instanceType).getCanonicalName(), e);
         }
     }
 
@@ -28,7 +31,9 @@ public final class JSON {
             if (result == null) throw new Error("invalid json value, value=" + json);   // not allow passing "null" as json value
             return result;
         } catch (JacksonException e) {
-            throw new JSONException(e);
+            // jackson exception contains source info, refer to StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
+            // not leak internal info to external, root cause can be viewed in trace
+            throw new JSONException("failed to deserialize json, class=" + instanceClass.getCanonicalName(), e);
         }
     }
 
