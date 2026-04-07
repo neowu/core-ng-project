@@ -84,7 +84,7 @@ public class JSONMapper {
             .deactivateDefaultTyping();
     }
 
-    private static JacksonModule timeModule() {
+    public static JacksonModule timeModule() {
         return new TimeModule();
     }
 

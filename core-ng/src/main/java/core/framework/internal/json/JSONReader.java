@@ -18,17 +18,15 @@ public final class JSONReader<T> {
         this.reader = JSONMapper.OBJECT_MAPPER.readerFor(instanceClass);
     }
 
+    // according to benchmark, pass byte[] to reader is fastest, second is to convert string to byte[] then pass to reader
     @Nullable
     public T fromJSON(byte[] json) {
         try {
             return reader.readValue(json);
         } catch (JacksonException e) {
-            throw new JSONException(e);
+            // jackson exception contains source info, refer to StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
+            // not leak internal info to external, root cause can be viewed in trace
+            throw new JSONException("failed to deserialize json, class=" + reader.getValueType().getRawClass().getCanonicalName(), e);
         }
-    }
-
-    @Nullable
-    public T fromJSON(String json) {
-        return reader.readValue(json);
     }
 }

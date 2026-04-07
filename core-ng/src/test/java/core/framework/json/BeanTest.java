@@ -168,4 +168,11 @@ class BeanTest {
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("validation failed");
     }
+
+    @Test
+    void invalidJSON() {
+        assertThatThrownBy(() -> Bean.fromJSON(TestBean.class, "{"))
+            .isInstanceOf(JSONException.class)
+            .hasMessageContaining("failed to deserialize json, class=core.framework.json.TestBean");
+    }
 }

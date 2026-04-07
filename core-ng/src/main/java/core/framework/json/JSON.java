@@ -46,7 +46,9 @@ public final class JSON {
         try {
             return OBJECT_MAPPER.convertValue(jsonValue, valueClass);
         } catch (JacksonException e) {
-            throw new JSONException(e);
+            // jackson exception contains source info, refer to StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION
+            // not leak internal info to external, root cause can be viewed in trace
+            throw new JSONException("failed to deserialize enum, enum=" + valueClass.getCanonicalName(), e);
         }
     }
 

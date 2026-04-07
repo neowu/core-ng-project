@@ -186,7 +186,8 @@ class JSONTest {
 
         // ordinal should be treated as invalid value
         assertThatThrownBy(() -> JSON.fromEnumValue(TestBean.TestEnum.class, "0"))
-            .isInstanceOf(JSONException.class);
+            .isInstanceOf(JSONException.class)
+            .hasMessageContaining("failed to deserialize enum, enum=core.framework.json.TestBean.TestEnum");
     }
 
     @Test
