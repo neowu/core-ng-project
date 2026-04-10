@@ -11,7 +11,7 @@ import java.util.Map;
  * @author neo
  */
 public class Stats {
-    public final Map<String, Double> stats = new HashMap<>(); // no need to keep insertion order, kibana will sort all keys on display
+    public final Map<String, Double> stats = new HashMap<>(); // no need to keep insertion order, kibana sorts all keys on display
     public Severity severity;
     public String errorCode;
     public String errorMessage;

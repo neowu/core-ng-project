@@ -17,6 +17,7 @@ public class TestModule extends AbstractTestModule {
         SearchConfig search = config(SearchConfig.class);
         search.host("localhost");
         search.timeout(Duration.ofSeconds(5));
+        search.maxConnections(100);
         search.maxResultWindow(1000);
         search.type(TestDocument.class);
         search.type(TestAggregationDocument.class);

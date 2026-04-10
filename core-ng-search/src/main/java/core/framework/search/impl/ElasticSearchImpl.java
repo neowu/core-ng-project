@@ -20,11 +20,13 @@ import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.SearchException;
 import core.framework.util.StopWatch;
+import org.apache.hc.client5.http.HttpRoute;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.pool.ConnPoolStats;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.jspecify.annotations.Nullable;
@@ -44,8 +46,12 @@ public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
 
     public Duration timeout = Duration.ofSeconds(15);
+    public int maxConnections = 200;
     public HttpHost[] hosts;
     public int maxResultWindow = 10000;
+    @Nullable
+    public ElasticSearchConnectionPoolMetrics metrics;
+
     ElasticsearchClient client;
     @Nullable
     Header authHeader;
@@ -55,18 +61,27 @@ public class ElasticSearchImpl implements ElasticSearch {
     // initialize will be called in startup hook, no need to synchronize
     public void initialize() {
         if (client == null) {   // initialize can be called by initSearch explicitly during test,
-            Rest5ClientBuilder builder = Rest5Client.builder(hosts)
-                .setCompressionEnabled(true);
+            Rest5ClientBuilder builder = Rest5Client.builder(hosts);    // setCompressionEnabled(true) slowed down performance significantly
             if (authHeader != null) {
                 builder.setDefaultHeaders(new Header[]{authHeader});
             }
             builder.setConnectionConfigCallback(config -> config.setConnectTimeout(Timeout.ofSeconds(5)));    // 5s, usually es is within same network, use shorter timeout to fail fast
             builder.setRequestConfigCallback(config -> config.setConnectionRequestTimeout(Timeout.ofSeconds(timeout.toSeconds()))    // timeout of requesting connection from connection pool
                 .setResponseTimeout(Timeout.of(timeout)));
-            builder.setConnectionManagerCallback(config -> config.setMaxConnPerRoute(100)   // default is too low, generally all requests are sent to same es route
-                .setMaxConnTotal(100));
-            builder.setHttpClientConfigCallback(config -> config
-                .setKeepAliveStrategy((_, _) -> TimeValue.ofSeconds(30)));
+            // default is too low, generally all requests are sent to same es route
+            // es operations usually happen in virtual threads, set max connection according to desired concurrency
+            builder.setConnectionManagerCallback(config -> config.setMaxConnPerRoute(maxConnections)
+                .setMaxConnTotal(maxConnections));
+            builder.setHttpClientConfigCallback(config -> {
+                    config.setKeepAliveStrategy((_, _) -> TimeValue.ofSeconds(30));
+
+                    if (metrics != null) {
+                        @SuppressWarnings("unchecked")
+                        ConnPoolStats<HttpRoute> stats = (ConnPoolStats<HttpRoute>) config.getConnManager();
+                        metrics.poolStats = stats;
+                    }
+                }
+            );
             restClient = builder.build();
             mapper = new Jackson3JsonpMapper(JSONMapper.builder()
                 // only include not null fields for partial update

@@ -1,13 +1,6 @@
 ## Change log
 
-### 9.5.1 (4/5/26 - )
-
-* json: tweak json deserialize error message
-  > JSON/Bean will not output source json info, detailed error will be in cause JacksonException
-* es: tweak client max connections
-  > default settings are too low for high concurrency
-
-### 9.5.0 (2/25/26 - 3/31/26)
+### 9.5.1-b3 (2/25/26 - )
 
 * kafka: update to 4.2.0
 * redis: support HMGET
@@ -16,8 +9,11 @@
 * db: tweak postgres query analyzer rules
 * es: updated to 9.3.2
   > underlying rest5client is using apache http async client + jackson 3.0
+* es: added config to set max connections, default to 200
+* es: added pool_es_count stats to monitor es connection pool usage
 * json: updated jackson api to 3.1.0
   > major jackson api update, now deserialization throws JSONException if json is invalid, instead of UncheckedIOException
+  > JSON/Bean will not output source json info, detailed error will be in cause JacksonException
 * monitor: improve kafka disk monitor error message
 
 ### 9.4.2 (1/26/26 - 2/15/26)

@@ -5,6 +5,7 @@ import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
+import core.framework.search.impl.ElasticSearchConnectionPoolMetrics;
 import core.framework.search.impl.ElasticSearchHost;
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.util.Types;
@@ -29,8 +30,10 @@ public class SearchConfig extends Config {
         this.name = name;
 
         var search = new ElasticSearchImpl();
+        search.metrics = new ElasticSearchConnectionPoolMetrics(name);
         context.startupHook.initialize.add(search::initialize);
         context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> search.close());
+        context.collector.metrics.add(search.metrics);
         context.beanFactory.bind(ElasticSearch.class, name, search);
         this.search = search;
     }
@@ -63,6 +66,10 @@ public class SearchConfig extends Config {
 
     public void timeout(Duration timeout) {
         search.timeout = timeout;
+    }
+
+    public void maxConnections(int maxConnections) {
+        search.maxConnections = maxConnections;
     }
 
     public <T> ElasticSearchType<T> type(Class<T> documentClass) {
