@@ -6,7 +6,7 @@ plugins {
 
 subprojects {
     group = "core.framework"
-    version = "9.5.1"
+    version = "9.5.1-b0"
     repositories {
         maven {
             url = uri("https://neowu.github.io/maven-repo/")
@@ -19,9 +19,9 @@ subprojects {
 
 val elasticVersion = "9.3.2"
 val jacksonVersion = "3.1.0"
-val junitVersion = "6.0.0"
-val mockitoVersion = "5.20.0"
-val assertjVersion = "3.27.6"
+val junitVersion = "6.0.3"
+val mockitoVersion = "5.23.0"
+val assertjVersion = "3.27.7"
 
 project("core-ng-api") {
     apply(plugin = "lib")
@@ -39,7 +39,7 @@ project("core-ng") {
         implementation("tools.jackson.module:jackson-module-afterburner:${jacksonVersion}")
         implementation("tools.jackson.core:jackson-databind:${jacksonVersion}")
         implementation("com.squareup.okhttp3:okhttp:5.3.2")
-        implementation("io.undertow:undertow-core:2.3.23.Final")
+        implementation("io.undertow:undertow-core:2.3.24.Final")
         implementation("org.apache.kafka:kafka-clients:4.2.0") {
             exclude("org.xerial.snappy")
             exclude("at.yawk.lz4")

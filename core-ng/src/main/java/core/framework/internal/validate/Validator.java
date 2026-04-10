@@ -35,7 +35,7 @@ public final class Validator<T> {
         this.validator = builder.build();
     }
 
-    public void validate(@Nullable T bean, boolean partial) {
+    public void validate(T bean, boolean partial) {
         Map<String, String> errors = errors(bean, partial);
         if (errors != null) throw new ValidationException(errors);
     }
