@@ -4,6 +4,8 @@
 
 * json: tweak json deserialize error message
   > JSON/Bean will not output source json info, detailed error will be in cause JacksonException
+* es: tweak client max connections
+  > default settings are too low for high concurrency
 
 ### 9.5.0 (2/25/26 - 3/31/26)
 
