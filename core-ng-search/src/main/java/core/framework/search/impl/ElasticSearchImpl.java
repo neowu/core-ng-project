@@ -20,14 +20,12 @@ import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.SearchException;
 import core.framework.util.StopWatch;
-import org.apache.hc.client5.http.HttpRoute;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicHeader;
-import org.apache.hc.core5.pool.ConnPoolStats;
-import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.util.Timeout;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -43,14 +41,13 @@ import java.util.Map;
  * @author neo
  */
 public class ElasticSearchImpl implements ElasticSearch {
+    public final LogInstrumentation instrumentation = new LogInstrumentation();
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
 
     public Duration timeout = Duration.ofSeconds(15);
     public int maxConnections = 200;
     public HttpHost[] hosts;
     public int maxResultWindow = 10000;
-    @Nullable
-    public ElasticSearchConnectionPoolMetrics metrics;
 
     ElasticsearchClient client;
     @Nullable
@@ -71,23 +68,14 @@ public class ElasticSearchImpl implements ElasticSearch {
             // default is too low, generally all requests are sent to same es route
             // es operations usually happen in virtual threads, set max connection according to desired concurrency
             builder.setConnectionManagerCallback(config -> config.setMaxConnPerRoute(maxConnections)
-                .setMaxConnTotal(maxConnections));
-            builder.setHttpClientConfigCallback(config -> {
-                    config.setKeepAliveStrategy((_, _) -> TimeValue.ofSeconds(30));
-
-                    if (metrics != null) {
-                        @SuppressWarnings("unchecked")
-                        ConnPoolStats<HttpRoute> stats = (ConnPoolStats<HttpRoute>) config.getConnManager();
-                        metrics.poolStats = stats;
-                    }
-                }
-            );
+                .setMaxConnTotal(maxConnections)
+                .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.LAX));
             restClient = builder.build();
             mapper = new Jackson3JsonpMapper(JSONMapper.builder()
                 // only include not null fields for partial update
                 .changeDefaultPropertyInclusion(_ -> JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL))
                 .build());
-            client = new ElasticsearchClient(new Rest5ClientTransport(restClient, mapper, null, new LogInstrumentation()));
+            client = new ElasticsearchClient(new Rest5ClientTransport(restClient, mapper, null, instrumentation));
         }
     }
 

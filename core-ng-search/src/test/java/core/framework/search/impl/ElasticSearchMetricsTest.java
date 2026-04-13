@@ -14,14 +14,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ElasticSearchConnectionPoolMetricsTest {
+class ElasticSearchMetricsTest {
     @Mock
     ConnPoolStats<HttpRoute> poolStats;
-    private ElasticSearchConnectionPoolMetrics metrics;
+    private ElasticSearchMetrics metrics;
 
     @BeforeEach
     void createElasticSearchConnectionPoolMetrics() {
-        metrics = new ElasticSearchConnectionPoolMetrics(null);
+        metrics = new ElasticSearchMetrics(null);
         metrics.poolStats = poolStats;
     }
 

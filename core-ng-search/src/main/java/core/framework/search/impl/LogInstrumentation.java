@@ -7,6 +7,7 @@ import co.elastic.clients.transport.instrumentation.Instrumentation;
 import co.elastic.clients.util.BinaryData;
 import core.framework.internal.http.HTTPRequestHelper;
 import core.framework.internal.log.filter.FieldMapLogParam;
+import core.framework.internal.stat.Counter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +18,6 @@ import java.util.Map;
 
 public final class LogInstrumentation implements Instrumentation {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogInstrumentation.class);
-    private static final Context CONTEXT = new Context();
-    private static final Scope SCOPE = new Scope();
 
     static String uri(String path, Map<String, String> params) {
         if (params.isEmpty()) return path;  // most of cases
@@ -28,15 +27,20 @@ public final class LogInstrumentation implements Instrumentation {
         return builder.toString();
     }
 
+    public final Counter activeRequests = new Counter();
+    private final Context context = new Context();
+
     @Override
     public <T> Instrumentation.Context newContext(T request, Endpoint<T, ?, ?> endpoint) {
-        return CONTEXT;
+        return context;
     }
 
-    private static final class Context implements Instrumentation.Context {
+    private final class Context implements Instrumentation.Context {
+        private final Scope scope = new Scope();
+
         @Override
         public ThreadScope makeCurrent() {
-            return SCOPE;
+            return scope;
         }
 
         @Override
@@ -49,6 +53,7 @@ public final class LogInstrumentation implements Instrumentation {
                     LOGGER.debug("[request] body={}", new ByteBufferParam(buffer.duplicate()));
                 }
             }
+            activeRequests.increase();
         }
 
         @Override
@@ -82,6 +87,7 @@ public final class LogInstrumentation implements Instrumentation {
 
         @Override
         public void close() {
+            activeRequests.decrease();
         }
 
     }

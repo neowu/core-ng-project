@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.5.1-b3 (2/25/26 - )
+### 9.5.1-b4 (2/25/26 - )
 
 * kafka: update to 4.2.0
 * redis: support HMGET
@@ -10,7 +10,8 @@
 * es: updated to 9.3.2
   > underlying rest5client is using apache http async client + jackson 3.0
 * es: added config to set max connections, default to 200
-* es: added pool_es_count stats to monitor es connection pool usage
+* es: added es_active_requests stats to monitor es concurrency
+  > search.maxConnections limits the number of requests processed at same time
 * json: updated jackson api to 3.1.0
   > major jackson api update, now deserialization throws JSONException if json is invalid, instead of UncheckedIOException
   > JSON/Bean will not output source json info, detailed error will be in cause JacksonException

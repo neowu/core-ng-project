@@ -5,9 +5,9 @@ import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
-import core.framework.search.impl.ElasticSearchConnectionPoolMetrics;
 import core.framework.search.impl.ElasticSearchHost;
 import core.framework.search.impl.ElasticSearchImpl;
+import core.framework.search.impl.ElasticSearchMetrics;
 import core.framework.util.Types;
 import org.jspecify.annotations.Nullable;
 
@@ -30,10 +30,9 @@ public class SearchConfig extends Config {
         this.name = name;
 
         var search = new ElasticSearchImpl();
-        search.metrics = new ElasticSearchConnectionPoolMetrics(name);
         context.startupHook.initialize.add(search::initialize);
         context.shutdownHook.add(ShutdownHook.STAGE_6, timeout -> search.close());
-        context.collector.metrics.add(search.metrics);
+        context.collector.metrics.add(new ElasticSearchMetrics(name, search.instrumentation));
         context.beanFactory.bind(ElasticSearch.class, name, search);
         this.search = search;
     }
