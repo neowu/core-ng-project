@@ -26,6 +26,7 @@ import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicHeader;
 import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
+import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -70,6 +71,7 @@ public class ElasticSearchImpl implements ElasticSearch {
             builder.setConnectionManagerCallback(config -> config.setMaxConnPerRoute(maxConnections)
                 .setMaxConnTotal(maxConnections)
                 .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.LAX));
+            builder.setHttpClientConfigCallback(config -> config.setKeepAliveStrategy((_, _) -> TimeValue.ofSeconds(30)));
             restClient = builder.build();
             mapper = new Jackson3JsonpMapper(JSONMapper.builder()
                 // only include not null fields for partial update
