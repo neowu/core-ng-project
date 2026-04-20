@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.5.1-b4 (2/25/26 - )
+### 9.5.1 (2/25/26 - )
 
 * kafka: update to 4.2.0
 * redis: support HMGET
@@ -16,6 +16,7 @@
   > major jackson api update, now deserialization throws JSONException if json is invalid, instead of UncheckedIOException
   > JSON/Bean will not output source json info, detailed error will be in cause JacksonException
 * monitor: improve kafka disk monitor error message
+* db: PostgreSQL upsert return true if inserted
 
 ### 9.4.2 (1/26/26 - 2/15/26)
 

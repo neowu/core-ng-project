@@ -104,23 +104,29 @@ public final class RepositoryImpl<T> implements Repository<T> {
         var watch = new StopWatch();
         if (insertQuery.generatedColumn != null) throw new Error("entity must not have auto increment primary key, entityClass=" + entityClass.getCanonicalName());
         validator.validate(entity, false);
-        int affectedRows = 0;
-        String sql = insertQuery.upsertSQL;
+
+        boolean inserted = false;
+        int writeRows = 0;
+        String sql = null;
         Object[] params = insertQuery.params(entity);
         try {
-            affectedRows = database.operation.update(sql, params);
-            // refer to https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html
-            // With ON DUPLICATE KEY UPDATE, the affected-rows value per row is 1 if the row is inserted as a new row, 2 if an existing row is updated, and 0 if an existing row is set to its current values.
-            return affectedRows == 1;
+            if (database.operation.dialect == Dialect.POSTGRESQL) {
+                sql = insertQuery.upsertSQL + " RETURNING (xmax = 0) AS inserted";  // construct returning sql only for single upsert, batchUpsert still need to use execute() for correct updatedRows
+                inserted = database.operation.selectOne(sql, new RowMapper.BooleanRowMapper(), params).orElse(Boolean.FALSE);
+                writeRows = 1;  // for postgres upsert always write to db
+            } else {
+                sql = insertQuery.upsertSQL;
+                int affectedRows = database.operation.update(sql, params);
+                // refer to https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html
+                // With ON DUPLICATE KEY UPDATE, the affected-rows value per row is 1 if the row is inserted as a new row, 2 if an existing row is updated, and 0 if an existing row is set to its current values.
+                inserted = affectedRows == 1;
+                if (affectedRows != 0) writeRows = 1;
+            }
+            return inserted;
         } finally {
             long elapsed = watch.elapsed();
-            if (database.operation.dialect == Dialect.POSTGRESQL) {
-                // postgres doesn't support affected rows, not log inserted to reduce confusion
-                logger.debug("upsert, sql={}, params={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), elapsed);
-            } else {
-                logger.debug("upsert, sql={}, params={}, inserted={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), affectedRows == 1, elapsed);
-            }
-            database.track(elapsed, 0, affectedRows == 0 ? 0 : 1, 1);
+            logger.debug("upsert, sql={}, params={}, inserted={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), inserted, elapsed);
+            database.track(elapsed, 0, writeRows, 1);
         }
     }
 
@@ -244,8 +250,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     private boolean batchUpdated(int[] affectedRows) {
-        // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchWithMultiValuesClause Line 612
-        // only need to check first value
+        // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchWithMultiValuesClause Line 746, only need to check first value
         // HSQL actually returns accurate affected rows for batch, so also check if > 0 to make unit test correct
         for (int affectedRow : affectedRows) {
             if (affectedRow == Statement.SUCCESS_NO_INFO) return true;

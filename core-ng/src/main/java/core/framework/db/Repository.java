@@ -45,7 +45,6 @@ public interface Repository<T> {
     // use insert on duplicate key sql, generally used by data sync
     // BE CAUTION, it uses PK or unique index to determine duplication !!! read mysql doc carefully to avoid unexpected side effect
     // return true if the new row inserted
-    // for postgres, always return true
     boolean upsert(T entity);
 
     // use update carefully, it will update all the columns according to the entity fields, includes null fields
@@ -71,7 +70,8 @@ public interface Repository<T> {
     // refer to com.mysql.cj.jdbc.ClientPreparedStatement.executeBatchWithMultiValuesClause Line 612
     boolean batchInsertIgnore(List<T> entities);
 
-    // return true if any row changed (inserted or updated)
+    // MySQL: return true if any row changed (inserted or updated)
+    // PostgreSQL: always return true
     // with batch, mysql treats both 1 (inserted) or 2 (updated) as java.sql.Statement.SUCCESS_NO_INFO
     // batch performance is significantly better than single call, try to do batch if possible on data sync
     boolean batchUpsert(List<T> entities);
