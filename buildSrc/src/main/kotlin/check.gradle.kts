@@ -10,7 +10,7 @@ plugins {
 
 checkstyle {
     dependencies {
-        checkstyle("com.puppycrawl.tools:checkstyle:13.3.0")
+        checkstyle("com.puppycrawl.tools:checkstyle:13.4.0")
         checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
     }
 
@@ -38,7 +38,7 @@ checkstyle {
 pmd {
     ruleSets = listOf()
     ruleSetFiles = rootProject.files("buildSrc/src/main/check/pmd.xml")
-    toolVersion = "7.22.0"
+    toolVersion = "7.23.0"
     isConsoleOutput = true
 
     tasks.withType<Pmd> {
