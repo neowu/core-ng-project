@@ -4,6 +4,7 @@ core-ng is a webapp framework, it's designed to support our own projects.
 [![Build](https://github.com/neowu/core-ng-project/actions/workflows/build.yml/badge.svg)](https://github.com/neowu/core-ng-project/actions/workflows/build.yml)
 [![CodeQL](https://github.com/neowu/core-ng-project/actions/workflows/codeql.yml/badge.svg)](https://github.com/neowu/core-ng-project/actions/workflows/codeql.yml)
 [![Code Coverage](https://codecov.io/gh/neowu/core-ng-project/branch/master/graph/badge.svg)](https://codecov.io/gh/neowu/core-ng-project)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/neowu/core-ng-project)
 
 ## Maven repo
 ```
@@ -19,7 +20,10 @@ core-ng is a webapp framework, it's designed to support our own projects.
 ```
 
 ## Wiki
-[https://github.com/neowu/core-ng-project/wiki](https://github.com/neowu/core-ng-project/wiki)
+
+* [https://github.com/neowu/core-ng-project/wiki](https://github.com/neowu/core-ng-project/wiki)
+* https://codewiki.google/github.com/neowu/core-ng-project
+* https://deepwiki.com/neowu/core-ng-project
 
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)
