@@ -1,5 +1,9 @@
 ## Change log
 
+### 9.5.3 (5/19/26 - )
+
+* jre: published neowu/jre:26.0.1
+
 ### 9.5.2 (4/29/26 - 5/4/26)
 
 * json: updated jackson to 3.1.3
