@@ -39,14 +39,14 @@ tasks.named<Test>("test") {
 tasks.register("mkdir") {
     group = "build setup"
     description = "Create project directories."
+
+    val sourceDirs = project.the<SourceSetContainer>().flatMap { sourceSet ->
+        sourceSet.java.srcDirs + sourceSet.resources.srcDirs
+    }
+
     doLast {
-        for ((_, sourceSet) in project.the<SourceSetContainer>().asMap) {
-            for (dir in sourceSet.java.srcDirs) {
-                dir.mkdirs()
-            }
-            for (dir in sourceSet.resources.srcDirs) {
-                dir.mkdirs()
-            }
+        for (dir in sourceDirs) {
+            dir.mkdirs()
         }
     }
 }

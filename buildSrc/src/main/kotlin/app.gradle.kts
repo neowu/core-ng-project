@@ -48,8 +48,9 @@ tasks.named<JavaExec>("run") {
 }
 
 tasks.named("mkdir") {
+    val envDir = file("${projectDir}/conf/dev/resources")
     doLast {
-        mkdir("${projectDir}/conf/dev/resources")
+        envDir.mkdirs()
     }
 }
 

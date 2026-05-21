@@ -1,6 +1,7 @@
 tasks.named("mkdir") {
+    val webDir = file("${projectDir}/src/main/dist/web")
     doLast {
-        mkdir("${projectDir}/src/main/dist/web")
+        webDir.mkdirs()
     }
 }
 
