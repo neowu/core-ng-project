@@ -1,5 +1,6 @@
 package core.framework.internal.stat;
 
+import core.framework.log.Severity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -45,5 +46,27 @@ class StatCollectorTest {
         doThrow(new Error("test")).when(metrics).collect(stats);
 
         collector.collectMetrics(stats);
+    }
+
+    @Test
+    void escalateHighMemoryUsage() {
+        collector.highMemoryUsageCounts = 6;
+
+        var stats = new Stats();
+        collector.escalateHighMemoryUsage(stats);
+
+        assertThat(stats.severity).isEqualTo(Severity.ERROR);
+        assertThat(stats.info).containsKeys("vm", "heap");
+    }
+
+    @Test
+    void escalateHighMemoryUsageWithoutDiagnostic() {
+        collector.highMemoryUsageCounts = 7;
+
+        var stats = new Stats();
+        collector.escalateHighMemoryUsage(stats);
+
+        assertThat(stats.severity).isEqualTo(Severity.ERROR);
+        assertThat(stats.info).isNull();
     }
 }

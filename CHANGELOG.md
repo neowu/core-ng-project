@@ -3,6 +3,8 @@
 ### 9.5.3 (5/19/26 - )
 
 * jre: published neowu/jre:26.0.1
+* stats: escalate to ERROR is cpu or memory high usage last more than 1 mins
+  > call vm() and heap() every 1 min if memory usage is high, make it easier for AI troubleshoot
 
 ### 9.5.2 (4/29/26 - 5/4/26)
 
