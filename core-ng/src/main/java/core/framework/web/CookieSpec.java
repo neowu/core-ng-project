@@ -31,12 +31,12 @@ public final class CookieSpec {
         return this;
     }
 
-    public CookieSpec domain(String domain) {
+    public CookieSpec domain(@Nullable String domain) {
         this.domain = domain;
         return this;
     }
 
-    public CookieSpec path(String path) {
+    public CookieSpec path(@Nullable String path) {
         this.path = path;
         return this;
     }
@@ -46,7 +46,7 @@ public final class CookieSpec {
         return this;
     }
 
-    public CookieSpec maxAge(Duration maxAge) {
+    public CookieSpec maxAge(@Nullable Duration maxAge) {
         this.maxAge = maxAge;
         return this;
     }
@@ -62,7 +62,7 @@ public final class CookieSpec {
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
         if (this == other) return true;
         if (other == null || getClass() != other.getClass()) return false;
         CookieSpec spec = (CookieSpec) other;

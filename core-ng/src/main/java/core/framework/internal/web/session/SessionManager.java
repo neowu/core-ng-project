@@ -23,6 +23,7 @@ import java.util.UUID;
 public class SessionManager implements SessionContext {
     private final Logger logger = LoggerFactory.getLogger(SessionManager.class);
     private CookieSpec cookieSpec;
+    @Nullable
     private String header;
     private Duration timeout = Duration.ofMinutes(20);
     private SessionStore store;
@@ -86,7 +87,7 @@ public class SessionManager implements SessionContext {
         return request.hostname();
     }
 
-    void putSessionId(Response response, String sessionId) {
+    void putSessionId(Response response, @Nullable String sessionId) {
         if (header != null) {
             response.header(header, sessionId == null ? "" : sessionId);
         } else {

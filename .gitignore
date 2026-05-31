@@ -10,3 +10,4 @@ buildSrc/build/
 node_modules/
 wiki/
 out/
+/.claude/
