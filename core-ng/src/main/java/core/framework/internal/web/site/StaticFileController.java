@@ -4,6 +4,7 @@ import core.framework.http.ContentType;
 import core.framework.http.HTTPHeaders;
 import core.framework.web.Request;
 import core.framework.web.Response;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,9 @@ import java.time.Duration;
 public final class StaticFileController implements StaticContentController {
     private final Logger logger = LoggerFactory.getLogger(StaticFileController.class);
     private final Path contentFile;
+    @Nullable
     private final ContentType contentType;
+    @Nullable
     private String cacheHeader;
 
     public StaticFileController(Path contentFile) {

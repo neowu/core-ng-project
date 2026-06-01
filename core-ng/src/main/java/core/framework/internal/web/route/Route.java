@@ -5,7 +5,7 @@ import core.framework.internal.log.ActionLog;
 import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.internal.web.request.PathParams;
 import core.framework.util.Maps;
-import core.framework.web.exception.NotFoundException;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +33,13 @@ public final class Route {
         handler.put(method, controller);
     }
 
+    // return null if handler not found / 404
+    @Nullable
     public ControllerHolder get(String path, HTTPMethod method, PathParams pathParams, ActionLog actionLog) {
         URLHandler handler = staticHandlers.get(path);
         if (handler == null) handler = dynamicRoot.find(path, pathParams);
         if (handler == null) {
-            throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
+            return null;
         }
         actionLog.context.put("path_pattern", List.of(handler.pathPattern));
         logger.debug("pathPattern={}", handler.pathPattern);

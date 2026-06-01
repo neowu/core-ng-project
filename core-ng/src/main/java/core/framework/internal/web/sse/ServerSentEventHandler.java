@@ -1,5 +1,6 @@
 package core.framework.internal.web.sse;
 
+import core.framework.api.http.HTTPStatus;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.async.VirtualThread;
 import core.framework.internal.log.ActionLog;
@@ -97,7 +98,11 @@ public class ServerSentEventHandler implements HttpHandler {
         ChannelImpl<Object> channel = null;
         try {
             handlerContext.requestParser.parse(request, exchange, actionLog);
-            if (handlerContext.accessControl != null) handlerContext.accessControl.validate(request.clientIP());  // check ip before checking routing, return 403 asap
+            if (handlerContext.accessControl != null && handlerContext.accessControl.forbid(request.clientIP())) {
+                // check ip before checking routing, return 403 asap
+                exchange.setStatusCode(HTTPStatus.FORBIDDEN.code);
+                exchange.endExchange();
+            }
 
             actionLog.warningContext.maxProcessTimeInNano(MAX_PROCESS_TIME_IN_NANO);
             String path = request.path();

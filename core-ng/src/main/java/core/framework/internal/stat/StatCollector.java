@@ -90,8 +90,8 @@ public class StatCollector {
         if (highMemoryUsageCounts >= HIGH_USAGE_ESCALATION_COUNT) { // high usage lasted for more than 1 min
             stats.severity = Severity.ERROR;
             if (highMemoryUsageCounts % HIGH_USAGE_ESCALATION_COUNT == 0) {   // every 1 min
-                stats.info("heap", Diagnostic.heap());  // heap triggers full GC
                 stats.info("vm", Diagnostic.vm());  // provide troubleshooting info for AI
+                stats.info("heap", Diagnostic.heap());  // heap triggers full GC
             }
         }
     }

@@ -1,10 +1,10 @@
 package core.framework.internal.web.site;
 
+import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;
 import core.framework.http.HTTPHeaders;
 import core.framework.web.Request;
 import core.framework.web.Response;
-import core.framework.web.exception.NotFoundException;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +33,9 @@ public final class StaticDirectoryController implements StaticContentController 
         Path filePath = contentDirectory.resolve(path).normalize();
         logger.debug("requestFile={}", filePath);
 
-        if (!Files.isRegularFile(filePath, LinkOption.NOFOLLOW_LINKS) || !filePath.startsWith(contentDirectory))
-            throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
+        if (!Files.isRegularFile(filePath, LinkOption.NOFOLLOW_LINKS) || !filePath.startsWith(contentDirectory)) {
+            return Response.empty().status(HTTPStatus.NOT_FOUND);
+        }
 
         Response response = Response.file(filePath);
         ContentType contentType = MimeTypes.get(String.valueOf(filePath.getFileName()));

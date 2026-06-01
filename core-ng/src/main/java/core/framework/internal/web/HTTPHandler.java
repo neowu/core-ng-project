@@ -1,5 +1,6 @@
 package core.framework.internal.web;
 
+import core.framework.api.http.HTTPStatus;
 import core.framework.internal.async.VirtualThread;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
@@ -98,12 +99,23 @@ public class HTTPHandler implements HttpHandler {
         try {
             handlerContext.requestParser.parse(request, exchange, actionLog);
 
-            if (handlerContext.accessControl != null) handlerContext.accessControl.validate(request.clientIP());  // check ip before checking routing, return 403 asap
+            if (handlerContext.accessControl != null && handlerContext.accessControl.forbid(request.clientIP())) {
+                // check ip before checking routing, return 403 asap
+                exchange.setStatusCode(HTTPStatus.FORBIDDEN.code);
+                exchange.endExchange();
+                return;
+            }
 
             HeaderMap headers = exchange.getRequestHeaders();
             linkContext(actionLog, headers);
 
             ControllerHolder controller = route.get(request.path(), request.method(), request.pathParams, actionLog);
+            if (controller == null) {
+                exchange.setStatusCode(HTTPStatus.NOT_FOUND.code);
+                exchange.endExchange();
+                return;
+            }
+
             actionLog.action(controller.action);
             actionLog.context.put("controller", List.of(controller.controllerInfo));
             logger.debug("controller={}", controller.controllerInfo);
