@@ -8,7 +8,7 @@
 * kafka: updated client to 4.3.0
 * web: updated undertow to 2.4.1.Final
 * web: replace path_not_found and forbidden warning with 404/403 and empty content
-  > reduce noisy for scanning requests, action log provides enough context
+  > reduce bandwidth usage for malicious traffic, action log provides enough context
 
 ### 9.5.2 (4/29/26 - 5/4/26)
 

@@ -22,6 +22,12 @@ public class IPAccessControl {
     @Nullable
     public IPv6Ranges denyIPv6;
 
+    public void validate(String clientIP) {
+        if (!allow(clientIP)) {
+            throw new ForbiddenException("access denied", "IP_ACCESS_DENIED");
+        }
+    }
+
     public boolean allow(String clientIP) {
         InetAddress address;
         try {
@@ -50,16 +56,6 @@ public class IPAccessControl {
         return allow(byteAddress, allow, deny);
     }
 
-    public void validate(String clientIP) {
-        if (!allow(clientIP)) {
-            throw new ForbiddenException("access denied", "IP_ACCESS_DENIED");
-        }
-    }
-
-    boolean isLocal(InetAddress address) {
-        return address.isLoopbackAddress() || address.isSiteLocalAddress();
-    }
-
     boolean allow(byte[] address, @Nullable IPRanges allow, @Nullable IPRanges deny) {
         if (allow != null && allow.matches(address)) {
             logger.debug("allow client ip within allowed ranges");
@@ -73,5 +69,9 @@ public class IPAccessControl {
 
         logger.debug("allow client ip not within denied ranges");
         return true;
+    }
+
+    boolean isLocal(InetAddress address) {
+        return address.isLoopbackAddress() || address.isSiteLocalAddress();
     }
 }
