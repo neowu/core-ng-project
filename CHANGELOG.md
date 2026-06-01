@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.5.3 (5/19/26 - )
+### 9.5.3 (5/19/26 - 6/1/26)
 
 * jre: published neowu/jre:26.0.1
 * stats: escalate to ERROR is cpu or memory high usage last more than 1 mins

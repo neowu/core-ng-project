@@ -22,7 +22,7 @@ public class IPAccessControl {
     @Nullable
     public IPv6Ranges denyIPv6;
 
-    public boolean forbid(String clientIP) {
+    public boolean allow(String clientIP) {
         InetAddress address;
         try {
             address = InetAddress.getByName(clientIP);
@@ -32,7 +32,7 @@ public class IPAccessControl {
 
         if (isLocal(address)) {
             logger.debug("allow site local client address");
-            return false;
+            return true;
         }
 
         byte[] byteAddress = address.getAddress();
@@ -47,11 +47,11 @@ public class IPAccessControl {
         } else {
             throw new Error("unexpected address, address=" + address);
         }
-        return !allow(byteAddress, allow, deny);
+        return allow(byteAddress, allow, deny);
     }
 
     public void validate(String clientIP) {
-        if (forbid(clientIP)) {
+        if (!allow(clientIP)) {
             throw new ForbiddenException("access denied", "IP_ACCESS_DENIED");
         }
     }

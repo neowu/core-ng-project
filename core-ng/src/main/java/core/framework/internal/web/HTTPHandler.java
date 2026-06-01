@@ -99,7 +99,7 @@ public class HTTPHandler implements HttpHandler {
         try {
             handlerContext.requestParser.parse(request, exchange, actionLog);
 
-            if (handlerContext.accessControl != null && handlerContext.accessControl.forbid(request.clientIP())) {
+            if (handlerContext.accessControl != null && !handlerContext.accessControl.allow(request.clientIP())) {
                 // check ip before checking routing, return 403 asap
                 exchange.setStatusCode(HTTPStatus.FORBIDDEN.code);
                 exchange.endExchange();
