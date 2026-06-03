@@ -87,6 +87,7 @@ public final class HTTPClientBuilder {
     private Duration retryWaitTime = Duration.ofMillis(500);
     @Nullable
     private Proxy proxy;
+    private boolean followRedirects = false; // for external site
 
     // force to use HTTPClient.builder()
     HTTPClientBuilder() {
@@ -103,8 +104,8 @@ public final class HTTPClientBuilder {
                 .connectionPool(new ConnectionPool(100, keepAlive.toSeconds(), TimeUnit.SECONDS))
                 .eventListenerFactory(new HTTPEventListenerFactory())
                 .retryOnConnectionFailure(false)    // disable all okHTTP builtin retry and followups, those should be handled on application level for traces
-                .followRedirects(false)
-                .followSslRedirects(false);
+                .followRedirects(followRedirects)
+                .followSslRedirects(followRedirects);
 
             configureHTTPS(builder);
 
@@ -219,6 +220,12 @@ public final class HTTPClientBuilder {
         } catch (CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
             throw new Error(e);
         }
+    }
+
+    // refer to okhttp3/internal/http/RetryAndFollowUpInterceptor.kt:357, max follow up is 20
+    public HTTPClientBuilder followRedirects() {
+        followRedirects = true;
+        return this;
     }
 
     public HTTPClientBuilder clientAuth(String privateKey, String cert) {

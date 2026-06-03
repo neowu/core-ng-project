@@ -1,5 +1,9 @@
 ## Change log
 
+### 9.5.4 (6/2/26 - )
+
+* http_client: support followRedirects
+
 ### 9.5.3 (5/19/26 - 6/1/26)
 
 * jre: published neowu/jre:26.0.1
