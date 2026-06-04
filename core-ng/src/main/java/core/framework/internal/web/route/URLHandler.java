@@ -1,9 +1,9 @@
 package core.framework.internal.web.route;
 
+import core.framework.api.http.HTTPStatus;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.util.Maps;
-import core.framework.web.exception.MethodNotAllowedException;
 
 import java.util.Map;
 
@@ -12,7 +12,7 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-class URLHandler {
+public class URLHandler {
     final String pathPattern;
     private final Map<HTTPMethod, ControllerHolder> controllers = Maps.newEnumMap(HTTPMethod.class);
 
@@ -27,11 +27,11 @@ class URLHandler {
         }
     }
 
-    ControllerHolder get(HTTPMethod method) {
+    Route.RouteResult get(HTTPMethod method) {
         ControllerHolder controller = controllers.get(method);
         if (controller == null) {
-            throw new MethodNotAllowedException("method not allowed, method=" + method);
+            return new Route.RouteResult(null, HTTPStatus.METHOD_NOT_ALLOWED);
         }
-        return controller;
+        return new Route.RouteResult(controller, null);
     }
 }

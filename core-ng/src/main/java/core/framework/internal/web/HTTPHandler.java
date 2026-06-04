@@ -109,13 +109,13 @@ public class HTTPHandler implements HttpHandler {
             HeaderMap headers = exchange.getRequestHeaders();
             linkContext(actionLog, headers);
 
-            ControllerHolder controller = route.get(request.path(), request.method(), request.pathParams, actionLog);
-            if (controller == null) {
-                exchange.setStatusCode(HTTPStatus.NOT_FOUND.code);
+            Route.RouteResult result = route.get(request.path(), request.method(), request.pathParams, actionLog);
+            if (result.errorStatus() != null) {
+                exchange.setStatusCode(result.errorStatus().code);
                 exchange.endExchange();
                 return;
             }
-
+            ControllerHolder controller = result.controller();
             actionLog.action(controller.action);
             actionLog.context.put("controller", List.of(controller.controllerInfo));
             logger.debug("controller={}", controller.controllerInfo);

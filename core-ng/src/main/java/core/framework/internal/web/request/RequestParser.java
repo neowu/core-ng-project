@@ -17,6 +17,7 @@ import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +114,7 @@ public final class RequestParser {
         logger.debug("[request] remoteAddress={}, clientIP={}", remoteAddress, request.clientIP);
     }
 
-    String scheme(String requestScheme, String xForwardedProto) {       // xForwardedProto is single value, refer to https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto
+    String scheme(String requestScheme, @Nullable String xForwardedProto) {       // xForwardedProto is single value, refer to https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto
         return xForwardedProto != null ? xForwardedProto : requestScheme;
     }
 
@@ -206,7 +207,7 @@ public final class RequestParser {
         }
     }
 
-    int port(int requestPort, String xForwardedPort) {
+    int port(int requestPort, @Nullable String xForwardedPort) {
         if (xForwardedPort != null) {
             try {
                 int index = xForwardedPort.indexOf(',');
@@ -224,7 +225,7 @@ public final class RequestParser {
     }
 
     // due to google cloud LB does not forward x-forwarded-port, here is to use x-forwarded-proto to determine port if any
-    int requestPort(String host, String scheme, HttpServerExchange exchange) {    // refer to io.undertow.server.HttpServerExchange.getHostPort(), use x-forwarded-proto as request scheme
+    int requestPort(@Nullable String host, String scheme, HttpServerExchange exchange) {    // refer to io.undertow.server.HttpServerExchange.getHostPort(), use x-forwarded-proto as request scheme
         if (host != null) {     // HOST header is must for http/1.1, refer to https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
             int colonIndex;
             if (Strings.startsWith(host, '[')) { //for ipv6 addresses make sure to take out the first part, which can have multiple occurrences of ':', e.g. Host: [::1]:5001
