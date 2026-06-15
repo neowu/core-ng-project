@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,7 +33,7 @@ class CollectStatTaskTest {
 
     @Test
     void message() {
-        var stats = new Stats();
+        var stats = new Stats(new HashMap<>());
         stats.put("sys_load_avg", 1d);
         StatMessage message = task.message(stats);
         assertThat(message.id).isNotNull();

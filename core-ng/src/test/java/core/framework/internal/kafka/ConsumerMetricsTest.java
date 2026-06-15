@@ -4,6 +4,7 @@ import core.framework.internal.stat.Stats;
 import org.apache.kafka.common.Metric;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +39,7 @@ class ConsumerMetricsTest {
     @Test
     void collect() {
         var metrics = new ConsumerMetrics(null);
-        var stats = new Stats();
+        var stats = new Stats(new HashMap<>());
         metrics.collect(stats);
 
         assertThat(stats.stats).containsKeys("kafka_consumer_records_max_lag",

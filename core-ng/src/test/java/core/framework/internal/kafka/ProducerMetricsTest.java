@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -30,7 +32,7 @@ class ProducerMetricsTest {
     void collect() {
         when(requestSizeAvg.metricValue()).thenReturn(10.0);
 
-        var stats = new Stats();
+        var stats = new Stats(new HashMap<>());
         metrics.collect(stats);
 
         assertThat(stats.stats).containsEntry("kafka_producer_request_size_avg", 10.0);
@@ -40,7 +42,7 @@ class ProducerMetricsTest {
     void collectWithoutRequestSizeAvg() {
         when(requestSizeAvg.metricValue()).thenReturn(Double.NaN);
 
-        var stats = new Stats();
+        var stats = new Stats(new HashMap<>());
         metrics.collect(stats);
 
         assertThat(stats.stats).doesNotContainKeys("kafka_producer_request_size_avg");

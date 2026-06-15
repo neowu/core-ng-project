@@ -7,6 +7,8 @@ import core.framework.log.message.StatMessage;
 import core.framework.util.Network;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author neo
@@ -14,6 +16,7 @@ import java.time.Instant;
 public final class CollectStatTask implements Runnable {
     private final LogAppender appender;
     private final StatCollector collector;
+    private final Map<String, Integer> highUsageHistory = new HashMap<>();
 
     public CollectStatTask(LogAppender appender, StatCollector collector) {
         this.appender = appender;
@@ -22,7 +25,7 @@ public final class CollectStatTask implements Runnable {
 
     @Override
     public void run() {
-        var stats = new Stats();
+        var stats = new Stats(highUsageHistory);
         collector.collectJVMUsage(stats);
         collector.collectMetrics(stats);
         StatMessage message = message(stats);

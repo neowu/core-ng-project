@@ -2,7 +2,6 @@ package core.framework.internal.stat;
 
 import com.sun.management.OperatingSystemMXBean;
 import core.framework.internal.async.VirtualThread;
-import core.framework.log.Severity;
 import core.framework.util.Files;
 import core.framework.util.Lists;
 import org.slf4j.Logger;
@@ -22,9 +21,6 @@ import java.util.List;
  * @author neo
  */
 public class StatCollector {
-    // stats are collected every 10s (see LogConfig), so 6 cycles == 1 minute
-    private static final int HIGH_USAGE_ESCALATION_COUNT = 6;
-
     public final List<Metrics> metrics = Lists.newArrayList();
 
     private final Logger logger = LoggerFactory.getLogger(StatCollector.class);
@@ -40,9 +36,6 @@ public class StatCollector {
     public double highHeapUsageThreshold = 0.8;
     public double highMemUsageThreshold = 0.8;  // the java process RSS usage
 
-    int highCPUUsageCounts = 0;
-    int highMemoryUsageCounts = 0;
-
     public StatCollector() {
         List<GarbageCollectorMXBean> beans = ManagementFactory.getGarbageCollectorMXBeans();
         for (GarbageCollectorMXBean bean : beans) {
@@ -56,7 +49,10 @@ public class StatCollector {
         collectCPUUsage(stats);
         stats.put("thread_count", thread.getThreadCount());
         stats.put("virtual_thread_count", VirtualThread.COUNT.max());
-        collectMemoryUsage(stats);
+        collectHeapUsage(stats);
+        if (supportMemoryTracking) {
+            collectNativeMemoryUsage(stats);
+        }
 
         for (GCStat gcStat : gcStats) {
             double count = gcStat.count();
@@ -66,52 +62,36 @@ public class StatCollector {
         }
     }
 
-    private void collectMemoryUsage(Stats stats) {
+    private void collectHeapUsage(Stats stats) {
         MemoryUsage heapUsage = memory.getHeapMemoryUsage();
         double usedHeap = heapUsage.getUsed();
         double maxHeap = heapUsage.getMax();
         stats.put("jvm_heap_used", usedHeap);
         stats.put("jvm_heap_max", maxHeap);
-        boolean highUsage = stats.checkHighUsage(usedHeap / maxHeap, highHeapUsageThreshold, "heap");
+        boolean escalatedError = stats.checkHighUsage(usedHeap / maxHeap, highHeapUsageThreshold, "heap");
+        if (escalatedError) {
+            stats.info("vm", Diagnostic.vm());  // provide troubleshooting info for AI
+            stats.info("heap", Diagnostic.heap());  // heap triggers full GC
+        }
         MemoryUsage nonHeapUsage = memory.getNonHeapMemoryUsage();
         stats.put("jvm_non_heap_used", nonHeapUsage.getUsed());
-        if (supportMemoryTracking) {
-            highUsage |= collectNativeMemoryUsage(stats);
-        }
-        if (highUsage) {
-            highMemoryUsageCounts++;
-        } else {
-            highMemoryUsageCounts = 0;
-        }
-        escalateHighMemoryUsage(stats);
-    }
-
-    void escalateHighMemoryUsage(Stats stats) {
-        if (highMemoryUsageCounts >= HIGH_USAGE_ESCALATION_COUNT) { // high usage lasted for more than 1 min
-            stats.severity = Severity.ERROR;
-            if (highMemoryUsageCounts % HIGH_USAGE_ESCALATION_COUNT == 0) {   // every 1 min
-                stats.info("vm", Diagnostic.vm());  // provide troubleshooting info for AI
-                stats.info("heap", Diagnostic.heap());  // heap triggers full GC
-            }
-        }
     }
 
     // collect VmRSS / cgroup ram limit
     // refer to https://man7.org/linux/man-pages/man5/proc.5.html, /proc/[pid]/statm section
     // e.g. 913415 52225 7215 1 0 66363 0
     // the second number is VmRSS in pages (4k)
-    private boolean collectNativeMemoryUsage(Stats stats) {
+    private void collectNativeMemoryUsage(Stats stats) {
         var content = new String(Files.bytes(procPath), StandardCharsets.US_ASCII);
         double vmRSS = parseVmRSS(content);
         stats.put("vm_rss", vmRSS);
         double maxMemory = os.getTotalMemorySize();
         stats.put("mem_max", maxMemory);
-        boolean highUsage = stats.checkHighUsage(vmRSS / maxMemory, highMemUsageThreshold, "mem");
-        if (highUsage) {
+        boolean escalatedError = stats.checkHighUsage(vmRSS / maxMemory, highMemUsageThreshold, "mem");
+        if (escalatedError) {
             stats.info("proc_status", new String(Files.bytes(statusPath), StandardCharsets.US_ASCII));
             stats.info("native_memory", Diagnostic.nativeMemory());
         }
-        return highUsage;
     }
 
     long parseVmRSS(String content) {
@@ -138,16 +118,10 @@ public class StatCollector {
         // refer to com.sun.management.internal.OperatingSystemImpl.ContainerCpuTicks.getContainerCpuLoad
         double usage = os.getProcessCpuLoad();
         stats.put("cpu_usage", usage);
-        boolean highUsage = stats.checkHighUsage(usage, highCPUUsageThreshold, "cpu");
-        if (highUsage) {
-            highCPUUsageCounts++;
+        boolean escalatedError = stats.checkHighUsage(usage, highCPUUsageThreshold, "cpu");
+        if (escalatedError) {
             stats.info("thread_dump", Diagnostic.thread());
             stats.info("virtual_thread_dump", Diagnostic.virtualThread());
-        } else {
-            highCPUUsageCounts = 0;
-        }
-        if (highCPUUsageCounts >= HIGH_USAGE_ESCALATION_COUNT) {  // high usage lasted for more than 1 min
-            stats.severity = Severity.ERROR;
         }
     }
 }

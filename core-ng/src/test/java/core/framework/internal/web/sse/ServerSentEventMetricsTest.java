@@ -5,6 +5,8 @@ import core.framework.internal.web.request.RequestImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ServerSentEventMetricsTest {
@@ -21,7 +23,7 @@ class ServerSentEventMetricsTest {
         context.add(new ChannelImpl<>(null, null, null, null, null, new RequestImpl(null, null)));
         metrics.contexts.add(context);
 
-        var stats = new Stats();
+        var stats = new Stats(new HashMap<>());
         metrics.collect(stats);
         assertThat(stats.stats)
             .containsEntry("sse_active_channels", 1.0d);

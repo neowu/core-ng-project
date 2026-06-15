@@ -4,6 +4,9 @@ import core.framework.log.Severity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -11,10 +14,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class StatsTest {
     private Stats stats;
+    private Map<String, Integer> errorHistory;
 
     @BeforeEach
     void createStats() {
-        stats = new Stats();
+        errorHistory = new HashMap<>();
+        stats = new Stats(errorHistory);
     }
 
     @Test
@@ -33,9 +38,23 @@ class StatsTest {
         stats.checkHighUsage(0.7, 0.8, "disk");
         assertThat(stats.errorCode).isNull();
 
-        stats.checkHighUsage(0.81, 0.8, "disk");
+        boolean escalatedError = stats.checkHighUsage(0.81, 0.8, "disk");
+        assertThat(escalatedError).isFalse();
+        assertThat(stats.severity).isEqualTo(Severity.WARN);
         assertThat(stats.errorCode).isEqualTo("HIGH_DISK_USAGE");
         assertThat(stats.errorMessage).isEqualTo("disk usage is too high, usage=81%");
+    }
+
+    @Test
+    void checkHighUsageWithEscalation() {
+        errorHistory.put("disk", 5);
+        boolean escalatedError = stats.checkHighUsage(0.81, 0.8, "disk");
+
+        assertThat(escalatedError).isTrue();
+        assertThat(stats.severity).isEqualTo(Severity.ERROR);
+        assertThat(stats.errorCode).isEqualTo("HIGH_DISK_USAGE");
+        assertThat(stats.errorMessage).isEqualTo("disk usage is too high, usage=81%");
+        assertThat(errorHistory).doesNotContainKey("disk");
     }
 
     @Test

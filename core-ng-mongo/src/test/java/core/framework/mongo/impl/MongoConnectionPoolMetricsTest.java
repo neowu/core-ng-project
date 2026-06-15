@@ -8,6 +8,8 @@ import core.framework.internal.stat.Stats;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -24,7 +26,7 @@ class MongoConnectionPoolMetricsTest {
 
     @Test
     void collect() {
-        var stats = new Stats();
+        var stats = new Stats(new HashMap<>());
 
         var event = mock(ConnectionCreatedEvent.class);
         metrics.connectionCreated(event);

@@ -19,6 +19,7 @@ import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeData;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Set;
 
 import static app.monitor.job.JMXClient.objectName;
@@ -64,7 +65,7 @@ public class KafkaMonitorJob implements Job {
     }
 
     Stats collect(MBeanServerConnection connection) throws JMException, IOException {
-        var stats = new Stats();
+        var stats = new Stats(new HashMap<>());
 
         collectDiskUsage(stats, connection);    // disk usage is most important to check, if disk usage is high, requires to expand disk immediately
 

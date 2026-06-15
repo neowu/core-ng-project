@@ -2,7 +2,6 @@ package app.monitor.job;
 
 import core.framework.internal.stat.Stats;
 import core.framework.kafka.MessagePublisher;
-import core.framework.log.Severity;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
@@ -10,6 +9,7 @@ import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,6 +22,7 @@ public class ElasticSearchMonitorJob implements Job {
     private final String app;
     private final String host;
     private final Map<String, GCStat> gcStats = Maps.newHashMapWithExpectedSize(2);
+    private final Map<String, Integer> highUsageHistory = new HashMap<>();
     public double highCPUUsageThreshold;
     public double highHeapUsageThreshold;
     public double highDiskUsageThreshold;
@@ -49,7 +50,7 @@ public class ElasticSearchMonitorJob implements Job {
     }
 
     Stats collect(ElasticSearchNodeStats.Node node) {
-        var stats = new Stats();
+        var stats = new Stats(highUsageHistory);
 
         collectDiskUsage(stats, node);  // disk usage is most important to check, if disk usage is high, requires to expand disk immediately
 
@@ -85,9 +86,6 @@ public class ElasticSearchMonitorJob implements Job {
         stats.put("es_disk_used", diskUsed);
         double diskMax = node.fs.total.totalInBytes;
         stats.put("es_disk_max", diskMax);
-        boolean highUsage = stats.checkHighUsage(diskUsed / diskMax, highDiskUsageThreshold, "disk");
-        if (highUsage) {
-            stats.severity = Severity.ERROR;
-        }
+        stats.checkHighUsage(diskUsed / diskMax, highDiskUsageThreshold, "disk");
     }
 }

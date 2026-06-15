@@ -4,6 +4,7 @@
 
 * http_client: support followRedirects
 * web: replace method_not_allowed warning with 405 and empty content
+* stats: refactor to support generic escalated error
 
 ### 9.5.3 (5/19/26 - 6/1/26)
 

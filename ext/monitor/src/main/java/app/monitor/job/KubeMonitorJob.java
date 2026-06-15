@@ -6,6 +6,7 @@ import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ public class KubeMonitorJob implements Job {
         }
     }
 
+    @Nullable
     String check(KubePodList.Pod pod, ZonedDateTime now) {
         if (pod.metadata.deletionTimestamp != null) {
             Duration elapsed = Duration.between(pod.metadata.deletionTimestamp, now);

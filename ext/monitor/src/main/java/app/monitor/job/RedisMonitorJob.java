@@ -9,6 +9,7 @@ import core.framework.scheduler.JobContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,6 +21,7 @@ public class RedisMonitorJob implements Job {
     private final String app;
     private final String host;
     private final MessagePublisher<StatMessage> publisher;
+    private final Map<String, Integer> highUsageHistory = new HashMap<>();
     public double highMemUsageThreshold;
 
     public RedisMonitorJob(Redis redis, String app, String host, MessagePublisher<StatMessage> publisher) {
@@ -42,7 +44,7 @@ public class RedisMonitorJob implements Job {
     }
 
     Stats stats(Map<String, String> info) {
-        var stats = new Stats();
+        var stats = new Stats(highUsageHistory);
         double maxMem = get(info, "maxmemory");
         if (maxMem == 0) maxMem = get(info, "total_system_memory");
         stats.put("redis_mem_max", maxMem);

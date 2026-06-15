@@ -1,9 +1,10 @@
 package core.framework.internal.stat;
 
-import core.framework.log.Severity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
@@ -21,7 +22,7 @@ class StatCollectorTest {
 
     @Test
     void collectJVMUsage() {
-        var stats = new Stats();
+        var stats = new Stats(new HashMap<>());
         collector.collectJVMUsage(stats);
 
         assertThat(stats.stats).containsKeys("cpu_usage", "thread_count", "jvm_heap_used", "jvm_heap_max", "jvm_non_heap_used");
@@ -42,31 +43,9 @@ class StatCollectorTest {
         Metrics metrics = Mockito.mock(Metrics.class);
         collector.metrics.add(metrics);
 
-        var stats = new Stats();
+        var stats = new Stats(new HashMap<>());
         doThrow(new Error("test")).when(metrics).collect(stats);
 
         collector.collectMetrics(stats);
-    }
-
-    @Test
-    void escalateHighMemoryUsage() {
-        collector.highMemoryUsageCounts = 6;
-
-        var stats = new Stats();
-        collector.escalateHighMemoryUsage(stats);
-
-        assertThat(stats.severity).isEqualTo(Severity.ERROR);
-        assertThat(stats.info).containsKeys("vm", "heap");
-    }
-
-    @Test
-    void escalateHighMemoryUsageWithoutDiagnostic() {
-        collector.highMemoryUsageCounts = 7;
-
-        var stats = new Stats();
-        collector.escalateHighMemoryUsage(stats);
-
-        assertThat(stats.severity).isEqualTo(Severity.ERROR);
-        assertThat(stats.info).isNull();
     }
 }

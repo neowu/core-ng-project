@@ -3,13 +3,15 @@ package app.monitor.job;
 import com.mongodb.client.MongoClient;
 import core.framework.internal.stat.Stats;
 import core.framework.kafka.MessagePublisher;
-import core.framework.log.Severity;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author neo
@@ -20,6 +22,7 @@ public class MongoMonitorJob implements Job {
     private final String app;
     private final String host;
     private final MessagePublisher<StatMessage> publisher;
+    private final Map<String, Integer> highUsageHistory = new HashMap<>();
     public double highDiskUsageThreshold;
 
     public MongoMonitorJob(MongoClient mongo, String app, String host, MessagePublisher<StatMessage> publisher) {
@@ -57,15 +60,12 @@ public class MongoMonitorJob implements Job {
             if (diskMax == 0) diskMax = result.getDouble("fsTotalSize");
         }
 
-        var stats = new Stats();
+        var stats = new Stats(highUsageHistory);
         stats.put("mongo_docs", objects);
         stats.put("mongo_total_size", totalSize);
         stats.put("mongo_disk_used", diskUsed);
         stats.put("mongo_disk_max", diskMax);
-        boolean highUsage = stats.checkHighUsage(diskUsed / diskMax, highDiskUsageThreshold, "disk");
-        if (highUsage) {
-            stats.severity = Severity.ERROR;
-        }
+        stats.checkHighUsage(diskUsed / diskMax, highDiskUsageThreshold, "disk");
         return stats;
     }
 

@@ -59,6 +59,7 @@ public class KubePodList {  // refer to https://kubernetes.io/docs/reference/gen
         @Property(name = "containerStatuses")
         public List<ContainerStatus> containerStatuses = List.of(); // kube api may return null for newly created pending pod
 
+        @Nullable
         @Property(name = "startTime")
         public ZonedDateTime startTime;
 
@@ -82,6 +83,7 @@ public class KubePodList {  // refer to https://kubernetes.io/docs/reference/gen
         @Property(name = "name")
         public String name;
 
+        @Nullable
         @Property(name = "ready")
         public Boolean ready;   // whether pass readiness probe
 
@@ -91,6 +93,7 @@ public class KubePodList {  // refer to https://kubernetes.io/docs/reference/gen
         @Property(name = "state")
         public ContainerState state = new ContainerState();
 
+        @Nullable
         @Property(name = "lastState")
         public ContainerState lastState;
     }
@@ -103,6 +106,7 @@ public class KubePodList {  // refer to https://kubernetes.io/docs/reference/gen
         @Property(name = "waiting")
         public ContainerStateWaiting waiting;
 
+        @Nullable
         @Property(name = "terminated")
         public ContainerStateTerminated terminated;
     }

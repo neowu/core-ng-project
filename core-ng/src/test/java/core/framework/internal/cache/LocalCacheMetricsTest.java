@@ -4,6 +4,8 @@ import core.framework.internal.stat.Stats;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -19,7 +21,7 @@ class LocalCacheMetricsTest {
 
     @Test
     void collect() {
-        var stats = new Stats();
+        var stats = new Stats(new HashMap<>());
         metrics.collect(stats);
 
         assertThat(stats.stats)
