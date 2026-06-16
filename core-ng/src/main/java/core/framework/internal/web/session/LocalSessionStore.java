@@ -3,6 +3,7 @@ package core.framework.internal.web.session;
 
 import core.framework.util.Maps;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ public class LocalSessionStore implements SessionStore {
 
     private final Logger logger = LoggerFactory.getLogger(LocalSessionStore.class);
 
+    @Nullable
     @Override
     public Map<String, String> getAndRefresh(String sessionId, String domain, Duration timeout) {
         SessionValue sessionValue = values.get(sessionId);
@@ -35,7 +37,7 @@ public class LocalSessionStore implements SessionStore {
     }
 
     @Override
-    public void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration timeout) {
+    public void save(String sessionId, String domain, Map<String, @Nullable String> values, Set<String> changedFields, Duration timeout) {
         Map<String, String> updatedValues = Maps.newHashMapWithExpectedSize(values.size());
         values.forEach((field, value) -> {
             if (value != null) updatedValues.put(field, value);

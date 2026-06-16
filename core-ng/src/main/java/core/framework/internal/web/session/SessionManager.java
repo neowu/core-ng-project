@@ -28,6 +28,7 @@ public class SessionManager implements SessionContext {
     private Duration timeout = Duration.ofMinutes(20);
     private SessionStore store;
 
+    @Nullable
     public Session load(Request request, ActionLog actionLog) {
         if (store == null) return null;  // session store is not initialized
         if (!"https".equals(request.scheme())) return null;  // only load session under https

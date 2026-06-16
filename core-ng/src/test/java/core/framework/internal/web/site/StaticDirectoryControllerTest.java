@@ -1,7 +1,7 @@
 package core.framework.internal.web.site;
 
-import core.framework.api.http.HTTPStatus;
 import core.framework.web.Request;
+import core.framework.web.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.nio.file.Path;
 import java.time.Duration;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -40,6 +40,7 @@ class StaticDirectoryControllerTest {
     void illegalAccess() {
         when(request.pathParam("path")).thenReturn("//////../../../../etc/passwd");
 
-        assertThat(controller.execute(request).status()).isEqualTo(HTTPStatus.NOT_FOUND);
+        assertThatThrownBy(() -> controller.execute(request))
+            .isInstanceOf(NotFoundException.class);
     }
 }

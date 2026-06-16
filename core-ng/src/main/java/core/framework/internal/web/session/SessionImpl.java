@@ -3,6 +3,7 @@ package core.framework.internal.web.session;
 import core.framework.crypto.Hash;
 import core.framework.util.Strings;
 import core.framework.web.Session;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +18,7 @@ public class SessionImpl implements Session {
     final Map<String, String> values = new HashMap<>();
     final Set<String> changedFields = new HashSet<>();
     final String domain;
+    @Nullable
     String id;
     // used to track current session, without exposing actual session id value
     // redis session store use sha256(domain+sessionId) to hash, here to use md5 to make sure not logging actual redis key, and keep reference shorter

@@ -48,7 +48,7 @@ public class HTTPErrorHandler {
         try {
             Response errorResponse = null;
             if (customErrorHandler != null) errorResponse = customErrorHandler.handle(request, e).orElse(null);
-            if (errorResponse == null) errorResponse = defaultErrorResponse(e, exchange, actionLog);
+            if (errorResponse == null) errorResponse = defaultErrorResponse(e, exchange, actionLog.id);
             responseHandler.render(request, (ResponseImpl) errorResponse, exchange, actionLog);
         } catch (Throwable error) {
             logger.error(error.getMessage(), error);
@@ -60,7 +60,7 @@ public class HTTPErrorHandler {
         }
     }
 
-    private Response defaultErrorResponse(Throwable e, HttpServerExchange exchange, ActionLog actionLog) {
+    private Response defaultErrorResponse(Throwable e, HttpServerExchange exchange, String actionId) {
         HTTPStatus status = httpStatus(e);
 
         HeaderMap headers = exchange.getRequestHeaders();
@@ -68,9 +68,9 @@ public class HTTPErrorHandler {
 
         if (accept != null && accept.contains(ContentType.APPLICATION_JSON.mediaType)) {
             String userAgent = headers.getFirst(Headers.USER_AGENT);
-            return Response.bean(errorResponse(e, userAgent, actionLog.id)).status(status);
+            return Response.bean(errorResponse(e, userAgent, actionId)).status(status);
         } else {
-            return Response.text(errorHTML(e, actionLog.id)).status(status).contentType(ContentType.TEXT_HTML);
+            return Response.text(errorHTML(e, actionId)).status(status).contentType(ContentType.TEXT_HTML);
         }
     }
 

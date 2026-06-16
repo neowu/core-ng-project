@@ -1,6 +1,5 @@
 package core.framework.internal.web;
 
-import core.framework.api.http.HTTPStatus;
 import core.framework.internal.async.VirtualThread;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
@@ -16,6 +15,10 @@ import core.framework.internal.web.session.SessionManager;
 import core.framework.internal.web.site.TemplateManager;
 import core.framework.web.Interceptor;
 import core.framework.web.Response;
+import core.framework.web.exception.ForbiddenException;
+import core.framework.web.exception.MethodNotAllowedException;
+import core.framework.web.exception.NotFoundException;
+import core.framework.web.exception.TooManyRequestsException;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
@@ -99,23 +102,12 @@ public class HTTPHandler implements HttpHandler {
         try {
             handlerContext.requestParser.parse(request, exchange, actionLog);
 
-            if (handlerContext.accessControl != null && !handlerContext.accessControl.allow(request.clientIP())) {
-                // check ip before checking routing, return 403 asap
-                exchange.setStatusCode(HTTPStatus.FORBIDDEN.code);
-                exchange.endExchange();
-                return;
-            }
+            if (handlerContext.accessControl != null) handlerContext.accessControl.validate(request.clientIP());  // check ip before checking routing, return 403 asap
 
             HeaderMap headers = exchange.getRequestHeaders();
             linkContext(actionLog, headers);
 
-            Route.RouteResult result = route.get(request.path(), request.method(), request.pathParams, actionLog);
-            if (result.errorStatus() != null) {
-                exchange.setStatusCode(result.errorStatus().code);
-                exchange.endExchange();
-                return;
-            }
-            ControllerHolder controller = result.controller();
+            ControllerHolder controller = route.get(request.path(), request.method(), request.pathParams, actionLog);
             actionLog.action(controller.action);
             actionLog.context.put("controller", List.of(controller.controllerInfo));
             logger.debug("controller={}", controller.controllerInfo);
@@ -128,6 +120,10 @@ public class HTTPHandler implements HttpHandler {
 
             addKeepAliveHeader(exchange);
             responseHandler.render(request, (ResponseImpl) response, exchange, actionLog);
+        } catch (NotFoundException | MethodNotAllowedException | ForbiddenException | TooManyRequestsException e) {
+            // do not treat those malicious requests as error w/ trace, to reduce overhead
+            // app can still use errorHandler to render custom error page and potentially log error
+            errorHandler.handleError(e, exchange, request, actionLog);
         } catch (Throwable e) {
             logManager.logError(e);
             errorHandler.handleError(e, exchange, request, actionLog);

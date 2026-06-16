@@ -6,6 +6,7 @@ import core.framework.redis.Redis;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
 import core.framework.util.Strings;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,7 @@ public class RedisSessionStore implements SessionStore {
         this.redis = redis;
     }
 
+    @Nullable
     @Override
     public Map<String, String> getAndRefresh(String sessionId, String domain, Duration timeout) {
         String key = sessionKey(sessionId, domain);
@@ -44,7 +46,7 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration timeout) {
+    public void save(String sessionId, String domain, Map<String, @Nullable String> values, Set<String> changedFields, Duration timeout) {
         String key = sessionKey(sessionId, domain);
 
         List<String> deletedFields = Lists.newArrayList();

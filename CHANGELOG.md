@@ -3,7 +3,8 @@
 ### 9.5.4 (6/2/26 - )
 
 * http_client: support followRedirects
-* web: replace method_not_allowed warning with 405 and empty content
+* web: for 403/404/405/429, still produce exception, which can be handled by custom error handler
+  > still treat them as OK result to reduce overhead
 * stats: refactor to support generic escalated error
 
 ### 9.5.3 (5/19/26 - 6/1/26)

@@ -28,7 +28,7 @@ public class IPAccessControl {
         }
     }
 
-    public boolean allow(String clientIP) {
+    boolean allow(String clientIP) {
         InetAddress address;
         try {
             address = InetAddress.getByName(clientIP);
