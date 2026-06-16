@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.5.4 (6/2/26 - )
+### 9.5.4 (6/2/26 - 6/16/26)
 
 * http_client: support followRedirects
 * web: for 403/404/405/429, still produce exception, which can be handled by custom error handler
