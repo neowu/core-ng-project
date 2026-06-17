@@ -8,14 +8,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-java@v3
+    - uses: actions/checkout@v7
+    - uses: actions/setup-java@v5
       with:
         distribution: temurin
         java-version: 25
-    - uses: gradle/gradle-build-action@v2.11.1
+    - uses: gradle/actions/setup-gradle@v6
     - run: ./gradlew check
     - run: ./gradlew testCodeCoverageReport
-    - uses: codecov/codecov-action@v4
+    - uses: codecov/codecov-action@v7
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
