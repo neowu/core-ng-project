@@ -33,7 +33,8 @@ public class LocalPluginsService extends PluginsService {
                 false,
                 false,
                 false,
-                false);
+                false,
+                PluginDescriptor.DeploymentTarget.ALL);
             plugins.add(new LoadedPlugin(descriptor, plugin, Thread.currentThread().getContextClassLoader()));
         }
         loadExtensions(plugins);

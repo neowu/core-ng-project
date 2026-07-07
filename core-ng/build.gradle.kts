@@ -12,8 +12,8 @@ dependencies {
     implementation("org.javassist:javassist:3.31.0-GA")
     implementation(libs.jackson.afterburner)
     implementation(libs.jackson.databind)
-    implementation("com.squareup.okhttp3:okhttp:5.3.2")
-    implementation("io.undertow:undertow-core:2.4.1.Final")
+    implementation("com.squareup.okhttp3:okhttp:5.4.0")
+    implementation("io.undertow:undertow-core:2.4.2.Final")
     implementation("org.apache.kafka:kafka-clients:4.3.1") {
         exclude("org.xerial.snappy")
         exclude("at.yawk.lz4")
