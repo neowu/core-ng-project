@@ -5,6 +5,7 @@ import org.jspecify.annotations.Nullable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Objects;
 
 import static core.framework.internal.redis.RedisEncodings.encode;
 
@@ -94,6 +95,7 @@ public class RedisConnection implements AutoCloseable {
         if (socket != null) socket.close();
     }
 
+    // e.g. SET NX may return Nil Reply, https://valkey.io/commands/set/
     @Nullable
     String readSimpleString() throws IOException {
         return (String) Protocol.read(inputStream);
@@ -104,7 +106,7 @@ public class RedisConnection implements AutoCloseable {
     }
 
     long readLong() throws IOException {
-        return (long) Protocol.read(inputStream);
+        return (long) Objects.requireNonNull(Protocol.read(inputStream));
     }
 
     @Nullable

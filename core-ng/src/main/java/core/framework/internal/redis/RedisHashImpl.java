@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Objects;
 
 import static core.framework.internal.redis.Protocol.Command.HDEL;
 import static core.framework.internal.redis.Protocol.Command.HGET;
@@ -74,11 +75,11 @@ public final class RedisHashImpl implements RedisHash {
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyCommand(HGETALL, key);
-            Object[] response = connection.readArray();
+            @Nullable Object[] response = Objects.requireNonNull(connection.readArray());
             if (response.length % 2 != 0) throw new IOException("unexpected length of array, length=" + response.length);
             values = Maps.newHashMapWithExpectedSize(response.length / 2);
             for (int i = 0; i < response.length; i += 2) {
-                values.put(decode((byte[]) response[i]), decode((byte[]) response[i + 1]));
+                values.put(Objects.requireNonNull(decode((byte[]) response[i])), Objects.requireNonNull(decode((byte[]) response[i + 1])));
             }
             return values;
         } catch (IOException e) {
@@ -103,7 +104,7 @@ public final class RedisHashImpl implements RedisHash {
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyArgumentsCommand(HMGET, key, fields);
-            Object[] response = connection.readArray();
+            @Nullable Object[] response = Objects.requireNonNull(connection.readArray());
             for (int i = 0; i < response.length; i++) {
                 byte[] value = (byte[]) response[i];
                 if (value != null) values.put(fields[i], decode(value));

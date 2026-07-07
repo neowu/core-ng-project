@@ -20,7 +20,7 @@ afterEvaluate {
     if (!frontendDir.exists()) throw Error("$frontendDir does not exist")
 
     val context = project.objects.newInstance<Context>()
-    val env = project.properties["env"] as String? // use gradlew -Penv=${env} to pass
+    val env = providers.gradleProperty("env").orNull // use gradlew -Penv=${env} to pass
 
     tasks.register("buildFrontend") {
         group = "build"

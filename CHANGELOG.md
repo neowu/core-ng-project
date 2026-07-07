@@ -1,5 +1,10 @@
 ## Change log
 
+### 9.6.0 (7/6/26 - )
+
+* NPE: due to spotbugs improved NPE checking and jspecify, some built in utils methods changed behavior !!!
+  > ASCII.toLowerCase/toUpperCase only accept nonnull
+
 ### 9.5.4 (6/2/26 - 6/16/26)
 
 * http_client: support followRedirects

@@ -10,6 +10,7 @@ import core.framework.util.Strings;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * @author neo
@@ -30,7 +31,7 @@ public class ElasticSearchClient {
     }
 
     ElasticSearchNodeStats parseResponse(byte[] body) throws IOException {
-        ElasticSearchNodeStats stats = reader.fromJSON(body);
+        ElasticSearchNodeStats stats = Objects.requireNonNull(reader.fromJSON(body));
         // refer to filter_path=_nodes to return stats.stats
         if (stats.stats.failed > 0) {
             throw new Error(Strings.format("failed to call elasticsearch node stats api, error={}", new String(body, StandardCharsets.UTF_8)));

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +51,7 @@ class MessageListenerThreadProcessTest {
         entries.put(topic("topic2"), List.of(record("topic2", "key1")));
         when(consumer.poll(any())).thenReturn(new ConsumerRecords<>(entries, Map.of()));
 
-        List<KafkaMessages> messages = new ArrayList<>(thread.poll());
+        List<KafkaMessages> messages = new ArrayList<>(Objects.requireNonNull(thread.poll()));
         assertThat(messages.getFirst().topic).isEqualTo("topic1");
         assertThat(messages.getFirst().ordered.get("key2").subsequent).hasSize(1);
 

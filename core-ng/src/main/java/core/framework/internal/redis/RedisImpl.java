@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import static core.framework.internal.redis.Protocol.Command.DEL;
@@ -238,7 +239,7 @@ public final class RedisImpl implements Redis {
         try {
             RedisConnection connection = item.resource;
             connection.writeKeysCommand(MGET, keys);
-            Object[] response = connection.readArray();
+            @Nullable Object[] response = Objects.requireNonNull(connection.readArray());
             for (int i = 0; i < response.length; i++) {
                 byte[] value = (byte[]) response[i];
                 if (value != null) values.put(keys[i], value);
@@ -347,9 +348,9 @@ public final class RedisImpl implements Redis {
                 connection.writeBlobString(COUNT);
                 connection.writeBlobString(batchSize);
                 connection.flush();
-                Object[] response = connection.readArray();
-                cursor = decode((byte[]) response[0]);
-                Object[] keys = (Object[]) response[1];
+                @Nullable Object[] response = Objects.requireNonNull(connection.readArray());
+                cursor = Objects.requireNonNull(decode((byte[]) response[0]));
+                Object[] keys = (Object[]) Objects.requireNonNull(response[1]);
                 returnedKeys += keys.length;
                 redisTook += System.nanoTime() - start;
                 for (Object key : keys) {

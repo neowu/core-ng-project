@@ -32,7 +32,6 @@ class ASCIITest {
 
     @Test
     void toUpperCase() {
-        assertThat(ASCII.toUpperCase(null)).isNull();
         assertThat(ASCII.toUpperCase("text")).isEqualTo("TEXT");
         assertThat(ASCII.toUpperCase("tExt")).isEqualTo("TEXT");
         assertThat(ASCII.toUpperCase("TEXT")).isEqualTo("TEXT");
@@ -41,7 +40,6 @@ class ASCIITest {
 
     @Test
     void toLowerCase() {
-        assertThat(ASCII.toLowerCase(null)).isNull();
         assertThat(ASCII.toLowerCase("text")).isEqualTo("text");
         assertThat(ASCII.toLowerCase("tExt")).isEqualTo("text");
         assertThat(ASCII.toLowerCase("TEXT")).isEqualTo("text");

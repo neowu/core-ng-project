@@ -1,15 +1,12 @@
 package core.framework.util;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * @author neo
  */
 public final class ASCII {
     // only convert ascii chars, faster than JDK String.toUpperCase due to JDK needs to handle UTF and locale
     // refers to https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Ascii.java
-    public static @Nullable String toUpperCase(@Nullable String text) {
-        if (text == null) return null;
+    public static String toUpperCase(String text) {
         int length = text.length();
         for (int i = 0; i < length; i++) {
             if (isLowerCase(text.charAt(i))) {
@@ -31,8 +28,7 @@ public final class ASCII {
         return ch;
     }
 
-    public static @Nullable String toLowerCase(@Nullable String text) {
-        if (text == null) return null;
+    public static String toLowerCase(String text) {
         int length = text.length();
         for (int i = 0; i < length; i++) {
             if (isUpperCase(text.charAt(i))) {

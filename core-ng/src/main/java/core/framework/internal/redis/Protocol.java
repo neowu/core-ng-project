@@ -54,7 +54,7 @@ final class Protocol {
         return stream.readBytes(length);
     }
 
-    private static Object @Nullable [] parseArray(RedisInputStream stream) throws IOException {
+    private static @Nullable Object @Nullable [] parseArray(RedisInputStream stream) throws IOException {
         int length = (int) stream.readLong();
         if (length == -1) return null;
 

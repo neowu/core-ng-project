@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 import static core.framework.internal.redis.RedisEncodings.decode;
 import static core.framework.internal.redis.RedisEncodings.encode;
@@ -59,7 +60,7 @@ class ProtocolTest {
     @Test
     void readNumber() throws IOException {
         var stream = new ByteArrayInputStream(Strings.bytes(":10\r\n"));
-        long response = (Long) Protocol.read(new RedisInputStream(stream));
+        long response = (Long) Objects.requireNonNull(Protocol.read(new RedisInputStream(stream)));
         assertThat(response).isEqualTo(10);
     }
 

@@ -5,6 +5,7 @@ import core.framework.internal.resource.PoolItem;
 import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisList;
 import core.framework.util.StopWatch;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static core.framework.internal.redis.Protocol.Command.LPOP;
 import static core.framework.internal.redis.Protocol.Command.LRANGE;
@@ -42,10 +44,10 @@ public final class RedisListImpl implements RedisList {
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyArgumentCommand(LPOP, key, encode(size));
-            Object[] response = connection.readArray();
+            @Nullable Object[] response = connection.readArray();
             if (response != null) {     // lpop returns nil array if no element, this is different behavior of other pop (e.g. spop), it's likely due to blpop impl, use nil array to distinguish between timeout and empty list
                 for (Object value : response) {
-                    values.add(decode((byte[]) value));
+                    values.add(Objects.requireNonNull(decode((byte[]) value)));
                 }
             }
             return values;
@@ -95,10 +97,10 @@ public final class RedisListImpl implements RedisList {
             connection.writeBlobString(encode(start));
             connection.writeBlobString(encode(stop));
             connection.flush();
-            Object[] response = connection.readArray();
+            @Nullable Object[] response = Objects.requireNonNull(connection.readArray());
             values = new ArrayList<>(response.length);
             for (Object value : response) {
-                values.add(decode((byte[]) value));
+                values.add(Objects.requireNonNull(decode((byte[]) value)));
             }
             return values;
         } catch (IOException e) {

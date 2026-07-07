@@ -9,7 +9,7 @@ tasks.withType<AbstractFlywayTask> {
 
     val migrationDir = file("src/main/resources/db/migration")
     if (!migrationDir.exists()) throw Error("$migrationDir does not exist")
-    val env = properties["env"] // use gradlew -Penv=${env} to pass
+    val env = providers.gradleProperty("env").orNull // use gradlew -Penv=${env} to pass
     val propertyFile = if (env == null) file("src/main/resources/flyway.properties") else file("conf/${env}/resources/flyway.properties")
     val properties = DBMigration.loadProperties(propertyFile)
 

@@ -16,7 +16,7 @@
     <rule ref="category/java/bestpractices.xml/DoubleBraceInitialization"/>
     <rule ref="category/java/bestpractices.xml/ForLoopCanBeForeach"/>
     <rule ref="category/java/bestpractices.xml/ForLoopVariableCount"/>
-    <rule ref="category/java/bestpractices.xml/JUnit5TestShouldBePackagePrivate"/>
+    <rule ref="category/java/bestpractices.xml/JUnitJupiterTestShouldBePackagePrivate"/>
     <rule ref="category/java/bestpractices.xml/LooseCoupling">
         <properties>
             <property name="allowedTypes" value="java.util.Properties,org.bson.Document,io.undertow.util.HeaderValues,org.jsoup.select.Elements,com.google.cloud.bigquery.FieldValueList"/>
@@ -56,6 +56,7 @@
     <rule ref="category/java/codestyle.xml/ModifierOrder"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryAnnotationValueElement"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryBoxing"/>
+    <rule ref="category/java/codestyle.xml/UnnecessaryBlock"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryCast"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryConstructor"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName"/>
@@ -121,6 +122,7 @@
     <rule ref="category/java/errorprone.xml/InstantiationToGetClass"/>
     <rule ref="category/java/errorprone.xml/InvalidLogMessageFormat"/>
     <rule ref="category/java/errorprone.xml/JumbledIncrementer"/>
+    <rule ref="category/java/errorprone.xml/JUnitJupiterTestNoPrivateModifier"/>
     <rule ref="category/java/errorprone.xml/MisplacedNullCheck"/>
     <rule ref="category/java/errorprone.xml/NonStaticInitializer"/>
     <rule ref="category/java/errorprone.xml/OverrideBothEqualsAndHashcode"/>

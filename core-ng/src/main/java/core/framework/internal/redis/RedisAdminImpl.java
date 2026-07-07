@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 import static core.framework.internal.redis.Protocol.Command.INFO;
@@ -36,7 +37,7 @@ public class RedisAdminImpl implements RedisAdmin {
         try {
             RedisConnection connection = item.resource;
             connection.writeCommand(INFO);
-            value = decode(connection.readBlobString());
+            value = Objects.requireNonNull(decode(connection.readBlobString()));
             return parseInfo(value);
         } catch (IOException e) {
             item.broken = true;

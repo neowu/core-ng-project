@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
 }
 
-val mavenURL = project.properties["mavenURL"] as String?    // usage: "gradlew -PmavenURL=/path clean publish"
+val mavenURL = providers.gradleProperty("mavenURL").orNull    // usage: "gradlew -PmavenURL=/path clean publish"
 
 if (mavenURL != null) {
     val mavenDir = file(mavenURL)

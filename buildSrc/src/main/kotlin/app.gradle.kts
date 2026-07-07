@@ -7,7 +7,7 @@ application {
 }
 
 tasks.named<ProcessResources>("processResources") {
-    val env = project.properties["env"] // use gradlew -Penv=${env} to pass
+    val env = providers.gradleProperty("env").orNull // use gradlew -Penv=${env} to pass
     if (env != null) {
         val envResourceDir = file("conf/${env}/resources")
         if (!envResourceDir.exists()) throw Error("$envResourceDir does not exist")

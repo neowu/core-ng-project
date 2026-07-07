@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 
 import static core.framework.log.Markers.errorCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -86,7 +87,7 @@ public class KafkaController {
     }
 
     private ActionLog initAction(String topic, String key) {
-        ActionLog actionLog = LogManager.currentActionLog();
+        ActionLog actionLog = Objects.requireNonNull(LogManager.currentActionLog());
         actionLog.context.put("topic", List.of(topic));
         actionLog.context.put("key", List.of(key));
         return actionLog;

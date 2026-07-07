@@ -14,7 +14,7 @@ dependencies {
     implementation(libs.jackson.databind)
     implementation("com.squareup.okhttp3:okhttp:5.3.2")
     implementation("io.undertow:undertow-core:2.4.1.Final")
-    implementation("org.apache.kafka:kafka-clients:4.3.0") {
+    implementation("org.apache.kafka:kafka-clients:4.3.1") {
         exclude("org.xerial.snappy")
         exclude("at.yawk.lz4")
     }

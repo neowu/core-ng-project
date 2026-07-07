@@ -6,11 +6,13 @@ import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisSet;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Objects;
 import java.util.Set;
 
 import static core.framework.internal.redis.Protocol.Command.SADD;
@@ -66,10 +68,10 @@ public final class RedisSetImpl implements RedisSet {
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyCommand(SMEMBERS, key);
-            Object[] response = connection.readArray();
+            @Nullable Object[] response = Objects.requireNonNull(connection.readArray());
             values = Sets.newHashSetWithExpectedSize(response.length);
             for (Object value : response) {
-                values.add(decode((byte[]) value));
+                values.add(Objects.requireNonNull(decode((byte[]) value)));
             }
             return values;
         } catch (IOException e) {
@@ -142,10 +144,10 @@ public final class RedisSetImpl implements RedisSet {
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyArgumentCommand(SPOP, key, encode(count));
-            Object[] response = connection.readArray();
+            @Nullable Object[] response = Objects.requireNonNull(connection.readArray());
             values = Sets.newHashSetWithExpectedSize(response.length);
             for (Object value : response) {
-                values.add(decode((byte[]) value));
+                values.add(Objects.requireNonNull(decode((byte[]) value)));
             }
             return values;
         } catch (IOException e) {

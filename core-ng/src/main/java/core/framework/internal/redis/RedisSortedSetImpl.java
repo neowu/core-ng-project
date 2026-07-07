@@ -6,12 +6,14 @@ import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisSortedSet;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
+import java.util.Objects;
 
 import static core.framework.internal.redis.Protocol.Command.ZADD;
 import static core.framework.internal.redis.Protocol.Command.ZINCRBY;
@@ -85,7 +87,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
             connection.writeBlobString(encode(increment));
             connection.writeBlobString(encode(value));
             connection.flush();
-            score = (long) Double.parseDouble(decode(connection.readBlobString()));
+            score = (long) Double.parseDouble(Objects.requireNonNull(decode(connection.readBlobString())));
             return score;
         } catch (IOException e) {
             item.broken = true;
@@ -113,7 +115,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
             connection.writeBlobString(encode(stop));
             connection.writeBlobString(WITHSCORES);
             connection.flush();
-            Object[] response = connection.readArray();
+            @Nullable Object[] response = Objects.requireNonNull(connection.readArray());
             values = valuesWithScores(response);
             return values;
         } catch (IOException e) {
@@ -139,7 +141,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            Object[] response = rangeByScore(connection, key, minScore, maxScore, limit);
+            @Nullable Object[] response = Objects.requireNonNull(rangeByScore(connection, key, minScore, maxScore, limit));
             values = valuesWithScores(response);
             return values;
         } catch (IOException e) {
@@ -154,7 +156,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         }
     }
 
-    private Object[] rangeByScore(RedisConnection connection, String key, long minScore, long maxScore, long limit) throws IOException {
+    private @Nullable Object[] rangeByScore(RedisConnection connection, String key, long minScore, long maxScore, long limit) throws IOException {
         connection.writeArray(9);
         connection.writeBlobString(ZRANGE);
         connection.writeBlobString(encode(key));
@@ -166,7 +168,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         connection.writeBlobString(encode(0));
         connection.writeBlobString(encode(limit));
         connection.flush();
-        return connection.readArray();
+        return Objects.requireNonNull(connection.readArray());
     }
 
     @SuppressWarnings("PMD.ExceptionAsFlowControl") // intentional, simplest way to unify control flow
@@ -183,16 +185,16 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            Object[] response = rangeByScore(connection, key, minScore, maxScore, -1);
+            @Nullable Object[] response = rangeByScore(connection, key, minScore, maxScore, -1);
             if (response.length % 2 != 0) throw new IOException("unexpected length of array, length=" + response.length);
             values = Maps.newLinkedHashMapWithExpectedSize(response.length / 2);
             fetchedEntries = response.length / 2;
             for (int i = 0; i < response.length; i += 2) {
-                byte[] value = (byte[]) response[i];
+                byte[] value = (byte[]) Objects.requireNonNull(response[i]);
                 connection.writeKeyArgumentCommand(ZREM, key, value);
                 long removed = connection.readLong();
                 if (removed == 1L) {
-                    values.put(decode(value), (long) Double.parseDouble(decode((byte[]) response[i + 1])));
+                    values.put(decode(value), (long) Double.parseDouble(Objects.requireNonNull(decode((byte[]) response[i + 1]))));
                     size++;
                     if (limit > 0 && size >= limit) break;
                 }
@@ -219,7 +221,7 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyArgumentCommand(ZPOPMIN, key, encode(limit));
-            Object[] response = connection.readArray();
+            @Nullable Object[] response = Objects.requireNonNull(connection.readArray());
             values = valuesWithScores(response);
             return values;
         } catch (IOException e) {
@@ -258,11 +260,11 @@ public class RedisSortedSetImpl implements RedisSortedSet {
         }
     }
 
-    private Map<String, Long> valuesWithScores(Object[] response) throws IOException {
+    private Map<String, Long> valuesWithScores(@Nullable Object[] response) throws IOException {
         if (response.length % 2 != 0) throw new IOException("unexpected length of array, length=" + response.length);
         Map<String, Long> values = Maps.newLinkedHashMapWithExpectedSize(response.length / 2);
         for (int i = 0; i < response.length; i += 2) {
-            values.put(decode((byte[]) response[i]), (long) Double.parseDouble(decode((byte[]) response[i + 1])));
+            values.put(Objects.requireNonNull(decode((byte[]) response[i])), (long) Double.parseDouble(Objects.requireNonNull(decode((byte[]) response[i + 1]))));
         }
         return values;
     }

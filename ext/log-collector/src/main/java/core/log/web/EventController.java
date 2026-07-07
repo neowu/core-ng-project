@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author neo
@@ -130,7 +131,7 @@ public class EventController {
             throw new BadRequestException("body must not be null", "INVALID_HTTP_REQUEST");
         }
         try {
-            SendEventRequest eventRequest = reader.fromJSON(body);
+            SendEventRequest eventRequest = Objects.requireNonNull(reader.fromJSON(body));
             validator.validate(eventRequest);
             return eventRequest;
         } catch (ValidationException e) {

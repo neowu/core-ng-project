@@ -10,7 +10,7 @@ plugins {
 
 checkstyle {
     dependencies {
-        checkstyle("com.puppycrawl.tools:checkstyle:13.4.0")
+        checkstyle("com.puppycrawl.tools:checkstyle:13.7.0")
         checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
     }
 
@@ -38,7 +38,7 @@ checkstyle {
 pmd {
     ruleSets = listOf()
     ruleSetFiles = rootProject.files("buildSrc/src/main/lint/pmd.xml")
-    toolVersion = "7.23.0"
+    toolVersion = "7.26.0"
     isConsoleOutput = true
 
     tasks.withType<Pmd> {
@@ -48,17 +48,17 @@ pmd {
 
 spotbugs {
     dependencies {
-        spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.6.15")
+        spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.7.4")
     }
 
-    toolVersion = "4.9.8"
+    toolVersion = "4.10.2"
     reportLevel = Confidence.LOW
     extraArgs = listOf("-longBugCodes")
     includeFilter = rootProject.file("buildSrc/src/main/lint/spotbugs.xml")
 }
 
 jacoco {
-    toolVersion = "0.8.14"
+    toolVersion = "0.8.15"
 
     tasks.named<JacocoReport>("testCodeCoverageReport") {
         reports {
