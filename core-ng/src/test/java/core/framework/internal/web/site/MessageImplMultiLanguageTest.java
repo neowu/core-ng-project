@@ -18,16 +18,16 @@ class MessageImplMultiLanguageTest {
     @BeforeEach
     void createMessage() {
         message = new MessageImpl();
-        List<String> properties = List.of("message-test/messages.properties", "message-test/messages_en.properties", "message-test/messages_en_US.properties");
+        List<String> properties = List.of("message-test/message.properties", "message-test/message_en.properties", "message-test/message_en_US.properties");
         message.load(properties, "en", "en_US", "zh");
     }
 
     @Test
     void language() {
-        assertThat(message.language("messages_en_US.properties")).isEqualTo("en_US");
-        assertThat(message.language("messages_en.properties")).isEqualTo("en");
+        assertThat(message.language("message_en_US.properties")).isEqualTo("en_US");
+        assertThat(message.language("message_en.properties")).isEqualTo("en");
 
-        assertThat(message.language("messages.properties")).isEqualTo(MessageImpl.DEFAULT_LANGUAGE);
+        assertThat(message.language("message.properties")).isEqualTo(MessageImpl.DEFAULT_LANGUAGE);
 
         assertThatThrownBy(() -> message.language("invalid.message_E.properties"))
             .isInstanceOf(Error.class)

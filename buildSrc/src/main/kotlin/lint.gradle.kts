@@ -23,6 +23,8 @@ checkstyle {
             include("conf/**/*.properties")
             include("src/main/java/**/*.java")
             include("src/main/**/*.properties")
+            include("src/main/**/*.csv")
+            include("src/main/**/*.json")
         }
     }
 
@@ -31,6 +33,8 @@ checkstyle {
         source = fileTree(projectDir) {
             include("src/test/java/**/*.java")       // not include java files in resources
             include("src/test/**/*.properties")
+            include("src/test/**/*.csv")
+            include("src/test/**/*.json")
         }
     }
 }

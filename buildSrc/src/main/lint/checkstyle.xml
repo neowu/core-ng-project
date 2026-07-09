@@ -4,6 +4,14 @@
 <module name="Checker">
     <module name="OrderedProperties"/>                      <!--Detects if keys in properties files are in correct order.-->
 
+    <module name="RegexpOnFilename">
+        <property name="fileExtensions" value="csv, json, properties"/>
+        <!-- allow message_{locale}.properties -->
+        <property name="fileNamePattern" value="^(message_[a-zA-Z0-9_]*|[a-z0-9]+(-[a-z0-9]+)*)$"/>
+        <property name="ignoreFileNameExtensions" value="true"/>
+        <property name="match" value="false"/>
+    </module>
+
     <module name="TreeWalker">
         <!--Annotations:-->
         <module name="AnnotationLocation">                  <!--Check location of annotation on language elements.-->

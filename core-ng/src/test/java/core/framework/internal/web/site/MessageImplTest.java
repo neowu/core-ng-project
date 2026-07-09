@@ -17,7 +17,7 @@ class MessageImplTest {
     @BeforeEach
     void createMessage() {
         message = new MessageImpl();
-        message.load(List.of("message-test/messages.properties"));
+        message.load(List.of("message-test/message.properties"));
     }
 
     @Test
