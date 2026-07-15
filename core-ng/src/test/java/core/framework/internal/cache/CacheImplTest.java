@@ -126,14 +126,18 @@ class CacheImplTest {
 
     @Test
     void evict() {
-        cache.evict("key1");
+        when(cacheStore.delete("name:key1")).thenReturn(true);
+
+        assertThat(cache.evict("key1")).isTrue();
 
         verify(cacheStore).delete("name:key1");
     }
 
     @Test
     void evictAll() {
-        cache.evictAll(List.of("key1", "key2"));
+        when(cacheStore.delete("name:key1", "name:key2")).thenReturn(true);
+
+        assertThat(cache.evictAll(List.of("key1", "key2"))).isTrue();
 
         verify(cacheStore).delete("name:key1", "name:key2");
     }

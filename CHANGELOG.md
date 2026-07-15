@@ -5,6 +5,7 @@
 * NPE: due to spotbugs improved NPE checking and jspecify, some built in utils methods changed behavior !!!
   > ASCII.toLowerCase/toUpperCase only accept nonnull
 * es: update to 9.4.3
+* cache: evicts return if success
 
 ### 9.5.4 (6/2/26 - 6/16/26)
 

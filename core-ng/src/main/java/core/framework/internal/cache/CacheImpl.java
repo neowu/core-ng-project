@@ -99,14 +99,14 @@ public class CacheImpl<T> implements Cache<T> {
     }
 
     @Override
-    public void evict(String key) {
-        cacheStore.delete(cacheKey(key));
+    public boolean evict(String key) {
+        return cacheStore.delete(cacheKey(key));
     }
 
     @Override
-    public void evictAll(Collection<String> keys) {
+    public boolean evictAll(Collection<String> keys) {
         String[] cacheKeys = cacheKeys(keys);
-        cacheStore.delete(cacheKeys);
+        return cacheStore.delete(cacheKeys);
     }
 
     private String[] cacheKeys(Collection<String> keys) {
