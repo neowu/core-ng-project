@@ -29,15 +29,26 @@ class GCloudAuthProviderTest {
     @Test
     void user() {
         assertThat(provider.user(Dialect.MYSQL))
-            .isEqualTo("lab-customer-service")
-            .isEqualTo(provider.user);
+            .isEqualTo("lab-customer-service");
+
+        assertThat(provider.email).isNotNull();
     }
 
     @Test
-    void userWithPosgreSQL() {
+    void userWithPostgreSQL() {
         assertThat(provider.user(Dialect.POSTGRESQL))
-            .isEqualTo("lab-customer-service@lab.iam")
-            .isEqualTo(provider.user);
+            .isEqualTo("lab-customer-service@lab.iam");
+
+        assertThat(provider.email).isNotNull();
+    }
+
+    @Test
+    void userWithMultipleDB() {
+        assertThat(provider.user(Dialect.MYSQL))
+            .isEqualTo("lab-customer-service");
+        assertThat(provider.user(Dialect.POSTGRESQL))
+            .isEqualTo("lab-customer-service@lab.iam");
+        assertThat(provider.email).isNotNull();
     }
 
     @Test

@@ -1,11 +1,12 @@
 ## Change log
 
-### 9.6.0 (7/6/26 - 7/22/26)
+### 9.6.1-b1 (7/6/26 - )
 
 * NPE: due to spotbugs improved NPE checking and jspecify, some built in utils methods changed behavior !!!
   > ASCII.toLowerCase/toUpperCase only accept nonnull
 * es: update to 9.4.3
 * cache: evicts return if success
+* db: CloudAuthProvider supports connecting to both MySQL and PostgreSQL
 
 ### 9.5.4 (6/2/26 - 6/16/26)
 

@@ -1,6 +1,6 @@
 subprojects {
     group = "core.framework"
-    version = "9.6.0"
+    version = "9.6.1-b1"
     repositories {
         maven {
             url = uri("https://neowu.github.io/maven-repo/")

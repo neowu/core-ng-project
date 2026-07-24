@@ -24,18 +24,18 @@ public final class GCloudAuthProvider implements CloudAuthProvider {
         .build();
 
     @Nullable
-    String user;    // iam user, won't change once pod is created
+    String email;    // iam user, won't change once pod is created
     @Nullable
     String accessToken;
     long expirationTime;
 
     @Override
     public String user(Dialect dialect) {
-        // email won't change once pod created
-        if (user == null) {
-            user = parseUser(dialect, metadata("email"));
+        if (email == null) {
+            // email won't change once pod created
+            email = metadata("email");
         }
-        return user;
+        return parseUser(dialect, email);
     }
 
     @Override
