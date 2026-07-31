@@ -2,7 +2,6 @@ package app.monitor.kafka;
 
 import app.monitor.alert.AlertService;
 import core.framework.log.Severity;
-import core.framework.log.message.EventMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

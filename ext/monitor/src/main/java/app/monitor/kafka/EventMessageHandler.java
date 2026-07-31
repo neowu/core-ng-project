@@ -4,7 +4,6 @@ import app.monitor.alert.Alert;
 import app.monitor.alert.AlertService;
 import core.framework.inject.Inject;
 import core.framework.kafka.MessageHandler;
-import core.framework.log.message.EventMessage;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

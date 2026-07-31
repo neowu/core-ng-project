@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.6.1 (7/6/26 - 7/31/26)
+### 9.6.2 (7/6/26 - 7/31/26)
 
 * NPE: due to spotbugs improved NPE checking and jspecify, some built in utils methods changed behavior !!!
   > ASCII.toLowerCase/toUpperCase only accept nonnull
