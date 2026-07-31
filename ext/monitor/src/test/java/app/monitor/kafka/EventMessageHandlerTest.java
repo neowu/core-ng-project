@@ -33,7 +33,7 @@ class EventMessageHandlerTest {
     @Test
     void handleOKAction() {
         var message = new EventMessage();
-        message.date = Instant.now();
+        message.timestamp = Instant.now();
         message.result = "OK";
         message.errorCode = null;
         handler.handle(null, message);
@@ -43,7 +43,7 @@ class EventMessageHandlerTest {
     @Test
     void handle() {
         var message = new EventMessage();
-        message.date = Instant.now();
+        message.timestamp = Instant.now();
         message.result = "ERROR";
         message.errorCode = "RUNTIME_ERROR";
         handler.handle(null, message);

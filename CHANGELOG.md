@@ -9,6 +9,7 @@
 * db: CloudAuthProvider supports connecting to both MySQL and PostgreSQL
 * ext: removed log-processor/log-collector/log-exporter
   > migrate to rust version, https://github.com/neowu/core_rs_workspace
+* monitor: updated with event-v2 topic
 
 ### 9.5.4 (6/2/26 - 6/16/26)
 
