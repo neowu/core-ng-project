@@ -12,7 +12,7 @@ import java.util.Map;
 public class EventMessage {
     @Property(name = "id")
     public String id;
-    @Property(name = "date")
+    @Property(name = "timestamp")
     public Instant timestamp;
     @Property(name = "app")
     public String app;
