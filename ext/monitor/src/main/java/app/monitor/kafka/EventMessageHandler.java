@@ -26,7 +26,7 @@ public class EventMessageHandler implements MessageHandler<EventMessage> {
     private Alert alert(EventMessage message) {
         var alert = new Alert();
         alert.id = message.id;
-        alert.date = LocalDateTime.ofInstant(message.date, ZoneId.systemDefault());
+        alert.date = LocalDateTime.ofInstant(message.timestamp, ZoneId.systemDefault());
         alert.app = message.app;
         alert.action = message.action;
         alert.severity(message.result);

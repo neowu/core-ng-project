@@ -1,7 +1,6 @@
-package core.log.domain;
+package app.monitor.kafka;
 
 import core.framework.api.json.Property;
-import core.framework.search.Index;
 
 import java.time.Instant;
 import java.util.Map;
@@ -9,20 +8,27 @@ import java.util.Map;
 /**
  * @author neo
  */
-@Index(name = "stat")
-public class StatDocument {
-    @Property(name = "@timestamp")
-    public Instant timestamp;
+public class EventMessage {
+    @Property(name = "id")
+    public String id;
+    @Property(name = "date")
+    public Instant date;
     @Property(name = "app")
     public String app;
-    @Property(name = "host")
-    public String host;
+    @Property(name = "received_time")
+    public Instant receivedTime;
     @Property(name = "result")
     public String result;
+    @Property(name = "action")
+    public String action;
     @Property(name = "error_code")
     public String errorCode;
     @Property(name = "error_message")
     public String errorMessage;
+    @Property(name = "elapsed")
+    public Long elapsed;
+    @Property(name = "context")
+    public Map<String, String> context;
     @Property(name = "stats")
     public Map<String, Double> stats;
     @Property(name = "info")

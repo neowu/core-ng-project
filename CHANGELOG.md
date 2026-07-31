@@ -1,12 +1,14 @@
 ## Change log
 
-### 9.6.1-b1 (7/6/26 - )
+### 9.6.1 (7/6/26 - 7/31/26)
 
 * NPE: due to spotbugs improved NPE checking and jspecify, some built in utils methods changed behavior !!!
   > ASCII.toLowerCase/toUpperCase only accept nonnull
 * es: update to 9.4.3
 * cache: evicts return if success
 * db: CloudAuthProvider supports connecting to both MySQL and PostgreSQL
+* ext: removed log-processor/log-collector/log-exporter
+  > migrate to rust version, https://github.com/neowu/core_rs_workspace
 
 ### 9.5.4 (6/2/26 - 6/16/26)
 

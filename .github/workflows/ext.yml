@@ -20,21 +20,6 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_TOKEN }}
     - uses: docker/build-push-action@v7
       with:
-        context: "build/ext/log-processor/docker"
-        tags: "neowu/log-processor:${{ env.TAG }}"
-        push: true
-    - uses: docker/build-push-action@v7
-      with:
-        context: "build/ext/log-collector/docker"
-        tags: "neowu/log-collector:${{ env.TAG }}"
-        push: true
-    - uses: docker/build-push-action@v7
-      with:
         context: "build/ext/monitor/docker"
         tags: "neowu/monitor:${{ env.TAG }}"
-        push: true
-    - uses: docker/build-push-action@v7
-      with:
-        context: "build/ext/log-exporter/docker"
-        tags: "neowu/log-exporter:${{ env.TAG }}"
         push: true
