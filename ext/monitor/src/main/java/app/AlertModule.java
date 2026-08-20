@@ -42,7 +42,7 @@ public class AlertModule extends Module {
         bind(new AlertService(config));
 
         kafka().concurrency(2);
-        kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get 1M message
+        kafka().minPoll(1024 * 1024, Duration.ofMillis(1000));           // try to get 1M message
         kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));
         kafka().subscribe(LogTopics.TOPIC_STAT, StatMessage.class, bind(StatMessageHandler.class));
         kafka().subscribe("event-v2", EventMessage.class, bind(EventMessageHandler.class));
