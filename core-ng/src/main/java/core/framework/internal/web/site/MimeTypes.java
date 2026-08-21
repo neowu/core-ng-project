@@ -12,7 +12,7 @@ import java.util.Map;
  */
 final class MimeTypes {
     // refer to /etc/nginx/mime.types
-    private static final Map<String, ContentType> MIME_TYPES = Maps.newHashMapWithExpectedSize(40);
+    private static final Map<String, ContentType> MIME_TYPES = Maps.newHashMapWithExpectedSize(28);
 
     static {
         MIME_TYPES.put("html", ContentType.TEXT_HTML);

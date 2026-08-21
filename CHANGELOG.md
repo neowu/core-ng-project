@@ -1,5 +1,7 @@
 ## Change log
 
+### 9.6.3 (8/21/26 - )
+
 ### 9.6.2 (7/6/26 - 7/31/26)
 
 * NPE: due to spotbugs improved NPE checking and jspecify, some built in utils methods changed behavior !!!
