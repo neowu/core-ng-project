@@ -103,7 +103,7 @@ public class MessageListener {
     Consumer<String, byte[]> createConsumer() {
         var watch = new StopWatch();
         try {
-            Map<String, Object> config = Maps.newHashMapWithExpectedSize(13);
+            Map<String, Object> config = Maps.newHashMapWithExpectedSize(14);
             config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs);
             config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
             config.put(ConsumerConfig.CLIENT_ID_CONFIG, Network.LOCAL_HOST_NAME + (name == null ? "" : "/" + name));      // will show in monitor metrics
