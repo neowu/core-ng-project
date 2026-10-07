@@ -46,6 +46,7 @@ public class APIConfig extends Config {
             .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
             .keepAlive(Duration.ofMinutes(5))   // use longer keep alive timeout within cluster, to reduce connection creation overhead
             .maxRetries(5)
+            .enableFallbackDNSCache()   // with zonal GKE cluster, dns record could be deleted during auto-upgrade, cache service ip to tolerate
             .build();
         writer = new RequestBeanWriter();
         reader = new ResponseBeanReader();

@@ -10,7 +10,7 @@ plugins {
 
 checkstyle {
     dependencies {
-        checkstyle("com.puppycrawl.tools:checkstyle:13.7.0")
+        checkstyle("com.puppycrawl.tools:checkstyle:13.11.0")
         checkstyle("com.github.sevntu-checkstyle:sevntu-checks:1.44.1")
     }
 
@@ -42,7 +42,7 @@ checkstyle {
 pmd {
     ruleSets = listOf()
     ruleSetFiles = rootProject.files("buildSrc/src/main/lint/pmd.xml")
-    toolVersion = "7.26.0"
+    toolVersion = "7.28.0"
     isConsoleOutput = true
 
     tasks.withType<Pmd> {
@@ -55,7 +55,7 @@ spotbugs {
         spotbugsPlugins("com.mebigfatguy.sb-contrib:sb-contrib:7.7.4")
     }
 
-    toolVersion = "4.10.2"
+    toolVersion = "4.10.4"
     reportLevel = Confidence.LOW
     extraArgs = listOf("-longBugCodes")
     includeFilter = rootProject.file("buildSrc/src/main/lint/spotbugs.xml")

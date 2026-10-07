@@ -1,6 +1,9 @@
 ## Change log
 
-### 9.6.3 (8/21/26 - )
+### 9.6.3 (8/21/26 - 10/7/26)
+
+* api: enable fallback dns cache for api client
+  > with zonal GKE cluster, dns record could be deleted during auto-upgrade, cache service ip to tolerate
 
 ### 9.6.2 (7/6/26 - 7/31/26)
 
