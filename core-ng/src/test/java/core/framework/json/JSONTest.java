@@ -222,4 +222,11 @@ class JSONTest {
         assertThatThrownBy(() -> JSON.fromJSON(Integer.class, "\"\""))
             .isInstanceOf(JSONException.class);
     }
+
+    @Test
+    void lenientMapper() {
+        // JSON.fromJSON may parse external json, keep lenient
+        TestBean bean = JSON.fromJSON(TestBean.class, "{\"string\":\"value\\u0000\"}");
+        assertThat(bean.stringField).isEqualTo("value\u0000");
+    }
 }

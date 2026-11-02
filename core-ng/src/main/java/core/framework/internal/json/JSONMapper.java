@@ -39,6 +39,7 @@ import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
  */
 public class JSONMapper {
     public static final JsonMapper OBJECT_MAPPER = builder().build();
+
     private static Map<Class<?>, JSONReader<?>> readers = new HashMap<>();
     private static Map<Class<?>, JSONWriter<?>> writers = new HashMap<>();
 

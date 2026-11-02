@@ -1,5 +1,11 @@
 ## Change log
 
+### 9.6.4 (11/02/26)
+
+* json: for internal json reader, reject invalid utf-8 escaping
+
+> refer to core/framework/internal/json/StrictStringDeserializer.java
+
 ### 9.6.3 (8/21/26 - 10/7/26)
 
 * api: enable fallback dns cache for api client
