@@ -68,6 +68,9 @@ public class ClientIPParser {
         // only 1 colon means ipv4:port, ipv6 must have at least 2 colons
         if (colonIndex > 0 && colonIndex < node.length() - 1 && node.indexOf(':', colonIndex + 1) == -1) ip = node.substring(0, colonIndex);
 
+        // ofLiteral resolves ipv6 scope id (e.g. fe80::1%eth0) against local network interfaces, client ip never has scope id
+        if (ip.indexOf('%') >= 0) throw new BadRequestException("invalid client ip address", "INVALID_HTTP_REQUEST");
+
         InetAddress address;
         try {
             address = InetAddress.ofLiteral(ip);

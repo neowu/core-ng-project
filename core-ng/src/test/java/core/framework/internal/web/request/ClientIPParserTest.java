@@ -83,7 +83,11 @@ class ClientIPParserTest {
         assertInvalidNode("cafe");
         assertInvalidNode("2001:db8:cafe::17::1");
         assertInvalidNode("[::1]:80");
+        // scope id, ofLiteral result depends on local network interfaces
         assertInvalidNode("fe80::1%eth0");
+        assertInvalidNode("fe80::1%lo0");
+        assertInvalidNode("fe80::1%en0");
+        assertInvalidNode("fe80::1%1");
 
         // legacy ipv4 forms
         assertInvalidNode("1");
