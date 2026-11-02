@@ -2,6 +2,10 @@ package core.framework.internal.web.request;
 
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
+import org.jspecify.annotations.Nullable;
+
+import java.net.Inet4Address;
+import java.net.InetAddress;
 
 /**
  * @author neo
@@ -11,7 +15,7 @@ public class ClientIPParser {
     // for google lb, it appends <immediate client IP>, <global forwarding rule external IP>, refer to https://cloud.google.com/load-balancing/docs/https#target-proxies
     public int maxForwardedIPs = 2;
 
-    String parse(String remoteAddress, String xForwardedFor) {
+    String parse(String remoteAddress, @Nullable String xForwardedFor) {
         if (Strings.isBlank(xForwardedFor)) return remoteAddress;
 
         int foundForwardedIPs = 1;
@@ -47,7 +51,7 @@ public class ClientIPParser {
     }
 
     // could be x-forwarded-for spoofing or pass thru http forward proxies
-    boolean hasMoreThanMaxForwardedIPs(String xForwardedFor) {
+    boolean hasMoreThanMaxForwardedIPs(@Nullable String xForwardedFor) {
         if (xForwardedFor == null) return false;    // maxForwardedIPs must greater than 0
         int foundIPs = 1;
         int length = xForwardedFor.length();
@@ -57,33 +61,23 @@ public class ClientIPParser {
         return foundIPs > maxForwardedIPs;
     }
 
-    // check loosely to avoid unnecessary overhead, especially x-forwarded-for is extracted from right to left, where values are from trusted LB
-    // ipv4 must have 3 dots and 1 optional colon, with hex chars
-    // ipv6 must have only colons with hex chars
+    // validate with InetAddress.ofLiteral, which only parses ip literal and never does DNS lookup, so downstream (e.g. IPAccessControl) always gets valid ip
     String extractIP(String node) {
-        int length = node.length();
-        int dots = 0;
-        int lastDotIndex = -1;
-        int colons = 0;
-        int lastColonIndex = -1;
-        for (int i = 0; i < length; i++) {
-            char ch = node.charAt(i);
-            if (ch == '.') {
-                dots++;
-                lastDotIndex = i;
-            } else if (ch == ':') {
-                colons++;
-                lastColonIndex = i;
-            } else if (Character.digit(ch, 16) == -1) {
-                throw new BadRequestException("invalid client ip address");
-            }
+        String ip = node;
+        int colonIndex = node.indexOf(':');
+        // only 1 colon means ipv4:port, ipv6 must have at least 2 colons
+        if (colonIndex > 0 && colonIndex < node.length() - 1 && node.indexOf(':', colonIndex + 1) == -1) ip = node.substring(0, colonIndex);
+
+        InetAddress address;
+        try {
+            address = InetAddress.ofLiteral(ip);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("invalid client ip address", "INVALID_HTTP_REQUEST", e);
         }
-        if (dots == 0) return node; // should be ipv6 format
-        if (dots == 3 && (colons == 0
-                          || colons == 1 && lastColonIndex > lastDotIndex && lastColonIndex < length - 1)) {
-            if (lastColonIndex > 0) return node.substring(0, lastColonIndex);   // should be ipv4:port
-            return node;    // should be ipv4
+        // ofLiteral accepts legacy ipv4 forms, e.g. 1.2, 192.0.2, 010.1.1.1, ::ffff:1.2.3.4, only allow standard dotted-decimal
+        if (address instanceof Inet4Address && !ip.equals(address.getHostAddress())) {
+            throw new BadRequestException("invalid client ip address", "INVALID_HTTP_REQUEST");
         }
-        throw new BadRequestException("invalid client ip address");
+        return ip;
     }
 }

@@ -44,7 +44,7 @@ class IPAccessControlTest {
             .isInstanceOf(ForbiddenException.class)
             .hasMessageContaining("access denied");
     }
-
+    
     @Test
     void isLocal() throws UnknownHostException {
         assertThat(accessControl.isLocal(InetAddress.getByName("127.0.0.1"))).isTrue();

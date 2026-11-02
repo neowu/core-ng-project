@@ -3,8 +3,8 @@
 ### 9.6.4 (11/02/26)
 
 * json: for internal json reader, reject invalid utf-8 escaping
-
-> refer to core/framework/internal/json/StrictStringDeserializer.java
+  > refer to core/framework/internal/json/StrictStringDeserializer.java
+* http: IPAccessControl/ClientIPParser, make it stricter and avoid DNS resolving
 
 ### 9.6.3 (8/21/26 - 10/7/26)
 

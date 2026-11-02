@@ -38,19 +38,17 @@ class StrictStringDeserializerTest {
 
     @Test
     void rejectInvalidString() {
-        assertThatThrownBy(() -> reader.fromJSON("{\"string\":\"www.example.com\\u0000\"}".getBytes(UTF_8)))
-            .isInstanceOf(JSONException.class);
-        assertThatThrownBy(() -> reader.fromJSON("{\"string\":\"\\uD800\"}".getBytes(UTF_8)))
-            .isInstanceOf(JSONException.class);
-        assertThatThrownBy(() -> reader.fromJSON("{\"list\":[\"\\u0000\"]}".getBytes(UTF_8)))
-            .isInstanceOf(JSONException.class);
-        assertThatThrownBy(() -> reader.fromJSON("{\"map\":{\"key\":\"\\uDC00\"}}".getBytes(UTF_8)))
-            .isInstanceOf(JSONException.class);
-        assertThatThrownBy(() -> reader.fromJSON("{\"map\":{\"key\\u0000\":\"value\"}}".getBytes(UTF_8)))
-            .isInstanceOf(JSONException.class);
-        assertThatThrownBy(() -> reader.fromJSON("{\"listMap\":{\"key\":[\"\\u0000\"]}}".getBytes(UTF_8)))
-            .isInstanceOf(JSONException.class);
-        assertThatThrownBy(() -> reader.fromJSON("{\"defaultValue\":\"\\uD83D\"}".getBytes(UTF_8)))
+        assertInvalid("{\"string\":\"www.example.com\\u0000\"}");
+        assertInvalid("{\"string\":\"\\uD800\"}");
+        assertInvalid("{\"list\":[\"\\u0000\"]}");
+        assertInvalid("{\"map\":{\"key\":\"\\uDC00\"}}");
+        assertInvalid("{\"map\":{\"key\\u0000\":\"value\"}}");
+        assertInvalid("{\"listMap\":{\"key\":[\"\\u0000\"]}}");
+        assertInvalid("{\"defaultValue\":\"\\uD83D\"}");
+    }
+
+    private void assertInvalid(String json) {
+        assertThatThrownBy(() -> reader.fromJSON(json.getBytes(UTF_8)))
             .isInstanceOf(JSONException.class);
     }
 }

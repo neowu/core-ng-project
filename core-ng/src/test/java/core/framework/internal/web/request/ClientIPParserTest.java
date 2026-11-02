@@ -72,6 +72,31 @@ class ClientIPParserTest {
     }
 
     @Test
+    void extractIPWithHostname() {
+        // must not be treated as hostname to resolve DNS
+        assertInvalidNode("");
+        assertInvalidNode("999.1.1.1");
+        assertInvalidNode("256.0.0.1:80");
+        assertInvalidNode("dead.beef.cafe.babe");
+        assertInvalidNode("a.b.deed.de");
+        assertInvalidNode("deadbeef");
+        assertInvalidNode("cafe");
+        assertInvalidNode("2001:db8:cafe::17::1");
+        assertInvalidNode("[::1]:80");
+        assertInvalidNode("fe80::1%eth0");
+
+        // legacy ipv4 forms
+        assertInvalidNode("1");
+        assertInvalidNode("1.2");
+        assertInvalidNode("010.1.1.1");
+        assertInvalidNode("::ffff:1.2.3.4");
+
+        assertThatThrownBy(() -> parser.parse("10.0.0.1", "dead.beef.cafe.babe, 10.0.0.1"))
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("invalid client ip address");
+    }
+
+    @Test
     void hasMoreThanMaxForwardedIPs() {
         parser.maxForwardedIPs = 1;
         assertThat(parser.hasMoreThanMaxForwardedIPs(null)).isFalse();

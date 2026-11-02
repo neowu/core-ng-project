@@ -104,7 +104,7 @@ public final class RequestParser {
         }
     }
 
-    private void parseClientIP(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog, String xForwardedFor) {
+    private void parseClientIP(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog, @Nullable String xForwardedFor) {
         String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
         request.clientIP = clientIPParser.parse(remoteAddress, xForwardedFor);
         actionLog.context.put("client_ip", List.of(request.clientIP));

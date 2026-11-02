@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * @author neo
@@ -31,9 +30,9 @@ public class IPAccessControl {
     boolean allow(String clientIP) {
         InetAddress address;
         try {
-            address = InetAddress.getByName(clientIP);
-        } catch (UnknownHostException e) {
-            throw new Error(e);  // client ip format is already validated in ClientIPParser, so here it won't resolve DNS
+            address = InetAddress.ofLiteral(clientIP);  // only parse ip literal, never resolve DNS
+        } catch (IllegalArgumentException e) {
+            throw new Error("invalid client ip address", e);  // client ip format is already validated in ClientIPParser
         }
 
         if (isLocal(address)) {
