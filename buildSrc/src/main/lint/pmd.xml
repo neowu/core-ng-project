@@ -41,8 +41,6 @@
     <rule ref="category/java/bestpractices.xml/UseStandardCharsets"/>
     <rule ref="category/java/bestpractices.xml/UseTryWithResources"/>
 
-    <rule ref="category/java/codestyle.xml/AvoidProtectedFieldInFinalClass"/>
-    <rule ref="category/java/codestyle.xml/AvoidProtectedMethodInFinalClassNotExtending"/>
     <rule ref="category/java/codestyle.xml/BooleanGetMethodName"/>
     <rule ref="category/java/codestyle.xml/EmptyControlStatement"/>
     <rule ref="category/java/codestyle.xml/ForLoopShouldBeWhileLoop"/>
@@ -104,7 +102,6 @@
     <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators"/>
     <rule ref="category/java/errorprone.xml/AvoidUsingOctalValues"/>
     <rule ref="category/java/errorprone.xml/BrokenNullCheck"/>
-    <rule ref="category/java/errorprone.xml/CheckSkipResult"/>
     <rule ref="category/java/errorprone.xml/ClassCastExceptionWithToArray"/>
     <rule ref="category/java/errorprone.xml/CompareObjectsWithEquals"/>
     <rule ref="category/java/errorprone.xml/ComparisonWithNaN"/>
@@ -142,7 +139,6 @@
     <rule ref="category/java/errorprone.xml/UnusedNullCheckInEquals"/>
     <rule ref="category/java/errorprone.xml/UseCorrectExceptionLogging"/>
     <rule ref="category/java/errorprone.xml/UseEqualsToCompareStrings"/>
-    <rule ref="category/java/errorprone.xml/UselessPureMethodCall"/>
     <rule ref="category/java/errorprone.xml/UseLocaleWithCaseConversions"/>
     <rule ref="category/java/errorprone.xml/UseProperClassLoader"/>
 
