@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -224,6 +225,47 @@ class RequestParserTest {
         assertThat(request.method).isEqualTo(HTTPMethod.POST);
         assertThat(request.body()).hasValue(body);
         assertThat(actionLog.stats).containsKeys("request_body_length");
+    }
+
+    @Test
+    void singleHeader() {
+        var headers = new HeaderMap();
+        assertThat(parser.singleHeader(headers, Headers.X_FORWARDED_FOR)).isNull();
+
+        headers.put(Headers.X_FORWARDED_FOR, "108.0.0.1");
+        assertThat(parser.singleHeader(headers, Headers.X_FORWARDED_FOR)).isEqualTo("108.0.0.1");
+
+        headers.add(Headers.X_FORWARDED_FOR, "108.0.0.2");
+        assertThatThrownBy(() -> parser.singleHeader(headers, Headers.X_FORWARDED_FOR))
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("duplicate header");
+    }
+
+    @Test
+    void parseWithDuplicateXForwardedFor() {
+        var actionLog = new ActionLog(null, null);
+        HttpServerExchange exchange = exchange(Methods.GET);
+        exchange.getRequestHeaders().add(Headers.X_FORWARDED_FOR, "108.0.0.1");
+        exchange.getRequestHeaders().add(Headers.X_FORWARDED_FOR, "10.0.0.1");
+
+        var request = new RequestImpl(exchange, null);
+        assertThatThrownBy(() -> parser.parse(request, exchange, actionLog))
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("duplicate header, name=X-Forwarded-For");
+    }
+
+    @Test
+    void parseRemoteIP() throws Throwable {
+        var actionLog = new ActionLog(null, null);
+        HttpServerExchange exchange = exchange(Methods.GET);
+        exchange.setSourceAddress(new InetSocketAddress(InetAddress.ofLiteral("10.0.0.2"), 10000));
+        exchange.getRequestHeaders().put(Headers.X_FORWARDED_FOR, "108.0.0.1");
+
+        var request = new RequestImpl(exchange, null);
+        parser.parse(request, exchange, actionLog);
+
+        assertThat(request.clientIP()).isEqualTo("108.0.0.1");
+        assertThat(request.remoteIP().getHostAddress()).isEqualTo("10.0.0.2");
     }
 
     @Test

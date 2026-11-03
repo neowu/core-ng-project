@@ -15,7 +15,6 @@ import java.util.TreeSet;
  * @author neo
  */
 public class PropertyController implements Controller {
-    private final IPAccessControl accessControl = new IPAccessControl();
     private final PropertyManager propertyManager;
 
     public PropertyController(PropertyManager propertyManager) {
@@ -24,7 +23,7 @@ public class PropertyController implements Controller {
 
     @Override
     public Response execute(Request request) {
-        accessControl.validate(request.clientIP());
+        IPAccessControl.validateLocalIP(request.remoteIP());
         return Response.text(properties());
     }
 

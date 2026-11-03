@@ -9,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.net.InetAddress;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -23,7 +25,7 @@ class DiagnosticControllerTest {
 
     @BeforeEach
     void createDiagnosticController() {
-        when(request.clientIP()).thenReturn("127.0.0.1");
+        when(request.remoteIP()).thenReturn(InetAddress.ofLiteral("127.0.0.1"));
         controller = new DiagnosticController();
     }
 

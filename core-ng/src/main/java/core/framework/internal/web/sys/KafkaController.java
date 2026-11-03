@@ -30,12 +30,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class KafkaController {
     private final Logger logger = LoggerFactory.getLogger(KafkaController.class);
-    private final IPAccessControl accessControl = new IPAccessControl();
     public MessageProducer producer;
     public MessageListener listener;
 
     public Response publish(Request request) {
-        accessControl.validate(request.clientIP());
+        IPAccessControl.validateLocalIP(request.remoteIP());
         String topic = request.pathParam("topic");
         String key = request.pathParam("key");
         ActionLog actionLog = initAction(topic, key);
@@ -50,7 +49,7 @@ public class KafkaController {
     }
 
     public Response handle(Request request) throws Exception {
-        accessControl.validate(request.clientIP());
+        IPAccessControl.validateLocalIP(request.remoteIP());
         String topic = request.pathParam("topic");
         String key = request.pathParam("key");
         ActionLog actionLog = initAction(topic, key);

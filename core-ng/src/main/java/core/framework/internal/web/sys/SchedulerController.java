@@ -20,7 +20,6 @@ import java.util.List;
  */
 public class SchedulerController {
     private final Logger logger = LoggerFactory.getLogger(SchedulerController.class);
-    private final IPAccessControl accessControl = new IPAccessControl();
     private final Scheduler scheduler;
 
     public SchedulerController(Scheduler scheduler) {
@@ -28,7 +27,7 @@ public class SchedulerController {
     }
 
     public Response jobs(Request request) {
-        accessControl.validate(request.clientIP());
+        IPAccessControl.validateLocalIP(request.remoteIP());
 
         var response = new ListJobResponse();
         List<ListJobResponse.JobView> jobs = new ArrayList<>();
@@ -44,7 +43,7 @@ public class SchedulerController {
     }
 
     public Response triggerJob(Request request) {
-        accessControl.validate(request.clientIP());
+        IPAccessControl.validateLocalIP(request.remoteIP());
 
         String job = request.pathParam("job");
         logger.warn(Markers.errorCode("MANUAL_OPERATION"), "trigger job manually, job={}", job);   // log trace message, due to potential impact

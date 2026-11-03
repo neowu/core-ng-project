@@ -1,10 +1,14 @@
 ## Change log
 
-### 9.6.4 (11/02/26)
+### 9.6.5 (11/02/26 - 11/03/26)
 
 * json: for internal json reader, reject invalid utf-8 escaping
   > refer to core/framework/internal/json/StrictStringDeserializer.java
 * http: IPAccessControl/ClientIPParser, make it stricter and avoid DNS resolving
+* http: reject request with duplicate Host/X-Forwarded-For/X-Forwarded-Proto/X-Forwarded-Host/X-Forwarded-Port headers
+  > attacker may send multiple headers with same name to override the value appended by proxy
+* http: added Request.remoteIP (), return direct peer ip of connection, ignores x-forwarded-for
+* controller: internal sys controllers use remoteIP instead of trusting XFF
 
 ### 9.6.3 (8/21/26 - 10/7/26)
 

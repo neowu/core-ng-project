@@ -7,6 +7,8 @@ import core.framework.web.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.net.InetAddress;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -27,7 +29,7 @@ class PropertyControllerTest {
     @Test
     void execute() {
         var request = mock(Request.class);
-        when(request.clientIP()).thenReturn("127.0.0.1");
+        when(request.remoteIP()).thenReturn(InetAddress.ofLiteral("127.0.0.1"));
 
         Response response = controller.execute(request);
         assertThat(response.contentType()).get().isEqualTo(ContentType.TEXT_PLAIN);

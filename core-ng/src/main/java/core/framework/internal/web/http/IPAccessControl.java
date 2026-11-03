@@ -11,6 +11,16 @@ import java.net.InetAddress;
  * @author neo
  */
 public class IPAccessControl {
+    public static void validateLocalIP(InetAddress remoteIP) {
+        if (!isLocal(remoteIP)) {
+            throw new ForbiddenException("access denied", "IP_ACCESS_DENIED");
+        }
+    }
+
+    static boolean isLocal(InetAddress address) {
+        return address.isLoopbackAddress() || address.isSiteLocalAddress();
+    }
+
     private final Logger logger = LoggerFactory.getLogger(IPAccessControl.class);
     @Nullable
     public IPv4Ranges allow;
@@ -68,9 +78,5 @@ public class IPAccessControl {
 
         logger.debug("allow client ip not within denied ranges");
         return true;
-    }
-
-    boolean isLocal(InetAddress address) {
-        return address.isLoopbackAddress() || address.isSiteLocalAddress();
     }
 }

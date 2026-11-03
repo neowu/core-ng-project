@@ -2,6 +2,7 @@ package core.framework.web;
 
 import core.framework.http.HTTPMethod;
 
+import java.net.InetAddress;
 import java.util.Map;
 import java.util.Optional;
 
@@ -33,7 +34,9 @@ public interface Request {
 
     <T> T bean(Class<T> beanClass);
 
-    String clientIP();
+    String clientIP();  // parsed from x-forwarded-for if present, for logging/rate limiting/etc
+
+    InetAddress remoteIP(); // direct peer ip of the connection, ignores x-forwarded-for, e.g. to verify request is from internal network
 
     Optional<String> cookie(CookieSpec spec);
 

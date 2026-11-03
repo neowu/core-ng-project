@@ -48,23 +48,22 @@ public final class RequestParser {
     public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {
         HeaderMap headers = exchange.getRequestHeaders();
 
-        request.scheme = scheme(exchange.getRequestScheme(), headers.getFirst(Headers.X_FORWARDED_PROTO));
-        request.hostname = hostname(exchange.getHostName(), headers.getFirst(Headers.X_FORWARDED_HOST));
-        int requestPort = requestPort(headers.getFirst(Headers.HOST), request.scheme, exchange);
-        request.port = port(requestPort, headers.getFirst(Headers.X_FORWARDED_PORT));
-
         String method = exchange.getRequestMethod().toString();
         actionLog.context.put("method", List.of(method));
-
         String path = exchange.getRequestPath();
         request.path = path.isEmpty() ? "/" : path; // according to https://www.rfc-editor.org/rfc/rfc2616#section-5.1.2, empty path must be normalized as '/'
-
         request.requestURL = requestURL(request, exchange);
         putContext(actionLog, "request_url", request.requestURL);   // record request url even if attacker passes long string
         logger.debug("[request] method={}, requestURL={}", method, request.requestURL);
 
         logHeaders(headers);
-        parseClientIP(request, exchange, actionLog, headers.getFirst(Headers.X_FORWARDED_FOR)); // parse client ip after logging header, as ip in x-forwarded-for may be invalid
+
+        request.scheme = scheme(exchange.getRequestScheme(), singleHeader(headers, Headers.X_FORWARDED_PROTO));
+        request.hostname = hostname(exchange.getHostName(), singleHeader(headers, Headers.X_FORWARDED_HOST));
+        int requestPort = requestPort(singleHeader(headers, Headers.HOST), request.scheme, exchange);
+        request.port = port(requestPort, singleHeader(headers, Headers.X_FORWARDED_PORT));
+
+        parseClientIP(request, exchange, actionLog, singleHeader(headers, Headers.X_FORWARDED_FOR));
         parseCookies(request, exchange);
 
         // parse method, validate url length after logging header/etc, to gather more info in case we see arbitrary attacking request from internet
@@ -82,7 +81,17 @@ public final class RequestParser {
         }
     }
 
-    String hostname(String hostname, String xForwardedHost) {
+    // proxy appends to existing header, attacker may send multiple headers with same name to override the value proxy appended (e.g. getFirst() picks forged one)
+    // only expect single header for these headers, reject everything else
+    @Nullable
+    String singleHeader(HeaderMap headers, HttpString name) {
+        HeaderValues values = headers.get(name);
+        if (values == null) return null;
+        if (values.size() > 1) throw new BadRequestException("duplicate header, name=" + name, "INVALID_HTTP_REQUEST");
+        return values.getFirst();
+    }
+
+    String hostname(String hostname, @Nullable String xForwardedHost) {
         if (Strings.isBlank(xForwardedHost)) return hostname;
         return xForwardedHost;
     }
@@ -105,7 +114,8 @@ public final class RequestParser {
     }
 
     private void parseClientIP(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog, @Nullable String xForwardedFor) {
-        String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
+        request.remoteIP = exchange.getSourceAddress().getAddress();
+        String remoteAddress = request.remoteIP.getHostAddress();
         request.clientIP = clientIPParser.parse(remoteAddress, xForwardedFor);
         actionLog.context.put("client_ip", List.of(request.clientIP));
         if (clientIPParser.hasMoreThanMaxForwardedIPs(xForwardedFor)) {

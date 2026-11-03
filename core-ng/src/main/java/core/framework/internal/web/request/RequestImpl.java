@@ -14,6 +14,7 @@ import core.framework.web.exception.BadRequestException;
 import io.undertow.server.HttpServerExchange;
 import org.jspecify.annotations.Nullable;
 
+import java.net.InetAddress;
 import java.util.Map;
 import java.util.Optional;
 
@@ -36,6 +37,7 @@ public final class RequestImpl implements Request {
 
     HTTPMethod method;
     String clientIP;
+    InetAddress remoteIP;
     String scheme;
     String hostname;
     int port;
@@ -75,6 +77,11 @@ public final class RequestImpl implements Request {
     @Override
     public String clientIP() {
         return clientIP;
+    }
+
+    @Override
+    public InetAddress remoteIP() {
+        return remoteIP;
     }
 
     @Override

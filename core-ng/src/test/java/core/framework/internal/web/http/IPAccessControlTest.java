@@ -38,6 +38,11 @@ class IPAccessControlTest {
     }
 
     @Test
+    void validateLocalIP() {
+        IPAccessControl.validateLocalIP(InetAddress.ofLiteral("127.0.0.1"));
+    }
+
+    @Test
     void validateWithNotAllowedIP() {
         accessControl.allow = new IPv4Ranges(List.of("100.100.100.100/32"));
         assertThatThrownBy(() -> accessControl.validate("100.100.100.1"))
@@ -47,12 +52,12 @@ class IPAccessControlTest {
     
     @Test
     void isLocal() throws UnknownHostException {
-        assertThat(accessControl.isLocal(InetAddress.getByName("127.0.0.1"))).isTrue();
-        assertThat(accessControl.isLocal(InetAddress.getByName("192.168.0.1"))).isTrue();
-        assertThat(accessControl.isLocal(InetAddress.getByName("10.0.0.1"))).isTrue();
-        assertThat(accessControl.isLocal(InetAddress.getByName("::1"))).isTrue();
+        assertThat(IPAccessControl.isLocal(InetAddress.getByName("127.0.0.1"))).isTrue();
+        assertThat(IPAccessControl.isLocal(InetAddress.getByName("192.168.0.1"))).isTrue();
+        assertThat(IPAccessControl.isLocal(InetAddress.getByName("10.0.0.1"))).isTrue();
+        assertThat(IPAccessControl.isLocal(InetAddress.getByName("::1"))).isTrue();
 
-        assertThat(accessControl.isLocal(InetAddress.getByName("24.0.0.1"))).isFalse();
+        assertThat(IPAccessControl.isLocal(InetAddress.getByName("24.0.0.1"))).isFalse();
     }
 
     @Test

@@ -8,6 +8,7 @@ import core.framework.web.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -44,7 +45,7 @@ class CacheControllerTest {
         caches.put("cache1", cache);
 
         var request = mock(Request.class);
-        when(request.clientIP()).thenReturn("127.0.0.1");
+        when(request.remoteIP()).thenReturn(InetAddress.ofLiteral("127.0.0.1"));
         when(request.pathParam("name")).thenReturn("cache1");
         when(request.pathParam("key")).thenReturn("key");
 
@@ -58,7 +59,7 @@ class CacheControllerTest {
         caches.put("cache1", cache);
 
         var request = mock(Request.class);
-        when(request.clientIP()).thenReturn("127.0.0.1");
+        when(request.remoteIP()).thenReturn(InetAddress.ofLiteral("127.0.0.1"));
         when(request.pathParam("name")).thenReturn("cache1");
         when(request.pathParam("key")).thenReturn("key");
 
