@@ -46,22 +46,23 @@ public final class RequestParser {
     public boolean logSiteHeaders;
 
     public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {
-        HeaderMap headers = exchange.getRequestHeaders();
-
         String method = exchange.getRequestMethod().toString();
         actionLog.context.put("method", List.of(method));
         String path = exchange.getRequestPath();
         request.path = path.isEmpty() ? "/" : path; // according to https://www.rfc-editor.org/rfc/rfc2616#section-5.1.2, empty path must be normalized as '/'
-        request.requestURL = requestURL(request, exchange);
-        putContext(actionLog, "request_url", request.requestURL);   // record request url even if attacker passes long string
-        logger.debug("[request] method={}, requestURL={}", method, request.requestURL);
+        logger.debug("[request] method={}, path={}", method, request.path);
 
+        HeaderMap headers = exchange.getRequestHeaders();
         logHeaders(headers);
 
         request.scheme = scheme(exchange.getRequestScheme(), singleHeader(headers, Headers.X_FORWARDED_PROTO));
         request.hostname = hostname(exchange.getHostName(), singleHeader(headers, Headers.X_FORWARDED_HOST));
         int requestPort = requestPort(singleHeader(headers, Headers.HOST), request.scheme, exchange);
         request.port = port(requestPort, singleHeader(headers, Headers.X_FORWARDED_PORT));
+
+        request.requestURL = requestURL(request, exchange); // use request.schema, request.host, request.port
+        putContext(actionLog, "request_url", request.requestURL);   // record request url even if attacker passes long string
+        logger.debug("[request] request_url={}", request.requestURL);
 
         parseClientIP(request, exchange, actionLog, singleHeader(headers, Headers.X_FORWARDED_FOR));
         parseCookies(request, exchange);
@@ -93,6 +94,9 @@ public final class RequestParser {
 
     String hostname(String hostname, @Nullable String xForwardedHost) {
         if (Strings.isBlank(xForwardedHost)) return hostname;
+        // x-forwarded-host may carry port of original Host header, port is determined by x-forwarded-port/host header
+        int colonIndex = xForwardedHost.lastIndexOf(':');
+        if (colonIndex > xForwardedHost.lastIndexOf(']')) return xForwardedHost.substring(0, colonIndex);
         return xForwardedHost;
     }
 

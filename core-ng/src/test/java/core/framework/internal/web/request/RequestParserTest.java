@@ -85,6 +85,9 @@ class RequestParserTest {
     void hostname() {
         assertThat(parser.hostname("proxy", "original")).isEqualTo("original");
         assertThat(parser.hostname("original", null)).isEqualTo("original");
+        assertThat(parser.hostname("proxy", "original:8443")).isEqualTo("original");
+        assertThat(parser.hostname("proxy", "[::1]:8443")).isEqualTo("[::1]");
+        assertThat(parser.hostname("proxy", "[::1]")).isEqualTo("[::1]");
     }
 
     @Test
@@ -225,6 +228,25 @@ class RequestParserTest {
         assertThat(request.method).isEqualTo(HTTPMethod.POST);
         assertThat(request.body()).hasValue(body);
         assertThat(actionLog.stats).containsKeys("request_body_length");
+    }
+
+    @Test
+    void parseWithForwardedHostContainingPort() throws Throwable {
+        var actionLog = new ActionLog(null, null);
+        HttpServerExchange exchange = exchange(Methods.GET);
+        exchange.setRequestScheme("http");
+        exchange.setRequestPath("/path");
+        exchange.setRequestURI("/path");
+        HeaderMap headers = exchange.getRequestHeaders();
+        headers.put(Headers.HOST, "localhost:8080");
+        headers.put(Headers.X_FORWARDED_PROTO, "https");
+        headers.put(Headers.X_FORWARDED_HOST, "example.com:8443");
+        headers.put(Headers.X_FORWARDED_PORT, "8443");
+
+        var request = new RequestImpl(exchange, null);
+        parser.parse(request, exchange, actionLog);
+
+        assertThat(request.requestURL()).isEqualTo("https://example.com:8443/path");
     }
 
     @Test

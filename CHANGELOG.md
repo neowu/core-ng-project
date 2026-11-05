@@ -1,6 +1,6 @@
 ## Change log
 
-### 9.6.5 (11/02/26 - 11/03/26)
+### 9.6.6 (11/02/26 - 11/05/26)
 
 * json: for internal json reader, reject invalid utf-8 escaping
   > refer to core/framework/internal/json/StrictStringDeserializer.java
