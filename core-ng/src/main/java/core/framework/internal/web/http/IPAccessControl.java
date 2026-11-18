@@ -1,5 +1,6 @@
 package core.framework.internal.web.http;
 
+import core.framework.web.Request;
 import core.framework.web.exception.ForbiddenException;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -11,8 +12,14 @@ import java.net.InetAddress;
  * @author neo
  */
 public class IPAccessControl {
-    public static void validateLocalIP(InetAddress remoteIP) {
-        if (!isLocal(remoteIP)) {
+    // only for human troubleshooting via kubectl port-forward or on same host,
+    // site local ip is not trusted, LB/ingress/proxy-only subnet or SNAT node ip could be private ip
+    // forwarded headers mean request went through proxy on same host/pod, e.g. sidecar or local nginx
+    public static void validateLoopbackIP(Request request) {
+        if (!request.remoteIP().isLoopbackAddress()
+            || request.header("X-Forwarded-For").isPresent()
+            || request.header("Forwarded").isPresent()
+            || request.header("X-Real-IP").isPresent()) {
             throw new ForbiddenException("access denied", "IP_ACCESS_DENIED");
         }
     }

@@ -1,5 +1,10 @@
 ## Change log
 
+### 9.6.7 (11/18/26 - )
+
+* controller: internal sys controllers (/_sys/) only allow loopback remoteIP without X-Forwarded-For/Forwarded/X-Real-IP headers !!!
+  > site local ip is not trusted, LB/ingress may connect from private ip, only access via kubectl port-forward or on same host
+
 ### 9.6.6 (11/02/26 - 11/05/26)
 
 * json: for internal json reader, reject invalid utf-8 escaping

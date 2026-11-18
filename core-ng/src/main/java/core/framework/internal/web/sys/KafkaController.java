@@ -34,7 +34,7 @@ public class KafkaController {
     public MessageListener listener;
 
     public Response publish(Request request) {
-        IPAccessControl.validateLocalIP(request.remoteIP());
+        IPAccessControl.validateLoopbackIP(request);
         String topic = request.pathParam("topic");
         String key = request.pathParam("key");
         ActionLog actionLog = initAction(topic, key);
@@ -49,7 +49,7 @@ public class KafkaController {
     }
 
     public Response handle(Request request) throws Exception {
-        IPAccessControl.validateLocalIP(request.remoteIP());
+        IPAccessControl.validateLoopbackIP(request);
         String topic = request.pathParam("topic");
         String key = request.pathParam("key");
         ActionLog actionLog = initAction(topic, key);

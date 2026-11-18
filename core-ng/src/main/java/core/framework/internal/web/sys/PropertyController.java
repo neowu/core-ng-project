@@ -23,7 +23,7 @@ public class PropertyController implements Controller {
 
     @Override
     public Response execute(Request request) {
-        IPAccessControl.validateLocalIP(request.remoteIP());
+        IPAccessControl.validateLoopbackIP(request);
         return Response.text(properties());
     }
 

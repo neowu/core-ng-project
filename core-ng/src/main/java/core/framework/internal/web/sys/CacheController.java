@@ -23,7 +23,7 @@ public class CacheController {
     }
 
     public Response get(Request request) {
-        IPAccessControl.validateLocalIP(request.remoteIP());
+        IPAccessControl.validateLoopbackIP(request);
         String name = request.pathParam("name");
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
@@ -32,7 +32,7 @@ public class CacheController {
     }
 
     public Response delete(Request request) {
-        IPAccessControl.validateLocalIP(request.remoteIP());
+        IPAccessControl.validateLoopbackIP(request);
         String name = request.pathParam("name");
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
@@ -41,7 +41,7 @@ public class CacheController {
     }
 
     public Response list(Request request) {
-        IPAccessControl.validateLocalIP(request.remoteIP());
+        IPAccessControl.validateLoopbackIP(request);
         var response = new ListCacheResponse();
         response.caches = caches.values().stream().map(this::view).collect(Collectors.toList());
         return Response.text(JSON.toJSON(response)).contentType(ContentType.APPLICATION_JSON);

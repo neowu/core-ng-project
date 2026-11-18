@@ -1,16 +1,21 @@
 package core.framework.internal.web.http;
 
+import core.framework.web.Request;
 import core.framework.web.exception.ForbiddenException;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Optional;
 
 import static core.framework.internal.web.http.IPRanges.address;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author neo
@@ -38,8 +43,32 @@ class IPAccessControlTest {
     }
 
     @Test
-    void validateLocalIP() {
-        IPAccessControl.validateLocalIP(InetAddress.ofLiteral("127.0.0.1"));
+    void validateLoopbackIP() {
+        IPAccessControl.validateLoopbackIP(request("127.0.0.1", null));
+        IPAccessControl.validateLoopbackIP(request("::1", null));
+    }
+
+    @Test
+    void validateLoopbackIPWithSiteLocalIP() {
+        assertThatThrownBy(() -> IPAccessControl.validateLoopbackIP(request("10.0.0.1", null)))
+            .isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    void validateLoopbackIPWithForwardedHeaders() {
+        assertThatThrownBy(() -> IPAccessControl.validateLoopbackIP(request("127.0.0.1", "X-Forwarded-For")))
+            .isInstanceOf(ForbiddenException.class);
+        assertThatThrownBy(() -> IPAccessControl.validateLoopbackIP(request("127.0.0.1", "Forwarded")))
+            .isInstanceOf(ForbiddenException.class);
+        assertThatThrownBy(() -> IPAccessControl.validateLoopbackIP(request("127.0.0.1", "X-Real-IP")))
+            .isInstanceOf(ForbiddenException.class);
+    }
+
+    private Request request(String remoteIP, @Nullable String header) {
+        Request request = mock(Request.class);
+        when(request.remoteIP()).thenReturn(InetAddress.ofLiteral(remoteIP));
+        if (header != null) when(request.header(header)).thenReturn(Optional.of("24.0.0.1"));
+        return request;
     }
 
     @Test

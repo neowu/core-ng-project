@@ -27,7 +27,7 @@ public class SchedulerController {
     }
 
     public Response jobs(Request request) {
-        IPAccessControl.validateLocalIP(request.remoteIP());
+        IPAccessControl.validateLoopbackIP(request);
 
         var response = new ListJobResponse();
         List<ListJobResponse.JobView> jobs = new ArrayList<>();
@@ -43,7 +43,7 @@ public class SchedulerController {
     }
 
     public Response triggerJob(Request request) {
-        IPAccessControl.validateLocalIP(request.remoteIP());
+        IPAccessControl.validateLoopbackIP(request);
 
         String job = request.pathParam("job");
         logger.warn(Markers.errorCode("MANUAL_OPERATION"), "trigger job manually, job={}", job);   // log trace message, due to potential impact
